@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, User, WalletCards } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 type MainNavigationPlacement = 'header' | 'mobileBottom';
 

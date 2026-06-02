@@ -33,7 +33,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-8 px-4 py-6">
         <Link to="/" className="flex shrink-0 items-center">
-          <LogoMain className="h-9 w-auto" aria-label="DNA" />
+          <LogoMain className="h-6 w-auto" aria-label="DNA" />
         </Link>
 
         <div className="hidden flex-1 items-center gap-3 md:flex">
