@@ -5,16 +5,30 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll() {
-    return this.prismaService.product.findMany({
+  async findAll() {
+    const products = await this.prismaService.product.findMany({
       include: {
-        category: true,
         images: {
           include: {
             image: true,
           },
         },
       },
+      orderBy: {
+        title: 'asc',
+      },
     });
+
+    return products.map((product) => ({
+      id: product.id,
+      categoryId: product.categoryId,
+      title: product.title,
+      slug: product.slug,
+      description: product.description,
+      price: product.price,
+      images: product.images
+        .map((productImage) => productImage.image)
+        .sort((firstImage, secondImage) => firstImage.sortOrder - secondImage.sortOrder),
+    }));
   }
 }
