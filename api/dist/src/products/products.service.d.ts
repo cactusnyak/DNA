@@ -5,10 +5,10 @@ export declare class ProductsService {
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         category: {
             id: string;
-            slug: string;
-            description: string | null;
             name: string;
+            slug: string;
             sortOrder: number;
+            description: string | null;
             parentId: string | null;
             imageId: string | null;
         };
@@ -25,10 +25,10 @@ export declare class ProductsService {
         })[];
     } & {
         id: string;
-        categoryId: string;
-        title: string;
         slug: string;
         description: string;
+        title: string;
         price: number;
+        categoryId: string;
     })[]>;
 }
