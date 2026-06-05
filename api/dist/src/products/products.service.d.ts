@@ -1,19 +1,28 @@
 import { PrismaService } from '../prisma/prisma.service';
+type FindAllProductsParams = {
+    categoryId?: string;
+};
 export declare class ProductsService {
     private readonly prismaService;
     constructor(prismaService: PrismaService);
-    findAll(): Promise<{
-        id: string;
-        categoryId: string;
-        title: string;
-        slug: string;
-        description: string;
-        price: number;
-        images: {
-            id: string;
-            url: string;
-            sortOrder: number;
-            alt: string | null;
-        }[];
+    findAll(params?: FindAllProductsParams): Promise<{
+        id: any;
+        categoryId: any;
+        title: any;
+        slug: any;
+        description: any;
+        price: any;
+        images: any;
     }[]>;
+    findById(productId: string): Promise<{
+        id: any;
+        categoryId: any;
+        title: any;
+        slug: any;
+        description: any;
+        price: any;
+        images: any;
+    }>;
+    private mapProduct;
 }
+export {};

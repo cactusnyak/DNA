@@ -17,8 +17,11 @@ let ProductsService = class ProductsService {
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
-    async findAll() {
+    async findAll(params = {}) {
         const products = await this.prismaService.product.findMany({
+            where: {
+                categoryId: params.categoryId,
+            },
             include: {
                 images: {
                     include: {
@@ -30,7 +33,28 @@ let ProductsService = class ProductsService {
                 title: 'asc',
             },
         });
-        return products.map((product) => ({
+        return products.map((product) => this.mapProduct(product));
+    }
+    async findById(productId) {
+        const product = await this.prismaService.product.findUnique({
+            where: {
+                id: productId,
+            },
+            include: {
+                images: {
+                    include: {
+                        image: true,
+                    },
+                },
+            },
+        });
+        if (!product) {
+            throw new common_1.NotFoundException('Product not found');
+        }
+        return this.mapProduct(product);
+    }
+    mapProduct(product) {
+        return {
             id: product.id,
             categoryId: product.categoryId,
             title: product.title,
@@ -40,7 +64,7 @@ let ProductsService = class ProductsService {
             images: product.images
                 .map((productImage) => productImage.image)
                 .sort((firstImage, secondImage) => firstImage.sortOrder - secondImage.sortOrder),
-        }));
+        };
     }
 };
 exports.ProductsService = ProductsService;
