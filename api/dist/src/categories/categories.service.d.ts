@@ -10,9 +10,9 @@ export declare class CategoriesService {
         description: string | undefined;
         parentId: string | undefined;
         image: {
+            url: string;
             id: string;
             sortOrder: number;
-            url: string;
             alt: string | null;
         } | undefined;
     }[]>;
