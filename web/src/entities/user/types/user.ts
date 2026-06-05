@@ -5,7 +5,7 @@ import type { UserRole } from './user-role';
 export type User = {
   id: string;
   email: string;
-  firstName: string
+  firstName: string;
   lastName: string;
   role: UserRole;
   createdAt: string;

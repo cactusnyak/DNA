@@ -7,22 +7,181 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  firstName  String
-  lastName   String
-  patronymic String?
-  role       UserRole @default(USER)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  phone      String?
-  avatarId   String?
-  referralCode String?
-}
-
 enum UserRole {
-  USER
+  DEFAULT
   REFERRAL_PARTNER
   ADMIN
+}
+
+enum Currency {
+  RUB
+}
+
+enum OrderStatus {
+  CREATED
+  AWAITING_PAYMENT
+  PAID
+  SHIPPED
+  DELIVERED
+  CASHBACK_ACCRUED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  role      UserRole @default(DEFAULT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patronymic   String?
+  phone        String?
+  referralCode String? @unique
+
+  avatarId String?
+  avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])
+
+  cartItems CartItem[]
+  orders    Order[]
+
+  invitedReferrals Referral[] @relation("Inviter")
+  receivedReferral Referral?  @relation("Invited")
+  balance          Balance?
+}
+
+model Balance {
+  id       String   @id @default(uuid())
+  userId   String   @unique
+  value    Int
+  currency Currency @default(RUB)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Image {
+  id        String  @id @default(uuid())
+  url       String
+  sortOrder Int
+  alt       String?
+
+  userAvatars User[]         @relation("UserAvatar")
+  categories  Category[]
+  products    ProductImage[]
+}
+
+model Category {
+  id        String @id @default(uuid())
+  name      String
+  slug      String @unique
+  sortOrder Int
+
+  description String?
+  parentId    String?
+  imageId     String?
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+
+  image    Image?    @relation(fields: [imageId], references: [id])
+  products Product[]
+}
+
+model Product {
+  id          String @id @default(uuid())
+  categoryId  String
+  title       String
+  slug        String @unique
+  description String
+  price       Int
+
+  category Category       @relation(fields: [categoryId], references: [id])
+  images   ProductImage[]
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+}
+
+model ProductImage {
+  productId String
+  imageId   String
+
+  product Product @relation(fields: [productId], references: [id])
+  image   Image   @relation(fields: [imageId], references: [id])
+
+  @@id([productId, imageId])
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  userId    String
+  productId String
+  quantity  Int
+  unitPrice Int
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  status      OrderStatus @default(CREATED)
+  totalAmount Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
+  referralRewards ReferralReward[]
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  unitPrice Int
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model ReferralLevel {
+  id    String @id @default(uuid())
+  grade Int
+  name  String
+
+  referrals Referral[]
+
+  @@unique([grade])
+}
+
+model Referral {
+  id            String   @id @default(uuid())
+  inviterUserId String
+  invitedUserId String   @unique
+  levelId       String
+  createdAt     DateTime @default(now())
+
+  inviter User @relation("Inviter", fields: [inviterUserId], references: [id])
+  invited User @relation("Invited", fields: [invitedUserId], references: [id])
+
+  level   ReferralLevel    @relation(fields: [levelId], references: [id])
+  rewards ReferralReward[]
+}
+
+model ReferralReward {
+  id         String   @id @default(uuid())
+  referralId String
+  orderId    String
+  amount     Int
+  createdAt  DateTime @default(now())
+
+  referral Referral @relation(fields: [referralId], references: [id])
+  order    Order    @relation(fields: [orderId], references: [id])
 }
