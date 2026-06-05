@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: dna-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dna
+      POSTGRES_USER: dna_user
+      POSTGRES_PASSWORD: dna_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - dna_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  dna_postgres_data:
