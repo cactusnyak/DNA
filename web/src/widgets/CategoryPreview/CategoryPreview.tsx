@@ -27,10 +27,7 @@ export function CategoryPreview({
     return (
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">{title}</h2>
-
-        <p className="text-sm text-muted-foreground">
-          Загрузка категорий...
-        </p>
+        <p className="text-sm text-muted-foreground">Загрузка категорий...</p>
       </section>
     );
   }
@@ -58,10 +55,18 @@ export function CategoryPreview({
           <Link
             key={category.id}
             to={`/catalog/${category.slug}`}
-            className="flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-4 text-center transition-colors hover:bg-muted"
+            className="flex flex-col items-center gap-1 rounded-lg border border-border bg-card p-4 text-center transition-colors hover:bg-muted"
           >
-            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-              <Grid2X2 className="size-5" />
+            <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg">
+              {category.image?.url ? (
+                <img
+                  src={category.image.url}
+                  alt={category.image.alt ?? category.name}
+                  className="size-7 object-contain"
+                />
+              ) : (
+                <Grid2X2 className="size-7 text-muted-foreground" />
+              )}
             </div>
 
             <span className="text-sm font-medium">{category.name}</span>

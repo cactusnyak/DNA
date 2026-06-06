@@ -8,6 +8,7 @@ type CatalogDropdownTreeProps = {
   categories: Category[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
+  onCategoryClick?: () => void;
 };
 
 function getChildrenCategories(categories: Category[], parentId?: string) {
@@ -56,6 +57,7 @@ type CategoryColumnProps = {
   activePathCategoryIds: string[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
+  onCategoryClick?: () => void;
   level?: number;
 };
 
@@ -65,6 +67,7 @@ function CategoryColumn({
   activePathCategoryIds,
   activeCategorySlug,
   onActiveCategoryChange,
+  onCategoryClick,
   level = 0,
 }: CategoryColumnProps) {
   const columnCategories = getChildrenCategories(categories, parentId);
@@ -99,6 +102,7 @@ function CategoryColumn({
               >
                 <Link
                   to={`/catalog/${category.slug}`}
+                  onClick={onCategoryClick}
                   onMouseEnter={() => onActiveCategoryChange(category.slug)}
                   className={cn(
                     'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
@@ -126,6 +130,7 @@ function CategoryColumn({
           activePathCategoryIds={activePathCategoryIds}
           activeCategorySlug={activeCategorySlug}
           onActiveCategoryChange={onActiveCategoryChange}
+          onCategoryClick={onCategoryClick}
           level={level + 1}
         />
       )}
@@ -137,6 +142,7 @@ export function CatalogDropdownTree({
   categories,
   activeCategorySlug,
   onActiveCategoryChange,
+  onCategoryClick,
 }: CatalogDropdownTreeProps) {
   const activePathCategoryIds = getActivePathCategoryIds(
     categories,
@@ -150,6 +156,7 @@ export function CatalogDropdownTree({
         activePathCategoryIds={activePathCategoryIds}
         activeCategorySlug={activeCategorySlug}
         onActiveCategoryChange={onActiveCategoryChange}
+        onCategoryClick={onCategoryClick}
       />
     </div>
   );

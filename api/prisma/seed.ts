@@ -15,7 +15,7 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-	const referralLevel = await prisma.referralLevel.upsert({
+	await prisma.referralLevel.upsert({
 		where: {
 			grade: 1,
 		},
@@ -26,16 +26,35 @@ async function main() {
 		},
 	});
 
+	const electronicsCategoryImage = await prisma.image.create({
+		data: {
+			url: 'https://api.iconify.design/lucide/headphones.svg?strokeWidth=1',
+			sortOrder: 1,
+			alt: 'Электроника',
+		},
+	});
+
+	const sportCategoryImage = await prisma.image.create({
+		data: {
+			url: 'https://api.iconify.design/lucide/dumbbell.svg?strokeWidth=1',
+			sortOrder: 1,
+			alt: 'Спорт',
+		},
+	});
+
 	const electronicsCategory = await prisma.category.upsert({
 		where: {
 			slug: 'electronics',
 		},
-		update: {},
+		update: {
+			imageId: electronicsCategoryImage.id,
+		},
 		create: {
 			name: 'Электроника',
 			slug: 'electronics',
 			sortOrder: 1,
 			description: 'Электроника и гаджеты',
+			imageId: electronicsCategoryImage.id,
 		},
 	});
 
@@ -43,16 +62,19 @@ async function main() {
 		where: {
 			slug: 'sport',
 		},
-		update: {},
+		update: {
+			imageId: sportCategoryImage.id,
+		},
 		create: {
 			name: 'Спорт',
 			slug: 'sport',
 			sortOrder: 2,
 			description: 'Спортивные товары',
+			imageId: sportCategoryImage.id,
 		},
 	});
 
-	const image1 = await prisma.image.create({
+	const headphonesImage = await prisma.image.create({
 		data: {
 			url: 'https://placehold.co/600x600/png',
 			sortOrder: 1,
@@ -60,7 +82,7 @@ async function main() {
 		},
 	});
 
-	const image2 = await prisma.image.create({
+	const fitnessBandImage = await prisma.image.create({
 		data: {
 			url: 'https://placehold.co/600x600/png',
 			sortOrder: 1,
@@ -68,8 +90,17 @@ async function main() {
 		},
 	});
 
-	const headphones = await prisma.product.create({
-		data: {
+	const headphones = await prisma.product.upsert({
+		where: {
+			slug: 'dna-wireless-headphones',
+		},
+		update: {
+			title: 'Беспроводные наушники DNA',
+			description: 'Тестовый товар для разработки',
+			price: 4990,
+			categoryId: electronicsCategory.id,
+		},
+		create: {
 			title: 'Беспроводные наушники DNA',
 			slug: 'dna-wireless-headphones',
 			description: 'Тестовый товар для разработки',
@@ -78,8 +109,17 @@ async function main() {
 		},
 	});
 
-	const fitnessBand = await prisma.product.create({
-		data: {
+	const fitnessBand = await prisma.product.upsert({
+		where: {
+			slug: 'dna-fitness-band',
+		},
+		update: {
+			title: 'Фитнес-браслет DNA',
+			description: 'Ещё один тестовый товар',
+			price: 2990,
+			categoryId: sportCategory.id,
+		},
+		create: {
 			title: 'Фитнес-браслет DNA',
 			slug: 'dna-fitness-band',
 			description: 'Ещё один тестовый товар',
@@ -88,17 +128,32 @@ async function main() {
 		},
 	});
 
-	await prisma.productImage.createMany({
-		data: [
-			{
+	await prisma.productImage.upsert({
+		where: {
+			productId_imageId: {
 				productId: headphones.id,
-				imageId: image1.id,
+				imageId: headphonesImage.id,
 			},
-			{
+		},
+		update: {},
+		create: {
+			productId: headphones.id,
+			imageId: headphonesImage.id,
+		},
+	});
+
+	await prisma.productImage.upsert({
+		where: {
+			productId_imageId: {
 				productId: fitnessBand.id,
-				imageId: image2.id,
+				imageId: fitnessBandImage.id,
 			},
-		],
+		},
+		update: {},
+		create: {
+			productId: fitnessBand.id,
+			imageId: fitnessBandImage.id,
+		},
 	});
 
 	await prisma.user.upsert({

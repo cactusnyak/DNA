@@ -6,7 +6,11 @@ import { getProducts } from '@/entities/product/api/get-products';
 
 import { CatalogDropdownTree } from './Components/CatalogDropdownTree';
 
-export function CatalogDropdown() {
+type CatalogDropdownProps = {
+  onClose?: () => void;
+};
+
+export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
   const [activeCategorySlug, setActiveCategorySlug] = useState<string>();
 
   const {
@@ -17,6 +21,10 @@ export function CatalogDropdown() {
     queryKey: ['categories'],
     queryFn: getCategories,
   });
+
+  const activeCategory = categories?.find(
+    (category) => category.slug === activeCategorySlug,
+  );
 
   const {
     data: products,
@@ -30,7 +38,7 @@ export function CatalogDropdown() {
   });
 
   return (
-    <div className="h-[70vh] overflow-hidden rounded-lg border border-border bg-background shadow-lg">
+    <div className="mt-2 h-[70vh] overflow-hidden rounded-lg border border-border bg-background shadow-lg">
       <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] overflow-hidden">
         <div className="max-w-[560px] overflow-auto border-r border-border p-4">
           {isCategoriesPending && (
@@ -50,13 +58,16 @@ export function CatalogDropdown() {
               categories={categories}
               activeCategorySlug={activeCategorySlug}
               onActiveCategoryChange={setActiveCategorySlug}
+              onCategoryClick={onClose}
             />
           )}
         </div>
 
         <aside className="min-w-0 overflow-auto p-4">
           <p className="mb-3 text-sm font-medium">
-            {activeCategorySlug ? 'Товары категории' : 'Все товары'}
+            {activeCategory
+              ? `Товары категории «${activeCategory.name}»`
+              : 'Все товары'}
           </p>
 
           {isProductsPending && (
@@ -80,6 +91,7 @@ export function CatalogDropdown() {
                   <a
                     key={product.id}
                     href={`/product/${product.id}`}
+                    onClick={onClose}
                     className="group overflow-hidden rounded-lg border border-border bg-card"
                   >
                     <div className="aspect-square bg-muted">

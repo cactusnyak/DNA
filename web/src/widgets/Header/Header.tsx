@@ -73,7 +73,7 @@ export function Header() {
           onMouseEnter={openCatalogDropdown}
         >
           <div className="mx-auto max-w-7xl">
-            <CatalogDropdown />
+            <CatalogDropdown onClose={closeCatalogDropdown} />
           </div>
         </div>
       )}
