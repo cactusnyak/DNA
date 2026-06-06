@@ -2,7 +2,7 @@ import { ProductsService } from './products.service';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    findAll(categoryId?: string): Promise<{
+    findAll(categorySlug?: string): Promise<{
         id: any;
         categoryId: any;
         category: {

@@ -4,7 +4,7 @@ import type { Category } from '@/entities/category';
 
 type CatalogBreadcrumbsProps = {
   breadcrumbs: Category[];
-  onCategoryChange: (categoryId?: string) => void;
+  onCategoryChange: (categorySlug?: string) => void;
 };
 
 export function CatalogBreadcrumbs({
@@ -27,7 +27,7 @@ export function CatalogBreadcrumbs({
 
           <button
             type="button"
-            onClick={() => onCategoryChange(category.id)}
+            onClick={() => onCategoryChange(category.slug)}
             className="cursor-pointer hover:text-foreground"
           >
             {category.name}

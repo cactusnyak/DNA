@@ -1,6 +1,6 @@
 import { PrismaService } from '../prisma/prisma.service';
 type FindAllProductsParams = {
-    categoryId?: string;
+    categorySlug?: string;
 };
 export declare class ProductsService {
     private readonly prismaService;

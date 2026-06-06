@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
 
 type FindAllProductsParams = {
-  categoryId?: string;
+  categorySlug?: string;
 };
 
 @Injectable()
@@ -12,7 +13,11 @@ export class ProductsService {
   async findAll(params: FindAllProductsParams = {}) {
     const products = await this.prismaService.product.findMany({
       where: {
-        categoryId: params.categoryId,
+        category: params.categorySlug
+          ? {
+              slug: params.categorySlug,
+            }
+          : undefined,
       },
       include: {
         category: {

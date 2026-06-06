@@ -20,9 +20,9 @@ let ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
     }
-    findAll(categoryId) {
+    findAll(categorySlug) {
         return this.productsService.findAll({
-            categoryId,
+            categorySlug,
         });
     }
     findById(productId) {
@@ -32,7 +32,7 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('categoryId')),
+    __param(0, (0, common_1.Query)('category')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)

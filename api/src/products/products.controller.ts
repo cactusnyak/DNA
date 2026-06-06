@@ -6,9 +6,9 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  findAll(@Query('categoryId') categoryId?: string) {
+  findAll(@Query('category') categorySlug?: string) {
     return this.productsService.findAll({
-      categoryId,
+      categorySlug,
     });
   }
 

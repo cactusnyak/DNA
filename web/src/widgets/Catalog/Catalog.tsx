@@ -1,12 +1,11 @@
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getCategories } from '@/entities/category/api/get-categories';
+
 import { getProducts } from '@/entities/product/api/get-products';
-import { CatalogBreadcrumbs } from './Components/CatalogBreadcrumbs';
+
 import { CatalogControls } from './Components/CatalogControls';
 import { CatalogHeader } from './Components/CatalogHeader';
 import { ProductGrid } from './Components/ProductGrid';
-import { getCategoryBreadcrumbs } from './logic/get-category-breadcrumbs';
 
 type CatalogProps = {
   title?: string;
@@ -15,7 +14,6 @@ type CatalogProps = {
   showControls?: boolean;
   showFilters?: boolean;
   showSorting?: boolean;
-  showBreadcrumbs?: boolean;
 };
 
 export function Catalog({
@@ -25,48 +23,20 @@ export function Catalog({
   showControls = true,
   showFilters = true,
   showSorting = true,
-  showBreadcrumbs = true,
 }: CatalogProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedCategoryId = searchParams.get('categoryId') ?? undefined;
-
-  function handleCategoryChange(categoryId?: string) {
-    setSearchParams((currentSearchParams) => {
-      const nextSearchParams = new URLSearchParams(currentSearchParams);
-
-      if (categoryId) {
-        nextSearchParams.set('categoryId', categoryId);
-      } else {
-        nextSearchParams.delete('categoryId');
-      }
-
-      return nextSearchParams;
-    });
-  }
-
-  const {
-    data: categories,
-  } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
-  });
+  const { categorySlug } = useParams();
 
   const {
     data: products,
     isPending,
     error,
   } = useQuery({
-    queryKey: ['products', selectedCategoryId],
+    queryKey: ['products', categorySlug],
     queryFn: () =>
       getProducts({
-        categoryId: selectedCategoryId,
+        categorySlug,
       }),
   });
-
-  const breadcrumbs = getCategoryBreadcrumbs(
-    categories ?? [],
-    selectedCategoryId,
-  );
 
   if (isPending) {
     return (
@@ -93,24 +63,15 @@ export function Catalog({
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       {showHeader && (
         <CatalogHeader title={title} showCatalogLink={showCatalogLink} />
       )}
 
       {showControls && (
         <CatalogControls
-          selectedCategoryId={selectedCategoryId}
-          onCategoryChange={handleCategoryChange}
           showFilters={showFilters}
           showSorting={showSorting}
-        />
-      )}
-
-      {showBreadcrumbs && (
-        <CatalogBreadcrumbs
-          breadcrumbs={breadcrumbs}
-          onCategoryChange={handleCategoryChange}
         />
       )}
 

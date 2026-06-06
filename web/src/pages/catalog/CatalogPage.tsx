@@ -3,7 +3,7 @@ import { Catalog } from '@/widgets/Catalog';
 export function CatalogPage() {
   return (
     <Catalog
-      title="Каталог"
+      title="Популярные товары"
       showHeader
       showControls
       showFilters

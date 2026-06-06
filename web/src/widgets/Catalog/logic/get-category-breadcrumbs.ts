@@ -2,9 +2,9 @@ import type { Category } from '@/entities/category';
 
 export function getCategoryBreadcrumbs(
   categories: Category[],
-  selectedCategoryId?: string,
+  selectedCategorySlug?: string,
 ) {
-  if (!selectedCategoryId) {
+  if (!selectedCategorySlug) {
     return [];
   }
 
@@ -12,8 +12,16 @@ export function getCategoryBreadcrumbs(
     categories.map((category) => [category.id, category]),
   );
 
+  const selectedCategory = categories.find(
+    (category) => category.slug === selectedCategorySlug,
+  );
+
+  if (!selectedCategory) {
+    return [];
+  }
+
   const breadcrumbs: Category[] = [];
-  let currentCategory = categoriesById.get(selectedCategoryId);
+  let currentCategory: Category | undefined = selectedCategory;
 
   while (currentCategory) {
     breadcrumbs.unshift(currentCategory);

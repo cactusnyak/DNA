@@ -20,7 +20,11 @@ let ProductsService = class ProductsService {
     async findAll(params = {}) {
         const products = await this.prismaService.product.findMany({
             where: {
-                categoryId: params.categoryId,
+                category: params.categorySlug
+                    ? {
+                        slug: params.categorySlug,
+                    }
+                    : undefined,
             },
             include: {
                 category: {
