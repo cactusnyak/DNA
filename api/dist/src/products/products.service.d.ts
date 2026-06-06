@@ -8,6 +8,15 @@ export declare class ProductsService {
     findAll(params?: FindAllProductsParams): Promise<{
         id: any;
         categoryId: any;
+        category: {
+            id: any;
+            name: any;
+            slug: any;
+            sortOrder: any;
+            description: any;
+            parentId: any;
+            image: any;
+        };
         title: any;
         slug: any;
         description: any;
@@ -17,6 +26,15 @@ export declare class ProductsService {
     findById(productId: string): Promise<{
         id: any;
         categoryId: any;
+        category: {
+            id: any;
+            name: any;
+            slug: any;
+            sortOrder: any;
+            description: any;
+            parentId: any;
+            image: any;
+        };
         title: any;
         slug: any;
         description: any;

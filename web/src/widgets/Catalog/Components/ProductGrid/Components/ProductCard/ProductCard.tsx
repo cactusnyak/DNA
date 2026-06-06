@@ -1,33 +1,29 @@
 import type { Product } from '@/entities/product';
 
+import { AddToCartButton } from './Components/AddToCartButton';
+import { ProductCardContent } from './Components/ProductCardContent';
+import { ProductGallery } from './Components/ProductGallery';
+
 type ProductCardProps = {
   product: Product;
+  showAddToCartButton?: boolean;
 };
 
-export function ProductCard({ product }: ProductCardProps) {
-  const mainImage = product.images[0];
-
+export function ProductCard({
+  product,
+  showAddToCartButton = true,
+}: ProductCardProps) {
   return (
-    <article className="overflow-hidden rounded-lg border border-border bg-card">
-      {mainImage && (
-        <img
-          src={mainImage.url}
-          alt={mainImage.alt ?? product.title}
-          className="aspect-square w-full object-cover"
-        />
+    <article className="overflow-hidden bg-card">
+      <ProductGallery images={product.images} title={product.title} />
+
+      <ProductCardContent product={product} />
+
+      {showAddToCartButton && (
+        <div className="p-4 pt-0">
+          <AddToCartButton productId={product.id} />
+        </div>
       )}
-
-      <div className="space-y-2 p-4">
-        <h3 className="line-clamp-2 font-medium">{product.title}</h3>
-
-        <p className="line-clamp-3 text-sm text-muted-foreground">
-          {product.description}
-        </p>
-
-        <p className="text-lg font-semibold">
-          {product.price.toLocaleString('ru-RU')} ₽
-        </p>
-      </div>
     </article>
   );
 }

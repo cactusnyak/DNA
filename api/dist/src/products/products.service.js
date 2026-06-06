@@ -23,6 +23,11 @@ let ProductsService = class ProductsService {
                 categoryId: params.categoryId,
             },
             include: {
+                category: {
+                    include: {
+                        image: true,
+                    },
+                },
                 images: {
                     include: {
                         image: true,
@@ -41,6 +46,11 @@ let ProductsService = class ProductsService {
                 id: productId,
             },
             include: {
+                category: {
+                    include: {
+                        image: true,
+                    },
+                },
                 images: {
                     include: {
                         image: true,
@@ -57,6 +67,15 @@ let ProductsService = class ProductsService {
         return {
             id: product.id,
             categoryId: product.categoryId,
+            category: {
+                id: product.category.id,
+                name: product.category.name,
+                slug: product.category.slug,
+                sortOrder: product.category.sortOrder,
+                description: product.category.description ?? undefined,
+                parentId: product.category.parentId ?? undefined,
+                image: product.category.image ?? undefined,
+            },
             title: product.title,
             slug: product.slug,
             description: product.description,

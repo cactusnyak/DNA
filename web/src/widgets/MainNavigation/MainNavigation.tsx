@@ -40,11 +40,13 @@ export function MainNavigation({ placement }: MainNavigationProps) {
                 key={item.to}
                 variant="ghost"
                 asChild
-                className="h-12 flex-col gap-1"
+                className="h-12"
               >
-                <Link to={item.to}>
-                  <Icon className="size-4" />
-                  <span className="text-xs">{item.label}</span>
+                <Link
+                  to={item.to}
+                  className="flex items-center justify-center"
+                >
+                  <Icon className="size-7" />
                 </Link>
               </Button>
             );

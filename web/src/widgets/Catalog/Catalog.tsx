@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { getProducts } from '@/entities/product/api/get-products';
@@ -23,13 +24,18 @@ export function Catalog({
   showFilters = true,
   showSorting = true,
 }: CatalogProps) {
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
+
   const {
     data: products,
     isPending,
     error,
   } = useQuery({
-    queryKey: ['products'],
-    queryFn: () => getProducts(),
+    queryKey: ['products', selectedCategoryId],
+    queryFn: () =>
+      getProducts({
+        categoryId: selectedCategoryId,
+      }),
   });
 
   if (isPending) {
@@ -64,6 +70,8 @@ export function Catalog({
 
       {showControls && (
         <CatalogControls
+          selectedCategoryId={selectedCategoryId}
+          onCategoryChange={setSelectedCategoryId}
           showFilters={showFilters}
           showSorting={showSorting}
         />

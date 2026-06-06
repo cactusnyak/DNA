@@ -5,6 +5,15 @@ export declare class ProductsController {
     findAll(categoryId?: string): Promise<{
         id: any;
         categoryId: any;
+        category: {
+            id: any;
+            name: any;
+            slug: any;
+            sortOrder: any;
+            description: any;
+            parentId: any;
+            image: any;
+        };
         title: any;
         slug: any;
         description: any;
@@ -14,6 +23,15 @@ export declare class ProductsController {
     findById(productId: string): Promise<{
         id: any;
         categoryId: any;
+        category: {
+            id: any;
+            name: any;
+            slug: any;
+            sortOrder: any;
+            description: any;
+            parentId: any;
+            image: any;
+        };
         title: any;
         slug: any;
         description: any;
