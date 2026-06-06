@@ -1,7 +1,14 @@
+import { Catalog } from '@/widgets/Catalog';
+
 export function HomePage() {
   return (
-    <section>
-      <h1 className="text-2xl font-semibold">Главная</h1>
-    </section>
+    <div className="space-y-10">
+      <Catalog
+        title="Популярные товары"
+        showHeader
+        showCatalogLink
+        showControls={false}
+      />
+    </div>
   );
 }
