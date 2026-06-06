@@ -1,37 +1,57 @@
 import type { Category } from '@/entities/category';
 
+export type CategoryBreadcrumb = {
+  label: string;
+  href: string;
+};
+
 export function getCategoryBreadcrumbs(
   categories: Category[],
-  selectedCategorySlug?: string,
-) {
-  if (!selectedCategorySlug) {
-    return [];
+  currentCategorySlug?: string,
+): CategoryBreadcrumb[] {
+  const breadcrumbs: CategoryBreadcrumb[] = [
+    {
+      label: 'Каталог',
+      href: '/catalog',
+    },
+  ];
+
+  if (!currentCategorySlug) {
+    return breadcrumbs;
   }
 
-  const categoriesById = new Map(
-    categories.map((category) => [category.id, category]),
-  );
+  const categoryBySlug = new Map<string, Category>();
+  const categoryById = new Map<string, Category>();
 
-  const selectedCategory = categories.find(
-    (category) => category.slug === selectedCategorySlug,
-  );
+  categories.forEach((category) => {
+    categoryBySlug.set(category.slug, category);
+    categoryById.set(category.id, category);
+  });
 
-  if (!selectedCategory) {
-    return [];
+  const currentCategory = categoryBySlug.get(currentCategorySlug);
+
+  if (!currentCategory) {
+    return breadcrumbs;
   }
 
-  const breadcrumbs: Category[] = [];
-  let currentCategory: Category | undefined = selectedCategory;
+  const categoryPath: Category[] = [];
+  let category: Category | undefined = currentCategory;
 
-  while (currentCategory) {
-    breadcrumbs.unshift(currentCategory);
+  while (category) {
+    categoryPath.unshift(category);
 
-    if (!currentCategory.parentId) {
+    if (!category.parentId) {
       break;
     }
 
-    currentCategory = categoriesById.get(currentCategory.parentId);
+    category = categoryById.get(category.parentId);
   }
 
-  return breadcrumbs;
+  return [
+    ...breadcrumbs,
+    ...categoryPath.map((category) => ({
+      label: category.name,
+      href: `/catalog/${category.slug}`,
+    })),
+  ];
 }

@@ -1,39 +1,35 @@
-import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-import type { Category } from '@/entities/category';
+import type { CategoryBreadcrumb } from '../../logic/get-category-breadcrumbs';
 
 type CatalogBreadcrumbsProps = {
-  breadcrumbs: Category[];
-  onCategoryChange: (categorySlug?: string) => void;
+  breadcrumbs: CategoryBreadcrumb[];
 };
 
-export function CatalogBreadcrumbs({
-  breadcrumbs,
-  onCategoryChange,
-}: CatalogBreadcrumbsProps) {
+export function CatalogBreadcrumbs({ breadcrumbs }: CatalogBreadcrumbsProps) {
   return (
-    <nav className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-      <button
-        type="button"
-        onClick={() => onCategoryChange(undefined)}
-        className="cursor-pointer hover:text-foreground"
-      >
-        Каталог
-      </button>
+    <nav aria-label="Хлебные крошки" className="text-sm text-muted-foreground">
+      <ol className="flex flex-wrap items-center gap-2">
+        {breadcrumbs.map((breadcrumb, index) => {
+          const isLast = index === breadcrumbs.length - 1;
 
-      {breadcrumbs.map((category) => (
-        <div key={category.id} className="flex items-center gap-1">
-          <ChevronRight className="size-4" />
+          return (
+            <li key={breadcrumb.href} className="flex items-center gap-2">
+              {index > 0 && <span>/</span>}
 
-          <button
-            type="button"
-            onClick={() => onCategoryChange(category.slug)}
-            className="cursor-pointer hover:text-foreground"
-          >
-            {category.name}
-          </button>
-        </div>
-      ))}
+              {isLast ? (
+                <span className="font-medium text-foreground">
+                  {breadcrumb.label}
+                </span>
+              ) : (
+                <Link to={breadcrumb.href} className="hover:text-foreground">
+                  {breadcrumb.label}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
     </nav>
   );
 }

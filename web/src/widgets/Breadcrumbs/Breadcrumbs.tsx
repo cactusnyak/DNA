@@ -2,6 +2,7 @@ import { Link, useMatches } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
+import type { Category } from '@/entities/category';
 import { getCategories } from '@/entities/category/api/get-categories';
 
 type BreadcrumbHandle = {
@@ -17,6 +18,56 @@ type BreadcrumbMatch = {
   handle?: BreadcrumbHandle;
 };
 
+type BreadcrumbItem = {
+  id: string;
+  href: string;
+  label: string;
+};
+
+function getCategoryPath(
+  categories: Category[],
+  currentCategorySlug: string,
+): BreadcrumbItem[] {
+  const categoryBySlug = new Map<string, Category>();
+  const categoryById = new Map<string, Category>();
+
+  categories.forEach((category) => {
+    categoryBySlug.set(category.slug, category);
+    categoryById.set(category.id, category);
+  });
+
+  const currentCategory = categoryBySlug.get(currentCategorySlug);
+
+  if (!currentCategory) {
+    return [
+      {
+        id: `category-${currentCategorySlug}`,
+        href: `/catalog/${currentCategorySlug}`,
+        label: currentCategorySlug,
+      },
+    ];
+  }
+
+  const categoryPath: Category[] = [];
+  let category: Category | undefined = currentCategory;
+
+  while (category) {
+    categoryPath.unshift(category);
+
+    if (!category.parentId) {
+      break;
+    }
+
+    category = categoryById.get(category.parentId);
+  }
+
+  return categoryPath.map((category) => ({
+    id: `category-${category.id}`,
+    href: `/catalog/${category.slug}`,
+    label: category.name,
+  }));
+}
+
 export function Breadcrumbs() {
   const matches = useMatches() as BreadcrumbMatch[];
 
@@ -30,22 +81,32 @@ export function Breadcrumbs() {
     enabled: Boolean(categorySlug),
   });
 
-  const currentCategory = categories?.find(
-    (category) => category.slug === categorySlug,
-  );
-
   const breadcrumbItems = matches
     .filter((match) => match.handle?.breadcrumb)
-    .map((match) => {
-      const isCategoryRoute = Boolean(match.params.categorySlug);
+    .flatMap<BreadcrumbItem>((match) => {
+      const breadcrumb = match.handle?.breadcrumb;
 
-      return {
-        id: match.id,
-        href: match.pathname,
-        label: isCategoryRoute
-          ? currentCategory?.name ?? match.params.categorySlug
-          : match.handle?.breadcrumb,
-      };
+      if (breadcrumb === 'Каталог') {
+        return [
+          {
+            id: 'catalog',
+            href: '/catalog',
+            label: 'Каталог',
+          },
+        ];
+      }
+
+      if (breadcrumb === 'Категория' && categorySlug) {
+        return getCategoryPath(categories ?? [], categorySlug);
+      }
+
+      return [
+        {
+          id: match.id,
+          href: match.pathname,
+          label: breadcrumb ?? '',
+        },
+      ];
     });
 
   if (breadcrumbItems.length <= 1) {
@@ -58,7 +119,7 @@ export function Breadcrumbs() {
         const isLastItem = index === breadcrumbItems.length - 1;
 
         return (
-          <div key={item.id} className="flex items-center gap-1">
+          <div key={`${item.id}-${item.href}`} className="flex items-center gap-1">
             {index > 0 && <ChevronRight className="size-4" />}
 
             {isLastItem ? (

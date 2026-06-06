@@ -11,7 +11,7 @@ export function ProductCardContent({ product }: ProductCardContentProps) {
     <div className="space-y-3 p-4">
       <div className="space-y-1">
         <Link
-          to={`/catalog?categoryId=${product.category.id}`}
+          to={`/catalog/${product.category.slug}`}
           className="text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           В категорию «{product.category.name}»
@@ -24,9 +24,7 @@ export function ProductCardContent({ product }: ProductCardContentProps) {
         {product.description}
       </p>
 
-      <p className="text-lg font-semibold">
-        {product.price.toLocaleString('ru-RU')} ₽
-      </p>
+      <p className="text-lg font-semibold">{product.price} ₽</p>
     </div>
   );
 }

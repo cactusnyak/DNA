@@ -70,6 +70,7 @@ export const router = createBrowserRouter([
           breadcrumb: 'Корзина',
         },
       },
+
       {
         path: '/checkout',
         element: <CheckoutPage />,
@@ -85,6 +86,7 @@ export const router = createBrowserRouter([
           breadcrumb: 'Профиль',
         },
       },
+
       {
         path: '/authorization',
         element: <AuthorizationPage />,
