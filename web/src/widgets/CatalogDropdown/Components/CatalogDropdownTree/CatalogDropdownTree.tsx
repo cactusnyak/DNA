@@ -7,7 +7,7 @@ import { cn } from '@/shared/utils/cn';
 type CatalogDropdownTreeProps = {
   categories: Category[];
   activeCategorySlug?: string;
-  onActiveCategoryChange: (categorySlug: string) => void;
+  onActiveCategoryChange: (categorySlug?: string) => void;
 };
 
 function getChildrenCategories(categories: Category[], parentId?: string) {
@@ -55,7 +55,7 @@ type CategoryColumnProps = {
   parentId?: string;
   activePathCategoryIds: string[];
   activeCategorySlug?: string;
-  onActiveCategoryChange: (categorySlug: string) => void;
+  onActiveCategoryChange: (categorySlug?: string) => void;
   level?: number;
 };
 
@@ -81,8 +81,8 @@ function CategoryColumn({
 
   return (
     <>
-      <div className="w-56 shrink-0 border-r border-border pr-2">
-        <ul className="space-y-1">
+      <div className="w-56 shrink-0 pr-2">
+        <ul className="p-1">
           {columnCategories.map((category) => {
             const hasChildren = getChildrenCategories(
               categories,
@@ -93,7 +93,10 @@ function CategoryColumn({
             const isInPath = activePathCategoryIds.includes(category.id);
 
             return (
-              <li key={category.id}>
+              <li
+                key={category.id}
+                onMouseLeave={() => onActiveCategoryChange(undefined)}
+              >
                 <Link
                   to={`/catalog/${category.slug}`}
                   onMouseEnter={() => onActiveCategoryChange(category.slug)}
@@ -135,21 +138,17 @@ export function CatalogDropdownTree({
   activeCategorySlug,
   onActiveCategoryChange,
 }: CatalogDropdownTreeProps) {
-  const rootCategories = getChildrenCategories(categories);
-  const defaultCategorySlug = rootCategories[0]?.slug;
-  const resolvedActiveCategorySlug = activeCategorySlug ?? defaultCategorySlug;
-
   const activePathCategoryIds = getActivePathCategoryIds(
     categories,
-    resolvedActiveCategorySlug,
+    activeCategorySlug,
   );
 
   return (
-    <div className="flex min-h-80 gap-2 overflow-x-auto">
+    <div className="flex h-full min-h-0 gap-2 overflow-auto">
       <CategoryColumn
         categories={categories}
         activePathCategoryIds={activePathCategoryIds}
-        activeCategorySlug={resolvedActiveCategorySlug}
+        activeCategorySlug={activeCategorySlug}
         onActiveCategoryChange={onActiveCategoryChange}
       />
     </div>

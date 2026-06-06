@@ -27,21 +27,20 @@ export function CatalogDropdown() {
       getProducts({
         categorySlug: activeCategorySlug,
       }),
-    enabled: Boolean(activeCategorySlug),
   });
 
   return (
-    <div className="max-h-[70vh] overflow-hidden rounded-lg border border-border bg-background shadow-lg">
-      <div className="mx-auto grid max-h-[70vh] max-w-7xl grid-cols-[minmax(0,1fr)_320px] overflow-hidden px-4 py-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="overflow-x-auto overflow-y-hidden">
+    <div className="h-[70vh] overflow-hidden rounded-lg border border-border bg-background shadow-lg">
+      <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] overflow-hidden">
+        <div className="max-w-[560px] overflow-auto border-r border-border p-4">
           {isCategoriesPending && (
-            <p className="p-4 text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Загрузка категорий...
             </p>
           )}
 
           {categoriesError && (
-            <p className="p-4 text-sm text-destructive">
+            <p className="text-sm text-destructive">
               Не удалось загрузить категории
             </p>
           )}
@@ -55,30 +54,26 @@ export function CatalogDropdown() {
           )}
         </div>
 
-        <aside className="border-l border-border pl-4">
-          <p className="mb-3 text-sm font-medium">Товары категории</p>
+        <aside className="min-w-0 overflow-auto p-4">
+          <p className="mb-3 text-sm font-medium">
+            {activeCategorySlug ? 'Товары категории' : 'Все товары'}
+          </p>
 
-          {!activeCategorySlug && (
-            <p className="text-sm text-muted-foreground">
-              Наведите на категорию, чтобы увидеть товары.
-            </p>
-          )}
-
-          {activeCategorySlug && isProductsPending && (
+          {isProductsPending && (
             <p className="text-sm text-muted-foreground">
               Загрузка товаров...
             </p>
           )}
 
-          {activeCategorySlug && !isProductsPending && !products?.length && (
+          {!isProductsPending && !products?.length && (
             <p className="text-sm text-muted-foreground">
-              В категории пока нет товаров.
+              Товары не найдены.
             </p>
           )}
 
           {!!products?.length && (
-            <div className="grid grid-cols-2 gap-3">
-              {products.slice(0, 6).map((product) => {
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+              {products.slice(0, 8).map((product) => {
                 const image = product.images[0];
 
                 return (
