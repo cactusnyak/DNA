@@ -83,7 +83,7 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
           )}
 
           {!!products?.length && (
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-3 gap-2 lg:grid-cols-4 xl:grid-cols-6">
               {products.slice(0, 8).map((product) => {
                 const image = product.images[0];
 
@@ -92,25 +92,21 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
                     key={product.id}
                     href={`/product/${product.id}`}
                     onClick={onClose}
-                    className="group overflow-hidden rounded-lg border border-border bg-card"
+                    className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/30"
                   >
-                    <div className="aspect-square bg-muted">
+                    <div className="aspect-square overflow-hidden bg-muted">
                       {image && (
                         <img
                           src={image.url}
                           alt={image.alt ?? product.title}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       )}
                     </div>
 
-                    <div className="space-y-1 p-2">
-                      <p className="line-clamp-2 text-xs font-medium">
+                    <div className="p-1.5">
+                      <p className="line-clamp-2 text-[11px] font-medium leading-snug">
                         {product.title}
-                      </p>
-
-                      <p className="text-xs text-muted-foreground group-hover:text-foreground">
-                        К товару
                       </p>
                     </div>
                   </a>

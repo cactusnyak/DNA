@@ -4,18 +4,28 @@ import type { Product } from '@/entities/product';
 
 type ProductCardContentProps = {
   product: Product;
+  currentCategorySlug?: string;
 };
 
-export function ProductCardContent({ product }: ProductCardContentProps) {
+export function ProductCardContent({
+  product,
+  currentCategorySlug,
+}: ProductCardContentProps) {
+  const shouldShowCategoryLink =
+    currentCategorySlug &&
+    currentCategorySlug !== product.category.slug;
+
   return (
     <div className="space-y-3 p-4">
       <div className="space-y-1">
-        <Link
-          to={`/catalog/${product.category.slug}`}
-          className="text-xs font-medium text-muted-foreground hover:text-foreground"
-        >
-          В категорию «{product.category.name}»
-        </Link>
+        {shouldShowCategoryLink && (
+          <Link
+            to={`/catalog/${product.category.slug}`}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground"
+          >
+            В категорию «{product.category.name}»
+          </Link>
+        )}
 
         <h3 className="line-clamp-2 font-medium">{product.title}</h3>
       </div>

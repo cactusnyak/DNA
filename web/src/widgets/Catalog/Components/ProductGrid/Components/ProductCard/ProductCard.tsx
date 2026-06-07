@@ -6,18 +6,23 @@ import { ProductGallery } from './Components/ProductGallery';
 
 type ProductCardProps = {
   product: Product;
+  currentCategorySlug?: string;
   showAddToCartButton?: boolean;
 };
 
 export function ProductCard({
   product,
+  currentCategorySlug,
   showAddToCartButton = true,
 }: ProductCardProps) {
   return (
     <article className="overflow-hidden bg-card">
       <ProductGallery images={product.images} title={product.title} />
 
-      <ProductCardContent product={product} />
+      <ProductCardContent
+        product={product}
+        currentCategorySlug={currentCategorySlug}
+      />
 
       {showAddToCartButton && (
         <div className="p-4 pt-0">
