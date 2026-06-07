@@ -24,6 +24,16 @@ type BreadcrumbItem = {
   label: string;
 };
 
+type BreadcrumbsProps = {
+  root?: BreadcrumbItem;
+};
+
+const defaultRoot: BreadcrumbItem = {
+  id: 'home',
+  href: '/',
+  label: 'Главная',
+};
+
 function getCategoryPath(
   categories: Category[],
   currentCategorySlug: string,
@@ -68,8 +78,25 @@ function getCategoryPath(
   }));
 }
 
-export function Breadcrumbs() {
+function removeDuplicateBreadcrumbs(items: BreadcrumbItem[]) {
+  const usedHrefs = new Set<string>();
+
+  return items.filter((item) => {
+    if (usedHrefs.has(item.href)) {
+      return false;
+    }
+
+    usedHrefs.add(item.href);
+    return true;
+  });
+}
+
+export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
   const matches = useMatches() as BreadcrumbMatch[];
+
+  const isHomePage = matches.some(
+    (match) => match.pathname === root.href && match.handle?.breadcrumb,
+  );
 
   const categorySlug = matches.find(
     (match) => match.params.categorySlug,
@@ -81,10 +108,14 @@ export function Breadcrumbs() {
     enabled: Boolean(categorySlug),
   });
 
-  const breadcrumbItems = matches
+  const routeBreadcrumbItems = matches
     .filter((match) => match.handle?.breadcrumb)
     .flatMap<BreadcrumbItem>((match) => {
       const breadcrumb = match.handle?.breadcrumb;
+
+      if (breadcrumb === root.label && match.pathname === root.href) {
+        return [];
+      }
 
       if (breadcrumb === 'Каталог') {
         return [
@@ -109,6 +140,10 @@ export function Breadcrumbs() {
       ];
     });
 
+  const breadcrumbItems = isHomePage
+    ? []
+    : removeDuplicateBreadcrumbs([root, ...routeBreadcrumbItems]);
+
   if (breadcrumbItems.length <= 1) {
     return null;
   }
@@ -119,7 +154,10 @@ export function Breadcrumbs() {
         const isLastItem = index === breadcrumbItems.length - 1;
 
         return (
-          <div key={`${item.id}-${item.href}`} className="flex items-center gap-1">
+          <div
+            key={`${item.id}-${item.href}`}
+            className="flex items-center gap-1"
+          >
             {index > 0 && <ChevronRight className="size-4" />}
 
             {isLastItem ? (
