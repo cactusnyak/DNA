@@ -41,6 +41,8 @@ export declare class ProductsService {
         price: any;
         images: any;
     }>;
+    private getCategoryWithDescendantIds;
+    private collectDescendantCategoryIds;
     private mapProduct;
 }
 export {};

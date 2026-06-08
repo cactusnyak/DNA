@@ -18,14 +18,17 @@ let ProductsService = class ProductsService {
         this.prismaService = prismaService;
     }
     async findAll(params = {}) {
+        const categoryIds = params.categorySlug
+            ? await this.getCategoryWithDescendantIds(params.categorySlug)
+            : undefined;
         const products = await this.prismaService.product.findMany({
-            where: {
-                category: params.categorySlug
-                    ? {
-                        slug: params.categorySlug,
-                    }
-                    : undefined,
-            },
+            where: categoryIds
+                ? {
+                    categoryId: {
+                        in: categoryIds,
+                    },
+                }
+                : undefined,
             include: {
                 category: {
                     include: {
@@ -66,6 +69,43 @@ let ProductsService = class ProductsService {
             throw new common_1.NotFoundException('Product not found');
         }
         return this.mapProduct(product);
+    }
+    async getCategoryWithDescendantIds(categorySlug) {
+        const rootCategory = await this.prismaService.category.findUnique({
+            where: {
+                slug: categorySlug,
+            },
+            select: {
+                id: true,
+            },
+        });
+        if (!rootCategory) {
+            return [];
+        }
+        const categories = await this.prismaService.category.findMany({
+            select: {
+                id: true,
+                parentId: true,
+            },
+        });
+        const categoryIds = this.collectDescendantCategoryIds(categories, rootCategory.id);
+        return categoryIds;
+    }
+    collectDescendantCategoryIds(categories, rootCategoryId) {
+        const categoryIds = new Set([rootCategoryId]);
+        let shouldContinue = true;
+        while (shouldContinue) {
+            shouldContinue = false;
+            categories.forEach((category) => {
+                if (category.parentId &&
+                    categoryIds.has(category.parentId) &&
+                    !categoryIds.has(category.id)) {
+                    categoryIds.add(category.id);
+                    shouldContinue = true;
+                }
+            });
+        }
+        return Array.from(categoryIds);
     }
     mapProduct(product) {
         return {

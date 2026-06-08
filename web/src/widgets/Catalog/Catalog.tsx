@@ -75,7 +75,10 @@ export function Catalog({
         />
       )}
 
-      <ProductGrid products={products ?? []} />
+      <ProductGrid
+        products={products ?? []}
+        currentCategorySlug={categorySlug}
+      />
     </section>
   );
 }
