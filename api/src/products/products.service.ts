@@ -8,12 +8,13 @@ type FindAllProductsParams = {
 
 type CategoryNode = {
   id: string;
+  slug: string;
   parentId: string | null;
 };
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAll(params: FindAllProductsParams = {}) {
     const categoryIds = params.categorySlug
@@ -23,10 +24,10 @@ export class ProductsService {
     const products = await this.prismaService.product.findMany({
       where: categoryIds
         ? {
-          categoryId: {
-            in: categoryIds,
-          },
-        }
+            categoryId: {
+              in: categoryIds,
+            },
+          }
         : undefined,
       include: {
         category: {
@@ -45,7 +46,11 @@ export class ProductsService {
       },
     });
 
-    return products.map((product) => this.mapProduct(product));
+    const categoryPathById = await this.getCategoryPathById();
+
+    return products.map((product) =>
+      this.mapProduct(product, categoryPathById),
+    );
   }
 
   async findById(productId: string) {
@@ -71,7 +76,9 @@ export class ProductsService {
       throw new NotFoundException('Product not found');
     }
 
-    return this.mapProduct(product);
+    const categoryPathById = await this.getCategoryPathById();
+
+    return this.mapProduct(product, categoryPathById);
   }
 
   private async getCategoryWithDescendantIds(categorySlug: string) {
@@ -95,16 +102,11 @@ export class ProductsService {
       },
     });
 
-    const categoryIds = this.collectDescendantCategoryIds(
-      categories,
-      rootCategory.id,
-    );
-
-    return categoryIds;
+    return this.collectDescendantCategoryIds(categories, rootCategory.id);
   }
 
   private collectDescendantCategoryIds(
-    categories: CategoryNode[],
+    categories: Pick<CategoryNode, 'id' | 'parentId'>[],
     rootCategoryId: string,
   ) {
     const categoryIds = new Set<string>([rootCategoryId]);
@@ -129,7 +131,43 @@ export class ProductsService {
     return Array.from(categoryIds);
   }
 
-  private mapProduct(product: any) {
+  private async getCategoryPathById() {
+    const categories = await this.prismaService.category.findMany({
+      select: {
+        id: true,
+        slug: true,
+        parentId: true,
+      },
+    });
+
+    const categoryById = new Map(
+      categories.map((category) => [category.id, category]),
+    );
+
+    const categoryPathById = new Map<string, string>();
+
+    categories.forEach((category) => {
+      const parts: string[] = [];
+
+      let currentCategory: CategoryNode | undefined = category;
+
+      while (currentCategory) {
+        parts.unshift(currentCategory.slug);
+
+        if (!currentCategory.parentId) {
+          break;
+        }
+
+        currentCategory = categoryById.get(currentCategory.parentId);
+      }
+
+      categoryPathById.set(category.id, parts.join('/'));
+    });
+
+    return categoryPathById;
+  }
+
+  private mapProduct(product: any, categoryPathById: Map<string, string>) {
     return {
       id: product.id,
       categoryId: product.categoryId,
@@ -137,6 +175,7 @@ export class ProductsService {
         id: product.category.id,
         name: product.category.name,
         slug: product.category.slug,
+        path: categoryPathById.get(product.category.id) ?? product.category.slug,
         sortOrder: product.category.sortOrder,
         description: product.category.description ?? undefined,
         parentId: product.category.parentId ?? undefined,

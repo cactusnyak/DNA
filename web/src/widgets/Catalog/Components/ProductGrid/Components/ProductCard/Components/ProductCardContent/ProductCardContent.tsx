@@ -16,7 +16,7 @@ export function ProductCardContent({
     currentCategorySlug !== product.category.slug;
 
   return (
-    <div className="space-y-3 p-4">
+    <div className="flex flex-1 flex-col space-y-3 p-4">
       <div className="space-y-1">
         {shouldShowCategoryLink && (
           <Link
@@ -34,7 +34,7 @@ export function ProductCardContent({
         {product.description}
       </p>
 
-      <p className="text-lg font-semibold">{product.price} ₽</p>
+      <p className="mt-auto text-lg font-semibold">{product.price} ₽</p>
     </div>
   );
 }

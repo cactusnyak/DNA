@@ -45,7 +45,8 @@ let ProductsService = class ProductsService {
                 title: 'asc',
             },
         });
-        return products.map((product) => this.mapProduct(product));
+        const categoryPathById = await this.getCategoryPathById();
+        return products.map((product) => this.mapProduct(product, categoryPathById));
     }
     async findById(productId) {
         const product = await this.prismaService.product.findUnique({
@@ -68,7 +69,8 @@ let ProductsService = class ProductsService {
         if (!product) {
             throw new common_1.NotFoundException('Product not found');
         }
-        return this.mapProduct(product);
+        const categoryPathById = await this.getCategoryPathById();
+        return this.mapProduct(product, categoryPathById);
     }
     async getCategoryWithDescendantIds(categorySlug) {
         const rootCategory = await this.prismaService.category.findUnique({
@@ -88,8 +90,7 @@ let ProductsService = class ProductsService {
                 parentId: true,
             },
         });
-        const categoryIds = this.collectDescendantCategoryIds(categories, rootCategory.id);
-        return categoryIds;
+        return this.collectDescendantCategoryIds(categories, rootCategory.id);
     }
     collectDescendantCategoryIds(categories, rootCategoryId) {
         const categoryIds = new Set([rootCategoryId]);
@@ -107,7 +108,31 @@ let ProductsService = class ProductsService {
         }
         return Array.from(categoryIds);
     }
-    mapProduct(product) {
+    async getCategoryPathById() {
+        const categories = await this.prismaService.category.findMany({
+            select: {
+                id: true,
+                slug: true,
+                parentId: true,
+            },
+        });
+        const categoryById = new Map(categories.map((category) => [category.id, category]));
+        const categoryPathById = new Map();
+        categories.forEach((category) => {
+            const parts = [];
+            let currentCategory = category;
+            while (currentCategory) {
+                parts.unshift(currentCategory.slug);
+                if (!currentCategory.parentId) {
+                    break;
+                }
+                currentCategory = categoryById.get(currentCategory.parentId);
+            }
+            categoryPathById.set(category.id, parts.join('/'));
+        });
+        return categoryPathById;
+    }
+    mapProduct(product, categoryPathById) {
         return {
             id: product.id,
             categoryId: product.categoryId,
@@ -115,6 +140,7 @@ let ProductsService = class ProductsService {
                 id: product.category.id,
                 name: product.category.name,
                 slug: product.category.slug,
+                path: categoryPathById.get(product.category.id) ?? product.category.slug,
                 sortOrder: product.category.sortOrder,
                 description: product.category.description ?? undefined,
                 parentId: product.category.parentId ?? undefined,

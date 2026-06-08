@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
             element: <CategoriesPage />,
           },
           {
-            path: ':categorySlug',
+            path: '*',
             element: <CatalogPage />,
             handle: {
               breadcrumb: 'Категория',

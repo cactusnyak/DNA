@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { Category } from '@/entities/category';
 import { getCategories } from '@/entities/category/api/get-categories';
+import { getCategoryHref } from '@/entities/category/utils/category-path';
 
 type BreadcrumbHandle = {
   breadcrumb?: string;
@@ -73,7 +74,7 @@ function getCategoryPath(
 
   return categoryPath.map((category) => ({
     id: `category-${category.id}`,
-    href: `/catalog/${category.slug}`,
+    href: getCategoryHref(categories, category.id),
     label: category.name,
   }));
 }

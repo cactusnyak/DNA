@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { Category } from '@/entities/category';
 import { getCategories } from '@/entities/category/api/get-categories';
+import { getCategoryHref } from '@/entities/category/utils/category-path';
 import { cn } from '@/shared/utils/cn';
 
 function getChildrenCategories(categories: Category[], parentId?: string) {
@@ -50,7 +51,7 @@ function CategoryTreeNode({
         </button>
 
         <Link
-          to={`/catalog/${category.slug}`}
+          to={getCategoryHref(categories, category.id)}
           className="text-sm font-medium hover:underline"
         >
           {category.name}

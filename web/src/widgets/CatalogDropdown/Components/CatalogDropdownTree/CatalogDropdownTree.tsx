@@ -2,6 +2,7 @@ import { ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import type { Category } from '@/entities/category';
+import { getCategoryHref } from '@/entities/category/utils/category-path';
 import { cn } from '@/shared/utils/cn';
 
 const MAX_VISIBLE_CATEGORY_COLUMNS = 3;
@@ -141,7 +142,7 @@ function CollapsedAncestors({
         {hiddenPath.map((category) => (
           <li key={category.id}>
             <Link
-              to={`/catalog/${category.slug}`}
+              to={getCategoryHref(categories, category.id)}
               onClick={onCategoryClick}
               onMouseEnter={() => onActiveCategoryChange(category.slug)}
               className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -205,7 +206,7 @@ function CategoryColumn({
           return (
             <li key={category.id}>
               <Link
-                to={`/catalog/${category.slug}`}
+                to={getCategoryHref(categories, category.id)}
                 onClick={onCategoryClick}
                 onMouseEnter={() => onActiveCategoryChange(category.slug)}
                 className={cn(

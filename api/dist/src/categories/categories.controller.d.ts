@@ -6,13 +6,14 @@ export declare class CategoriesController {
         id: string;
         name: string;
         slug: string;
+        path: string;
         sortOrder: number;
         description: string | undefined;
         parentId: string | undefined;
         image: {
-            url: string;
             id: string;
             sortOrder: number;
+            url: string;
             alt: string | null;
         } | undefined;
     }[]>;

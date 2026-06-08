@@ -16,7 +16,7 @@ export function ProductCard({
   showAddToCartButton = true,
 }: ProductCardProps) {
   return (
-    <article className="overflow-hidden bg-card">
+    <article className="flex h-full flex-col overflow-hidden rounded-lg bg-card">
       <ProductGallery images={product.images} title={product.title} />
 
       <ProductCardContent
@@ -25,7 +25,7 @@ export function ProductCard({
       />
 
       {showAddToCartButton && (
-        <div className="p-4 pt-0">
+        <div className="mt-auto p-4 pt-0">
           <AddToCartButton productId={product.id} />
         </div>
       )}

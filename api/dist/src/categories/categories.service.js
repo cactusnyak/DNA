@@ -26,10 +26,24 @@ let CategoriesService = class CategoriesService {
                 sortOrder: 'asc',
             },
         });
+        const categoryById = new Map(categories.map((category) => [category.id, category]));
+        function getCategoryPath(category) {
+            const parts = [];
+            let currentCategory = category;
+            while (currentCategory) {
+                parts.unshift(currentCategory.slug);
+                if (!currentCategory.parentId) {
+                    break;
+                }
+                currentCategory = categoryById.get(currentCategory.parentId);
+            }
+            return parts.join('/');
+        }
         return categories.map((category) => ({
             id: category.id,
             name: category.name,
             slug: category.slug,
+            path: getCategoryPath(category),
             sortOrder: category.sortOrder,
             description: category.description ?? undefined,
             parentId: category.parentId ?? undefined,

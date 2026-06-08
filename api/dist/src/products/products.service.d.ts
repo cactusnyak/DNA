@@ -12,6 +12,7 @@ export declare class ProductsService {
             id: any;
             name: any;
             slug: any;
+            path: any;
             sortOrder: any;
             description: any;
             parentId: any;
@@ -30,6 +31,7 @@ export declare class ProductsService {
             id: any;
             name: any;
             slug: any;
+            path: any;
             sortOrder: any;
             description: any;
             parentId: any;
@@ -43,6 +45,7 @@ export declare class ProductsService {
     }>;
     private getCategoryWithDescendantIds;
     private collectDescendantCategoryIds;
+    private getCategoryPathById;
     private mapProduct;
 }
 export {};

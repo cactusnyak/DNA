@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { getProducts } from '@/entities/product/api/get-products';
+import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
 
 import { CatalogControls } from './Components/CatalogControls';
 import { CatalogHeader } from './Components/CatalogHeader';
@@ -24,7 +25,8 @@ export function Catalog({
   showFilters = true,
   showSorting = true,
 }: CatalogProps) {
-  const { categorySlug } = useParams();
+  const { '*': categoryPath } = useParams();
+  const categorySlug = getCategorySlugFromPath(categoryPath);
 
   const {
     data: products,
