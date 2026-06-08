@@ -26,10 +26,7 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
     (category) => category.slug === activeCategorySlug,
   );
 
-  const {
-    data: products,
-    isPending: isProductsPending,
-  } = useQuery({
+  const { data: products, isPending: isProductsPending } = useQuery({
     queryKey: ['products', activeCategorySlug],
     queryFn: () =>
       getProducts({
@@ -38,9 +35,9 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
   });
 
   return (
-    <div className="mt-2 h-[70vh] overflow-hidden rounded-lg border border-border bg-background shadow-lg">
-      <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] overflow-hidden">
-        <div className="max-w-[560px] overflow-auto border-r border-border p-4">
+    <div className="mt-2 h-[70vh] w-full overflow-hidden rounded-lg border border-border bg-background shadow-lg">
+      <div className="grid h-full min-w-0 grid-cols-[minmax(360px,auto)_minmax(220px,1fr)] overflow-hidden">
+        <div className="min-w-0 overflow-hidden border-r border-border p-4">
           {isCategoriesPending && (
             <p className="text-sm text-muted-foreground">
               Загрузка категорий...
@@ -63,7 +60,7 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
           )}
         </div>
 
-        <aside className="min-w-0 overflow-auto p-4">
+        <aside className="min-w-0 overflow-y-auto p-4">
           <p className="mb-3 text-sm font-medium">
             {activeCategory
               ? `Товары категории «${activeCategory.name}»`
@@ -77,14 +74,12 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
           )}
 
           {!isProductsPending && !products?.length && (
-            <p className="text-sm text-muted-foreground">
-              Товары не найдены.
-            </p>
+            <p className="text-sm text-muted-foreground">Товары не найдены.</p>
           )}
 
           {!!products?.length && (
-            <div className="grid grid-cols-3 gap-2 lg:grid-cols-4 xl:grid-cols-6">
-              {products.slice(0, 8).map((product) => {
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+              {products.slice(0, 12).map((product) => {
                 const image = product.images[0];
 
                 return (

@@ -1,8 +1,10 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import type { Category } from '@/entities/category';
 import { cn } from '@/shared/utils/cn';
+
+const MAX_VISIBLE_CATEGORY_COLUMNS = 3;
 
 type CatalogDropdownTreeProps = {
   categories: Category[];
@@ -11,11 +13,17 @@ type CatalogDropdownTreeProps = {
   onCategoryClick?: () => void;
 };
 
+type CategoryLevel = {
+  level: number;
+  parentId?: string;
+  categories: Category[];
+};
+
 function getChildrenCategories(categories: Category[], parentId?: string) {
   return categories.filter((category) => category.parentId === parentId);
 }
 
-function getActivePathCategoryIds(
+function getActiveCategoryPath(
   categories: Category[],
   activeCategorySlug?: string,
 ) {
@@ -35,11 +43,11 @@ function getActivePathCategoryIds(
     return [];
   }
 
-  const path: string[] = [];
+  const path: Category[] = [];
   let currentCategory: Category | undefined = activeCategory;
 
   while (currentCategory) {
-    path.unshift(currentCategory.id);
+    path.unshift(currentCategory);
 
     if (!currentCategory.parentId) {
       break;
@@ -51,90 +59,171 @@ function getActivePathCategoryIds(
   return path;
 }
 
+function getCategoryLevels(
+  categories: Category[],
+  activeCategoryPath: Category[],
+): CategoryLevel[] {
+  const levels: CategoryLevel[] = [];
+
+  let parentId: string | undefined;
+
+  for (let level = 0; level <= activeCategoryPath.length; level += 1) {
+    const levelCategories = getChildrenCategories(categories, parentId);
+
+    if (!levelCategories.length) {
+      break;
+    }
+
+    levels.push({
+      level,
+      parentId,
+      categories: levelCategories,
+    });
+
+    parentId = activeCategoryPath[level]?.id;
+
+    if (!parentId) {
+      break;
+    }
+  }
+
+  return levels;
+}
+
+function getVisibleCategoryLevels(levels: CategoryLevel[]) {
+  if (levels.length <= MAX_VISIBLE_CATEGORY_COLUMNS) {
+    return {
+      hiddenLevels: [],
+      visibleLevels: levels,
+    };
+  }
+
+  return {
+    hiddenLevels: levels.slice(0, levels.length - MAX_VISIBLE_CATEGORY_COLUMNS),
+    visibleLevels: levels.slice(-MAX_VISIBLE_CATEGORY_COLUMNS),
+  };
+}
+
+type CollapsedAncestorsProps = {
+  activeCategoryPath: Category[];
+  hiddenLevelsCount: number;
+  onActiveCategoryChange: (categorySlug?: string) => void;
+  onCategoryClick?: () => void;
+};
+
+function CollapsedAncestors({
+  activeCategoryPath,
+  hiddenLevelsCount,
+  onActiveCategoryChange,
+  onCategoryClick,
+}: CollapsedAncestorsProps) {
+  const hiddenPath = activeCategoryPath.slice(0, hiddenLevelsCount);
+
+  if (!hiddenPath.length) {
+    return null;
+  }
+
+  return (
+    <div className="w-44 shrink-0 border-r border-border/70 pr-2">
+      <ul className="space-y-1 p-1">
+        <li>
+          <Link
+            to="/catalog"
+            onClick={onCategoryClick}
+            onMouseEnter={() => onActiveCategoryChange(undefined)}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <MoreHorizontal className="size-4 shrink-0" />
+            <span className="line-clamp-1">Все товары</span>
+          </Link>
+        </li>
+
+        {hiddenPath.map((category) => (
+          <li key={category.id}>
+            <Link
+              to={`/catalog/${category.slug}`}
+              onClick={onCategoryClick}
+              onMouseEnter={() => onActiveCategoryChange(category.slug)}
+              className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <span className="line-clamp-1">{category.name}</span>
+              <ChevronRight className="size-4 shrink-0" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 type CategoryColumnProps = {
   categories: Category[];
-  parentId?: string;
-  activePathCategoryIds: string[];
+  level: CategoryLevel;
+  activeCategoryPath: Category[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
   onCategoryClick?: () => void;
-  level?: number;
 };
 
 function CategoryColumn({
   categories,
-  parentId,
-  activePathCategoryIds,
+  level,
+  activeCategoryPath,
   activeCategorySlug,
   onActiveCategoryChange,
   onCategoryClick,
-  level = 0,
 }: CategoryColumnProps) {
-  const columnCategories = getChildrenCategories(categories, parentId);
-
-  if (!columnCategories.length) {
-    return null;
-  }
-
-  const activeCategoryIdAtLevel = activePathCategoryIds[level];
-
-  const activeCategory = columnCategories.find(
-    (category) => category.id === activeCategoryIdAtLevel,
-  );
+  const activePathCategoryIds = activeCategoryPath.map((category) => category.id);
 
   return (
-    <>
-      <div className="w-56 shrink-0 pr-2">
-        <ul className="p-1">
-          {columnCategories.map((category) => {
-            const hasChildren = getChildrenCategories(
-              categories,
-              category.id,
-            ).length > 0;
+    <div className="w-52 shrink-0 pr-2">
+      <ul className="space-y-1 p-1">
+        {level.level === 0 && (
+          <li>
+            <Link
+              to="/catalog"
+              onClick={onCategoryClick}
+              onMouseEnter={() => onActiveCategoryChange(undefined)}
+              className={cn(
+                'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+                !activeCategorySlug
+                  ? 'bg-muted text-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
+            >
+              <span className="line-clamp-1">Все товары</span>
+            </Link>
+          </li>
+        )}
 
-            const isActive = activeCategorySlug === category.slug;
-            const isInPath = activePathCategoryIds.includes(category.id);
+        {level.categories.map((category) => {
+          const hasChildren = getChildrenCategories(categories, category.id).length > 0;
 
-            return (
-              <li
-                key={category.id}
-                onMouseLeave={() => onActiveCategoryChange(undefined)}
+          const isActive = activeCategorySlug === category.slug;
+          const isInPath = activePathCategoryIds.includes(category.id);
+
+          return (
+            <li key={category.id}>
+              <Link
+                to={`/catalog/${category.slug}`}
+                onClick={onCategoryClick}
+                onMouseEnter={() => onActiveCategoryChange(category.slug)}
+                className={cn(
+                  'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+                  isActive || isInPath
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
               >
-                <Link
-                  to={`/catalog/${category.slug}`}
-                  onClick={onCategoryClick}
-                  onMouseEnter={() => onActiveCategoryChange(category.slug)}
-                  className={cn(
-                    'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
-                    isActive || isInPath
-                      ? 'bg-muted text-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  )}
-                >
-                  <span className="line-clamp-1">{category.name}</span>
+                <span className="line-clamp-1">{category.name}</span>
 
-                  {hasChildren && (
-                    <ChevronRight className="size-4 shrink-0" />
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      {activeCategory && (
-        <CategoryColumn
-          categories={categories}
-          parentId={activeCategory.id}
-          activePathCategoryIds={activePathCategoryIds}
-          activeCategorySlug={activeCategorySlug}
-          onActiveCategoryChange={onActiveCategoryChange}
-          onCategoryClick={onCategoryClick}
-          level={level + 1}
-        />
-      )}
-    </>
+                {hasChildren && <ChevronRight className="size-4 shrink-0" />}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
@@ -144,20 +233,37 @@ export function CatalogDropdownTree({
   onActiveCategoryChange,
   onCategoryClick,
 }: CatalogDropdownTreeProps) {
-  const activePathCategoryIds = getActivePathCategoryIds(
+  const activeCategoryPath = getActiveCategoryPath(
     categories,
     activeCategorySlug,
   );
 
+  const levels = getCategoryLevels(categories, activeCategoryPath);
+
+  const { hiddenLevels, visibleLevels } = getVisibleCategoryLevels(levels);
+
   return (
-    <div className="flex h-full min-h-0 gap-2 overflow-auto">
-      <CategoryColumn
-        categories={categories}
-        activePathCategoryIds={activePathCategoryIds}
-        activeCategorySlug={activeCategorySlug}
+    <div className="flex h-full min-h-0 max-w-full overflow-hidden">
+      <CollapsedAncestors
+        activeCategoryPath={activeCategoryPath}
+        hiddenLevelsCount={hiddenLevels.length}
         onActiveCategoryChange={onActiveCategoryChange}
         onCategoryClick={onCategoryClick}
       />
+
+      <div className="flex min-w-0 overflow-hidden">
+        {visibleLevels.map((level) => (
+          <CategoryColumn
+            key={`${level.level}-${level.parentId ?? 'root'}`}
+            categories={categories}
+            level={level}
+            activeCategoryPath={activeCategoryPath}
+            activeCategorySlug={activeCategorySlug}
+            onActiveCategoryChange={onActiveCategoryChange}
+            onCategoryClick={onCategoryClick}
+          />
+        ))}
+      </div>
     </div>
   );
 }
