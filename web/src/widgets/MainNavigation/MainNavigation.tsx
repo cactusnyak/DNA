@@ -5,14 +5,13 @@ import type { MainNavigationPlacement } from './types/main-navigation-placement'
 
 type MainNavigationProps = {
   placement: MainNavigationPlacement;
+  onNavigate?: () => void;
 };
 
-export function MainNavigation({
-  placement,
-}: MainNavigationProps) {
+export function MainNavigation({ placement, onNavigate }: MainNavigationProps) {
   if (placement === 'mobileBottom') {
     return <MobileNavigation />;
   }
 
-  return <DesktopNavigation />;
+  return <DesktopNavigation onNavigate={onNavigate} />;
 }

@@ -5,10 +5,6 @@ export function useCatalogDropdown() {
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
 
-  function openCatalogDropdown() {
-    setIsCatalogDropdownOpen(true);
-  }
-
   function closeCatalogDropdown() {
     setIsCatalogDropdownOpen(false);
   }
@@ -38,10 +34,24 @@ export function useCatalogDropdown() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isCatalogDropdownOpen) {
+      document.body.style.overflow = '';
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isCatalogDropdownOpen]);
+
   return {
     isCatalogDropdownOpen,
     dropdownContainerRef,
-    openCatalogDropdown,
     closeCatalogDropdown,
     toggleCatalogDropdown,
   };

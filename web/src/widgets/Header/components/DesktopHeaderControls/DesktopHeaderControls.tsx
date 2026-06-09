@@ -2,25 +2,42 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { SearchInput } from '@/components/ui/SearchInput';
+import { cn } from '@/shared/utils/cn';
 
 type DesktopHeaderControlsProps = {
+  isCatalogDropdownOpen: boolean;
   onCatalogHover: () => void;
+  onNavigate: () => void;
 };
 
 export function DesktopHeaderControls({
+  isCatalogDropdownOpen,
   onCatalogHover,
+  onNavigate,
 }: DesktopHeaderControlsProps) {
   return (
     <div className="hidden flex-1 items-center gap-3 md:flex">
-      <SearchInput placeholder="Поиск товаров" />
+      <SearchInput
+        placeholder="Поиск товаров"
+        onFocus={onNavigate}
+      />
 
       <Button
         variant="outline"
         type="button"
         asChild
         onMouseEnter={onCatalogHover}
+        className={cn(
+          !isCatalogDropdownOpen &&
+            'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
+        )}
       >
-        <Link to="/catalog">Каталог</Link>
+        <Link
+          to="/catalog"
+          onClick={onNavigate}
+        >
+          Каталог
+        </Link>
       </Button>
     </div>
   );

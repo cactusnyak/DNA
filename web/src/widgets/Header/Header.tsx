@@ -26,11 +26,15 @@ export function Header() {
       onMouseLeave={closeCatalogDropdown}
     >
       <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-8 px-4 py-6">
-        <HeaderLogo />
+        <HeaderLogo onClick={closeCatalogDropdown} />
 
-        <DesktopHeaderControls onCatalogHover={toggleCatalogDropdown} />
+        <DesktopHeaderControls
+          isCatalogDropdownOpen={isCatalogDropdownOpen}
+          onCatalogHover={toggleCatalogDropdown}
+          onNavigate={closeCatalogDropdown}
+        />
 
-        <MainNavigation placement="header" />
+        <MainNavigation placement="header" onNavigate={closeCatalogDropdown} />
       </div>
 
       {isCatalogDropdownOpen && (
