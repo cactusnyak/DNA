@@ -43,7 +43,12 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-border bg-background"
+      className="
+        sticky top-0 z-40
+        border-b border-border/50
+        bg-background/70
+        backdrop-blur-xl
+      "
       onMouseLeave={closeCatalogDropdown}
     >
       <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-8 px-4 py-6">
@@ -67,18 +72,9 @@ export function Header() {
         <MainNavigation placement="header" />
       </div>
 
-      {isCatalogDropdownOpen && (
-        <div
-          className="absolute top-full right-0 left-0 hidden px-4 pb-4 md:block"
-          onMouseEnter={openCatalogDropdown}
-        >
-          <div className="w-full">
-            <CatalogDropdown onClose={closeCatalogDropdown} />
-          </div>
-        </div>
-      )}
+      {isCatalogDropdownOpen && (<div className=" absolute top-full right-0 left-0 hidden px-4 pb-4 md:block bg-white/5 backdrop-blur-md " onMouseEnter={openCatalogDropdown} > <div className="w-full"> <CatalogDropdown onClose={closeCatalogDropdown} /> </div> </div>)}
 
-      <div className="border-t border-border px-4 py-3 md:hidden">
+      <div className="border-t border-border/50 px-4 py-3 md:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-2">
           <MobileCatalogButton className="shrink-0" />
           <SearchField placeholder="Поиск" />
