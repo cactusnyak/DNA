@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/entities/product/api/get-products';
 import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
 
-import { CatalogControls } from './Components/CatalogControls';
-import { CatalogHeader } from './Components/CatalogHeader';
-import { ProductGrid } from './Components/ProductGrid';
+import { CatalogControls } from './components/CatalogControls';
+import { CatalogHeader } from './components/CatalogHeader';
+import { ProductGrid } from './components/ProductGrid';
 
 type CatalogProps = {
   title?: string;

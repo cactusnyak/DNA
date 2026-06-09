@@ -1,0 +1,1 @@
+export { FooterMessengers } from './FooterMessengers';

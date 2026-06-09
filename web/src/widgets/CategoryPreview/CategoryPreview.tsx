@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Grid2X2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
+import { Button } from '@/components/ui/Button';
 import { getCategories } from '@/entities/category/api/get-categories';
-import { Button } from '@/components/ui/button';
+
+import { CategoryPreviewGrid } from './components/CategoryPreviewGrid';
+import { getPreviewCategories } from './logic/get-preview-categories';
 
 type CategoryPreviewProps = {
   title?: string;
@@ -36,9 +38,7 @@ export function CategoryPreview({
     return null;
   }
 
-  const previewCategories = categories
-    .filter((category) => !category.parentId)
-    .slice(0, limit);
+  const previewCategories = getPreviewCategories(categories, limit);
 
   return (
     <section className="space-y-4">
@@ -50,29 +50,10 @@ export function CategoryPreview({
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {previewCategories.map((category) => (
-          <Link
-            key={category.id}
-            to={`/catalog/${category.slug}`}
-            className="flex flex-col items-center gap-1 rounded-lg border border-border bg-card p-4 text-center transition-colors hover:bg-muted"
-          >
-            <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg">
-              {category.image?.url ? (
-                <img
-                  src={category.image.url}
-                  alt={category.image.alt ?? category.name}
-                  className="size-7 object-contain"
-                />
-              ) : (
-                <Grid2X2 className="size-7 text-muted-foreground" />
-              )}
-            </div>
-
-            <span className="text-sm font-medium">{category.name}</span>
-          </Link>
-        ))}
-      </div>
+      <CategoryPreviewGrid
+        categories={categories}
+        previewCategories={previewCategories}
+      />
     </section>
   );
 }

@@ -1,8 +1,8 @@
 import type { Product } from '@/entities/product';
 
-import { AddToCartButton } from './Components/AddToCartButton';
-import { ProductCardContent } from './Components/ProductCardContent';
-import { ProductGallery } from './Components/ProductGallery';
+import { AddToCartButton } from './components/AddToCartButton';
+import { ProductCardContent } from './components/ProductCardContent';
+import { ProductGallery } from './components/ProductGallery';
 
 type ProductCardProps = {
   product: Product;

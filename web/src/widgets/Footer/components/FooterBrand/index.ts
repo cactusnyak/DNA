@@ -1,0 +1,1 @@
+export { FooterBrand } from './FooterBrand';

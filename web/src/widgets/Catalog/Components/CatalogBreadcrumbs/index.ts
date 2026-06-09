@@ -1,1 +1,0 @@
-export { CatalogBreadcrumbs } from './CatalogBreadcrumbs';

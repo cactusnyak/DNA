@@ -5,7 +5,7 @@ import { MainLayout } from '@/app/layouts/MainLayout';
 import { HomePage } from '@/pages/home/HomePage';
 
 import { CatalogPage } from '@/pages/catalog/CatalogPage';
-import { CategoriesPage } from '@/pages/categories/CategoriesPage';
+import { CategoryPage } from '@/pages/category/CategoryPage';
 import { ProductPage } from '@/pages/product/ProductPage';
 
 import { CartPage } from '@/pages/cart/CartPage';
@@ -38,11 +38,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <CategoriesPage />,
+            element: <CatalogPage />,
           },
           {
             path: '*',
-            element: <CatalogPage />,
+            element: <CategoryPage />,
             handle: {
               breadcrumb: 'Категория',
             },

@@ -1,0 +1,1 @@
+export { HeaderCatalogDropdown } from './HeaderCatalogDropdown';

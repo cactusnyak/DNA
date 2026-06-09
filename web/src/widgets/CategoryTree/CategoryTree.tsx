@@ -1,7 +1,7 @@
 import type { Category } from '@/entities/category';
 import { cn } from '@/shared/utils/cn';
 
-type CatalogCategoryTreeProps = {
+type CategoryTreeProps = {
   categories: Category[];
   selectedCategorySlug?: string;
   onCategoryChange: (categorySlug?: string) => void;
@@ -66,11 +66,11 @@ function CategoryTreeLevel({
   );
 }
 
-export function CatalogCategoryTree({
+export function CategoryTree({
   categories,
   selectedCategorySlug,
   onCategoryChange,
-}: CatalogCategoryTreeProps) {
+}: CategoryTreeProps) {
   return (
     <div className="w-full space-y-2">
       <button

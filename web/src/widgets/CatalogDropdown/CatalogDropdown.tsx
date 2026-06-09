@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getProducts } from '@/entities/product/api/get-products';
 
-import { CatalogDropdownTree } from './Components/CatalogDropdownTree';
+import { CatalogDropdownProducts } from './components/CatalogDropdownProducts';
+import { CatalogDropdownTree } from './components/CatalogDropdownTree';
 
 type CatalogDropdownProps = {
   onClose?: () => void;
@@ -26,7 +27,10 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
     (category) => category.slug === activeCategorySlug,
   );
 
-  const { data: products, isPending: isProductsPending } = useQuery({
+  const {
+    data: products,
+    isPending: isProductsPending,
+  } = useQuery({
     queryKey: ['products', activeCategorySlug],
     queryFn: () =>
       getProducts({
@@ -60,56 +64,12 @@ export function CatalogDropdown({ onClose }: CatalogDropdownProps) {
           )}
         </div>
 
-        <aside className="min-w-0 overflow-y-auto p-4">
-          <p className="mb-3 text-sm font-medium">
-            {activeCategory
-              ? `Товары категории «${activeCategory.name}»`
-              : 'Все товары'}
-          </p>
-
-          {isProductsPending && (
-            <p className="text-sm text-muted-foreground">
-              Загрузка товаров...
-            </p>
-          )}
-
-          {!isProductsPending && !products?.length && (
-            <p className="text-sm text-muted-foreground">Товары не найдены.</p>
-          )}
-
-          {!!products?.length && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
-              {products.slice(0, 12).map((product) => {
-                const image = product.images[0];
-
-                return (
-                  <a
-                    key={product.id}
-                    href={`/product/${product.id}`}
-                    onClick={onClose}
-                    className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/30"
-                  >
-                    <div className="aspect-square overflow-hidden bg-muted">
-                      {image && (
-                        <img
-                          src={image.url}
-                          alt={image.alt ?? product.title}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      )}
-                    </div>
-
-                    <div className="p-1.5">
-                      <p className="line-clamp-2 text-[11px] font-medium leading-snug">
-                        {product.title}
-                      </p>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          )}
-        </aside>
+        <CatalogDropdownProducts
+          products={products ?? []}
+          activeCategoryName={activeCategory?.name}
+          isPending={isProductsPending}
+          onProductClick={onClose}
+        />
       </div>
     </div>
   );

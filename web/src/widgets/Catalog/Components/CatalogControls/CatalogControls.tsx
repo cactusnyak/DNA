@@ -1,5 +1,5 @@
-import { CatalogFilters } from './Components/CatalogFilters';
-import { CatalogSorting } from './Components/CatalogSorting';
+import { CatalogFilters } from './components/CatalogFilters';
+import { CatalogSorting } from './components/CatalogSorting';
 
 type CatalogControlsProps = {
   showFilters?: boolean;

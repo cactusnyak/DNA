@@ -1,6 +1,6 @@
 import type { Product } from '@/entities/product';
 
-import { ProductCard } from './Components/ProductCard';
+import { ProductCard } from './components/ProductCard';
 
 type ProductGridProps = {
   products: Product[];

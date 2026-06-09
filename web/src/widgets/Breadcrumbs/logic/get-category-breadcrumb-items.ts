@@ -1,25 +1,12 @@
 import type { Category } from '@/entities/category';
+import { getCategoryHref } from '@/entities/category/utils/category-path';
 
-export type CategoryBreadcrumb = {
-  label: string;
-  href: string;
-};
+import type { BreadcrumbItem } from '../types/breadcrumbs';
 
-export function getCategoryBreadcrumbs(
+export function getCategoryBreadcrumbItems(
   categories: Category[],
-  currentCategorySlug?: string,
-): CategoryBreadcrumb[] {
-  const breadcrumbs: CategoryBreadcrumb[] = [
-    {
-      label: 'Каталог',
-      href: '/catalog',
-    },
-  ];
-
-  if (!currentCategorySlug) {
-    return breadcrumbs;
-  }
-
+  currentCategorySlug: string,
+): BreadcrumbItem[] {
   const categoryBySlug = new Map<string, Category>();
   const categoryById = new Map<string, Category>();
 
@@ -31,7 +18,13 @@ export function getCategoryBreadcrumbs(
   const currentCategory = categoryBySlug.get(currentCategorySlug);
 
   if (!currentCategory) {
-    return breadcrumbs;
+    return [
+      {
+        id: `category-${currentCategorySlug}`,
+        href: `/catalog/${currentCategorySlug}`,
+        label: currentCategorySlug,
+      },
+    ];
   }
 
   const categoryPath: Category[] = [];
@@ -47,11 +40,9 @@ export function getCategoryBreadcrumbs(
     category = categoryById.get(category.parentId);
   }
 
-  return [
-    ...breadcrumbs,
-    ...categoryPath.map((category) => ({
-      label: category.name,
-      href: `/catalog/${category.slug}`,
-    })),
-  ];
+  return categoryPath.map((category) => ({
+    id: `category-${category.id}`,
+    href: getCategoryHref(categories, category.id),
+    label: category.name,
+  }));
 }
