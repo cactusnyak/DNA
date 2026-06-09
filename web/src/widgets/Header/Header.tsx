@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CatalogDropdown } from '@/widgets/CatalogDropdown';
 import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
 
-import LogoMain from '@/assets/logo/logo-main.svg?react';
+import LogoMain from '@/assets/logos/dna/logo-main.svg?react';
 
 function SearchField({ placeholder }: { placeholder: string }) {
   return (
