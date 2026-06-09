@@ -1,13 +1,11 @@
 import { Link } from 'react-router-dom';
-import {
-  Mail,
-  MessageCircle,
-  Phone,
-  Send,
-  ShieldCheck,
-} from 'lucide-react';
+import { Mail, Phone, ShieldCheck } from 'lucide-react';
 
 import LogoMain from '@/assets/logo/logo-main.svg?react';
+
+import TelegramLogo from '@/assets/logos/messengers/telegram.png';
+import WhatsAppLogo from '@/assets/logos/messengers/whatsapp.svg';
+import MaxLogo from '@/assets/logos/messengers/max.svg';
 
 const navigationLinks = [
   {
@@ -57,13 +55,11 @@ const legalLinks = [
 
 const contactLinks = [
   {
-    label: 'Почта',
     value: 'hello@dna.local',
     href: 'mailto:hello@dna.local',
     icon: Mail,
   },
   {
-    label: 'Телефон',
     value: '+7 (000) 000-00-00',
     href: 'tel:+70000000000',
     icon: Phone,
@@ -74,17 +70,17 @@ const messengerLinks = [
   {
     label: 'Telegram',
     href: '#',
-    icon: Send,
+    logo: TelegramLogo,
   },
   {
     label: 'WhatsApp',
     href: '#',
-    icon: MessageCircle,
+    logo: WhatsAppLogo,
   },
   {
-    label: 'Max',
+    label: 'MAX',
     href: '#',
-    icon: MessageCircle,
+    logo: MaxLogo,
   },
 ];
 
@@ -146,7 +142,7 @@ export function Footer() {
           <section>
             <h2 className="text-sm font-semibold">Контакты</h2>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-5">
               <div className="space-y-2">
                 {contactLinks.map((link) => {
                   const Icon = link.icon;
@@ -169,21 +165,22 @@ export function Footer() {
                   Мессенджеры
                 </p>
 
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {messengerLinks.map((link) => {
-                    const Icon = link.icon;
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {messengerLinks.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                    >
+                      <img
+                        src={link.logo}
+                        alt={link.label}
+                        className="size-4 object-contain"
+                      />
 
-                    return (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-                      >
-                        <Icon className="size-3.5" />
-                        {link.label}
-                      </a>
-                    );
-                  })}
+                      <span>{link.label}</span>
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
@@ -194,8 +191,7 @@ export function Footer() {
           <p>© {currentYear} DNA. Все права защищены.</p>
 
           <p>
-            Цены, наличие и условия кешбэка могут меняться. Да, даже сайты
-            вынуждены говорить очевидное.
+            Цены, наличие и условия кешбэка могут меняться.
           </p>
         </div>
       </div>
