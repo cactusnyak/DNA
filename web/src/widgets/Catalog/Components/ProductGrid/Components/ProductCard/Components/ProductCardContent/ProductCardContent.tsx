@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-
 import type { Product } from '@/entities/product';
 
 type ProductCardContentProps = {
@@ -12,14 +11,13 @@ export function ProductCardContent({
   currentCategorySlug,
 }: ProductCardContentProps) {
   const shouldShowCategoryLink =
-    currentCategorySlug &&
-    currentCategorySlug !== product.category.slug;
+    currentCategorySlug && currentCategorySlug !== product.category.slug;
 
   return (
-    <div className="flex flex-1 flex-col space-y-3 p-4">
-      <div>
-        <h3 className="line-clamp-2 font-medium">{product.title}</h3>
-
+    <div className="flex flex-1 flex-col p-4">
+      <p className="text-xl font-bold">{product.price} ₽</p>
+      <div className="mt-2">
+        <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
         {shouldShowCategoryLink && (
           <Link
             to={`/catalog/${product.category.slug}`}
@@ -29,12 +27,9 @@ export function ProductCardContent({
           </Link>
         )}
       </div>
-
-      <p className="line-clamp-3 text-sm text-muted-foreground">
+      <p className="mt-2 line-clamp-3 text-xs text-muted-foreground">
         {product.description}
       </p>
-
-      <p className="mt-auto text-lg font-semibold">{product.price} ₽</p>
     </div>
   );
 }
