@@ -31,7 +31,7 @@ function CategoryTreeNode({
 
   return (
     <li className="space-y-1">
-      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+      <div className="flex items-center gap-2 rounded-lg bg-card px-3 py-2">
         <button
           type="button"
           onClick={() => onToggle(category.id)}

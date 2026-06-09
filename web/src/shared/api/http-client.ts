@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
 type RequestOptions = {
   query?: Record<string, string | undefined>;
@@ -9,7 +10,7 @@ function buildUrl(path: string, query?: RequestOptions['query']) {
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
-      if (value) {
+      if (value !== undefined) {
         url.searchParams.set(key, value);
       }
     });
