@@ -3,7 +3,7 @@ import { Mail, Phone, ShieldCheck } from 'lucide-react';
 
 import LogoMain from '@/assets/logos/dna/logo-main.svg?react';
 
-import TelegramLogo from '@/assets/logos/messengers/telegram.png';
+import TelegramLogo from '@/assets/logos/messengers/telegram.svg';
 import WhatsAppLogo from '@/assets/logos/messengers/whatsapp.svg';
 import MaxLogo from '@/assets/logos/messengers/max.svg';
 
