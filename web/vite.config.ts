@@ -11,4 +11,17 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: '0.0.0.0',
+    proxy: {
+      '/products': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/categories': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
 });

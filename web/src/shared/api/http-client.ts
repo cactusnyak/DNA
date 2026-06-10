@@ -1,12 +1,9 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
-
 type RequestOptions = {
   query?: Record<string, string | undefined>;
 };
 
 function buildUrl(path: string, query?: RequestOptions['query']) {
-  const url = new URL(path, API_BASE_URL);
+  const url = new URL(path, window.location.origin);
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
