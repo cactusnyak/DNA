@@ -1,8 +1,8 @@
 export type OrderStatus =
-	| 'created'
-	| 'awaiting_payment'
-	| 'paid'
-	| 'shipped'
-	| 'delivered'
-	| 'cashback_accrued'
-	| 'cancelled';
+  | 'CREATED'
+  | 'AWAITING_PAYMENT'
+  | 'PAID'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CASHBACK_ACCRUED'
+  | 'CANCELLED';

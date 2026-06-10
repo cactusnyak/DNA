@@ -1,4 +1,4 @@
 export type UserRole =
-  | 'default'
-  | 'referral_partner'
-  | 'admin';
+  | 'DEFAULT'
+  | 'REFERRAL_PARTNER'
+  | 'ADMIN';

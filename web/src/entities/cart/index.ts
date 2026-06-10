@@ -1,2 +1,2 @@
-export type { Balance } from './types/balance';
-export type { Currency } from './types/currency';
+export type { Cart } from './types/cart';
+export type { CartItem } from './types/cart-item';

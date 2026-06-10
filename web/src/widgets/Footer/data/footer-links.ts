@@ -10,10 +10,6 @@ export const navigationLinks = [
     href: '/catalog',
   },
   {
-    label: 'Категории',
-    href: '/categories',
-  },
-  {
     label: 'Корзина',
     href: '/cart',
   },
