@@ -1,0 +1,1 @@
+export { ProductDetailsActions } from './ProductDetailsActions';

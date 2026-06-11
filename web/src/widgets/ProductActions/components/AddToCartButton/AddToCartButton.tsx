@@ -1,13 +1,16 @@
 import { Button } from '@/components/ui/Button';
 import { useCartStore } from '@/entities/cart';
 import type { Product } from '@/entities/product';
-import { ProductQuantityCounter } from '@/widgets/ProductQuantityCounter';
-
-type AddToCartButtonVariant = 'card' | 'details';
+import { cn } from '@/shared/utils/cn';
+import {
+  ProductQuantityCounter,
+  getProductActionHeightClass,
+  type ProductQuantityCounterVariant,
+} from '@/widgets/ProductQuantityCounter';
 
 type AddToCartButtonProps = {
   product: Product;
-  variant?: AddToCartButtonVariant;
+  variant?: ProductQuantityCounterVariant;
 };
 
 export function AddToCartButton({
@@ -18,7 +21,12 @@ export function AddToCartButton({
   const addItem = useCartStore((state) => state.addItem);
 
   if (quantity > 0) {
-    return <ProductQuantityCounter productId={product.id} />;
+    return (
+      <ProductQuantityCounter
+        productId={product.id}
+        variant={variant}
+      />
+    );
   }
 
   return (
@@ -26,7 +34,7 @@ export function AddToCartButton({
       type="button"
       variant="outline"
       size={variant === 'details' ? 'lg' : 'default'}
-      className="w-full bg-background"
+      className={cn('w-full bg-background', getProductActionHeightClass(variant))}
       onClick={() => addItem(product)}
     >
       В корзину
