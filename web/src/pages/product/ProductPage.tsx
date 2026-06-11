@@ -3,10 +3,13 @@ import { Link, useParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/Section';
+import { useCartStore } from '@/entities/cart';
 import { getProduct } from '@/entities/product/api/get-product';
+import { AddToCartButton } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/components/AddToCartButton';
 
 export function ProductPage() {
   const { productId } = useParams();
+  const addItem = useCartStore((state) => state.addItem);
 
   const {
     data: product,
@@ -31,6 +34,10 @@ export function ProductPage() {
   }
 
   const firstImage = product.images[0];
+
+  function handleBuyNow() {
+    addItem(product);
+  }
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
@@ -67,9 +74,18 @@ export function ProductPage() {
           </Link>
         </div>
 
-        <Button size="lg" className="w-full">
-          Добавить в корзину
-        </Button>
+        <div className="space-y-3">
+          <AddToCartButton product={product} />
+
+          <Button
+            type="button"
+            size="lg"
+            className="w-full"
+            onClick={handleBuyNow}
+          >
+            Купить в 1 клик
+          </Button>
+        </div>
       </section>
     </div>
   );
