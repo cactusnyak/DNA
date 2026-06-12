@@ -33,6 +33,7 @@ export function SubcategoryFilter({
               <input
                 type="checkbox"
                 checked={isSelected}
+                className="cursor-pointer"
                 onChange={() => onToggle(option.id)}
               />
               {option.name}

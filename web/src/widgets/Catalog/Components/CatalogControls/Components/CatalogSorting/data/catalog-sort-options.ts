@@ -10,10 +10,6 @@ export const catalogSortOptions: CatalogSortOption[] = [
     label: 'Категория',
   },
   {
-    field: 'createdAt',
-    label: 'Дата',
-  },
-  {
     field: 'price',
     label: 'Стоимость',
   },

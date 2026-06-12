@@ -9,10 +9,17 @@ type PriceFilterProps = {
   value: CatalogPriceFilterValue;
   min: number;
   max: number;
+  currencyLabel?: string;
   onChange: (value: CatalogPriceFilterValue) => void;
 };
 
-export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
+export function PriceFilter({
+  value,
+  min,
+  max,
+  currencyLabel = '',
+  onChange,
+}: PriceFilterProps) {
   const [draftValue, setDraftValue] = useState(value);
 
   const isDisabled = min === max;
@@ -60,6 +67,14 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
     commitValue(draftValue);
   }
 
+  function formatPrice(value: number) {
+    const formattedValue = value.toLocaleString('ru-RU');
+
+    return currencyLabel
+      ? `${formattedValue} ${currencyLabel}`
+      : formattedValue;
+  }
+
   const leftPercent =
     max === min ? 0 : ((draftValue.from - min) / (max - min)) * 100;
 
@@ -71,7 +86,7 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
       <div className="grid grid-cols-2 gap-2">
         <label className="space-y-1">
           <span className="text-xs text-muted-foreground">От</span>
-          <div className="h-9 rounded-lg bg-background px-3">
+          <div className="h-9 rounded-lg border border-border bg-background px-3">
             <Input
               type="number"
               value={draftValue.from}
@@ -90,7 +105,7 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
 
         <label className="space-y-1">
           <span className="text-xs text-muted-foreground">До</span>
-          <div className="h-9 rounded-lg bg-background px-3">
+          <div className="h-9 rounded-lg border border-border bg-background px-3">
             <Input
               type="number"
               value={draftValue.to}
@@ -127,7 +142,8 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
           disabled={isDisabled}
           className={cn(
             'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
-            '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
+            '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
+            '[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-foreground',
           )}
           onChange={(event) => updateDraftFrom(Number(event.target.value))}
           onMouseUp={commitDraftValue}
@@ -143,7 +159,8 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
           disabled={isDisabled}
           className={cn(
             'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
-            '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
+            '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
+            '[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-foreground',
           )}
           onChange={(event) => updateDraftTo(Number(event.target.value))}
           onMouseUp={commitDraftValue}
@@ -153,8 +170,8 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
       </div>
 
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{min.toLocaleString('ru-RU')} ₽</span>
-        <span>{max.toLocaleString('ru-RU')} ₽</span>
+        <span>{formatPrice(min)}</span>
+        <span>{formatPrice(max)}</span>
       </div>
     </div>
   );

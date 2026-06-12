@@ -1,4 +1,4 @@
-export type CatalogSortField = 'title' | 'category' | 'createdAt' | 'price';
+export type CatalogSortField = 'title' | 'category' | 'price';
 
 export type CatalogSortDirection = 'asc' | 'desc';
 
