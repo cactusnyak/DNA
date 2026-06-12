@@ -33,7 +33,7 @@ export function CatalogControls({
   }
 
   return (
-    <aside className="space-y-6 rounded-xl bg-muted/30 p-4 lg:sticky lg:top-24 lg:self-start">
+    <aside className="space-y-6 rounded-xl bg-muted/25 p-4 lg:sticky lg:top-24 lg:self-start">
       {showSorting && (
         <CatalogSorting value={sortRules} onChange={onSortRulesChange} />
       )}

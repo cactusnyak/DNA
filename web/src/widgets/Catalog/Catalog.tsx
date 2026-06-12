@@ -155,7 +155,11 @@ export function Catalog({
           />
         )}
 
-        <ProductGrid products={products} currentCategorySlug={categorySlug} />
+        <ProductGrid
+          products={products}
+          currentCategorySlug={categorySlug}
+          compact={shouldShowControls}
+        />
       </div>
     </section>
   );
