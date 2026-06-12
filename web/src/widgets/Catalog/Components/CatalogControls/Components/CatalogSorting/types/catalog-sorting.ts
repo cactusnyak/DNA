@@ -5,8 +5,6 @@ export type CatalogSortDirection = 'asc' | 'desc';
 export type CatalogSortOption = {
   field: CatalogSortField;
   label: string;
-  ascLabel: string;
-  descLabel: string;
 };
 
 export type CatalogSortRule = {

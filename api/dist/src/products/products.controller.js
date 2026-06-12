@@ -20,9 +20,13 @@ let ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
     }
-    findAll(categorySlug) {
+    findAll(categorySlug, priceFrom, priceTo, categoryIds, sort) {
         return this.productsService.findAll({
             categorySlug,
+            priceFrom: priceFrom ? Number(priceFrom) : undefined,
+            priceTo: priceTo ? Number(priceTo) : undefined,
+            categoryIds: categoryIds?.split(',').filter(Boolean),
+            sort,
         });
     }
     findById(productId) {
@@ -33,8 +37,12 @@ exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('category')),
+    __param(1, (0, common_1.Query)('priceFrom')),
+    __param(2, (0, common_1.Query)('priceTo')),
+    __param(3, (0, common_1.Query)('categoryIds')),
+    __param(4, (0, common_1.Query)('sort')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findAll", null);
 __decorate([

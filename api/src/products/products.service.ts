@@ -2,8 +2,20 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
+type CatalogSortField = 'title' | 'category' | 'createdAt' | 'price';
+type CatalogSortDirection = 'asc' | 'desc';
+
+type CatalogSortRule = {
+  field: CatalogSortField;
+  direction: CatalogSortDirection;
+};
+
 type FindAllProductsParams = {
   categorySlug?: string;
+  priceFrom?: number;
+  priceTo?: number;
+  categoryIds?: string[];
+  sort?: string;
 };
 
 type CategoryNode = {
@@ -21,14 +33,31 @@ export class ProductsService {
       ? await this.getCategoryWithDescendantIds(params.categorySlug)
       : undefined;
 
+    const filteredCategoryIds = this.getFilteredCategoryIds({
+      baseCategoryIds: categoryIds,
+      selectedCategoryIds: params.categoryIds,
+    });
+
     const products = await this.prismaService.product.findMany({
-      where: categoryIds
-        ? {
-            categoryId: {
-              in: categoryIds,
-            },
-          }
-        : undefined,
+      where: {
+        ...(filteredCategoryIds
+          ? {
+              categoryId: {
+                in: filteredCategoryIds,
+              },
+            }
+          : {}),
+        ...(params.priceFrom !== undefined || params.priceTo !== undefined
+          ? {
+              price: {
+                ...(params.priceFrom !== undefined
+                  ? { gte: params.priceFrom }
+                  : {}),
+                ...(params.priceTo !== undefined ? { lte: params.priceTo } : {}),
+              },
+            }
+          : {}),
+      },
       include: {
         category: {
           include: {
@@ -41,9 +70,7 @@ export class ProductsService {
           },
         },
       },
-      orderBy: {
-        title: 'asc',
-      },
+      orderBy: this.getOrderBy(params.sort),
     });
 
     const categoryPathById = await this.getCategoryPathById();
@@ -79,6 +106,85 @@ export class ProductsService {
     const categoryPathById = await this.getCategoryPathById();
 
     return this.mapProduct(product, categoryPathById);
+  }
+
+  private getFilteredCategoryIds(params: {
+    baseCategoryIds?: string[];
+    selectedCategoryIds?: string[];
+  }) {
+    const { baseCategoryIds, selectedCategoryIds } = params;
+
+    if (!baseCategoryIds && !selectedCategoryIds?.length) {
+      return undefined;
+    }
+
+    if (baseCategoryIds && !selectedCategoryIds?.length) {
+      return baseCategoryIds;
+    }
+
+    if (!baseCategoryIds && selectedCategoryIds?.length) {
+      return selectedCategoryIds;
+    }
+
+    return selectedCategoryIds?.filter((categoryId) =>
+      baseCategoryIds?.includes(categoryId),
+    );
+  }
+
+  private getOrderBy(sort?: string) {
+    const sortRules = this.parseSortRules(sort);
+
+    if (!sortRules.length) {
+      return {
+        title: 'asc' as const,
+      };
+    }
+
+    return sortRules.map((rule) => {
+      if (rule.field === 'category') {
+        return {
+          category: {
+            name: rule.direction,
+          },
+        };
+      }
+
+      return {
+        [rule.field]: rule.direction,
+      };
+    });
+  }
+
+  private parseSortRules(sort?: string): CatalogSortRule[] {
+    if (!sort) {
+      return [];
+    }
+
+    const allowedFields: CatalogSortField[] = [
+      'title',
+      'category',
+      'createdAt',
+      'price',
+    ];
+
+    return sort
+      .split(',')
+      .map((rule) => {
+        const [field, direction] = rule.split(':');
+
+        if (
+          !allowedFields.includes(field as CatalogSortField) ||
+          (direction !== 'asc' && direction !== 'desc')
+        ) {
+          return undefined;
+        }
+
+        return {
+          field: field as CatalogSortField,
+          direction,
+        };
+      })
+      .filter((rule): rule is CatalogSortRule => Boolean(rule));
   }
 
   private async getCategoryWithDescendantIds(categorySlug: string) {
@@ -185,6 +291,8 @@ export class ProductsService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
       images: product.images
         .map((productImage: any) => productImage.image)
         .sort(

@@ -1,6 +1,10 @@
 import { PrismaService } from '../prisma/prisma.service';
 type FindAllProductsParams = {
     categorySlug?: string;
+    priceFrom?: number;
+    priceTo?: number;
+    categoryIds?: string[];
+    sort?: string;
 };
 export declare class ProductsService {
     private readonly prismaService;
@@ -22,6 +26,8 @@ export declare class ProductsService {
         slug: any;
         description: any;
         price: any;
+        createdAt: any;
+        updatedAt: any;
         images: any;
     }[]>;
     findById(productId: string): Promise<{
@@ -41,8 +47,13 @@ export declare class ProductsService {
         slug: any;
         description: any;
         price: any;
+        createdAt: any;
+        updatedAt: any;
         images: any;
     }>;
+    private getFilteredCategoryIds;
+    private getOrderBy;
+    private parseSortRules;
     private getCategoryWithDescendantIds;
     private collectDescendantCategoryIds;
     private getCategoryPathById;

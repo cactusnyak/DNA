@@ -1,5 +1,7 @@
+type QueryValue = string | number | undefined;
+
 type RequestOptions = {
-  query?: Record<string, string | undefined>;
+  query?: Record<string, QueryValue>;
 };
 
 function buildUrl(path: string, query?: RequestOptions['query']) {
@@ -7,8 +9,8 @@ function buildUrl(path: string, query?: RequestOptions['query']) {
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined) {
-        url.searchParams.set(key, value);
+      if (value !== undefined && value !== '') {
+        url.searchParams.set(key, String(value));
       }
     });
   }

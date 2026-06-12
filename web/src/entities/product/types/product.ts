@@ -8,5 +8,7 @@ export type Product = {
   slug: string;
   description: string;
   price: number;
+  createdAt: string;
+  updatedAt: string;
   images: Image[];
 };

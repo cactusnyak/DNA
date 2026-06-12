@@ -1,5 +1,4 @@
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/shared/utils/cn';
@@ -10,6 +9,11 @@ import type {
   CatalogSortField,
   CatalogSortRule,
 } from './types/catalog-sorting';
+
+type CatalogSortingProps = {
+  value: CatalogSortRule[];
+  onChange: (value: CatalogSortRule[]) => void;
+};
 
 function getNextSortDirection(
   currentDirection?: CatalogSortDirection,
@@ -25,38 +29,31 @@ function getNextSortDirection(
   return undefined;
 }
 
-export function CatalogSorting() {
-  const [sortRules, setSortRules] = useState<CatalogSortRule[]>([]);
-
+export function CatalogSorting({ value, onChange }: CatalogSortingProps) {
   function getRuleDirection(field: CatalogSortField) {
-    return sortRules.find((rule) => rule.field === field)?.direction;
+    return value.find((rule) => rule.field === field)?.direction;
   }
 
   function handleToggleSort(field: CatalogSortField) {
-    setSortRules((currentRules) => {
-      const currentRule = currentRules.find((rule) => rule.field === field);
-      const nextDirection = getNextSortDirection(currentRule?.direction);
+    const currentRule = value.find((rule) => rule.field === field);
+    const nextDirection = getNextSortDirection(currentRule?.direction);
 
-      const rulesWithoutCurrentField = currentRules.filter(
-        (rule) => rule.field !== field,
-      );
+    const rulesWithoutCurrentField = value.filter(
+      (rule) => rule.field !== field,
+    );
 
-      if (!nextDirection) {
-        return rulesWithoutCurrentField;
-      }
+    if (!nextDirection) {
+      onChange(rulesWithoutCurrentField);
+      return;
+    }
 
-      return [
-        ...rulesWithoutCurrentField,
-        {
-          field,
-          direction: nextDirection,
-        },
-      ];
-    });
-  }
-
-  function handleClearRules() {
-    setSortRules([]);
+    onChange([
+      ...rulesWithoutCurrentField,
+      {
+        field,
+        direction: nextDirection,
+      },
+    ]);
   }
 
   return (
@@ -64,8 +61,8 @@ export function CatalogSorting() {
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold">Сортировка</h2>
 
-        {sortRules.length > 0 && (
-          <Button type="button" variant="ghost" size="sm" onClick={handleClearRules}>
+        {value.length > 0 && (
+          <Button type="button" variant="ghost" size="sm" onClick={() => onChange([])}>
             Сбросить
           </Button>
         )}
@@ -96,12 +93,6 @@ export function CatalogSorting() {
           );
         })}
       </div>
-
-      {sortRules.length > 1 && (
-        <p className="text-xs text-muted-foreground">
-          Порядок сортировки применяется слева направо.
-        </p>
-      )}
     </section>
   );
 }

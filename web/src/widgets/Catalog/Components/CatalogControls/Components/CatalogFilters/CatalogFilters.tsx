@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import type { Product } from '@/entities/product';
@@ -13,6 +13,10 @@ import type {
 
 type CatalogFiltersProps = {
   products: Product[];
+  priceFilter: CatalogPriceFilterValue;
+  selectedCategoryIds: string[];
+  onPriceFilterChange: (value: CatalogPriceFilterValue) => void;
+  onSelectedCategoryIdsChange: (categoryIds: string[]) => void;
 };
 
 function getPriceBounds(products: Product[]) {
@@ -58,43 +62,33 @@ function getSubcategoryOptions(products: Product[]) {
   );
 }
 
-export function CatalogFilters({ products }: CatalogFiltersProps) {
+export function CatalogFilters({
+  products,
+  priceFilter,
+  selectedCategoryIds,
+  onPriceFilterChange,
+  onSelectedCategoryIdsChange,
+}: CatalogFiltersProps) {
   const priceBounds = useMemo(() => getPriceBounds(products), [products]);
   const subcategoryOptions = useMemo(
     () => getSubcategoryOptions(products),
     [products],
   );
 
-  const [priceFilter, setPriceFilter] = useState<CatalogPriceFilterValue>({
-    from: priceBounds.min,
-    to: priceBounds.max,
-  });
-
-  const [selectedSubcategoryIds, setSelectedSubcategoryIds] = useState<
-    string[]
-  >([]);
-
-  useEffect(() => {
-    setPriceFilter({
-      from: priceBounds.min,
-      to: priceBounds.max,
-    });
-  }, [priceBounds.min, priceBounds.max]);
-
   function handleToggleSubcategory(subcategoryId: string) {
-    setSelectedSubcategoryIds((currentIds) =>
-      currentIds.includes(subcategoryId)
-        ? currentIds.filter((id) => id !== subcategoryId)
-        : [...currentIds, subcategoryId],
+    onSelectedCategoryIdsChange(
+      selectedCategoryIds.includes(subcategoryId)
+        ? selectedCategoryIds.filter((id) => id !== subcategoryId)
+        : [...selectedCategoryIds, subcategoryId],
     );
   }
 
   function handleReset() {
-    setPriceFilter({
+    onPriceFilterChange({
       from: priceBounds.min,
       to: priceBounds.max,
     });
-    setSelectedSubcategoryIds([]);
+    onSelectedCategoryIdsChange([]);
   }
 
   return (
@@ -112,14 +106,14 @@ export function CatalogFilters({ products }: CatalogFiltersProps) {
           value={priceFilter}
           min={priceBounds.min}
           max={priceBounds.max}
-          onChange={setPriceFilter}
+          onChange={onPriceFilterChange}
         />
       </FilterSection>
 
       <FilterSection title="Подкатегории">
         <SubcategoryFilter
           options={subcategoryOptions}
-          selectedIds={selectedSubcategoryIds}
+          selectedIds={selectedCategoryIds}
           onToggle={handleToggleSubcategory}
         />
       </FilterSection>

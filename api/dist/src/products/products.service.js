@@ -21,14 +21,30 @@ let ProductsService = class ProductsService {
         const categoryIds = params.categorySlug
             ? await this.getCategoryWithDescendantIds(params.categorySlug)
             : undefined;
+        const filteredCategoryIds = this.getFilteredCategoryIds({
+            baseCategoryIds: categoryIds,
+            selectedCategoryIds: params.categoryIds,
+        });
         const products = await this.prismaService.product.findMany({
-            where: categoryIds
-                ? {
-                    categoryId: {
-                        in: categoryIds,
-                    },
-                }
-                : undefined,
+            where: {
+                ...(filteredCategoryIds
+                    ? {
+                        categoryId: {
+                            in: filteredCategoryIds,
+                        },
+                    }
+                    : {}),
+                ...(params.priceFrom !== undefined || params.priceTo !== undefined
+                    ? {
+                        price: {
+                            ...(params.priceFrom !== undefined
+                                ? { gte: params.priceFrom }
+                                : {}),
+                            ...(params.priceTo !== undefined ? { lte: params.priceTo } : {}),
+                        },
+                    }
+                    : {}),
+            },
             include: {
                 category: {
                     include: {
@@ -41,9 +57,7 @@ let ProductsService = class ProductsService {
                     },
                 },
             },
-            orderBy: {
-                title: 'asc',
-            },
+            orderBy: this.getOrderBy(params.sort),
         });
         const categoryPathById = await this.getCategoryPathById();
         return products.map((product) => this.mapProduct(product, categoryPathById));
@@ -71,6 +85,64 @@ let ProductsService = class ProductsService {
         }
         const categoryPathById = await this.getCategoryPathById();
         return this.mapProduct(product, categoryPathById);
+    }
+    getFilteredCategoryIds(params) {
+        const { baseCategoryIds, selectedCategoryIds } = params;
+        if (!baseCategoryIds && !selectedCategoryIds?.length) {
+            return undefined;
+        }
+        if (baseCategoryIds && !selectedCategoryIds?.length) {
+            return baseCategoryIds;
+        }
+        if (!baseCategoryIds && selectedCategoryIds?.length) {
+            return selectedCategoryIds;
+        }
+        return selectedCategoryIds?.filter((categoryId) => baseCategoryIds?.includes(categoryId));
+    }
+    getOrderBy(sort) {
+        const sortRules = this.parseSortRules(sort);
+        if (!sortRules.length) {
+            return {
+                title: 'asc',
+            };
+        }
+        return sortRules.map((rule) => {
+            if (rule.field === 'category') {
+                return {
+                    category: {
+                        name: rule.direction,
+                    },
+                };
+            }
+            return {
+                [rule.field]: rule.direction,
+            };
+        });
+    }
+    parseSortRules(sort) {
+        if (!sort) {
+            return [];
+        }
+        const allowedFields = [
+            'title',
+            'category',
+            'createdAt',
+            'price',
+        ];
+        return sort
+            .split(',')
+            .map((rule) => {
+            const [field, direction] = rule.split(':');
+            if (!allowedFields.includes(field) ||
+                (direction !== 'asc' && direction !== 'desc')) {
+                return undefined;
+            }
+            return {
+                field: field,
+                direction,
+            };
+        })
+            .filter((rule) => Boolean(rule));
     }
     async getCategoryWithDescendantIds(categorySlug) {
         const rootCategory = await this.prismaService.category.findUnique({
@@ -150,6 +222,8 @@ let ProductsService = class ProductsService {
             slug: product.slug,
             description: product.description,
             price: product.price,
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt,
             images: product.images
                 .map((productImage) => productImage.image)
                 .sort((firstImage, secondImage) => firstImage.sortOrder - secondImage.sortOrder),

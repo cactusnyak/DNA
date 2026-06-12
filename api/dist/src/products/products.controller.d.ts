@@ -2,7 +2,7 @@ import { ProductsService } from './products.service';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    findAll(categorySlug?: string): Promise<{
+    findAll(categorySlug?: string, priceFrom?: string, priceTo?: string, categoryIds?: string, sort?: string): Promise<{
         id: any;
         categoryId: any;
         category: {
@@ -19,6 +19,8 @@ export declare class ProductsController {
         slug: any;
         description: any;
         price: any;
+        createdAt: any;
+        updatedAt: any;
         images: any;
     }[]>;
     findById(productId: string): Promise<{
@@ -38,6 +40,8 @@ export declare class ProductsController {
         slug: any;
         description: any;
         price: any;
+        createdAt: any;
+        updatedAt: any;
         images: any;
     }>;
 }
