@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/shared/utils/cn';
 
@@ -11,7 +13,13 @@ type PriceFilterProps = {
 };
 
 export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
+  const [draftValue, setDraftValue] = useState(value);
+
   const isDisabled = min === max;
+
+  useEffect(() => {
+    setDraftValue(value);
+  }, [value]);
 
   function normalizeRange(nextValue: CatalogPriceFilterValue) {
     const from = Math.max(min, Math.min(nextValue.from, max));
@@ -23,19 +31,40 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
     };
   }
 
-  function updateFrom(from: number) {
-    onChange(normalizeRange({ ...value, from }));
+  function commitValue(nextValue: CatalogPriceFilterValue) {
+    const normalizedValue = normalizeRange(nextValue);
+
+    setDraftValue(normalizedValue);
+    onChange(normalizedValue);
   }
 
-  function updateTo(to: number) {
-    onChange(normalizeRange({ ...value, to }));
+  function updateDraftFrom(from: number) {
+    setDraftValue((currentValue) =>
+      normalizeRange({
+        ...currentValue,
+        from,
+      }),
+    );
+  }
+
+  function updateDraftTo(to: number) {
+    setDraftValue((currentValue) =>
+      normalizeRange({
+        ...currentValue,
+        to,
+      }),
+    );
+  }
+
+  function commitDraftValue() {
+    commitValue(draftValue);
   }
 
   const leftPercent =
-    max === min ? 0 : ((value.from - min) / (max - min)) * 100;
+    max === min ? 0 : ((draftValue.from - min) / (max - min)) * 100;
 
   const rightPercent =
-    max === min ? 100 : ((value.to - min) / (max - min)) * 100;
+    max === min ? 100 : ((draftValue.to - min) / (max - min)) * 100;
 
   return (
     <div className="space-y-4">
@@ -45,11 +74,16 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
           <div className="h-9 rounded-lg bg-background px-3">
             <Input
               type="number"
-              value={value.from}
+              value={draftValue.from}
               min={min}
               max={max}
               disabled={isDisabled}
-              onChange={(event) => updateFrom(Number(event.target.value))}
+              onChange={(event) =>
+                commitValue({
+                  ...draftValue,
+                  from: Number(event.target.value),
+                })
+              }
             />
           </div>
         </label>
@@ -59,11 +93,16 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
           <div className="h-9 rounded-lg bg-background px-3">
             <Input
               type="number"
-              value={value.to}
+              value={draftValue.to}
               min={min}
               max={max}
               disabled={isDisabled}
-              onChange={(event) => updateTo(Number(event.target.value))}
+              onChange={(event) =>
+                commitValue({
+                  ...draftValue,
+                  to: Number(event.target.value),
+                })
+              }
             />
           </div>
         </label>
@@ -84,26 +123,32 @@ export function PriceFilter({ value, min, max, onChange }: PriceFilterProps) {
           type="range"
           min={min}
           max={max}
-          value={value.from}
+          value={draftValue.from}
           disabled={isDisabled}
           className={cn(
             'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
             '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
           )}
-          onChange={(event) => updateFrom(Number(event.target.value))}
+          onChange={(event) => updateDraftFrom(Number(event.target.value))}
+          onMouseUp={commitDraftValue}
+          onTouchEnd={commitDraftValue}
+          onKeyUp={commitDraftValue}
         />
 
         <input
           type="range"
           min={min}
           max={max}
-          value={value.to}
+          value={draftValue.to}
           disabled={isDisabled}
           className={cn(
             'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
             '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
           )}
-          onChange={(event) => updateTo(Number(event.target.value))}
+          onChange={(event) => updateDraftTo(Number(event.target.value))}
+          onMouseUp={commitDraftValue}
+          onTouchEnd={commitDraftValue}
+          onKeyUp={commitDraftValue}
         />
       </div>
 

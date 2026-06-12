@@ -47,6 +47,8 @@ export function Catalog({
   const { '*': categoryPath } = useParams();
   const categorySlug = getCategorySlugFromPath(categoryPath);
 
+  const shouldShowControls = showControls && (showFilters || showSorting);
+
   const { data: baseProducts = [] } = useQuery({
     queryKey: ['products', 'base', categorySlug],
     queryFn: () =>
@@ -132,8 +134,14 @@ export function Catalog({
         <CatalogHeader title={title} showCatalogLink={showCatalogLink} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-        {showControls && (
+      <div
+        className={
+          shouldShowControls
+            ? 'grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]'
+            : 'grid gap-6'
+        }
+      >
+        {shouldShowControls && (
           <CatalogControls
             products={baseProducts}
             priceFilter={priceFilter}
