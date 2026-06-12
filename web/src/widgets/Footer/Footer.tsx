@@ -27,10 +27,14 @@ export function Footer() {
           />
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-border pt-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <p>© {currentYear} DNA. Все права защищены.</p>
+        <div className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            <p>© {currentYear} DNA. Все права защищены.</p>
 
-          <p>Цены, наличие и условия кешбэка могут меняться.</p>
+            <span className="hidden md:inline">|</span>
+
+            <p>Цены, наличие и условия кешбэка могут меняться.</p>
+          </div>
         </div>
       </div>
     </footer>
