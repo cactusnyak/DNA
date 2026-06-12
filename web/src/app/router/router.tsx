@@ -2,21 +2,21 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import { MainLayout } from '@/app/layouts/MainLayout';
 
-import { HomePage } from '@/pages/home/HomePage';
-
+import { AdminPage } from '@/pages/admin/AdminPage';
+import { AuthorizationPage } from '@/pages/authorization/AuthorizationPage';
+import { CartPage } from '@/pages/cart/CartPage';
 import { CatalogPage } from '@/pages/catalog/CatalogPage';
 import { CategoryPage } from '@/pages/category/CategoryPage';
-import { ProductPage } from '@/pages/product/ProductPage';
-
-import { CartPage } from '@/pages/cart/CartPage';
 import { CheckoutPage } from '@/pages/checkout/CheckoutPage';
-
+import { HomePage } from '@/pages/home/HomePage';
+import { ProductPage } from '@/pages/product/ProductPage';
 import { ProfilePage } from '@/pages/profile/ProfilePage';
-import { AuthorizationPage } from '@/pages/authorization/AuthorizationPage';
-
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage';
 
-import { AdminPage } from '@/pages/admin/AdminPage';
+import {
+  BREADCRUMB_TYPE,
+  type BreadcrumbHandle,
+} from '@/widgets/Breadcrumbs/types/breadcrumbs';
 
 export const router = createBrowserRouter([
   {
@@ -26,15 +26,22 @@ export const router = createBrowserRouter([
         path: '/',
         element: <HomePage />,
         handle: {
-          breadcrumb: 'Главная',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.HOME,
+            label: 'Главная',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/catalog',
         handle: {
-          breadcrumb: 'Каталог',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.CATALOG,
+            label: 'Каталог',
+            href: '/catalog',
+          },
+        } satisfies BreadcrumbHandle,
         children: [
           {
             index: true,
@@ -44,8 +51,11 @@ export const router = createBrowserRouter([
             path: '*',
             element: <CategoryPage />,
             handle: {
-              breadcrumb: 'Категория',
-            },
+              breadcrumb: {
+                type: BREADCRUMB_TYPE.CATEGORY,
+                fallbackLabel: 'Категория',
+              },
+            } satisfies BreadcrumbHandle,
           },
         ],
       },
@@ -59,56 +69,77 @@ export const router = createBrowserRouter([
         path: '/product/:productId',
         element: <ProductPage />,
         handle: {
-          breadcrumb: 'Товар',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.PRODUCT,
+            fallbackLabel: 'Товар',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/cart',
         element: <CartPage />,
         handle: {
-          breadcrumb: 'Корзина',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Корзина',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/checkout',
         element: <CheckoutPage />,
         handle: {
-          breadcrumb: 'Оформление заказа',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Оформление заказа',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/profile',
         element: <ProfilePage />,
         handle: {
-          breadcrumb: 'Профиль',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Профиль',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/authorization',
         element: <AuthorizationPage />,
         handle: {
-          breadcrumb: 'Авторизация',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Авторизация',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/referrals',
         element: <ReferralsPage />,
         handle: {
-          breadcrumb: 'Заработок',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Заработок',
+          },
+        } satisfies BreadcrumbHandle,
       },
 
       {
         path: '/admin',
         element: <AdminPage />,
         handle: {
-          breadcrumb: 'Админка',
-        },
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Админка',
+          },
+        } satisfies BreadcrumbHandle,
       },
     ],
   },
