@@ -1,12 +1,16 @@
+import type { Product } from '@/entities/product';
+
 import { CatalogFilters } from './components/CatalogFilters';
 import { CatalogSorting } from './components/CatalogSorting';
 
 type CatalogControlsProps = {
+  products: Product[];
   showFilters?: boolean;
   showSorting?: boolean;
 };
 
 export function CatalogControls({
+  products,
   showFilters = true,
   showSorting = true,
 }: CatalogControlsProps) {
@@ -15,9 +19,9 @@ export function CatalogControls({
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg bg-card lg:flex-row lg:items-center lg:justify-between">
-      {showFilters && <CatalogFilters />}
+    <aside className="space-y-6 rounded-xl bg-muted/30 p-4 lg:sticky lg:top-24 lg:self-start">
       {showSorting && <CatalogSorting />}
-    </div>
+      {showFilters && <CatalogFilters products={products} />}
+    </aside>
   );
 }

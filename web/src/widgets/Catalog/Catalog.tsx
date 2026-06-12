@@ -29,7 +29,7 @@ export function Catalog({
   const categorySlug = getCategorySlugFromPath(categoryPath);
 
   const {
-    data: products,
+    data: products = [],
     isPending,
     error,
   } = useQuery({
@@ -70,17 +70,17 @@ export function Catalog({
         <CatalogHeader title={title} showCatalogLink={showCatalogLink} />
       )}
 
-      {showControls && (
-        <CatalogControls
-          showFilters={showFilters}
-          showSorting={showSorting}
-        />
-      )}
+      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        {showControls && (
+          <CatalogControls
+            products={products}
+            showFilters={showFilters}
+            showSorting={showSorting}
+          />
+        )}
 
-      <ProductGrid
-        products={products ?? []}
-        currentCategorySlug={categorySlug}
-      />
+        <ProductGrid products={products} currentCategorySlug={categorySlug} />
+      </div>
     </section>
   );
 }
