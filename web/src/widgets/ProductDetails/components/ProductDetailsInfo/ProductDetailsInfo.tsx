@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import { SectionHeader } from '@/components/ui/Section';
 import type { Product } from '@/entities/product';
+import { formatPrice } from '@/shared/utils/format-price';
 
 type ProductDetailsInfoProps = {
   product: Product;
@@ -14,7 +15,7 @@ export function ProductDetailsInfo({ product }: ProductDetailsInfoProps) {
 
       <div className="space-y-2">
         <p className="text-3xl font-semibold">
-          {product.price.toLocaleString('ru-RU')} ₽
+          {formatPrice(product.price)}
         </p>
 
         <Link

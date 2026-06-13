@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import { Button } from '@/components/ui/Button';
 import { useCartStore } from '@/entities/cart';
 import type { Product } from '@/entities/product';
@@ -22,7 +24,13 @@ export function ProductActions({
   showAddToCartButton = true,
   showBuyNowButton = true,
 }: ProductActionsProps) {
+  const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
+
+  function handleBuyNow() {
+    addItem(product);
+    navigate('/checkout');
+  }
 
   if (!showAddToCartButton && !showBuyNowButton) {
     return null;
@@ -39,7 +47,7 @@ export function ProductActions({
           type="button"
           size={variant === 'details' ? 'lg' : 'default'}
           className={cn('w-full', getProductActionHeightClass(variant))}
-          onClick={() => addItem(product)}
+          onClick={handleBuyNow}
         >
           Купить в 1 клик
         </Button>

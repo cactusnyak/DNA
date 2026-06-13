@@ -1,3 +1,5 @@
+import { Checkout } from '@/widgets/Checkout';
+
 export function CheckoutPage() {
-  return <h1 className="text-2xl font-semibold">Оформление заказа</h1>;
+  return <Checkout />;
 }

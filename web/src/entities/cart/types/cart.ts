@@ -1,6 +1,7 @@
 import type { CartItem } from './cart-item';
 
 export type Cart = {
-  userId: string;
+  userId?: string;
+  guestSessionId?: string;
   items: CartItem[];
 };

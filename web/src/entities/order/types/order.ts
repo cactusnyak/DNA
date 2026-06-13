@@ -1,9 +1,11 @@
+import type { OrderCustomer } from './order-customer';
 import type { OrderItem } from './order-item';
 import type { OrderStatus } from './order-status';
 
-export type Order = {
+export type Order = OrderCustomer & {
   id: string;
-  userId: string;
+  userId?: string;
+  guestSessionId?: string;
   status: OrderStatus;
   items: OrderItem[];
   totalAmount: number;
