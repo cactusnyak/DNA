@@ -4,6 +4,7 @@ require("dotenv/config");
 const adapter_pg_1 = require("@prisma/adapter-pg");
 const client_1 = require("@prisma/client");
 const pg_1 = require("pg");
+const node_crypto_1 = require("node:crypto");
 const pool = new pg_1.Pool({
     connectionString: process.env.DATABASE_URL,
 });
@@ -11,6 +12,11 @@ const adapter = new adapter_pg_1.PrismaPg(pool);
 const prisma = new client_1.PrismaClient({
     adapter,
 });
+function createPasswordHash(password) {
+    const salt = 'dna-admin-dev-salt';
+    const hash = (0, node_crypto_1.scryptSync)(password, salt, 64).toString('hex');
+    return `scrypt:${salt}:${hash}`;
+}
 async function createImage(alt, url = 'https://placehold.co/600x600/png') {
     return prisma.image.create({
         data: {
@@ -285,13 +291,21 @@ async function main() {
         where: {
             email: 'admin@dna.local',
         },
-        update: {},
+        update: {
+            passwordHash: createPasswordHash('admin12345'),
+        },
         create: {
             email: 'admin@dna.local',
             firstName: 'Admin',
             lastName: 'DNA',
             role: client_1.UserRole.ADMIN,
             referralCode: 'DNAADMIN',
+            passwordHash: createPasswordHash('admin12345'),
+            balance: {
+                create: {
+                    value: 0,
+                },
+            },
         },
     });
     console.log('Seed completed');

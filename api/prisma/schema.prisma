@@ -36,6 +36,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  passwordHash String?
+
   patronymic   String?
   phone        String?
   referralCode String? @unique

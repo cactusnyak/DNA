@@ -10,9 +10,13 @@ import type {
 type SortRuleListProps = {
   options: CatalogSortOption[];
   rules: CatalogSortRule[];
-  onRemoveRule: (ruleId: string) => void;
+  onRemoveRule: (field: CatalogSortRule['field']) => void;
   onClear: () => void;
 };
+
+function getDirectionLabel(direction: CatalogSortRule['direction']) {
+  return direction === 'asc' ? 'По возрастанию' : 'По убыванию';
+}
 
 export function SortRuleList({
   options,
@@ -21,11 +25,7 @@ export function SortRuleList({
   onClear,
 }: SortRuleListProps) {
   if (!rules.length) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Сортировка отключена.
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">Сортировка отключена.</p>;
   }
 
   return (
@@ -33,24 +33,22 @@ export function SortRuleList({
       <div className="flex flex-wrap gap-2">
         {rules.map((rule, index) => {
           const option = options.find((item) => item.field === rule.field);
-          const directionLabel =
-            rule.direction === 'asc'
-              ? option?.ascLabel
-              : option?.descLabel;
 
           return (
             <div
-              key={rule.id}
+              key={rule.field}
               className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs"
             >
               <span className="text-muted-foreground">{index + 1}</span>
               <span>{option?.label ?? rule.field}</span>
-              <span className="text-muted-foreground">{directionLabel}</span>
+              <span className="text-muted-foreground">
+                {getDirectionLabel(rule.direction)}
+              </span>
 
               <button
                 type="button"
                 className="text-muted-foreground hover:text-foreground"
-                onClick={() => onRemoveRule(rule.id)}
+                onClick={() => onRemoveRule(rule.field)}
               >
                 <X className="size-3" />
               </button>

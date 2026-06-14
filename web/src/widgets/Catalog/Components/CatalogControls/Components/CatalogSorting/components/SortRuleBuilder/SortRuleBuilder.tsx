@@ -12,6 +12,10 @@ type SortRuleBuilderProps = {
   onAddRule: (rule: CatalogSortRule) => void;
 };
 
+function getDirectionLabel(direction: CatalogSortDirection) {
+  return direction === 'asc' ? 'По возрастанию' : 'По убыванию';
+}
+
 export function SortRuleBuilder({
   options,
   rules,
@@ -22,7 +26,6 @@ export function SortRuleBuilder({
     direction: CatalogSortDirection,
   ) {
     onAddRule({
-      id: `${field}-${direction}-${Date.now()}`,
       field,
       direction,
     });
@@ -62,7 +65,7 @@ export function SortRuleBuilder({
                   disabled={isFieldUsed}
                   onClick={() => handleAddRule(option.field, 'asc')}
                 >
-                  {option.ascLabel}
+                  {getDirectionLabel('asc')}
                 </Button>
 
                 <Button
@@ -72,7 +75,7 @@ export function SortRuleBuilder({
                   disabled={isFieldUsed}
                   onClick={() => handleAddRule(option.field, 'desc')}
                 >
-                  {option.descLabel}
+                  {getDirectionLabel('desc')}
                 </Button>
               </div>
             </div>

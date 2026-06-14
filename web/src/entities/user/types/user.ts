@@ -1,3 +1,4 @@
+import type { Balance } from '@/entities/balance';
 import type { Image } from '@/shared/types/image';
 
 import type { UserRole } from './user-role';
@@ -14,4 +15,5 @@ export type User = {
   phone?: string;
   avatar?: Image;
   referralCode?: string;
+  balance?: Balance;
 };

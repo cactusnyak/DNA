@@ -29,7 +29,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
 
   if (!activeImage) {
     return (
-      <div className="flex aspect-square items-center justify-center bg-muted text-sm text-muted-foreground">
+      <div className="flex aspect-square items-center justify-center rounded-md bg-muted text-sm text-muted-foreground">
         Нет изображения
       </div>
     );

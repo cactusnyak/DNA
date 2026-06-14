@@ -47,7 +47,7 @@ export function CheckoutSuccessState({ order }: CheckoutSuccessStateProps) {
         </Button>
 
         <Button asChild variant="outline">
-          <Link to="/profile">Создать профиль позже</Link>
+          <Link to="/authorization">Создать профиль</Link>
         </Button>
       </div>
     </section>

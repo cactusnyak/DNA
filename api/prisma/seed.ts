@@ -4,6 +4,8 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, UserRole } from '@prisma/client';
 import { Pool } from 'pg';
 
+import { scryptSync } from 'node:crypto';
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -13,6 +15,13 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({
   adapter,
 });
+
+function createPasswordHash(password: string) {
+  const salt = 'dna-admin-dev-salt';
+  const hash = scryptSync(password, salt, 64).toString('hex');
+
+  return `scrypt:${salt}:${hash}`;
+}
 
 async function createImage(alt: string, url = 'https://placehold.co/600x600/png') {
   return prisma.image.create({
@@ -350,13 +359,21 @@ async function main() {
     where: {
       email: 'admin@dna.local',
     },
-    update: {},
+    update: {
+      passwordHash: createPasswordHash('admin12345'),
+    },
     create: {
       email: 'admin@dna.local',
       firstName: 'Admin',
       lastName: 'DNA',
       role: UserRole.ADMIN,
       referralCode: 'DNAADMIN',
+      passwordHash: createPasswordHash('admin12345'),
+      balance: {
+        create: {
+          value: 0,
+        },
+      },
     },
   });
 
