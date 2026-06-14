@@ -1,0 +1,1 @@
+export { CartItemsBadge } from './CartItemsBadge';

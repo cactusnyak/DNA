@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 
+import { CartItemsBadge } from '../CartItemsBadge';
 import { navigationItems } from '../../data/navigation-items';
 
 export function MobileNavigation() {
@@ -17,19 +18,19 @@ export function MobileNavigation() {
       >
         {navigationItems.map((item) => {
           const Icon = item.icon;
+          const isCartLink = item.to === '/cart';
 
           return (
-            <Button
-              key={item.to}
-              variant="ghost"
-              asChild
-              className="h-12"
-            >
+            <Button key={item.to} variant="ghost" asChild className="h-12">
               <Link
                 to={item.to}
-                className="flex items-center justify-center"
+                className="relative flex items-center justify-center"
               >
-                <Icon className="size-4" />
+                <span className="relative">
+                  <Icon className="size-4" />
+
+                  {isCartLink && <CartItemsBadge />}
+                </span>
               </Link>
             </Button>
           );

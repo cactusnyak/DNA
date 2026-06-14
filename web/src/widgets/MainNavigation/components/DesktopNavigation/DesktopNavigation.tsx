@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 
+import { CartItemsBadge } from '../CartItemsBadge';
 import { navigationItems } from '../../data/navigation-items';
 
 type DesktopNavigationProps = {
@@ -13,11 +14,20 @@ export function DesktopNavigation({ onNavigate }: DesktopNavigationProps) {
     <nav className="ml-auto hidden items-center gap-1 md:flex sm:gap-2">
       {navigationItems.map((item) => {
         const Icon = item.icon;
+        const isCartLink = item.to === '/cart';
 
         return (
           <Button key={item.to} variant="ghost" size="sm" asChild>
-            <Link to={item.to} onClick={onNavigate} className="gap-2">
-              <Icon className="size-4" />
+            <Link
+              to={item.to}
+              onClick={onNavigate}
+              className="relative gap-2"
+            >
+              <span className="relative">
+                <Icon className="size-4" />
+
+                {isCartLink && <CartItemsBadge />}
+              </span>
 
               <span className="hidden lg:inline">{item.label}</span>
             </Link>

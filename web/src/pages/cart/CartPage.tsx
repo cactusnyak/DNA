@@ -1,3 +1,5 @@
+import { Cart } from '@/widgets/Cart';
+
 export function CartPage() {
-  return <h1 className="text-2xl font-semibold">Корзина</h1>;
+  return <Cart />;
 }
