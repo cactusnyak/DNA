@@ -1,8 +1,9 @@
 import type { ChangeEvent, FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { FormInputField } from '@/components/ui/FormField';
 
+import { authorizationModeItems } from '../../data/authorization-mode-items';
 import type {
   AuthorizationFormValue,
   AuthorizationMode,
@@ -17,55 +18,6 @@ type AuthorizationFormProps = {
   onChange: (value: AuthorizationFormValue) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
-
-type FormInputFieldProps = {
-  label: string;
-  value: string;
-  placeholder?: string;
-  type?: React.HTMLInputTypeAttribute;
-  required?: boolean;
-  minLength?: number;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-};
-
-const authorizationModeItems: {
-  mode: AuthorizationMode;
-  label: string;
-}[] = [
-    {
-      mode: 'login',
-      label: 'Вход',
-    },
-    {
-      mode: 'register',
-      label: 'Регистрация',
-    },
-  ];
-
-function FormInputField({
-  label,
-  value,
-  placeholder,
-  type = 'text',
-  required = false,
-  minLength,
-  onChange,
-}: FormInputFieldProps) {
-  return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium">{label}</span>
-
-      <Input
-        required={required}
-        type={type}
-        value={value}
-        minLength={minLength}
-        placeholder={placeholder}
-        onChange={onChange}
-      />
-    </label>
-  );
-}
 
 export function AuthorizationForm({
   mode,

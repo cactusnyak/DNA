@@ -12,18 +12,14 @@ import { CheckoutOrderSummary } from './components/CheckoutOrderSummary';
 import { CheckoutSuccessState } from './components/CheckoutSuccessState';
 import { buildCreateOrderPayload } from './logic/build-create-order-payload';
 import { initialCheckoutFormValue } from './logic/initial-checkout-form-value';
+import { isCheckoutFormValid } from './logic/is-checkout-form-valid';
+
 import type { CheckoutFormValue } from './types/checkout-form';
 
-function isCheckoutFormValid(value: CheckoutFormValue) {
-  return Boolean(
-    value.customerName.trim() &&
-    value.customerPhone.trim() &&
-    value.deliveryAddress.trim(),
-  );
-}
-
 export function Checkout() {
-  const [formValue, setFormValue] = useState(initialCheckoutFormValue);
+  const [formValue, setFormValue] = useState<CheckoutFormValue>(
+    initialCheckoutFormValue,
+  );
   const [createdOrder, setCreatedOrder] = useState<Order>();
 
   const items = useCartStore((state) => state.items);
@@ -48,18 +44,16 @@ export function Checkout() {
     return <CheckoutEmptyState />;
   }
 
-  const isSubmitDisabled = !isCheckoutFormValid(formValue);
-
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const payload = buildCreateOrderPayload({
-      formValue,
-      items,
-      guestSessionId,
-    });
-
-    createOrderMutation.mutate(payload);
+    createOrderMutation.mutate(
+      buildCreateOrderPayload({
+        formValue,
+        items,
+        guestSessionId,
+      }),
+    );
   }
 
   return (
@@ -73,7 +67,7 @@ export function Checkout() {
         <CheckoutCustomerForm
           value={formValue}
           isPending={createOrderMutation.isPending}
-          isSubmitDisabled={isSubmitDisabled}
+          isSubmitDisabled={!isCheckoutFormValid(formValue)}
           errorMessage={
             createOrderMutation.isError
               ? 'Не удалось оформить заказ. Проверьте данные и попробуйте ещё раз.'

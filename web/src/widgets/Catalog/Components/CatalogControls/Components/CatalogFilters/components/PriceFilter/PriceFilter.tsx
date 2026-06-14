@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { Input } from '@/components/ui/Input';
-import { cn } from '@/shared/utils/cn';
-
 import type { CatalogPriceFilterValue } from '../../types/catalog-filters';
+
+import { PriceRangeFields } from './components/PriceRangeFields';
+import { PriceRangeSlider } from './components/PriceRangeSlider';
+import { formatPriceFilterValue } from './logic/format-price-filter-value';
+import { getRangePercent } from './logic/get-range-percent';
+import { normalizePriceRange } from './logic/normalize-price-range';
 
 type PriceFilterProps = {
   value: CatalogPriceFilterValue;
@@ -28,150 +31,78 @@ export function PriceFilter({
     setDraftValue(value);
   }, [value]);
 
-  function normalizeRange(nextValue: CatalogPriceFilterValue) {
-    const from = Math.max(min, Math.min(nextValue.from, max));
-    const to = Math.max(min, Math.min(nextValue.to, max));
-
-    return {
-      from: Math.min(from, to),
-      to: Math.max(from, to),
-    };
+  function normalizeValue(nextValue: CatalogPriceFilterValue) {
+    return normalizePriceRange(nextValue, min, max);
   }
 
   function commitValue(nextValue: CatalogPriceFilterValue) {
-    const normalizedValue = normalizeRange(nextValue);
+    const normalizedValue = normalizeValue(nextValue);
 
     setDraftValue(normalizedValue);
     onChange(normalizedValue);
   }
 
-  function updateDraftFrom(from: number) {
-    setDraftValue((currentValue) =>
-      normalizeRange({
-        ...currentValue,
-        from,
-      }),
-    );
-  }
-
-  function updateDraftTo(to: number) {
-    setDraftValue((currentValue) =>
-      normalizeRange({
-        ...currentValue,
-        to,
-      }),
-    );
+  function updateDraftValue(nextValue: CatalogPriceFilterValue) {
+    setDraftValue(normalizeValue(nextValue));
   }
 
   function commitDraftValue() {
     commitValue(draftValue);
   }
 
-  function formatPrice(value: number) {
-    const formattedValue = value.toLocaleString('ru-RU');
-
-    return currencyLabel
-      ? `${formattedValue} ${currencyLabel}`
-      : formattedValue;
-  }
-
-  const leftPercent =
-    max === min ? 0 : ((draftValue.from - min) / (max - min)) * 100;
-
-  const rightPercent =
-    max === min ? 100 : ((draftValue.to - min) / (max - min)) * 100;
+  const leftPercent = getRangePercent(draftValue.from, min, max);
+  const rightPercent = max === min
+    ? 100
+    : getRangePercent(draftValue.to, min, max);
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
-        <label className="block space-y-1">
-          <span className="text-xs text-muted-foreground">От</span>
+      <PriceRangeFields
+        from={draftValue.from}
+        to={draftValue.to}
+        min={min}
+        max={max}
+        isDisabled={isDisabled}
+        onFromChange={(from) =>
+          commitValue({
+            ...draftValue,
+            from,
+          })
+        }
+        onToChange={(to) =>
+          commitValue({
+            ...draftValue,
+            to,
+          })
+        }
+      />
 
-          <Input
-            type="number"
-            value={draftValue.from}
-            min={min}
-            max={max}
-            disabled={isDisabled}
-            className="h-9"
-            onChange={(event) =>
-              commitValue({
-                ...draftValue,
-                from: Number(event.target.value),
-              })
-            }
-          />
-        </label>
-
-        <label className="block space-y-1">
-          <span className="text-xs text-muted-foreground">До</span>
-
-          <Input
-            type="number"
-            value={draftValue.to}
-            min={min}
-            max={max}
-            disabled={isDisabled}
-            className="h-9"
-            onChange={(event) =>
-              commitValue({
-                ...draftValue,
-                to: Number(event.target.value),
-              })
-            }
-          />
-        </label>
-      </div>
-
-      <div className="relative h-6">
-        <div className="absolute right-0 left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-muted" />
-
-        <div
-          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-foreground"
-          style={{
-            left: `${leftPercent}%`,
-            right: `${100 - rightPercent}%`,
-          }}
-        />
-
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={draftValue.from}
-          disabled={isDisabled}
-          className={cn(
-            'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
-            '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
-            '[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-foreground',
-          )}
-          onChange={(event) => updateDraftFrom(Number(event.target.value))}
-          onMouseUp={commitDraftValue}
-          onTouchEnd={commitDraftValue}
-          onKeyUp={commitDraftValue}
-        />
-
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={draftValue.to}
-          disabled={isDisabled}
-          className={cn(
-            'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
-            '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
-            '[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-foreground',
-          )}
-          onChange={(event) => updateDraftTo(Number(event.target.value))}
-          onMouseUp={commitDraftValue}
-          onTouchEnd={commitDraftValue}
-          onKeyUp={commitDraftValue}
-        />
-      </div>
+      <PriceRangeSlider
+        from={draftValue.from}
+        to={draftValue.to}
+        min={min}
+        max={max}
+        leftPercent={leftPercent}
+        rightPercent={rightPercent}
+        isDisabled={isDisabled}
+        onFromChange={(from) =>
+          updateDraftValue({
+            ...draftValue,
+            from,
+          })
+        }
+        onToChange={(to) =>
+          updateDraftValue({
+            ...draftValue,
+            to,
+          })
+        }
+        onCommit={commitDraftValue}
+      />
 
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{formatPrice(min)}</span>
-        <span>{formatPrice(max)}</span>
+        <span>{formatPriceFilterValue(min, currencyLabel)}</span>
+        <span>{formatPriceFilterValue(max, currencyLabel)}</span>
       </div>
     </div>
   );

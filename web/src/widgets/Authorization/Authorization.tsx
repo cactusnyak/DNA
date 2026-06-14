@@ -7,44 +7,24 @@ import {
   register,
   useAuthStore,
   type AuthResponse,
-  type LoginPayload,
-  type RegisterPayload,
 } from '@/entities/auth';
 
 import { AuthorizationForm } from './components/AuthorizationForm';
+import {
+  buildLoginPayload,
+  buildRegisterPayload,
+} from './logic/build-authorization-payload';
 import { initialAuthorizationFormValue } from './logic/initial-authorization-form-value';
 import type {
   AuthorizationFormValue,
   AuthorizationMode,
 } from './types/authorization-form';
 
-function normalizeOptionalString(value: string) {
-  const normalizedValue = value.trim();
-
-  return normalizedValue || undefined;
-}
-
-function buildLoginPayload(value: AuthorizationFormValue): LoginPayload {
-  return {
-    email: value.email.trim(),
-    password: value.password,
-  };
-}
-
-function buildRegisterPayload(value: AuthorizationFormValue): RegisterPayload {
-  return {
-    email: value.email.trim(),
-    password: value.password,
-    firstName: value.firstName.trim(),
-    lastName: value.lastName.trim(),
-    phone: normalizeOptionalString(value.phone),
-    inviterReferralCode: normalizeOptionalString(value.inviterReferralCode),
-  };
-}
-
 export function Authorization() {
   const [mode, setMode] = useState<AuthorizationMode>('login');
-  const [formValue, setFormValue] = useState(initialAuthorizationFormValue);
+  const [formValue, setFormValue] = useState<AuthorizationFormValue>(
+    initialAuthorizationFormValue,
+  );
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();

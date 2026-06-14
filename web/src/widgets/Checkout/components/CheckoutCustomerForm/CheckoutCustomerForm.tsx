@@ -1,11 +1,10 @@
-import type {
-  ChangeEvent,
-  FormEvent,
-  HTMLInputTypeAttribute,
-} from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import {
+  FormInputField,
+  FormTextareaField,
+} from '@/components/ui/FormField';
 
 import type { CheckoutFormValue } from '../../types/checkout-form';
 
@@ -17,66 +16,6 @@ type CheckoutCustomerFormProps = {
   onChange: (value: CheckoutFormValue) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
-
-type CheckoutInputFieldProps = {
-  label: string;
-  value: string;
-  placeholder?: string;
-  type?: HTMLInputTypeAttribute;
-  required?: boolean;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-};
-
-type CheckoutTextareaFieldProps = {
-  label: string;
-  value: string;
-  placeholder?: string;
-  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
-};
-
-function CheckoutInputField({
-  label,
-  value,
-  placeholder,
-  type = 'text',
-  required = false,
-  onChange,
-}: CheckoutInputFieldProps) {
-  return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium">{label}</span>
-
-      <Input
-        required={required}
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onChange={onChange}
-      />
-    </label>
-  );
-}
-
-function CheckoutTextareaField({
-  label,
-  value,
-  placeholder,
-  onChange,
-}: CheckoutTextareaFieldProps) {
-  return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium">{label}</span>
-
-      <textarea
-        value={value}
-        placeholder={placeholder}
-        rows={4}
-        className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm leading-5 outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-        onChange={onChange}
-      />
-    </label>
-  );
-}
 
 export function CheckoutCustomerForm({
   value,
@@ -117,7 +56,7 @@ export function CheckoutCustomerForm({
         </header>
 
         <div className="mt-6 grid gap-4">
-          <CheckoutInputField
+          <FormInputField
             required
             label="Имя"
             value={value.customerName}
@@ -125,7 +64,7 @@ export function CheckoutCustomerForm({
             onChange={getInputChangeHandler('customerName')}
           />
 
-          <CheckoutInputField
+          <FormInputField
             required
             type="tel"
             label="Телефон"
@@ -134,7 +73,7 @@ export function CheckoutCustomerForm({
             onChange={getInputChangeHandler('customerPhone')}
           />
 
-          <CheckoutInputField
+          <FormInputField
             type="email"
             label="Email"
             value={value.customerEmail}
@@ -142,7 +81,7 @@ export function CheckoutCustomerForm({
             onChange={getInputChangeHandler('customerEmail')}
           />
 
-          <CheckoutInputField
+          <FormInputField
             required
             label="Адрес доставки"
             value={value.deliveryAddress}
@@ -150,7 +89,7 @@ export function CheckoutCustomerForm({
             onChange={getInputChangeHandler('deliveryAddress')}
           />
 
-          <CheckoutTextareaField
+          <FormTextareaField
             label="Комментарий"
             value={value.comment}
             placeholder="Необязательно"

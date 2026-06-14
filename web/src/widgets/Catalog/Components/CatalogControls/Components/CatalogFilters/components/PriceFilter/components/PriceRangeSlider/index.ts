@@ -1,0 +1,1 @@
+export { PriceRangeSlider } from './PriceRangeSlider';
