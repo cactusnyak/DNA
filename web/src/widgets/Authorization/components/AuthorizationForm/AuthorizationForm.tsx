@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -17,6 +17,55 @@ type AuthorizationFormProps = {
   onChange: (value: AuthorizationFormValue) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
+
+type FormInputFieldProps = {
+  label: string;
+  value: string;
+  placeholder?: string;
+  type?: React.HTMLInputTypeAttribute;
+  required?: boolean;
+  minLength?: number;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+};
+
+const authorizationModeItems: {
+  mode: AuthorizationMode;
+  label: string;
+}[] = [
+    {
+      mode: 'login',
+      label: 'Вход',
+    },
+    {
+      mode: 'register',
+      label: 'Регистрация',
+    },
+  ];
+
+function FormInputField({
+  label,
+  value,
+  placeholder,
+  type = 'text',
+  required = false,
+  minLength,
+  onChange,
+}: FormInputFieldProps) {
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-sm font-medium">{label}</span>
+
+      <Input
+        required={required}
+        type={type}
+        value={value}
+        minLength={minLength}
+        placeholder={placeholder}
+        onChange={onChange}
+      />
+    </label>
+  );
+}
 
 export function AuthorizationForm({
   mode,
@@ -39,9 +88,15 @@ export function AuthorizationForm({
     });
   }
 
+  function getInputChangeHandler(field: keyof AuthorizationFormValue) {
+    return (event: ChangeEvent<HTMLInputElement>) => {
+      updateField(field, event.target.value);
+    };
+  }
+
   return (
-    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5">
-      <div className="space-y-2">
+    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
+      <header className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">
           {isRegisterMode ? 'Регистрация' : 'Вход'}
         </p>
@@ -50,124 +105,90 @@ export function AuthorizationForm({
           {isRegisterMode ? 'Создать профиль DNA' : 'Войти в профиль'}
         </h1>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm leading-6 text-muted-foreground">
           Покупать можно без регистрации. Аккаунт нужен для истории заказов,
           кешбэка, реферальной системы и заработка.
         </p>
+      </header>
+
+      <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+        {authorizationModeItems.map((item) => {
+          const isActive = mode === item.mode;
+
+          return (
+            <Button
+              key={item.mode}
+              type="button"
+              variant={isActive ? 'default' : 'ghost'}
+              className="h-9"
+              onClick={() => onModeChange(item.mode)}
+            >
+              {item.label}
+            </Button>
+          );
+        })}
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
-        <Button
-          type="button"
-          variant={!isRegisterMode ? 'default' : 'ghost'}
-          onClick={() => onModeChange('login')}
-        >
-          Вход
-        </Button>
+      <form onSubmit={onSubmit} className="mt-6 space-y-6">
+        <div className="space-y-4">
+          {isRegisterMode && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormInputField
+                required
+                label="Имя"
+                value={value.firstName}
+                placeholder="Фёдор"
+                onChange={getInputChangeHandler('firstName')}
+              />
 
-        <Button
-          type="button"
-          variant={isRegisterMode ? 'default' : 'ghost'}
-          onClick={() => onModeChange('register')}
-        >
-          Регистрация
-        </Button>
-      </div>
+              <FormInputField
+                required
+                label="Фамилия"
+                value={value.lastName}
+                placeholder="Шевченко"
+                onChange={getInputChangeHandler('lastName')}
+              />
+            </div>
+          )}
 
-      <form onSubmit={onSubmit} className="mt-5 space-y-4">
-        {isRegisterMode && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium">Имя</span>
+          <FormInputField
+            required
+            type="email"
+            label="Email"
+            value={value.email}
+            placeholder="you@example.com"
+            onChange={getInputChangeHandler('email')}
+          />
 
-              <div className="h-10 rounded-lg border border-border bg-background px-3">
-                <Input
-                  required
-                  value={value.firstName}
-                  placeholder="Фёдор"
-                  onChange={(event) =>
-                    updateField('firstName', event.target.value)
-                  }
-                />
-              </div>
-            </label>
+          <FormInputField
+            required
+            type="password"
+            label="Пароль"
+            value={value.password}
+            minLength={6}
+            placeholder="Минимум 6 символов"
+            onChange={getInputChangeHandler('password')}
+          />
 
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium">Фамилия</span>
+          {isRegisterMode && (
+            <>
+              <FormInputField
+                type="tel"
+                label="Телефон"
+                value={value.phone}
+                placeholder="Необязательно"
+                onChange={getInputChangeHandler('phone')}
+              />
 
-              <div className="h-10 rounded-lg border border-border bg-background px-3">
-                <Input
-                  required
-                  value={value.lastName}
-                  placeholder="Шевченко"
-                  onChange={(event) =>
-                    updateField('lastName', event.target.value)
-                  }
-                />
-              </div>
-            </label>
-          </div>
-        )}
-
-        <label className="space-y-1.5">
-          <span className="text-sm font-medium">Email</span>
-
-          <div className="h-10 rounded-lg border border-border bg-background px-3">
-            <Input
-              required
-              type="email"
-              value={value.email}
-              placeholder="you@example.com"
-              onChange={(event) => updateField('email', event.target.value)}
-            />
-          </div>
-        </label>
-
-        <label className="space-y-1.5">
-          <span className="text-sm font-medium">Пароль</span>
-
-          <div className="h-10 rounded-lg border border-border bg-background px-3">
-            <Input
-              required
-              type="password"
-              minLength={6}
-              value={value.password}
-              placeholder="Минимум 6 символов"
-              onChange={(event) => updateField('password', event.target.value)}
-            />
-          </div>
-        </label>
-
-        {isRegisterMode && (
-          <>
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium">Телефон</span>
-
-              <div className="h-10 rounded-lg border border-border bg-background px-3">
-                <Input
-                  type="tel"
-                  value={value.phone}
-                  placeholder="Необязательно"
-                  onChange={(event) => updateField('phone', event.target.value)}
-                />
-              </div>
-            </label>
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium">Реферальный код</span>
-
-              <div className="h-10 rounded-lg border border-border bg-background px-3">
-                <Input
-                  value={value.inviterReferralCode}
-                  placeholder="Необязательно"
-                  onChange={(event) =>
-                    updateField('inviterReferralCode', event.target.value)
-                  }
-                />
-              </div>
-            </label>
-          </>
-        )}
+              <FormInputField
+                label="Реферальный код"
+                value={value.inviterReferralCode}
+                placeholder="Необязательно"
+                onChange={getInputChangeHandler('inviterReferralCode')}
+              />
+            </>
+          )}
+        </div>
 
         {errorMessage && (
           <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">

@@ -1,36 +1,20 @@
-import { Search } from 'lucide-react';
+import * as React from 'react';
 
-import { Input } from './Input';
-
-type SearchInputProps = {
-  placeholder?: string;
-  value?: string;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  className?: string;
-};
+import { cn } from '@/shared/utils/cn';
 
 export function SearchInput({
-  placeholder = 'Поиск',
-  value,
-  onChange,
   className,
-}: SearchInputProps) {
+  type = 'search',
+  ...props
+}: React.ComponentProps<'input'>) {
   return (
-    <label
-      className={[
-        'flex h-8 flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3',
-        'transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50',
+    <input
+      type={type}
+      className={cn(
+        'w-full rounded-lg border border-border bg-background px-3 py-2 text-sm leading-none outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50',
         className,
-      ].join(' ')}
-    >
-      <Search className="size-4 text-muted-foreground" />
-
-      <Input
-        type="search"
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-      />
-    </label>
+      )}
+      {...props}
+    />
   );
 }

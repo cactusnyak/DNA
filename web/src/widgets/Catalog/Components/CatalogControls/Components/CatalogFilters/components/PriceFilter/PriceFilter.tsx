@@ -84,47 +84,47 @@ export function PriceFilter({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-2">
-        <label className="space-y-1">
+        <label className="block space-y-1">
           <span className="text-xs text-muted-foreground">От</span>
-          <div className="h-9 rounded-lg border border-border bg-background px-3">
-            <Input
-              type="number"
-              value={draftValue.from}
-              min={min}
-              max={max}
-              disabled={isDisabled}
-              onChange={(event) =>
-                commitValue({
-                  ...draftValue,
-                  from: Number(event.target.value),
-                })
-              }
-            />
-          </div>
+
+          <Input
+            type="number"
+            value={draftValue.from}
+            min={min}
+            max={max}
+            disabled={isDisabled}
+            className="h-9"
+            onChange={(event) =>
+              commitValue({
+                ...draftValue,
+                from: Number(event.target.value),
+              })
+            }
+          />
         </label>
 
-        <label className="space-y-1">
+        <label className="block space-y-1">
           <span className="text-xs text-muted-foreground">До</span>
-          <div className="h-9 rounded-lg border border-border bg-background px-3">
-            <Input
-              type="number"
-              value={draftValue.to}
-              min={min}
-              max={max}
-              disabled={isDisabled}
-              onChange={(event) =>
-                commitValue({
-                  ...draftValue,
-                  to: Number(event.target.value),
-                })
-              }
-            />
-          </div>
+
+          <Input
+            type="number"
+            value={draftValue.to}
+            min={min}
+            max={max}
+            disabled={isDisabled}
+            className="h-9"
+            onChange={(event) =>
+              commitValue({
+                ...draftValue,
+                to: Number(event.target.value),
+              })
+            }
+          />
         </label>
       </div>
 
       <div className="relative h-6">
-        <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-muted" />
+        <div className="absolute right-0 left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-muted" />
 
         <div
           className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-foreground"
