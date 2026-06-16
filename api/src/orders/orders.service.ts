@@ -15,9 +15,9 @@ type NormalizedOrderItem = {
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
-  async create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto, userId?: string) {
     const customerName = this.getRequiredString(
       createOrderDto.customerName,
       'customerName',
@@ -89,6 +89,7 @@ export class OrdersService {
 
     const order = await this.prismaService.order.create({
       data: {
+        userId,
         guestSessionId,
         customerName,
         customerPhone,
@@ -108,12 +109,24 @@ export class OrdersService {
           })),
         },
       },
-      include: {
-        items: true,
-      },
+      include: this.getOrderInclude(),
     });
 
     return this.mapOrder(order);
+  }
+
+  async findMyOrders(userId: string) {
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        userId,
+      },
+      include: this.getOrderInclude(),
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return orders.map((order) => this.mapOrder(order));
   }
 
   async findById(orderId: string) {
@@ -121,9 +134,7 @@ export class OrdersService {
       where: {
         id: orderId,
       },
-      include: {
-        items: true,
-      },
+      include: this.getOrderInclude(),
     });
 
     if (!order) {
@@ -131,6 +142,29 @@ export class OrdersService {
     }
 
     return this.mapOrder(order);
+  }
+
+  private getOrderInclude() {
+    return {
+      items: {
+        include: {
+          product: {
+            include: {
+              category: {
+                include: {
+                  image: true,
+                },
+              },
+              images: {
+                include: {
+                  image: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    };
   }
 
   private getRequiredString(value: unknown, fieldName: string) {
@@ -202,7 +236,37 @@ export class OrdersService {
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
+        product: item.product ? this.mapOrderProduct(item.product) : undefined,
       })),
+    };
+  }
+
+  private mapOrderProduct(product: any) {
+    return {
+      id: product.id,
+      categoryId: product.categoryId,
+      category: {
+        id: product.category.id,
+        name: product.category.name,
+        slug: product.category.slug,
+        path: product.category.slug,
+        sortOrder: product.category.sortOrder,
+        description: product.category.description ?? undefined,
+        parentId: product.category.parentId ?? undefined,
+        image: product.category.image ?? undefined,
+      },
+      title: product.title,
+      slug: product.slug,
+      description: product.description,
+      price: product.price,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      images: product.images
+        .map((productImage: any) => productImage.image)
+        .sort(
+          (firstImage: any, secondImage: any) =>
+            firstImage.sortOrder - secondImage.sortOrder,
+        ),
     };
   }
 }

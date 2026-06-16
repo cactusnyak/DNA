@@ -17,7 +17,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     const email = this.getEmail(registerDto.email);
@@ -79,6 +79,14 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async getOptionalMeFromAuthorizationHeader(authorizationHeader?: string) {
+    if (!authorizationHeader) {
+      return undefined;
+    }
+
+    return this.getMeFromAuthorizationHeader(authorizationHeader);
   }
 
   private createAuthResponse(user: any) {

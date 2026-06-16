@@ -5,9 +5,11 @@ import {
   getCurrentUser,
   useAuthStore,
 } from '@/entities/auth';
+import { getMyOrders } from '@/entities/order';
 
 import { ProfileBalanceCard } from './components/ProfileBalanceCard';
 import { ProfileDetailsCard } from './components/ProfileDetailsCard';
+import { ProfileOrdersCard } from './components/ProfileOrdersCard';
 import { ProfileSessionErrorState } from './components/ProfileSessionErrorState';
 import { ProfileUnauthorizedState } from './components/ProfileUnauthorizedState';
 
@@ -22,6 +24,16 @@ export function Profile() {
   } = useQuery({
     queryKey: ['current-user'],
     queryFn: getCurrentUser,
+    enabled: Boolean(accessToken),
+  });
+
+  const {
+    data: orders = [],
+    isPending: isOrdersPending,
+    isError: isOrdersError,
+  } = useQuery({
+    queryKey: ['my-orders', accessToken],
+    queryFn: () => getMyOrders(accessToken ?? ''),
     enabled: Boolean(accessToken),
   });
 
@@ -41,7 +53,7 @@ export function Profile() {
     <div className="space-y-8">
       <SectionHeader
         title="Профиль"
-        description="Личные данные, баланс и будущая история заказов."
+        description="Личные данные, баланс и история заказов."
       />
 
       <section className="grid gap-4 md:grid-cols-[minmax(0,1fr)_320px]">
@@ -49,6 +61,12 @@ export function Profile() {
 
         <ProfileBalanceCard user={user} onLogout={clearAccessToken} />
       </section>
+
+      <ProfileOrdersCard
+        orders={orders}
+        isPending={isOrdersPending}
+        isError={isOrdersError}
+      />
     </div>
   );
 }

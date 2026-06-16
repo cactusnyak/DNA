@@ -2,8 +2,13 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
+import { useAuthStore } from '@/entities/auth';
 import { useCartStore } from '@/entities/cart';
-import { createOrder, type Order } from '@/entities/order';
+import {
+  createOrder,
+  type CreateOrderPayload,
+  type Order,
+} from '@/entities/order';
 import { useSessionStore } from '@/entities/session';
 
 import { CheckoutCustomerForm } from './components/CheckoutCustomerForm';
@@ -22,6 +27,8 @@ export function Checkout() {
   );
   const [createdOrder, setCreatedOrder] = useState<Order>();
 
+  const accessToken = useAuthStore((state) => state.accessToken);
+
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const totalAmount = useCartStore((state) => state.getTotalAmount());
@@ -29,7 +36,9 @@ export function Checkout() {
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
 
   const createOrderMutation = useMutation({
-    mutationFn: createOrder,
+    mutationFn: (payload: CreateOrderPayload) => {
+      return createOrder(payload, accessToken);
+    },
     onSuccess: (order) => {
       clearCart();
       setCreatedOrder(order);
@@ -60,7 +69,7 @@ export function Checkout() {
     <div className="space-y-8">
       <SectionHeader
         title="Оформление заказа"
-        description="Покупку можно оформить без регистрации. Аккаунт понадобится только для профиля, истории, кешбэка и заработка."
+        description="Покупку можно оформить без регистрации. Если вы уже вошли в профиль, заказ автоматически появится в истории."
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
