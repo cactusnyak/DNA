@@ -1,3 +1,5 @@
+import { Referrals } from '@/widgets/Referrals';
+
 export function ReferralsPage() {
-  return <h1 className="text-2xl font-semibold">Заработок</h1>;
+  return <Referrals />;
 }

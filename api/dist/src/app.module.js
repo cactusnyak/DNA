@@ -15,6 +15,7 @@ const categories_module_1 = require("./categories/categories.module");
 const orders_module_1 = require("./orders/orders.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const products_module_1 = require("./products/products.module");
+const referrals_module_1 = require("./referrals/referrals.module");
 const users_module_1 = require("./users/users.module");
 let AppModule = class AppModule {
 };
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             orders_module_1.OrdersModule,
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
+            referrals_module_1.ReferralsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
