@@ -33,7 +33,7 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
             className="aspect-square w-full object-cover"
           />
         ) : (
-          <div className="flex aspect-square items-center justify-center text-sm text-muted-foreground">
+          <div className="flex aspect-square items-center justify-center p-10 text-sm text-center text-muted-foreground">
             Нет изображения
           </div>
         )}
