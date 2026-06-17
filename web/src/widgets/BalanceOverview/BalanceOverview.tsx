@@ -29,7 +29,7 @@ export function BalanceOverview({
   return (
     <section
       className={cn(
-        'group relative isolate m-5 mt-15 mb-15 flex flex-col justify-end p-6 sm:p-8 md:p-10',
+        'group relative isolate m-5 mt-25 mb-25 flex flex-col justify-end p-6 sm:p-8 md:p-10',
         className,
       )}
     >
@@ -51,12 +51,11 @@ export function BalanceOverview({
           'pointer-events-none absolute z-10 max-w-none select-none object-contain',
           'drop-shadow-[0_36px_45px_rgba(99,102,241,0.45)]',
           'transition-all duration-700 ease-out',
-          'group-hover:-translate-y-4 group-hover:scale-105',
           'hidden sm:block',
-          'sm:right-[0%] sm:-top-[15%] sm:w-[90%] sm:max-w-none',
-          'md:-top-[20%] md:w-[85%]',
-          'lg:-top-[25%] lg:w-[80%]',
-          'xl:-top-[30%] xl:w-[75%] xl:max-w-[860px]',
+          'sm:-right-[10%] sm:top-[50%] sm:w-[90%] sm:max-w-none sm:scale-[1.6] sm:-translate-y-1/2',
+          'md:scale-[1.5] md:-translate-y-1/2',
+          'lg:scale-[1.15] lg:-translate-y-1/2',
+          'xl:scale-[1] xl:-translate-y-1/2',
         )}
       />
 
@@ -67,8 +66,8 @@ export function BalanceOverview({
 
         {isAuthenticated ? (
           <div className="mt-8 flex w-full flex-col gap-4 lg:flex-row lg:items-stretch">
-            <div className="w-full max-w-sm overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_10px_100px_rgba(0,0,0,0.1)] backdrop-blur-2xl transition-all duration-500 hover:border-white/25 hover:bg-white/15 sm:p-6 lg:shrink-0">
-              <p className="text-sm font-medium tracking-widest text-indigo-100/75">
+            <div className="w-full overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_10px_100px_rgba(0,0,0,0.1)] backdrop-blur-2xl transition-all duration-500 hover:border-white/25 hover:bg-white/15 sm:p-6 lg:max-w-sm lg:shrink-0">
+              <p className="text-sm font-medium uppercase tracking-widest text-indigo-100/75">
                 Доступно сейчас
               </p>
 
@@ -85,13 +84,13 @@ export function BalanceOverview({
               <Link
                 to="/referrals"
                 className={cn(
-                  'group/link flex w-full min-h-24 flex-1 items-center justify-center gap-2 rounded-3xl border border-white/15 bg-white/5 px-6 py-5 text-lg font-bold text-white shadow-[0_10px_100px_rgba(0,0,0,0.1)] backdrop-blur-md transition-all duration-500',
-                  'hover:-translate-y-1 hover:border-white/25 hover:bg-white/15 hover:shadow-[0_20px_120px_rgba(99,102,241,0.18)] sm:text-xl',
+                  'group/link flex w-full min-h-24 flex-1 items-center justify-center gap-2 rounded-3xl border border-white/15 bg-black/10 px-6 py-5 text-lg font-bold text-white shadow-[0_10px_100px_rgba(0,0,0,0.1)] backdrop-blur-md transition-all duration-500',
+                  'hover:-translate-y-1 hover:border-white/25 hover:bg-black/20 hover:shadow-[0_20px_120px_rgba(99,102,241,0.18)] sm:text-xl',
                 )}
               >
                 <span>Зарабатывать</span>
 
-                <ArrowRight className="size-6 text-indigo-100/80 transition-transform duration-300 group-hover/link:translate-x-1" />
+                <ArrowRight className="size-6 transition-transform duration-300 group-hover/link:translate-x-1" />
               </Link>
             )}
           </div>

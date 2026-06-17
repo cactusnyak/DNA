@@ -9,6 +9,10 @@ type CartSummaryProps = {
   onClear: () => void;
 };
 
+function getCartItemsLabel(totalItems: number) {
+  return totalItems === 1 ? 'товар' : 'товаров';
+}
+
 export function CartSummary({
   totalItems,
   totalAmount,
@@ -20,7 +24,7 @@ export function CartSummary({
         <h2 className="text-lg font-semibold">Итого</h2>
 
         <p className="text-sm text-muted-foreground">
-          {totalItems} товар(ов) в корзине
+          {totalItems} {getCartItemsLabel(totalItems)} в корзине
         </p>
       </div>
 
@@ -34,9 +38,7 @@ export function CartSummary({
         <div className="flex items-center justify-between gap-4">
           <span className="text-sm text-muted-foreground">Доставка</span>
 
-          <span className="text-sm text-muted-foreground">
-            уточняется
-          </span>
+          <span className="text-sm text-muted-foreground">уточняется</span>
         </div>
       </div>
 
