@@ -7,7 +7,7 @@ import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
 
 export function MainLayout() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
       <Header />
 
       <Breadcrumbs />

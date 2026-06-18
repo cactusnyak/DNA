@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
-import balanceIllustration from '@/assets/illustrations/balance-illustration.png';
+import balanceIllustration from '@/assets/illustrations/balance-illustration-v2.png';
 import type { Balance } from '@/entities/balance';
 import { cn } from '@/shared/utils/cn';
 import { formatPrice } from '@/shared/utils/format-price';
@@ -20,7 +20,7 @@ export function BalanceOverview({
   balance,
   isAuthenticated = false,
   showReferralLink = true,
-  title = 'Ваш баланс',
+  title = 'Деньги с DNA',
   guestText = 'Зарегистрируйтесь, чтобы видеть баланс, получать кешбэк, участвовать в реферальной системе и отслеживать будущие начисления.',
   className,
 }: BalanceOverviewProps) {
@@ -29,7 +29,7 @@ export function BalanceOverview({
   return (
     <section
       className={cn(
-        'group relative isolate m-5 mt-25 mb-25 flex flex-col justify-end p-6 sm:p-8 md:p-10',
+        'group relative isolate m-5 mt-30 mb-30 flex flex-col justify-end p-6 sm:p-8 md:p-10',
         className,
       )}
     >
@@ -68,14 +68,12 @@ export function BalanceOverview({
           <div
             className={cn(
               'mt-8 grid w-full gap-4',
-              showReferralLink
-                ? 'lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]'
-                : 'lg:grid-cols-1',
+              'lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]'
             )}
           >
             <div className="w-full overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_10px_100px_rgba(0,0,0,0.1)] backdrop-blur-2xl transition-all duration-500 hover:border-white/25 hover:bg-white/15 sm:p-6">
               <p className="text-sm font-medium uppercase tracking-widest text-indigo-100/75">
-                Доступно сейчас
+                Баланс
               </p>
 
               <p className="mt-3 bg-gradient-to-r from-white via-indigo-100 to-cyan-100 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
@@ -92,15 +90,17 @@ export function BalanceOverview({
                 to="/referrals"
                 className={cn(
                   'group/link relative isolate flex min-h-24 w-full items-center justify-center gap-2 overflow-hidden rounded-3xl border border-white/20 px-6 py-5 text-lg font-bold text-white transition-all duration-500 sm:text-xl',
-                  'bg-[linear-gradient(145deg,#282792_0%,#5945E2_30%,#94E1D1_55%,#B8B4F7_78%,#282792_100%)] bg-[length:300%_300%] [background-position:10%_50%]',
-                  'shadow-[0_20px_100px_rgba(89,69,226,0.25)',
-                  'hover:-translate-y-1 hover:scale-[1.01] hover:[background-position:90%_50%] hover:shadow-[0_30px_140px_rgba(148,225,209,0.25),inset_0_1px_0_rgba(245,249,253,0.30)]',
+                  'bg-white/8 backdrop-blur-xl',
+                  'bg-[radial-gradient(circle_at_30%_20%,rgba(40,39,146,0.42)_0%,rgba(89,69,226,0.34)_25%,rgba(148,225,209,0.26)_50%,rgba(184,180,247,0.24)_75%,rgba(40,39,146,0.34)_100%)] bg-[length:200%_200%] [background-position:0%_0%]',
+                  'shadow-[0_20px_100px_rgba(89,69,226,0.22)]',
+                  'hover:-translate-y-1 hover:scale-[1.01] hover:[background-position:100%_100%] hover:shadow-[0_30px_140px_rgba(148,225,209,0.25),inset_0_1px_0_rgba(245,249,253,0.30)]',
                   'active:translate-y-0 active:scale-[0.99]',
-                  'before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_25%_15%,rgba(245,249,253,0.20),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(148,225,209,0.18),transparent_50%),radial-gradient(circle_at_50%_50%,rgba(184,180,247,0.15),transparent_55%)] before:opacity-60 before:transition-opacity before:duration-700 hover:before:opacity-90',
-                  'after:pointer-events-none after:absolute after:inset-y-[-50%] after:left-[-40%] after:z-0 after:w-1/2 after:rotate-12 after:bg-[#F5F9FD]/10 after:blur-2xl after:transition-transform after:duration-[1000ms] hover:after:translate-x-[500%]'
+                  'before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_25%_15%,rgba(245,249,253,0.18),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(148,225,209,0.16),transparent_50%),radial-gradient(circle_at_50%_50%,rgba(184,180,247,0.13),transparent_55%)] before:opacity-55 before:transition-opacity before:duration-700 hover:before:opacity-85',
+                  'after:pointer-events-none after:absolute after:inset-y-[-50%] after:left-[-40%] after:z-0 after:w-1/2 after:rotate-12 after:bg-[#F5F9FD]/8 after:blur-2xl after:transition-transform after:duration-[1000ms] hover:after:translate-x-[500%]',
                 )}
               >
                 <span className="relative z-10">Зарабатывать</span>
+
                 <ArrowRight className="relative z-10 size-6 transition-transform duration-300 group-hover/link:translate-x-1" />
               </Link>
             )}
