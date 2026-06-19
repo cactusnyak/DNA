@@ -4,7 +4,7 @@ import {
   getCurrentUser,
   useAuthStore,
 } from '@/entities/auth';
-import { BalanceOverview } from '@/widgets/BalanceOverview';
+import { BalanceHero } from '@/widgets/BalanceHero';
 import { Catalog } from '@/widgets/Catalog';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
 
@@ -19,7 +19,7 @@ export function HomePage() {
 
   return (
     <div className="space-y-10">
-      <BalanceOverview
+      <BalanceHero
         balance={user?.balance}
         isAuthenticated={Boolean(user)}
         showReferralLink

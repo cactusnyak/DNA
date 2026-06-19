@@ -1,6 +1,6 @@
 import type { ReferralTreeUser } from '@/entities/referral';
 import type { User } from '@/entities/user';
-import { BalanceOverview } from '@/widgets/BalanceOverview';
+import { BalanceCard } from '@/widgets/BalanceCard';
 
 import { ReferralLinkCard } from '../ReferralLinkCard';
 import { ReferralTree } from '../ReferralTree';
@@ -20,11 +20,7 @@ export function ReferralDashboard({
 }: ReferralDashboardProps) {
   return (
     <div className="space-y-6">
-      <BalanceOverview
-        balance={user.balance}
-        isAuthenticated
-        showReferralLink={false}
-      />
+      <BalanceCard balance={user.balance} />
 
       <ReferralLinkCard user={user} />
 
