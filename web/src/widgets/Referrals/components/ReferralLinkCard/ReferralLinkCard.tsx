@@ -33,7 +33,7 @@ export function ReferralLinkCard({ user }: ReferralLinkCardProps) {
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+    <section className="rounded-3xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">

@@ -13,7 +13,7 @@ import { referralBenefits } from '../../data/referral-benefits';
 
 export function ReferralGuestLanding() {
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+    <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 sm:p-8">
       <div className="absolute right-[-80px] top-[-80px] size-56 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute bottom-[-100px] left-[-40px] size-64 rounded-full bg-muted blur-3xl" />
 
@@ -51,7 +51,7 @@ export function ReferralGuestLanding() {
         </div>
 
         <div className="relative">
-          <div className="rounded-3xl border border-border bg-background/80 p-5 shadow-sm">
+          <div className="rounded-3xl border border-border bg-background/80 p-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-muted/60 p-4">
                 <Users className="size-5 text-muted-foreground" />

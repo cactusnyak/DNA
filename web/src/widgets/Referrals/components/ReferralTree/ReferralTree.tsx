@@ -15,7 +15,7 @@ export function ReferralTree({
 }: ReferralTreeProps) {
   if (isPending) {
     return (
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+      <section className="rounded-3xl border border-border bg-card p-5">
         <h2 className="text-xl font-semibold">Приведённые пользователи</h2>
 
         <p className="mt-4 text-sm text-muted-foreground">
@@ -27,7 +27,7 @@ export function ReferralTree({
 
   if (isError) {
     return (
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+      <section className="rounded-3xl border border-border bg-card p-5">
         <h2 className="text-xl font-semibold">Приведённые пользователи</h2>
 
         <p className="mt-4 text-sm text-destructive">
@@ -38,7 +38,7 @@ export function ReferralTree({
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+    <section className="rounded-3xl border border-border bg-card p-5">
       <div>
         <h2 className="text-xl font-semibold">Приведённые пользователи</h2>
 
