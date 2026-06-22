@@ -1,22 +1,17 @@
-import { Link } from 'react-router-dom';
+import { LogIn } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
+import { StateCard } from '@/widgets/StateCard';
 
 export function ProfileUnauthorizedState() {
   return (
-    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Профиль недоступен</h1>
-
-        <p className="text-sm text-muted-foreground">
-          Войдите или зарегистрируйтесь, чтобы видеть историю заказов, баланс,
-          кешбэк и реферальную систему.
-        </p>
-      </div>
-
-      <Button asChild className="mt-6">
-        <Link to="/authorization">Войти или зарегистрироваться</Link>
-      </Button>
-    </section>
+    <StateCard
+      icon={LogIn}
+      title="Профиль недоступен"
+      description="Войдите или зарегистрируйтесь, чтобы видеть историю заказов, баланс, кешбэк и реферальную систему."
+      action={{
+        label: 'Войти или зарегистрироваться',
+        to: '/authorization',
+      }}
+    />
   );
 }
