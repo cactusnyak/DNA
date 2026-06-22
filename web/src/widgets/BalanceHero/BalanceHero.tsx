@@ -81,14 +81,13 @@ export function BalanceHero({
                   'bg-white/5 backdrop-blur-2xl',
                   'bg-[radial-gradient(circle_at_30%_20%,rgba(40,39,146,0.28)_0%,rgba(89,69,226,0.22)_25%,rgba(148,225,209,0.16)_50%,rgba(184,180,247,0.15)_75%,rgba(40,39,146,0.22)_100%)] bg-[length:200%_200%] [background-position:0%_0%]',
                   'shadow-[0_20px_100px_rgba(89,69,226,0.16)]',
-                  'hover:-translate-y-1 hover:scale-[1.01] hover:[background-position:100%_100%] hover:border-white/24 hover:shadow-[0_30px_140px_rgba(148,225,209,0.18),inset_0_1px_0_rgba(245,249,253,0.22)]',
+                  'hover:-translate-y-1 hover:scale-[1.01] hover:bg-white/5 hover:backdrop-blur-[2px] hover:[background-position:100%_100%] hover:border-white/24 hover:shadow-[0_30px_140px_rgba(148,225,209,0.18),inset_0_1px_0_rgba(245,249,253,0.22)]',
                   'active:translate-y-0 active:scale-[0.99]',
-                  'before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_25%_15%,rgba(245,249,253,0.12),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(148,225,209,0.10),transparent_50%),radial-gradient(circle_at_50%_50%,rgba(184,180,247,0.08),transparent_55%)] before:opacity-45 before:transition-opacity before:duration-700 hover:before:opacity-75',
-                  'after:pointer-events-none after:absolute after:inset-y-[-50%] after:left-[-40%] after:z-0 after:w-1/2 after:rotate-12 after:bg-[#F5F9FD]/5 after:blur-2xl after:transition-transform after:duration-[1000ms] hover:after:translate-x-[500%]',
+                  'before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_25%_15%,rgba(245,249,253,0.12),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(148,225,209,0.10),transparent_50%),radial-gradient(circle_at_50%_50%,rgba(184,180,247,0.08),transparent_55%)] before:opacity-45 before:transition-opacity before:duration-700 hover:before:opacity-0',
+                  'after:pointer-events-none after:absolute after:inset-y-[-50%] after:left-[-40%] after:z-0 after:w-1/2 after:rotate-12 after:bg-[#F5F9FD]/5 after:blur-2xl after:transition-transform after:duration-[1000ms] hover:after:translate-x-[500%]'
                 )}
               >
                 <span className="relative z-10">Зарабатывать</span>
-
                 <ArrowRight className="relative z-10 size-6 transition-transform duration-300 group-hover/link:translate-x-1" />
               </Link>
             )}

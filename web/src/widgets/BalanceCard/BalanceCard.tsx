@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { WalletCards } from 'lucide-react';
 
 import type { Balance } from '@/entities/balance';
 import { cn } from '@/shared/utils/cn';
@@ -28,11 +29,12 @@ export function BalanceCard({
       <div className="pointer-events-none absolute -bottom-24 -left-16 z-0 size-52 rounded-full bg-[#94E1D1]/18 blur-3xl" />
 
       <div className="relative z-10">
-        <p className="text-sm font-medium tracking-widest text-indigo-100/75">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100/75">
+          <WalletCards className="size-3.5" />
           {label}
-        </p>
+        </div>
 
-        <p className="mt-3 bg-gradient-to-r from-white via-indigo-100 to-cyan-100 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
+        <p className="mt-5 bg-gradient-to-r from-white via-indigo-100 to-cyan-100 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
           {formatPrice(balanceValue)}
         </p>
 

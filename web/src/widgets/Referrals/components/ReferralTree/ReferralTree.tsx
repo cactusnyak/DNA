@@ -1,3 +1,5 @@
+import { Network } from 'lucide-react';
+
 import type { ReferralTreeUser } from '@/entities/referral';
 
 import { ReferralTreeNode } from '../ReferralTreeNode';
@@ -8,6 +10,15 @@ type ReferralTreeProps = {
   isError?: boolean;
 };
 
+function ReferralTreeBadge() {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+      <Network className="size-3.5" />
+      Дерево приглашений
+    </div>
+  );
+}
+
 export function ReferralTree({
   users,
   isPending = false,
@@ -16,7 +27,11 @@ export function ReferralTree({
   if (isPending) {
     return (
       <section className="rounded-3xl border border-border bg-card p-5">
-        <h2 className="text-xl font-semibold">Приведённые пользователи</h2>
+        <ReferralTreeBadge />
+
+        <h2 className="mt-4 text-xl font-semibold">
+          Приведённые пользователи
+        </h2>
 
         <p className="mt-4 text-sm text-muted-foreground">
           Загружаем дерево приглашённых...
@@ -28,7 +43,11 @@ export function ReferralTree({
   if (isError) {
     return (
       <section className="rounded-3xl border border-border bg-card p-5">
-        <h2 className="text-xl font-semibold">Приведённые пользователи</h2>
+        <ReferralTreeBadge />
+
+        <h2 className="mt-4 text-xl font-semibold">
+          Приведённые пользователи
+        </h2>
 
         <p className="mt-4 text-sm text-destructive">
           Не удалось загрузить дерево приглашённых.
@@ -40,7 +59,11 @@ export function ReferralTree({
   return (
     <section className="rounded-3xl border border-border bg-card p-5">
       <div>
-        <h2 className="text-xl font-semibold">Приведённые пользователи</h2>
+        <ReferralTreeBadge />
+
+        <h2 className="mt-4 text-xl font-semibold">
+          Приведённые пользователи
+        </h2>
 
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Древовидная структура приглашений. Сейчас ограничиваем глубину на

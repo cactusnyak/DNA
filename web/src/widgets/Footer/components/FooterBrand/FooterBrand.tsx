@@ -11,7 +11,7 @@ export function FooterBrand() {
       </Link>
 
       <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-        DNA — онлайн-магазин с кешбэком, партнёрской программой и удобным
+        DNA — код новой экономики. Онлайн-магазин с кешбэком, партнёрской программой и удобным
         каталогом товаров.
       </p>
 

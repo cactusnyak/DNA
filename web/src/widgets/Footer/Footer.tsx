@@ -12,9 +12,9 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-card">
+    <footer className="border-t border-border bg-muted/30">
       <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="grid gap-10 md:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
+        <div className="grid gap-20 md:grid-cols-[auto_auto_auto_auto]">
           <FooterBrand />
 
           <FooterLinkGroup title="Навигация сайта" links={navigationLinks} />
