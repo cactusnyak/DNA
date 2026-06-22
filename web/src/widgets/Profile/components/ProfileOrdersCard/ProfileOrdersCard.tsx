@@ -41,6 +41,29 @@ function getOrderItemsLabel(order: Order) {
   return `${totalQuantity} товаров`;
 }
 
+function ProfileOrdersMessage({
+  tone = 'muted',
+  children,
+}: {
+  tone?: 'muted' | 'destructive';
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mt-5 rounded-xl border border-border px-4 py-4">
+      <p
+        className={[
+          'text-sm leading-6',
+          tone === 'destructive'
+            ? 'text-destructive'
+            : 'text-muted-foreground',
+        ].join(' ')}
+      >
+        {children}
+      </p>
+    </div>
+  );
+}
+
 export function ProfileOrdersCard({
   orders,
   isPending = false,
@@ -48,49 +71,51 @@ export function ProfileOrdersCard({
 }: ProfileOrdersCardProps) {
   if (isPending) {
     return (
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <section>
         <h2 className="text-lg font-semibold">Мои заказы</h2>
 
-        <p className="mt-4 text-sm text-muted-foreground">
+        <ProfileOrdersMessage>
           Загружаем заказы...
-        </p>
+        </ProfileOrdersMessage>
       </section>
     );
   }
 
   if (isError) {
     return (
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <section>
         <h2 className="text-lg font-semibold">Мои заказы</h2>
 
-        <p className="mt-4 text-sm text-destructive">
+        <ProfileOrdersMessage tone="destructive">
           Не удалось загрузить историю заказов.
-        </p>
+        </ProfileOrdersMessage>
       </section>
     );
   }
 
   if (!orders.length) {
     return (
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <section>
         <h2 className="text-lg font-semibold">Мои заказы</h2>
 
-        <p className="mt-4 text-sm text-muted-foreground">
-          Заказов пока нет. Каталог уже ждёт, как кассир в пустом магазине.
-        </p>
+        <div className="mt-5 rounded-xl border border-border px-4 py-4">
+          <p className="text-sm leading-6 text-muted-foreground">
+            Заказов пока нет. Каталог уже ждёт, как кассир в пустом магазине.
+          </p>
 
-        <Link
-          to="/catalog"
-          className="mt-4 inline-flex text-sm font-medium underline-offset-4 hover:underline"
-        >
-          Перейти в каталог
-        </Link>
+          <Link
+            to="/catalog"
+            className="mt-4 inline-flex text-sm font-medium underline-offset-4 hover:underline"
+          >
+            Перейти в каталог
+          </Link>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-5">
+    <section>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Мои заказы</h2>
@@ -105,10 +130,13 @@ export function ProfileOrdersCard({
         </span>
       </div>
 
-      <div className="mt-5 divide-y divide-border">
+      <div className="mt-5 overflow-hidden rounded-xl border border-border">
         {orders.map((order) => (
-          <article key={order.id} className="py-4 first:pt-0 last:pb-0">
-            <div className="flex flex-wrap items-start justify-between gap-3">
+          <article
+            key={order.id}
+            className="border-b border-border px-4 py-4 last:border-b-0"
+          >
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>
                 <p className="text-sm font-semibold">
                   Заказ № {order.id.slice(0, 8)}
@@ -119,7 +147,7 @@ export function ProfileOrdersCard({
                 </p>
               </div>
 
-              <div className="text-right">
+              <div className="sm:text-right">
                 <p className="text-sm font-semibold">
                   {formatPrice(order.totalAmount)}
                 </p>
@@ -130,11 +158,11 @@ export function ProfileOrdersCard({
               </div>
             </div>
 
-            <div className="mt-3 space-y-2">
+            <div className="mt-3 grid gap-2">
               {order.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between gap-3 text-sm"
+                  className="grid gap-1 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-3"
                 >
                   <span className="line-clamp-1 text-muted-foreground">
                     {item.product?.title ?? `Товар ${item.productId}`}

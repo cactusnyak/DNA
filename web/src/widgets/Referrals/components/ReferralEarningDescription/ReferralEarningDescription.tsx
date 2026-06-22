@@ -76,10 +76,6 @@ export function ReferralEarningDescription({
   return (
     <section>
       <div className="px-5">
-        <h2 className="text-xl font-semibold">
-          {activeCategory.details.title}
-        </h2>
-
         <div className="mt-5 flex flex-col gap-5">
           {infoBlocks.map((block) => (
             <div

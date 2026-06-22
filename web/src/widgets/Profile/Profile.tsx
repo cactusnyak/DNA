@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
 import {
@@ -6,8 +6,9 @@ import {
   useAuthStore,
 } from '@/entities/auth';
 import { getMyOrders } from '@/entities/order';
+import { deleteCurrentUser } from '@/entities/user';
 
-import { ProfileBalanceCard } from './components/ProfileBalanceCard';
+import { ProfileDangerZone } from './components/ProfileDangerZone';
 import { ProfileDetailsCard } from './components/ProfileDetailsCard';
 import { ProfileOrdersCard } from './components/ProfileOrdersCard';
 import { ProfileSessionErrorState } from './components/ProfileSessionErrorState';
@@ -37,6 +38,25 @@ export function Profile() {
     enabled: Boolean(accessToken),
   });
 
+  const deleteAccountMutation = useMutation({
+    mutationFn: () => deleteCurrentUser(accessToken ?? ''),
+    onSuccess: () => {
+      clearAccessToken();
+    },
+  });
+
+  function handleDeleteAccount() {
+    const isConfirmed = window.confirm(
+      'Удалить аккаунт? Это действие нельзя будет отменить.',
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    deleteAccountMutation.mutate();
+  }
+
   if (!accessToken) {
     return <ProfileUnauthorizedState />;
   }
@@ -56,16 +76,25 @@ export function Profile() {
         description="Личные данные, баланс и история заказов."
       />
 
-      <section className="grid gap-4 md:grid-cols-[minmax(0,1fr)_320px]">
-        <ProfileDetailsCard user={user} />
-
-        <ProfileBalanceCard user={user} onLogout={clearAccessToken} />
-      </section>
+      <ProfileDetailsCard user={user} />
 
       <ProfileOrdersCard
         orders={orders}
         isPending={isOrdersPending}
         isError={isOrdersError}
+      />
+
+      {deleteAccountMutation.isError && (
+        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          Не удалось удалить аккаунт. Проверьте, что backend поддерживает
+          DELETE /users/me.
+        </p>
+      )}
+
+      <ProfileDangerZone
+        isDeletePending={deleteAccountMutation.isPending}
+        onLogout={clearAccessToken}
+        onDeleteAccount={handleDeleteAccount}
       />
     </div>
   );
