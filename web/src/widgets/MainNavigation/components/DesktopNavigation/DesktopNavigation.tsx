@@ -11,7 +11,7 @@ type DesktopNavigationProps = {
 
 export function DesktopNavigation({ onNavigate }: DesktopNavigationProps) {
   return (
-    <nav className="ml-auto hidden items-center gap-1 md:flex sm:gap-2">
+    <nav className="ml-auto hidden items-center md:flex">
       {navigationItems.map((item) => {
         const Icon = item.icon;
         const isCartLink = item.to === '/cart';

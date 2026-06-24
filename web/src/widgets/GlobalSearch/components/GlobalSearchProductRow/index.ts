@@ -1,0 +1,1 @@
+export { GlobalSearchProductRow } from './GlobalSearchProductRow';

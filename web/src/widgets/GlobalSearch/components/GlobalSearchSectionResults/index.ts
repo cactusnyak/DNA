@@ -1,0 +1,1 @@
+export { GlobalSearchSectionResults } from './GlobalSearchSectionResults';

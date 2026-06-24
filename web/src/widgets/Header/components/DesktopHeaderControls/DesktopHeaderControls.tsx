@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
-import { SearchInput } from '@/components/ui/SearchInput';
 import { cn } from '@/shared/utils/cn';
+import { GlobalSearch } from '@/widgets/GlobalSearch';
 
 type DesktopHeaderControlsProps = {
   isCatalogDropdownOpen: boolean;
@@ -17,9 +17,9 @@ export function DesktopHeaderControls({
 }: DesktopHeaderControlsProps) {
   return (
     <div className="hidden flex-1 items-center gap-3 md:flex">
-      <SearchInput
-        placeholder="Поиск товаров"
-        onFocus={onNavigate}
+      <GlobalSearch
+        placeholder="Поиск товаров и разделов"
+        onOpen={onNavigate}
       />
 
       <Button
@@ -32,10 +32,7 @@ export function DesktopHeaderControls({
             'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
         )}
       >
-        <Link
-          to="/catalog"
-          onClick={onNavigate}
-        >
+        <Link to="/catalog" onClick={onNavigate}>
           Каталог
         </Link>
       </Button>

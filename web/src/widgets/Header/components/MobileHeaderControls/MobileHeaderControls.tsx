@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
-import { SearchInput } from '@/components/ui/SearchInput';
+import { GlobalSearch } from '@/widgets/GlobalSearch';
 
 function MobileCatalogButton({ className }: { className?: string }) {
   return (
@@ -16,7 +16,11 @@ export function MobileHeaderControls() {
     <div className="border-t border-border/50 px-4 py-3 md:hidden">
       <div className="mx-auto flex max-w-7xl items-center gap-2">
         <MobileCatalogButton className="shrink-0" />
-        <SearchInput placeholder="Поиск" />
+
+        <GlobalSearch
+          placeholder="Поиск"
+          className="min-w-0 flex-1"
+        />
       </div>
     </div>
   );

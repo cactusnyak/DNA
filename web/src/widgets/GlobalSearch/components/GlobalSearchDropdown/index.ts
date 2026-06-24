@@ -1,0 +1,1 @@
+export { GlobalSearchDropdown } from './GlobalSearchDropdown';
