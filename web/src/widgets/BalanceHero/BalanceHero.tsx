@@ -16,12 +16,42 @@ type BalanceHeroProps = {
   className?: string;
 };
 
+type BalanceHeroActionLinkProps = {
+  to: string;
+  children: ReactNode;
+};
+
+function BalanceHeroActionLink({
+  to,
+  children,
+}: BalanceHeroActionLinkProps) {
+  return (
+    <Link
+      to={to}
+      className={cn(
+        'group/link relative isolate flex min-h-24 w-full items-center justify-center gap-2 overflow-hidden rounded-3xl border border-white/20 px-6 py-5 text-lg font-bold text-white transition-all duration-500 sm:text-xl',
+        'bg-white/5 backdrop-blur-2xl',
+        'bg-[radial-gradient(circle_at_30%_20%,rgba(40,39,146,0.28)_0%,rgba(89,69,226,0.22)_25%,rgba(148,225,209,0.16)_50%,rgba(184,180,247,0.15)_75%,rgba(40,39,146,0.22)_100%)] bg-[length:200%_200%] [background-position:0%_0%]',
+        'shadow-[0_20px_100px_rgba(89,69,226,0.16)]',
+        'hover:-translate-y-1 hover:scale-[1.01] hover:border-white/24 hover:bg-white/5 hover:backdrop-blur-[2px] hover:[background-position:100%_100%] hover:shadow-[0_30px_140px_rgba(148,225,209,0.18),inset_0_1px_0_rgba(245,249,253,0.22)]',
+        'active:translate-y-0 active:scale-[0.99]',
+        'before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_25%_15%,rgba(245,249,253,0.12),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(148,225,209,0.10),transparent_50%),radial-gradient(circle_at_50%_50%,rgba(184,180,247,0.08),transparent_55%)] before:opacity-45 before:transition-opacity before:duration-700 hover:before:opacity-0',
+        'after:pointer-events-none after:absolute after:inset-y-[-50%] after:left-[-40%] after:z-0 after:w-1/2 after:rotate-12 after:bg-[#F5F9FD]/5 after:blur-2xl after:transition-transform after:duration-[1000ms] hover:after:translate-x-[500%]',
+      )}
+    >
+      <span className="relative z-10">{children}</span>
+
+      <ArrowRight className="relative z-10 size-6 transition-transform duration-300 group-hover/link:translate-x-1" />
+    </Link>
+  );
+}
+
 export function BalanceHero({
   balance,
   isAuthenticated = false,
   showReferralLink = true,
   title = 'Деньги с DNA',
-  guestText = 'Зарегистрируйтесь, чтобы видеть баланс, получать кешбэк, участвовать в реферальной системе и отслеживать будущие начисления.',
+  guestText,
   className,
 }: BalanceHeroProps) {
   return (
@@ -74,28 +104,21 @@ export function BalanceHero({
             <BalanceCard balance={balance} />
 
             {showReferralLink && (
-              <Link
-                to="/referrals"
-                className={cn(
-                  'group/link relative isolate flex min-h-24 w-full items-center justify-center gap-2 overflow-hidden rounded-3xl border border-white/20 px-6 py-5 text-lg font-bold text-white transition-all duration-500 sm:text-xl',
-                  'bg-white/5 backdrop-blur-2xl',
-                  'bg-[radial-gradient(circle_at_30%_20%,rgba(40,39,146,0.28)_0%,rgba(89,69,226,0.22)_25%,rgba(148,225,209,0.16)_50%,rgba(184,180,247,0.15)_75%,rgba(40,39,146,0.22)_100%)] bg-[length:200%_200%] [background-position:0%_0%]',
-                  'shadow-[0_20px_100px_rgba(89,69,226,0.16)]',
-                  'hover:-translate-y-1 hover:scale-[1.01] hover:bg-white/5 hover:backdrop-blur-[2px] hover:[background-position:100%_100%] hover:border-white/24 hover:shadow-[0_30px_140px_rgba(148,225,209,0.18),inset_0_1px_0_rgba(245,249,253,0.22)]',
-                  'active:translate-y-0 active:scale-[0.99]',
-                  'before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_25%_15%,rgba(245,249,253,0.12),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(148,225,209,0.10),transparent_50%),radial-gradient(circle_at_50%_50%,rgba(184,180,247,0.08),transparent_55%)] before:opacity-45 before:transition-opacity before:duration-700 hover:before:opacity-0',
-                  'after:pointer-events-none after:absolute after:inset-y-[-50%] after:left-[-40%] after:z-0 after:w-1/2 after:rotate-12 after:bg-[#F5F9FD]/5 after:blur-2xl after:transition-transform after:duration-[1000ms] hover:after:translate-x-[500%]'
-                )}
-              >
-                <span className="relative z-10">Зарабатывать</span>
-                <ArrowRight className="relative z-10 size-6 transition-transform duration-300 group-hover/link:translate-x-1" />
-              </Link>
+              <BalanceHeroActionLink to="/referrals">
+                Зарабатывать
+              </BalanceHeroActionLink>
             )}
           </div>
         ) : (
-          <p className="mt-6 max-w-md text-base leading-relaxed text-indigo-100/75 sm:text-lg sm:leading-8">
-            {guestText}
-          </p>
+          <div className="mt-8 grid w-full gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
+            <p className="rounded-xl bg-white p-5 leading-relaxed text-black sm:text-md">
+              {guestText}
+            </p>
+
+            <BalanceHeroActionLink to="/authorization">
+              Зарегистрироваться
+            </BalanceHeroActionLink>
+          </div>
         )}
       </div>
     </section>
