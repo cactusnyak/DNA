@@ -14,9 +14,6 @@ import { referralBenefits } from '../../data/referral-benefits';
 export function ReferralGuestLanding() {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 sm:p-8">
-      <div className="absolute right-[-80px] top-[-80px] size-56 rounded-full bg-primary/10 blur-3xl" />
-      <div className="absolute bottom-[-100px] left-[-40px] size-64 rounded-full bg-muted blur-3xl" />
-
       <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
         <div className="space-y-7">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground">

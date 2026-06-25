@@ -8,3 +8,16 @@ export const initialAuthorizationFormValue: AuthorizationFormValue = {
   phone: '',
   inviterReferralCode: '',
 };
+
+type GetInitialAuthorizationFormValueParams = {
+  inviterReferralCode?: string;
+};
+
+export function getInitialAuthorizationFormValue({
+  inviterReferralCode = '',
+}: GetInitialAuthorizationFormValueParams = {}): AuthorizationFormValue {
+  return {
+    ...initialAuthorizationFormValue,
+    inviterReferralCode,
+  };
+}

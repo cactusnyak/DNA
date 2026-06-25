@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
 } from '@nestjs/common';
@@ -51,6 +52,10 @@ export class UsersService {
       throw new ConflictException('User with this email already exists');
     }
 
+    const inviter = await this.getInviterByReferralCode(
+      params.inviterReferralCode,
+    );
+
     const referralCode = await this.generateUniqueReferralCode(params.email);
 
     const user = await this.prismaService.user.create({
@@ -73,10 +78,12 @@ export class UsersService {
       },
     });
 
-    await this.createReferralIfPossible({
-      invitedUserId: user.id,
-      inviterReferralCode: params.inviterReferralCode,
-    });
+    if (inviter) {
+      await this.createReferral({
+        invitedUserId: user.id,
+        inviterUserId: inviter.id,
+      });
+    }
 
     return this.mapPublicUser(user);
   }
@@ -103,23 +110,41 @@ export class UsersService {
     };
   }
 
-  private async createReferralIfPossible(params: {
-    invitedUserId: string;
-    inviterReferralCode?: string;
-  }) {
-    const inviterReferralCode = params.inviterReferralCode?.trim();
+  private async getInviterByReferralCode(inviterReferralCode?: string) {
+    const normalizedReferralCode = inviterReferralCode?.trim();
 
-    if (!inviterReferralCode) {
-      return;
+    if (!normalizedReferralCode) {
+      return undefined;
     }
 
     const inviter = await this.prismaService.user.findUnique({
       where: {
-        referralCode: inviterReferralCode,
+        referralCode: normalizedReferralCode,
       },
     });
 
-    if (!inviter || inviter.id === params.invitedUserId) {
+    if (!inviter) {
+      throw new BadRequestException('Inviter referral code is invalid');
+    }
+
+    return inviter;
+  }
+
+  private async createReferral(params: {
+    invitedUserId: string;
+    inviterUserId: string;
+  }) {
+    if (params.inviterUserId === params.invitedUserId) {
+      throw new BadRequestException('User cannot invite himself');
+    }
+
+    const existingReferral = await this.prismaService.referral.findUnique({
+      where: {
+        invitedUserId: params.invitedUserId,
+      },
+    });
+
+    if (existingReferral) {
       return;
     }
 
@@ -136,7 +161,7 @@ export class UsersService {
 
     await this.prismaService.referral.create({
       data: {
-        inviterUserId: inviter.id,
+        inviterUserId: params.inviterUserId,
         invitedUserId: params.invitedUserId,
         levelId: referralLevel.id,
       },

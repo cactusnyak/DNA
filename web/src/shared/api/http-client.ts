@@ -9,8 +9,20 @@ type RequestOptions<TBody = unknown> = {
   headers?: HeadersInit;
 };
 
+const API_PREFIX = '/api';
+
+function buildApiPath(path: string) {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+  if (normalizedPath.startsWith(API_PREFIX)) {
+    return normalizedPath;
+  }
+
+  return `${API_PREFIX}${normalizedPath}`;
+}
+
 function buildUrl(path: string, query?: RequestOptions['query']) {
-  const url = new URL(path, window.location.origin);
+  const url = new URL(buildApiPath(path), window.location.origin);
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
