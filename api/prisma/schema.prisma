@@ -29,18 +29,19 @@ enum OrderStatus {
 
 model User {
   id        String   @id @default(uuid())
-  email     String   @unique
+  email     String
   firstName String
   lastName  String
   role      UserRole @default(DEFAULT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   passwordHash String?
 
   patronymic   String?
   phone        String?
-  referralCode String? @unique
+  referralCode String?
 
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])

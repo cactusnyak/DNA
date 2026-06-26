@@ -3,6 +3,10 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
+import {
+  Prisma,
+  UserRole,
+} from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -20,9 +24,10 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findByEmail(email: string) {
-    return this.prismaService.user.findUnique({
+    return this.prismaService.user.findFirst({
       where: {
         email,
+        deletedAt: null,
       },
       include: {
         avatar: true,
@@ -32,9 +37,10 @@ export class UsersService {
   }
 
   async findById(userId: string) {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findFirst({
       where: {
         id: userId,
+        deletedAt: null,
       },
       include: {
         avatar: true,
@@ -46,9 +52,9 @@ export class UsersService {
   }
 
   async createRegisteredUser(params: CreateRegisteredUserParams) {
-    const existingUser = await this.findByEmail(params.email);
+    const existingActiveUser = await this.findByEmail(params.email);
 
-    if (existingUser) {
+    if (existingActiveUser) {
       throw new ConflictException('User with this email already exists');
     }
 
@@ -58,34 +64,82 @@ export class UsersService {
 
     const referralCode = await this.generateUniqueReferralCode(params.email);
 
-    const user = await this.prismaService.user.create({
-      data: {
-        email: params.email,
-        passwordHash: params.passwordHash,
-        firstName: params.firstName,
-        lastName: params.lastName,
-        phone: params.phone,
-        referralCode,
-        balance: {
-          create: {
-            value: 0,
+    try {
+      const user = await this.prismaService.user.create({
+        data: {
+          email: params.email,
+          passwordHash: params.passwordHash,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          phone: params.phone,
+          referralCode,
+          balance: {
+            create: {
+              value: 0,
+            },
           },
         },
+        include: {
+          avatar: true,
+          balance: true,
+        },
+      });
+
+      if (inviter) {
+        await this.createReferral({
+          invitedUserId: user.id,
+          inviterUserId: inviter.id,
+        });
+      }
+
+      return this.mapPublicUser(user);
+    } catch (error) {
+      if (this.isUniqueConstraintError(error)) {
+        throw new ConflictException('User with this email already exists');
+      }
+
+      throw error;
+    }
+  }
+
+  async softDeleteById(userId: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: userId,
+        deletedAt: null,
       },
-      include: {
-        avatar: true,
-        balance: true,
+      select: {
+        id: true,
       },
     });
 
-    if (inviter) {
-      await this.createReferral({
-        invitedUserId: user.id,
-        inviterUserId: inviter.id,
-      });
+    if (!user) {
+      throw new BadRequestException('User not found or already deleted');
     }
 
-    return this.mapPublicUser(user);
+    await this.prismaService.$transaction([
+      this.prismaService.cartItem.deleteMany({
+        where: {
+          userId,
+        },
+      }),
+
+      this.prismaService.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          firstName: 'Удалённый',
+          lastName: 'Пользователь',
+          patronymic: null,
+          phone: null,
+          passwordHash: null,
+          avatarId: null,
+          role: UserRole.DEFAULT,
+          deletedAt: new Date(),
+        },
+      }),
+    ]);
   }
 
   mapPublicUser(user: any) {
@@ -117,9 +171,10 @@ export class UsersService {
       return undefined;
     }
 
-    const inviter = await this.prismaService.user.findUnique({
+    const inviter = await this.prismaService.user.findFirst({
       where: {
         referralCode: normalizedReferralCode,
+        deletedAt: null,
       },
     });
 
@@ -179,17 +234,25 @@ export class UsersService {
       const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
       const referralCode = `${emailPrefix || 'DNA'}${suffix}`;
 
-      const existingUser = await this.prismaService.user.findUnique({
+      const existingActiveUser = await this.prismaService.user.findFirst({
         where: {
           referralCode,
+          deletedAt: null,
         },
       });
 
-      if (!existingUser) {
+      if (!existingActiveUser) {
         return referralCode;
       }
     }
 
     return `DNA${Date.now()}`;
+  }
+
+  private isUniqueConstraintError(error: unknown) {
+    return (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    );
   }
 }

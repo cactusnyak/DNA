@@ -47,7 +47,7 @@ export function Profile() {
 
   function handleDeleteAccount() {
     const isConfirmed = window.confirm(
-      'Удалить аккаунт? Это действие нельзя будет отменить.',
+      'Удалить аккаунт? Вход станет недоступен, а персональные данные будут обезличены.',
     );
 
     if (!isConfirmed) {

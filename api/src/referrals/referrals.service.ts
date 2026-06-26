@@ -13,6 +13,7 @@ type ReferralWithInvitedUser = {
     firstName: string;
     lastName: string;
     referralCode: string | null;
+    deletedAt: Date | null;
   };
 };
 
@@ -29,6 +30,7 @@ export class ReferralsService {
             firstName: true,
             lastName: true,
             referralCode: true,
+            deletedAt: true,
           },
         },
       },
@@ -93,14 +95,21 @@ export class ReferralsService {
       .filter((referral) => !visitedUserIds.has(referral.invitedUserId))
       .map((referral) => {
         const nextVisitedUserIds = new Set(visitedUserIds);
+        const isInvitedUserDeleted = Boolean(referral.invited.deletedAt);
 
         nextVisitedUserIds.add(referral.invitedUserId);
 
         return {
           id: referral.invited.id,
-          firstName: referral.invited.firstName,
-          lastName: referral.invited.lastName,
-          referralCode: referral.invited.referralCode ?? undefined,
+          firstName: isInvitedUserDeleted
+            ? 'Удалённый'
+            : referral.invited.firstName,
+          lastName: isInvitedUserDeleted
+            ? 'Пользователь'
+            : referral.invited.lastName,
+          referralCode: isInvitedUserDeleted
+            ? undefined
+            : referral.invited.referralCode ?? undefined,
           level,
           invitedAt: referral.createdAt,
           children: this.buildReferralTree({
