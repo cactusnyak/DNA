@@ -1,3 +1,5 @@
+import { Admin } from '@/widgets/Admin';
+
 export function AdminPage() {
-  return <h1 className="text-2xl font-semibold">Админ-панель</h1>;
+  return <Admin />;
 }

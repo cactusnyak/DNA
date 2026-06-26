@@ -1,10 +1,13 @@
 import {
+  ShieldCheck,
   ShoppingCart,
   User,
   WalletCards,
 } from 'lucide-react';
 
-export const navigationItems = [
+import type { MainNavigationItem } from '../types/main-navigation-item';
+
+export const navigationItems: MainNavigationItem[] = [
   {
     to: '/referrals',
     label: 'Заработок',
@@ -19,5 +22,11 @@ export const navigationItems = [
     to: '/cart',
     label: 'Корзина',
     icon: ShoppingCart,
+  },
+  {
+    to: '/admin',
+    label: 'Админка',
+    icon: ShieldCheck,
+    allowedRoles: ['ADMIN'],
   },
 ];

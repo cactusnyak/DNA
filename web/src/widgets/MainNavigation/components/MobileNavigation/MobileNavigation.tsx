@@ -3,10 +3,14 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 
 import { CartItemsBadge } from '../CartItemsBadge';
-import { navigationItems } from '../../data/navigation-items';
+import type { MainNavigationItem } from '../../types/main-navigation-item';
 
-export function MobileNavigation() {
-  const columnsCount = navigationItems.length;
+type MobileNavigationProps = {
+  items: MainNavigationItem[];
+};
+
+export function MobileNavigation({ items }: MobileNavigationProps) {
+  const columnsCount = items.length;
 
   return (
     <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-border bg-background md:hidden">
@@ -16,7 +20,7 @@ export function MobileNavigation() {
           gridTemplateColumns: `repeat(${columnsCount}, minmax(0, 1fr))`,
         }}
       >
-        {navigationItems.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const isCartLink = item.to === '/cart';
 

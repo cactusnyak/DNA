@@ -3,16 +3,20 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 
 import { CartItemsBadge } from '../CartItemsBadge';
-import { navigationItems } from '../../data/navigation-items';
+import type { MainNavigationItem } from '../../types/main-navigation-item';
 
 type DesktopNavigationProps = {
+  items: MainNavigationItem[];
   onNavigate?: () => void;
 };
 
-export function DesktopNavigation({ onNavigate }: DesktopNavigationProps) {
+export function DesktopNavigation({
+  items,
+  onNavigate,
+}: DesktopNavigationProps) {
   return (
     <nav className="ml-auto hidden items-center md:flex">
-      {navigationItems.map((item) => {
+      {items.map((item) => {
         const Icon = item.icon;
         const isCartLink = item.to === '/cart';
 
