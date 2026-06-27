@@ -78,11 +78,7 @@ export function AdminDashboard({
                 key={section.title}
                 className="rounded-2xl border border-border p-5"
               >
-                <div className="flex size-10 items-center justify-center rounded-xl bg-muted">
-                  <Icon className="size-5 text-muted-foreground" />
-                </div>
-
-                <h3 className="mt-4 text-base font-semibold">
+                <h3 className="text-base font-semibold">
                   {section.title}
                 </h3>
 

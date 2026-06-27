@@ -60,7 +60,7 @@ export function CheckoutCustomerForm({
             required
             label="Имя"
             value={value.customerName}
-            placeholder="Например, Фёдор"
+            placeholder=""
             onChange={getInputChangeHandler('customerName')}
           />
 

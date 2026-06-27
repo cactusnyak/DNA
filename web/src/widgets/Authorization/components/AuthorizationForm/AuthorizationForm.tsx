@@ -19,6 +19,8 @@ type AuthorizationFormProps = {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
 
+const PASSWORD_MIN_LENGTH = 6;
+
 export function AuthorizationForm({
   mode,
   value,
@@ -81,7 +83,11 @@ export function AuthorizationForm({
         })}
       </div>
 
-      <form onSubmit={onSubmit} className="mt-6 space-y-6">
+      <form
+        onSubmit={onSubmit}
+        className="mt-6 space-y-6"
+        autoComplete="off"
+      >
         <div className="space-y-4">
           {isRegisterMode && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -89,7 +95,8 @@ export function AuthorizationForm({
                 required
                 label="Имя"
                 value={value.firstName}
-                placeholder="Фёдор"
+                placeholder=""
+                autoComplete="off"
                 onChange={getInputChangeHandler('firstName')}
               />
 
@@ -97,7 +104,8 @@ export function AuthorizationForm({
                 required
                 label="Фамилия"
                 value={value.lastName}
-                placeholder="Шевченко"
+                placeholder=""
+                autoComplete="off"
                 onChange={getInputChangeHandler('lastName')}
               />
             </div>
@@ -108,7 +116,8 @@ export function AuthorizationForm({
             type="email"
             label="Email"
             value={value.email}
-            placeholder="you@example.com"
+            placeholder=""
+            autoComplete="off"
             onChange={getInputChangeHandler('email')}
           />
 
@@ -117,8 +126,10 @@ export function AuthorizationForm({
             type="password"
             label="Пароль"
             value={value.password}
-            minLength={6}
-            placeholder="Минимум 6 символов"
+            minLength={PASSWORD_MIN_LENGTH}
+            placeholder=""
+            caption={`Минимум ${PASSWORD_MIN_LENGTH} символов`}
+            autoComplete="new-password"
             onChange={getInputChangeHandler('password')}
           />
 
@@ -128,14 +139,18 @@ export function AuthorizationForm({
                 type="tel"
                 label="Телефон"
                 value={value.phone}
-                placeholder="Необязательно"
+                placeholder=""
+                caption="Необязательно"
+                autoComplete="off"
                 onChange={getInputChangeHandler('phone')}
               />
 
               <FormInputField
                 label="Реферальный код"
                 value={value.inviterReferralCode}
-                placeholder="Необязательно"
+                placeholder=""
+                caption="Необязательно"
+                autoComplete="off"
                 onChange={getInputChangeHandler('inviterReferralCode')}
               />
             </>
