@@ -2,12 +2,18 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
+const ACTIVE_CATEGORY_WHERE = {
+  isActive: true,
+  deletedAt: null,
+};
+
 @Injectable()
 export class CategoriesService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findAll() {
     const categories = await this.prismaService.category.findMany({
+      where: ACTIVE_CATEGORY_WHERE,
       include: {
         image: true,
       },

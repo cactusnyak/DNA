@@ -12,39 +12,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const ACTIVE_CATEGORY_WHERE = {
+    isActive: true,
+    deletedAt: null,
+};
+const ACTIVE_PRODUCT_WHERE = {
+    isActive: true,
+    deletedAt: null,
+};
+const SORT_FIELD_WHITELIST = new Set([
+    'title',
+    'category',
+    'createdAt',
+    'price',
+]);
+const SORT_DIRECTION_WHITELIST = new Set([
+    'asc',
+    'desc',
+]);
 let ProductsService = class ProductsService {
     prismaService;
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
     async findAll(params = {}) {
-        const categoryIds = params.categorySlug
-            ? await this.getCategoryWithDescendantIds(params.categorySlug)
-            : undefined;
-        const filteredCategoryIds = this.getFilteredCategoryIds({
-            baseCategoryIds: categoryIds,
-            selectedCategoryIds: params.categoryIds,
+        const activeCategories = await this.getActiveCategories();
+        const categoryById = new Map(activeCategories.map((category) => [category.id, category]));
+        const categoryIds = await this.getFilteredCategoryIds({
+            categorySlug: params.categorySlug,
+            categoryIds: params.categoryIds,
+            activeCategories,
         });
+        const where = {
+            ...ACTIVE_PRODUCT_WHERE,
+            category: ACTIVE_CATEGORY_WHERE,
+        };
+        if (categoryIds?.length) {
+            where.categoryId = {
+                in: categoryIds,
+            };
+        }
+        if (typeof params.priceFrom === 'number' ||
+            typeof params.priceTo === 'number') {
+            where.price = {
+                gte: params.priceFrom,
+                lte: params.priceTo,
+            };
+        }
         const products = await this.prismaService.product.findMany({
-            where: {
-                ...(filteredCategoryIds
-                    ? {
-                        categoryId: {
-                            in: filteredCategoryIds,
-                        },
-                    }
-                    : {}),
-                ...(params.priceFrom !== undefined || params.priceTo !== undefined
-                    ? {
-                        price: {
-                            ...(params.priceFrom !== undefined
-                                ? { gte: params.priceFrom }
-                                : {}),
-                            ...(params.priceTo !== undefined ? { lte: params.priceTo } : {}),
-                        },
-                    }
-                    : {}),
-            },
+            where,
             include: {
                 category: {
                     include: {
@@ -59,13 +75,16 @@ let ProductsService = class ProductsService {
             },
             orderBy: this.getOrderBy(params.sort),
         });
-        const categoryPathById = await this.getCategoryPathById();
-        return products.map((product) => this.mapProduct(product, categoryPathById));
+        return products.map((product) => this.mapProduct(product, categoryById));
     }
     async findById(productId) {
-        const product = await this.prismaService.product.findUnique({
+        const activeCategories = await this.getActiveCategories();
+        const categoryById = new Map(activeCategories.map((category) => [category.id, category]));
+        const product = await this.prismaService.product.findFirst({
             where: {
                 id: productId,
+                ...ACTIVE_PRODUCT_WHERE,
+                category: ACTIVE_CATEGORY_WHERE,
             },
             include: {
                 category: {
@@ -83,28 +102,88 @@ let ProductsService = class ProductsService {
         if (!product) {
             throw new common_1.NotFoundException('Product not found');
         }
-        const categoryPathById = await this.getCategoryPathById();
-        return this.mapProduct(product, categoryPathById);
+        return this.mapProduct(product, categoryById);
     }
-    getFilteredCategoryIds(params) {
-        const { baseCategoryIds, selectedCategoryIds } = params;
-        if (!baseCategoryIds && !selectedCategoryIds?.length) {
+    getActiveCategories() {
+        return this.prismaService.category.findMany({
+            where: ACTIVE_CATEGORY_WHERE,
+            include: {
+                image: true,
+            },
+            orderBy: {
+                sortOrder: 'asc',
+            },
+        });
+    }
+    async getFilteredCategoryIds(params) {
+        const requestedCategoryIds = params.categoryIds?.filter(Boolean) ?? [];
+        if (!params.categorySlug && !requestedCategoryIds.length) {
             return undefined;
         }
-        if (baseCategoryIds && !selectedCategoryIds?.length) {
-            return baseCategoryIds;
+        const categoryIdsFromSlug = params.categorySlug
+            ? this.getCategoryAndDescendantIds({
+                categorySlug: params.categorySlug,
+                categories: params.activeCategories,
+            })
+            : undefined;
+        if (categoryIdsFromSlug && !categoryIdsFromSlug.length) {
+            return [];
         }
-        if (!baseCategoryIds && selectedCategoryIds?.length) {
-            return selectedCategoryIds;
+        if (!requestedCategoryIds.length) {
+            return categoryIdsFromSlug;
         }
-        return selectedCategoryIds?.filter((categoryId) => baseCategoryIds?.includes(categoryId));
+        if (!categoryIdsFromSlug) {
+            return requestedCategoryIds;
+        }
+        const categoryIdsFromSlugSet = new Set(categoryIdsFromSlug);
+        return requestedCategoryIds.filter((categoryId) => categoryIdsFromSlugSet.has(categoryId));
+    }
+    getCategoryAndDescendantIds(params) {
+        const rootCategory = params.categories.find((category) => category.slug === params.categorySlug);
+        if (!rootCategory) {
+            return [];
+        }
+        const childrenByParentId = new Map();
+        params.categories.forEach((category) => {
+            if (!category.parentId) {
+                return;
+            }
+            const children = childrenByParentId.get(category.parentId) ?? [];
+            childrenByParentId.set(category.parentId, [...children, category]);
+        });
+        const result = [];
+        const stack = [rootCategory];
+        while (stack.length) {
+            const category = stack.pop();
+            if (!category) {
+                continue;
+            }
+            result.push(category.id);
+            stack.push(...(childrenByParentId.get(category.id) ?? []));
+        }
+        return result;
     }
     getOrderBy(sort) {
-        const sortRules = this.parseSortRules(sort);
-        if (!sortRules.length) {
+        const sortRules = sort
+            ?.split(',')
+            .map((rawRule) => {
+            const [field, direction] = rawRule.split(':');
+            if (!SORT_FIELD_WHITELIST.has(field) ||
+                !SORT_DIRECTION_WHITELIST.has(direction)) {
+                return undefined;
+            }
             return {
-                title: 'asc',
+                field: field,
+                direction: direction,
             };
+        })
+            .filter(Boolean);
+        if (!sortRules?.length) {
+            return [
+                {
+                    createdAt: 'desc',
+                },
+            ];
         }
         return sortRules.map((rule) => {
             if (rule.field === 'category') {
@@ -119,105 +198,35 @@ let ProductsService = class ProductsService {
             };
         });
     }
-    parseSortRules(sort) {
-        if (!sort) {
-            return [];
-        }
-        const allowedFields = [
-            'title',
-            'category',
-            'createdAt',
-            'price',
-        ];
-        return sort
-            .split(',')
-            .map((rule) => {
-            const [field, direction] = rule.split(':');
-            if (!allowedFields.includes(field) ||
-                (direction !== 'asc' && direction !== 'desc')) {
-                return undefined;
+    getCategoryPath(category, categoryById) {
+        const parts = [];
+        let currentCategory = category;
+        while (currentCategory) {
+            parts.unshift(currentCategory.slug);
+            if (!currentCategory.parentId) {
+                break;
             }
-            return {
-                field: field,
-                direction,
-            };
-        })
-            .filter((rule) => Boolean(rule));
-    }
-    async getCategoryWithDescendantIds(categorySlug) {
-        const rootCategory = await this.prismaService.category.findUnique({
-            where: {
-                slug: categorySlug,
-            },
-            select: {
-                id: true,
-            },
-        });
-        if (!rootCategory) {
-            return [];
+            currentCategory = categoryById.get(currentCategory.parentId);
         }
-        const categories = await this.prismaService.category.findMany({
-            select: {
-                id: true,
-                parentId: true,
-            },
-        });
-        return this.collectDescendantCategoryIds(categories, rootCategory.id);
+        return parts.join('/');
     }
-    collectDescendantCategoryIds(categories, rootCategoryId) {
-        const categoryIds = new Set([rootCategoryId]);
-        let shouldContinue = true;
-        while (shouldContinue) {
-            shouldContinue = false;
-            categories.forEach((category) => {
-                if (category.parentId &&
-                    categoryIds.has(category.parentId) &&
-                    !categoryIds.has(category.id)) {
-                    categoryIds.add(category.id);
-                    shouldContinue = true;
-                }
-            });
-        }
-        return Array.from(categoryIds);
+    mapCategory(category, categoryById) {
+        return {
+            id: category.id,
+            name: category.name,
+            slug: category.slug,
+            path: this.getCategoryPath(category, categoryById),
+            sortOrder: category.sortOrder,
+            description: category.description ?? undefined,
+            parentId: category.parentId ?? undefined,
+            image: category.image ?? undefined,
+        };
     }
-    async getCategoryPathById() {
-        const categories = await this.prismaService.category.findMany({
-            select: {
-                id: true,
-                slug: true,
-                parentId: true,
-            },
-        });
-        const categoryById = new Map(categories.map((category) => [category.id, category]));
-        const categoryPathById = new Map();
-        categories.forEach((category) => {
-            const parts = [];
-            let currentCategory = category;
-            while (currentCategory) {
-                parts.unshift(currentCategory.slug);
-                if (!currentCategory.parentId) {
-                    break;
-                }
-                currentCategory = categoryById.get(currentCategory.parentId);
-            }
-            categoryPathById.set(category.id, parts.join('/'));
-        });
-        return categoryPathById;
-    }
-    mapProduct(product, categoryPathById) {
+    mapProduct(product, categoryById) {
         return {
             id: product.id,
             categoryId: product.categoryId,
-            category: {
-                id: product.category.id,
-                name: product.category.name,
-                slug: product.category.slug,
-                path: categoryPathById.get(product.category.id) ?? product.category.slug,
-                sortOrder: product.category.sortOrder,
-                description: product.category.description ?? undefined,
-                parentId: product.category.parentId ?? undefined,
-                image: product.category.image ?? undefined,
-            },
+            category: this.mapCategory(product.category, categoryById),
             title: product.title,
             slug: product.slug,
             description: product.description,

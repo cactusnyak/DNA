@@ -16,7 +16,7 @@ export declare class ProductsService {
             id: any;
             name: any;
             slug: any;
-            path: any;
+            path: string;
             sortOrder: any;
             description: any;
             parentId: any;
@@ -37,7 +37,7 @@ export declare class ProductsService {
             id: any;
             name: any;
             slug: any;
-            path: any;
+            path: string;
             sortOrder: any;
             description: any;
             parentId: any;
@@ -51,12 +51,12 @@ export declare class ProductsService {
         updatedAt: any;
         images: any;
     }>;
+    private getActiveCategories;
     private getFilteredCategoryIds;
+    private getCategoryAndDescendantIds;
     private getOrderBy;
-    private parseSortRules;
-    private getCategoryWithDescendantIds;
-    private collectDescendantCategoryIds;
-    private getCategoryPathById;
+    private getCategoryPath;
+    private mapCategory;
     private mapProduct;
 }
 export {};

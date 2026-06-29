@@ -12,6 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoriesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const ACTIVE_CATEGORY_WHERE = {
+    isActive: true,
+    deletedAt: null,
+};
 let CategoriesService = class CategoriesService {
     prismaService;
     constructor(prismaService) {
@@ -19,6 +23,7 @@ let CategoriesService = class CategoriesService {
     }
     async findAll() {
         const categories = await this.prismaService.category.findMany({
+            where: ACTIVE_CATEGORY_WHERE,
             include: {
                 image: true,
             },

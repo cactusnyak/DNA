@@ -9,7 +9,7 @@ export declare class ProductsController {
             id: any;
             name: any;
             slug: any;
-            path: any;
+            path: string;
             sortOrder: any;
             description: any;
             parentId: any;
@@ -30,7 +30,7 @@ export declare class ProductsController {
             id: any;
             name: any;
             slug: any;
-            path: any;
+            path: string;
             sortOrder: any;
             description: any;
             parentId: any;

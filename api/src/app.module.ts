@@ -4,6 +4,7 @@ import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CatalogCollectionsModule } from './catalog-collections/catalog-collections.module';
 import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
     ProductsModule,
     CategoriesModule,
+    CatalogCollectionsModule,
     OrdersModule,
     UsersModule,
     AuthModule,

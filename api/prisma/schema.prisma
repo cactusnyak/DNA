@@ -27,6 +27,11 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum CatalogCollectionType {
+  CATEGORY
+  PRODUCT
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String
@@ -77,27 +82,35 @@ model Image {
 model Category {
   id        String @id @default(uuid())
   name      String
-  slug      String @unique
+  slug      String
   sortOrder Int
 
   description String?
   parentId    String?
   imageId     String?
 
+  isActive Boolean   @default(true)
+  deletedAt DateTime?
+
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children Category[] @relation("CategoryTree")
 
   image    Image?    @relation(fields: [imageId], references: [id])
   products Product[]
+
+  collectionCategories CatalogCollectionCategory[]
 }
 
 model Product {
   id          String @id @default(uuid())
   categoryId  String
   title       String
-  slug        String @unique
+  slug        String
   description String
   price       Int
+
+  isActive Boolean   @default(true)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,6 +120,8 @@ model Product {
 
   cartItems  CartItem[]
   orderItems OrderItem[]
+
+  collectionProducts CatalogCollectionProduct[]
 }
 
 model ProductImage {
@@ -200,4 +215,40 @@ model ReferralReward {
 
   referral Referral @relation(fields: [referralId], references: [id])
   order    Order    @relation(fields: [orderId], references: [id])
+}
+
+model CatalogCollection {
+  id          String                @id @default(uuid())
+  slug        String                @unique
+  type        CatalogCollectionType
+  title       String
+  description String?
+  isActive    Boolean               @default(true)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  categories CatalogCollectionCategory[]
+  products   CatalogCollectionProduct[]
+}
+
+model CatalogCollectionCategory {
+  collectionId String
+  categoryId   String
+  sortOrder    Int    @default(0)
+
+  collection CatalogCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, categoryId])
+}
+
+model CatalogCollectionProduct {
+  collectionId String
+  productId    String
+  sortOrder    Int    @default(0)
+
+  collection CatalogCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product    Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, productId])
 }
