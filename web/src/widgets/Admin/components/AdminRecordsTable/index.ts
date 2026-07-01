@@ -1,0 +1,1 @@
+export { AdminRecordsTable } from './AdminRecordsTable';

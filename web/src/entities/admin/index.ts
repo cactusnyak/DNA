@@ -1,3 +1,34 @@
 export { getAdminOverview } from './api/get-admin-overview';
 
+export {
+  createAdminCatalogCollection,
+  createAdminCategory,
+  createAdminProduct,
+  deleteAdminCatalogCollection,
+  deleteAdminCategory,
+  deleteAdminProduct,
+  getAdminCatalogData,
+  restoreAdminCatalogCollection,
+  restoreAdminCategory,
+  restoreAdminProduct,
+  updateAdminCatalogCollection,
+  updateAdminCatalogCollectionCategories,
+  updateAdminCatalogCollectionProducts,
+  updateAdminCategory,
+  updateAdminOrderStatus,
+  updateAdminProduct,
+} from './api/admin-catalog';
+
 export type { AdminOverview } from './types/admin-overview';
+
+export type {
+  AdminCatalogCollection,
+  AdminCatalogCollectionItemPayload,
+  AdminCatalogCollectionPayload,
+  AdminCatalogCollectionType,
+  AdminCatalogData,
+  AdminCategory,
+  AdminCategoryPayload,
+  AdminProduct,
+  AdminProductPayload,
+} from './types/admin-catalog';

@@ -1,10 +1,11 @@
 import type { AdminOverview } from '@/entities/admin';
 import { SectionHeader } from '@/components/ui/Section';
 
+import { AdminManagement } from '../AdminManagement';
 import { AdminOverviewCard } from '../AdminOverviewCard';
-import { adminSections } from '../../data/admin-sections';
 
 type AdminDashboardProps = {
+  accessToken: string;
   overview?: AdminOverview;
   isOverviewPending?: boolean;
   isOverviewError?: boolean;
@@ -19,15 +20,16 @@ function getOverviewValue(value?: number, isPending?: boolean) {
 }
 
 export function AdminDashboard({
+  accessToken,
   overview,
   isOverviewPending = false,
   isOverviewError = false,
 }: AdminDashboardProps) {
   return (
-    <div className="space-y-8">
+    <div className='space-y-10'>
       <SectionHeader
         title="Админ-панель"
-        description="Управление каталогом, заказами и базовыми сущностями сервиса."
+        description="Управление каталогом, подборками, заказами и базовыми сущностями сервиса."
       />
 
       {isOverviewError && (
@@ -38,60 +40,20 @@ export function AdminDashboard({
         </div>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <AdminOverviewCard
-          label="Пользователи"
-          value={getOverviewValue(overview?.usersCount, isOverviewPending)}
-          description="Все зарегистрированные пользователи, включая админов."
-        />
-
-        <AdminOverviewCard
-          label="Категории"
-          value={getOverviewValue(overview?.categoriesCount, isOverviewPending)}
-          description="Категории из базы, включая созданные через seed."
-        />
-
-        <AdminOverviewCard
-          label="Товары"
-          value={getOverviewValue(overview?.productsCount, isOverviewPending)}
-          description="Товары из базы, включая тестовые seed-позиции."
-        />
-
-        <AdminOverviewCard
-          label="Заказы"
-          value={getOverviewValue(overview?.ordersCount, isOverviewPending)}
-          description="Все заказы: гостевые и пользовательские."
-        />
+      <section className='space-y-4'>
+        <h2 className="text-xl font-semibold">База данных</h2>
+        <AdminManagement accessToken={accessToken} />
       </section>
 
-      <section>
-        <h2 className="text-lg font-semibold">
-          Разделы управления
-        </h2>
+      <section className='space-y-4'>
+        <h2 className="text-xl font-semibold">Сводки</h2>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {adminSections.map((section) => {
-            const Icon = section.icon;
-
-            return (
-              <article
-                key={section.title}
-                className="rounded-2xl border border-border p-5"
-              >
-                <h3 className="text-base font-semibold">
-                  {section.title}
-                </h3>
-
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {section.description}
-                </p>
-
-                <p className="mt-4 inline-flex rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {section.status}
-                </p>
-              </article>
-            );
-          })}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <AdminOverviewCard
+            label="Пользователи"
+            value={getOverviewValue(overview?.usersCount, isOverviewPending)}
+            description="Активные зарегистрированные пользователи."
+          />
         </div>
       </section>
     </div>

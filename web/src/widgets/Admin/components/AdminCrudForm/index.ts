@@ -1,0 +1,1 @@
+export { AdminCrudForm } from './AdminCrudForm';

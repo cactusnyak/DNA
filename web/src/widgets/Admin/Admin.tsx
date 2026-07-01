@@ -85,6 +85,7 @@ export function Admin() {
 
   return (
     <AdminDashboard
+      accessToken={accessToken}
       overview={overview}
       isOverviewPending={isOverviewPending}
       isOverviewError={isOverviewError}

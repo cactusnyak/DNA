@@ -12,18 +12,22 @@ export function AdminOverviewCard({
   description,
 }: AdminOverviewCardProps) {
   return (
-    <article className="rounded-2xl border border-border p-5">
-      <p className="text-sm text-muted-foreground">
+    <article className="rounded-2xl border border-border p-5 space-y-4">
+      <h4 className="text-sm text-muted-foreground font-semibold">
         {label}
-      </p>
+      </h4>
 
-      <p className="mt-2 text-3xl font-semibold tracking-tight">
-        {value}
-      </p>
+      <div className='space-y-2'>
+        <div>
+          <span className="text-3xl font-bold">
+            {value}
+          </span>
+        </div>
 
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        {description}
-      </p>
+        <p className="text-xs text-muted-foreground">
+          {description}
+        </p>
+      </div>
     </article>
   );
 }

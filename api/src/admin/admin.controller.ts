@@ -1,6 +1,12 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  Patch,
+  Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
@@ -20,5 +26,91 @@ export class AdminController {
   @Get('overview')
   getOverview() {
     return this.adminService.getOverview();
+  }
+
+  @Get('catalog')
+  getCatalog() {
+    return this.adminService.getCatalog();
+  }
+
+  @Post('categories')
+  createCategory(@Body() body: unknown) {
+    return this.adminService.createCategory(body);
+  }
+
+  @Patch('categories/:id')
+  updateCategory(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateCategory(id, body);
+  }
+
+  @Delete('categories/:id')
+  deleteCategory(@Param('id') id: string) {
+    return this.adminService.deleteCategory(id);
+  }
+
+  @Patch('categories/:id/restore')
+  restoreCategory(@Param('id') id: string) {
+    return this.adminService.restoreCategory(id);
+  }
+
+  @Post('products')
+  createProduct(@Body() body: unknown) {
+    return this.adminService.createProduct(body);
+  }
+
+  @Patch('products/:id')
+  updateProduct(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateProduct(id, body);
+  }
+
+  @Delete('products/:id')
+  deleteProduct(@Param('id') id: string) {
+    return this.adminService.deleteProduct(id);
+  }
+
+  @Patch('products/:id/restore')
+  restoreProduct(@Param('id') id: string) {
+    return this.adminService.restoreProduct(id);
+  }
+
+  @Post('catalog-collections')
+  createCatalogCollection(@Body() body: unknown) {
+    return this.adminService.createCatalogCollection(body);
+  }
+
+  @Patch('catalog-collections/:id')
+  updateCatalogCollection(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateCatalogCollection(id, body);
+  }
+
+  @Delete('catalog-collections/:id')
+  deleteCatalogCollection(@Param('id') id: string) {
+    return this.adminService.deleteCatalogCollection(id);
+  }
+
+  @Patch('catalog-collections/:id/restore')
+  restoreCatalogCollection(@Param('id') id: string) {
+    return this.adminService.restoreCatalogCollection(id);
+  }
+
+  @Put('catalog-collections/:id/categories')
+  updateCatalogCollectionCategories(
+    @Param('id') id: string,
+    @Body() body: unknown,
+  ) {
+    return this.adminService.updateCatalogCollectionCategories(id, body);
+  }
+
+  @Put('catalog-collections/:id/products')
+  updateCatalogCollectionProducts(
+    @Param('id') id: string,
+    @Body() body: unknown,
+  ) {
+    return this.adminService.updateCatalogCollectionProducts(id, body);
+  }
+
+  @Patch('orders/:id/status')
+  updateOrderStatus(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateOrderStatus(id, body);
   }
 }
