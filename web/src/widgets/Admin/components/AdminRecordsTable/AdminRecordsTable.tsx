@@ -1,12 +1,18 @@
 import type { ReactNode } from 'react';
 
+import { cn } from '@/shared/utils/cn';
+
+type DeletedAwareRecord = {
+  deletedAt?: string | Date | null;
+};
+
 type AdminTableColumn<TRecord> = {
   key: string;
   title: ReactNode;
   render: (record: TRecord) => ReactNode;
 };
 
-type AdminRecordsTableProps<TRecord> = {
+type AdminRecordsTableProps<TRecord extends DeletedAwareRecord> = {
   records: TRecord[];
   columns: AdminTableColumn<TRecord>[];
   getRecordKey: (record: TRecord) => string;
@@ -14,7 +20,7 @@ type AdminRecordsTableProps<TRecord> = {
   emptyText: ReactNode;
 };
 
-export function AdminRecordsTable<TRecord>({
+export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   records,
   columns,
   getRecordKey,
@@ -50,21 +56,37 @@ export function AdminRecordsTable<TRecord>({
           </thead>
 
           <tbody className="divide-y divide-border">
-            {records.map((record) => (
-              <tr key={getRecordKey(record)} className="align-top">
-                {columns.map((column) => (
-                  <td key={column.key} className="px-4 py-3">
-                    {column.render(record)}
-                  </td>
-                ))}
+            {records.map((record) => {
+              const isDeleted = Boolean(record.deletedAt);
 
-                {renderActions && (
-                  <td className="px-4 py-3 text-right">
-                    {renderActions(record)}
-                  </td>
-                )}
-              </tr>
-            ))}
+              return (
+                <tr
+                  key={getRecordKey(record)}
+                  className={cn(
+                    'align-top transition-colors',
+                    isDeleted && 'bg-muted/30 text-muted-foreground',
+                  )}
+                >
+                  {columns.map((column) => (
+                    <td
+                      key={column.key}
+                      className={cn(
+                        'px-4 py-3',
+                        isDeleted && 'opacity-65',
+                      )}
+                    >
+                      {column.render(record)}
+                    </td>
+                  ))}
+
+                  {renderActions && (
+                    <td className="px-4 py-3 text-right">
+                      {renderActions(record)}
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
