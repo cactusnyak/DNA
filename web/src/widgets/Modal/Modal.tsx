@@ -26,9 +26,9 @@ const MODAL_ROOT_ID = 'app-modal-root';
 
 const modalSizeClassNames: Record<ModalSize, string> = {
   sm: 'max-w-md',
-  md: 'max-w-2xl',
-  lg: 'max-w-4xl',
-  xl: 'max-w-6xl',
+  md: 'max-w-xl',
+  lg: 'max-w-xl',
+  xl: 'max-w-xl',
 };
 
 export function Modal({
@@ -102,7 +102,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          'flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl',
+          'flex max-h-[calc(100vh-10rem)] w-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl',
           modalSizeClassNames[size],
           className,
         )}

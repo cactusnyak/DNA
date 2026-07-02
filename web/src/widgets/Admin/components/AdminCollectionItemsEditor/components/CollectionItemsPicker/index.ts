@@ -1,0 +1,1 @@
+export { CollectionItemsPicker } from './CollectionItemsPicker';

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/Button';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { cn } from '@/shared/utils/cn';
 
+import { viewModeOptions } from './data/view-mode-options';
+
 import type { AdminViewMode } from '../../types/admin-management';
 
 type AdminToolbarProps = {
@@ -16,24 +18,6 @@ type AdminToolbarProps = {
   onViewModeChange: (viewMode: AdminViewMode) => void;
   onCreateClick: () => void;
 };
-
-const viewModeOptions = [
-  {
-    value: 'table',
-    label: 'Таблица',
-  },
-  {
-    value: 'list',
-    label: 'Список',
-  },
-  {
-    value: 'tree',
-    label: 'Дерево',
-  },
-] satisfies Array<{
-  value: AdminViewMode;
-  label: string;
-}>;
 
 export function AdminToolbar({
   searchValue,

@@ -26,7 +26,7 @@ export function AdminDashboard({
   isOverviewError = false,
 }: AdminDashboardProps) {
   return (
-    <div className='space-y-10'>
+    <div className="space-y-10">
       <SectionHeader
         title="Админ-панель"
         description="Управление каталогом, подборками, заказами и базовыми сущностями сервиса."
@@ -40,12 +40,12 @@ export function AdminDashboard({
         </div>
       )}
 
-      <section className='space-y-4'>
+      <section className="space-y-4">
         <h2 className="text-xl font-semibold">База данных</h2>
         <AdminManagement accessToken={accessToken} />
       </section>
 
-      <section className='space-y-4'>
+      <section className="space-y-4">
         <h2 className="text-xl font-semibold">Сводки</h2>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">

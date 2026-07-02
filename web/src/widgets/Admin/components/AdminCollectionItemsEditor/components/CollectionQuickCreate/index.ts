@@ -1,0 +1,1 @@
+export { CollectionQuickCreate } from './CollectionQuickCreate';

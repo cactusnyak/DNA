@@ -1,0 +1,1 @@
+export { ProductCrudFields } from './ProductCrudFields';

@@ -1,0 +1,1 @@
+export { AdminProductRecordsView } from './AdminProductRecordsView';

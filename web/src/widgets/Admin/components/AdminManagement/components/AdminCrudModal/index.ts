@@ -1,0 +1,1 @@
+export { AdminCrudModal } from './AdminCrudModal';

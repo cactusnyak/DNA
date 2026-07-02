@@ -1,0 +1,1 @@
+export { AdminManagementRecords } from './AdminManagementRecords';

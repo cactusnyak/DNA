@@ -51,10 +51,10 @@ function FormFieldRoot({
   children,
 }: FormFieldRootProps) {
   return (
-    <label className={cn('block space-y-1.5', className)}>
+    <label className={cn('flex flex-col', className)}>
       <span
         className={cn(
-          'text-sm font-medium',
+          'text-sm font-medium mb-2',
           required &&
             "after:ml-1 after:text-destructive after:content-['*']",
         )}
@@ -65,7 +65,7 @@ function FormFieldRoot({
       {children}
 
       {caption && (
-        <span className="block text-xs leading-5 text-muted-foreground">
+        <span className="mt-1 text-xs leading-5 text-muted-foreground">
           {caption}
         </span>
       )}
