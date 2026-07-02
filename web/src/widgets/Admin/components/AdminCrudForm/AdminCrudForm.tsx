@@ -39,7 +39,7 @@ type AdminCrudFormProps = {
   record?: AdminCrudRecord;
   categories: AdminCategory[];
   isPending?: boolean;
-  onSubmit: (payload: AdminCrudPayload) => void;
+  onSubmit: (payload: AdminCrudPayload) => void | Promise<void>;
   onCancel: () => void;
 };
 
@@ -184,28 +184,9 @@ export function AdminCrudForm({
   }
 
   return (
-    <form
-      className="rounded-2xl border border-border bg-card p-5"
-      onSubmit={handleSubmit}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-semibold">
-            {record ? 'Редактирование' : 'Создание'}
-          </h3>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            Заполните поля и сохраните изменения.
-          </p>
-        </div>
-
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Закрыть
-        </Button>
-      </div>
-
+    <form className="space-y-5" onSubmit={handleSubmit}>
       {tabId === 'categories' && (
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <FormInputField
             required
             label="Название"
@@ -272,7 +253,7 @@ export function AdminCrudForm({
       )}
 
       {tabId === 'products' && (
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <FormInputField
             required
             label="Название"
@@ -338,7 +319,7 @@ export function AdminCrudForm({
       )}
 
       {tabId === 'collections' && (
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <FormInputField
             required
             label="Название"
@@ -379,27 +360,25 @@ export function AdminCrudForm({
       )}
 
       {tabId === 'orders' && (
-        <div className="mt-5">
-          <label className="block space-y-1.5">
-            <span className="text-sm font-medium">Статус заказа</span>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">Статус заказа</span>
 
-            <select
-              value={String(values.status ?? 'CREATED')}
-              className={SELECT_CLASS_NAME}
-              onChange={(event) => updateValue('status', event.target.value)}
-            >
-              {orderStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+          <select
+            value={String(values.status ?? 'CREATED')}
+            className={SELECT_CLASS_NAME}
+            onChange={(event) => updateValue('status', event.target.value)}
+          >
+            {orderStatuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </label>
       )}
 
       {tabId !== 'orders' && (
-        <label className="mt-5 flex items-center gap-2 text-sm">
+        <label className="flex cursor-pointer items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={Boolean(values.isActive)}
@@ -409,7 +388,7 @@ export function AdminCrudForm({
         </label>
       )}
 
-      <div className="mt-6 flex flex-wrap justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-5">
         <Button type="button" variant="outline" onClick={onCancel}>
           Отмена
         </Button>

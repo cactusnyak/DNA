@@ -37,6 +37,7 @@ import {
 import type { Order } from '@/entities/order';
 import { formatOrderStatus } from '@/entities/order';
 import { formatPrice } from '@/shared/utils/format-price';
+import { Modal } from '@/widgets/Modal';
 
 import { AdminCategoryTreeView } from '../AdminCategoryTreeView';
 import { AdminCollectionItemsEditor } from '../AdminCollectionItemsEditor';
@@ -73,6 +74,37 @@ function getStatusLabel(record: {
   }
 
   return record.isActive === false ? 'Неактивно' : 'Активно';
+}
+
+function isAdminCatalogCollection(
+  record?: EditableRecord,
+): record is AdminCatalogCollection {
+  return Boolean(record && 'type' in record);
+}
+
+function getCrudFormModalTitle(
+  tabId: AdminManagementTabId,
+  record?: EditableRecord,
+) {
+  if (tabId === 'orders') {
+    return 'Изменение статуса заказа';
+  }
+
+  const actionLabel = record ? 'Редактирование' : 'Создание';
+
+  if (tabId === 'categories') {
+    return `${actionLabel} категории`;
+  }
+
+  if (tabId === 'products') {
+    return `${actionLabel} продукта`;
+  }
+
+  if (tabId === 'collections') {
+    return `${actionLabel} подборки`;
+  }
+
+  return 'Форма управления';
 }
 
 export function AdminManagement({ accessToken }: AdminManagementProps) {
@@ -252,6 +284,22 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       ]),
     [data?.orders, searchValue],
   );
+
+  const isCrudFormOpen = isCreating || Boolean(editingRecord);
+
+  const isCrudFormPending =
+    createCategoryMutation.isPending ||
+    updateCategoryMutation.isPending ||
+    createProductMutation.isPending ||
+    updateProductMutation.isPending ||
+    createCollectionMutation.isPending ||
+    updateCollectionMutation.isPending ||
+    updateOrderStatusMutation.isPending;
+
+  const collectionEditingRecord =
+    activeTabId === 'collections' && isAdminCatalogCollection(editingRecord)
+      ? editingRecord
+      : undefined;
 
   function resetEditing() {
     setEditingRecord(undefined);
@@ -437,74 +485,71 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         }}
       />
 
-      {(isCreating || editingRecord) && (
-        <AdminCrudForm
-          tabId={activeTabId}
-          record={editingRecord}
-          categories={data.categories}
-          isPending={
-            createCategoryMutation.isPending ||
-            updateCategoryMutation.isPending ||
-            createProductMutation.isPending ||
-            updateProductMutation.isPending ||
-            createCollectionMutation.isPending ||
-            updateCollectionMutation.isPending ||
-            updateOrderStatusMutation.isPending
-          }
-          onSubmit={handleSubmit}
-          onCancel={resetEditing}
-        />
-      )}
-
-      {activeTabId === 'collections' &&
-        editingRecord &&
-        'type' in editingRecord && (
-          <AdminCollectionItemsEditor
-            collection={editingRecord as AdminCatalogCollection}
+      <Modal
+        isOpen={isCrudFormOpen}
+        title={getCrudFormModalTitle(activeTabId, editingRecord)}
+        size={collectionEditingRecord ? 'xl' : activeTabId === 'orders' ? 'sm' : 'lg'}
+        onClose={resetEditing}
+      >
+        <div className="space-y-6">
+          <AdminCrudForm
+            tabId={activeTabId}
+            record={editingRecord}
             categories={data.categories}
-            products={data.products}
-            isPending={updateCollectionItemsMutation.isPending}
-            onSave={(items) =>
-              updateCollectionItemsMutation.mutate({
-                collection: editingRecord as AdminCatalogCollection,
-                items,
-              })
-            }
-            onQuickCreate={async (title) => {
-              if ((editingRecord as AdminCatalogCollection).type === 'CATEGORY') {
-                const category = await createCategoryMutation.mutateAsync({
-                  name: title,
+            isPending={isCrudFormPending}
+            onSubmit={handleSubmit}
+            onCancel={resetEditing}
+          />
+
+          {collectionEditingRecord && (
+            <AdminCollectionItemsEditor
+              collection={collectionEditingRecord}
+              categories={data.categories}
+              products={data.products}
+              isPending={updateCollectionItemsMutation.isPending}
+              onSave={(items) =>
+                updateCollectionItemsMutation.mutate({
+                  collection: collectionEditingRecord,
+                  items,
+                })
+              }
+              onQuickCreate={async (title) => {
+                if (collectionEditingRecord.type === 'CATEGORY') {
+                  const category = await createCategoryMutation.mutateAsync({
+                    name: title,
+                    slug: '',
+                    description: '',
+                    parentId: '',
+                    sortOrder: data.categories.length,
+                    imageUrl: '',
+                    imageAlt: '',
+                    isActive: true,
+                  });
+
+                  return category.id;
+                }
+
+                if (!data.categories[0]) {
+                  window.alert('Сначала создайте хотя бы одну категорию.');
+                  return undefined;
+                }
+
+                const product = await createProductMutation.mutateAsync({
+                  title,
                   slug: '',
                   description: '',
-                  parentId: '',
-                  sortOrder: data.categories.length,
-                  imageUrl: '',
-                  imageAlt: '',
+                  categoryId: data.categories[0].id,
+                  price: 0,
+                  imageUrls: [],
                   isActive: true,
                 });
 
-                return category.id;
-              }
-
-              if (!data.categories[0]) {
-                window.alert('Сначала создайте хотя бы одну категорию.');
-                return undefined;
-              }
-
-              const product = await createProductMutation.mutateAsync({
-                title,
-                slug: '',
-                description: '',
-                categoryId: data.categories[0].id,
-                price: 0,
-                imageUrls: [],
-                isActive: true,
-              });
-
-              return product.id;
-            }}
-          />
-        )}
+                return product.id;
+              }}
+            />
+          )}
+        </div>
+      </Modal>
 
       {activeTabId === 'categories' && viewMode === 'tree' && (
         <AdminCategoryTreeView
@@ -611,7 +656,10 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
             renderHighlightedText(product.title, searchValue)
           }
           getDescription={(product) =>
-            renderHighlightedText(product.description || 'Без описания', searchValue)
+            renderHighlightedText(
+              product.description || 'Без описания',
+              searchValue,
+            )
           }
           getMeta={(product) =>
             `${product.category?.name ?? 'Без категории'} · ${formatPrice(product.price)} · ${getStatusLabel(product)}`
@@ -671,7 +719,10 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
             renderHighlightedText(collection.title, searchValue)
           }
           getDescription={(collection) =>
-            renderHighlightedText(collection.description || 'Без описания', searchValue)
+            renderHighlightedText(
+              collection.description || 'Без описания',
+              searchValue,
+            )
           }
           getMeta={(collection) =>
             `${collection.type === 'CATEGORY' ? 'Категории' : 'Продукты'} · ${collection.slug} · ${getStatusLabel(collection)}`

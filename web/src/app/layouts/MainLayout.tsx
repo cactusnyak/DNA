@@ -7,7 +7,7 @@ import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
 
 export function MainLayout() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+    <div className="min-h-screen overflow-hidden bg-background text-foreground">
       <Header />
 
       <Breadcrumbs />
@@ -19,6 +19,16 @@ export function MainLayout() {
       <Footer />
 
       <MainNavigation placement="mobileBottom" />
+
+      <div
+        id="app-modal-root"
+        className="pointer-events-none fixed inset-0 z-[80]"
+      />
+
+      <div
+        id="app-notification-root"
+        className="pointer-events-none fixed inset-x-0 top-0 z-[90] h-0"
+      />
     </div>
   );
 }
