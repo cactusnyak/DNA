@@ -5,9 +5,9 @@ import {
   useState,
 } from 'react';
 
+import { FormToggleField } from '@/components/ui/FormField';
 import type { AdminCategory } from '@/entities/admin';
 
-import { ActiveStatusCheckbox } from './components/ActiveStatusCheckbox';
 import { AdminCrudFormActions } from './components/AdminCrudFormActions';
 import { CategoryCrudFields } from './components/CategoryCrudFields';
 import { CollectionCrudFields } from './components/CollectionCrudFields';
@@ -72,20 +72,31 @@ export function AdminCrudForm({
   };
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit}>
-      {tabId === 'categories' && <CategoryCrudFields {...fieldsProps} />}
-      {tabId === 'products' && <ProductCrudFields {...fieldsProps} />}
-      {tabId === 'collections' && <CollectionCrudFields {...fieldsProps} />}
-      {tabId === 'orders' && <OrderStatusCrudFields {...fieldsProps} />}
+    <form
+      className="flex max-h-full flex-1 flex-col overflow-hidden"
+      onSubmit={handleSubmit}
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex flex-col gap-6 p-6">
+          {tabId === 'categories' && <CategoryCrudFields {...fieldsProps} />}
+          {tabId === 'products' && <ProductCrudFields {...fieldsProps} />}
+          {tabId === 'collections' && <CollectionCrudFields {...fieldsProps} />}
+          {tabId === 'orders' && <OrderStatusCrudFields {...fieldsProps} />}
 
-      {tabId !== 'orders' && (
-        <ActiveStatusCheckbox
-          checked={Boolean(values.isActive)}
-          onChange={(checked) => updateValue('isActive', checked)}
-        />
-      )}
+          {tabId !== 'orders' && (
+            <FormToggleField
+              label="Статус активности"
+              caption="Неактивные записи можно скрывать из публичного каталога."
+              checked={Boolean(values.isActive)}
+              onCheckedChange={(checked) => updateValue('isActive', checked)}
+            />
+          )}
+        </div>
+      </div>
 
-      <AdminCrudFormActions isPending={isPending} onCancel={onCancel} />
+      <div className="shrink-0 border-t border-border bg-background p-6">
+        <AdminCrudFormActions isPending={isPending} onCancel={onCancel} />
+      </div>
     </form>
   );
 }

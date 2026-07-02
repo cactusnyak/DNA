@@ -1,10 +1,10 @@
 import {
   FormInputField,
+  FormSelectField,
   FormTextareaField,
 } from '@/components/ui/FormField';
 import type { AdminCategory } from '@/entities/admin';
 
-import { SELECT_CLASS_NAME } from '../../data/select-class-name';
 import type { AdminCrudFieldsProps } from '../../types/admin-crud-form';
 
 export function CategoryCrudFields({
@@ -14,6 +14,19 @@ export function CategoryCrudFields({
   onValueChange,
 }: AdminCrudFieldsProps) {
   const categoryRecord = record as AdminCategory | undefined;
+
+  const parentCategoryOptions = [
+    {
+      value: '',
+      label: 'Без родителя',
+    },
+    ...categories
+      .filter((category) => category.id !== categoryRecord?.id)
+      .map((category) => ({
+        value: category.id,
+        label: category.name,
+      })),
+  ];
 
   return (
     <div className="flex flex-col gap-5">
@@ -31,25 +44,12 @@ export function CategoryCrudFields({
         onChange={(event) => onValueChange('slug', event.target.value)}
       />
 
-      <label className="flex flex-col">
-        <span className="text-sm font-medium">Родительская категория</span>
-
-        <select
-          value={String(values.parentId ?? '')}
-          className={SELECT_CLASS_NAME}
-          onChange={(event) => onValueChange('parentId', event.target.value)}
-        >
-          <option value="">Без родителя</option>
-
-          {categories
-            .filter((category) => category.id !== categoryRecord?.id)
-            .map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-        </select>
-      </label>
+      <FormSelectField
+        label="Родительская категория"
+        value={String(values.parentId ?? '')}
+        options={parentCategoryOptions}
+        onValueChange={(value) => onValueChange('parentId', value)}
+      />
 
       <FormInputField
         type="number"
@@ -70,13 +70,11 @@ export function CategoryCrudFields({
         onChange={(event) => onValueChange('imageAlt', event.target.value)}
       />
 
-      <div className="md:col-span-2">
-        <FormTextareaField
-          label="Описание"
-          value={String(values.description ?? '')}
-          onChange={(event) => onValueChange('description', event.target.value)}
-        />
-      </div>
+      <FormTextareaField
+        label="Описание"
+        value={String(values.description ?? '')}
+        onChange={(event) => onValueChange('description', event.target.value)}
+      />
     </div>
   );
 }

@@ -10,7 +10,7 @@ export function AdminCrudFormActions({
   onCancel,
 }: AdminCrudFormActionsProps) {
   return (
-    <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-5">
+    <div className="flex flex-wrap justify-end gap-2">
       <Button type="button" variant="outline" onClick={onCancel}>
         Отмена
       </Button>

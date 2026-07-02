@@ -54,7 +54,7 @@ export function AdminCrudModal({
       size={collectionEditingRecord ? 'xl' : activeTabId === 'orders' ? 'sm' : 'lg'}
       onClose={onClose}
     >
-      <div className="space-y-6">
+      <div className="space-y-6 max-h-full overflow-y-auto">
         <AdminCrudForm
           tabId={activeTabId}
           record={editingRecord}
