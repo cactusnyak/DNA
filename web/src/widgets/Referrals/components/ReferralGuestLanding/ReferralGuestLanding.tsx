@@ -22,7 +22,7 @@ export function ReferralGuestLanding() {
           </div>
 
           <div className="space-y-4">
-            <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="max-w-3xl text-3xl font-semibold leading-tight sm:text-5xl">
               Приглашайте людей. Получайте бонусы. Не продавайте душу баннерной рекламе.
             </h1>
 

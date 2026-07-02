@@ -3,6 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { extname, join } from 'node:path';
 import {
   CatalogCollectionType,
   OrderStatus,
@@ -51,9 +54,26 @@ type CollectionItemPayload = {
   sortOrder?: number;
 };
 
+export type AdminUploadedImageFile = {
+  originalname: string;
+  mimetype: string;
+  size: number;
+  buffer?: Buffer;
+};
+
+const MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024;
+
+const IMAGE_MIME_EXTENSION: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/avif': '.avif',
+};
+
 @Injectable()
 export class AdminService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async getOverview() {
     const [
@@ -88,6 +108,37 @@ export class AdminService {
       productsCount,
       collectionsCount,
       ordersCount,
+    };
+  }
+
+
+  async uploadImage(file?: AdminUploadedImageFile) {
+    if (!file?.buffer) {
+      throw new BadRequestException('Image file is required');
+    }
+
+    if (!IMAGE_MIME_EXTENSION[file.mimetype]) {
+      throw new BadRequestException('Unsupported image file type');
+    }
+
+    if (file.size > MAX_IMAGE_UPLOAD_SIZE) {
+      throw new BadRequestException('Image file is too large');
+    }
+
+    const fileExtension = this.getImageUploadExtension(file);
+    const fileName = `${randomUUID()}${fileExtension}`;
+    const uploadsDirectory = join(process.cwd(), 'uploads', 'images');
+    const filePath = join(uploadsDirectory, fileName);
+
+    await mkdir(uploadsDirectory, {
+      recursive: true,
+    });
+
+    await writeFile(filePath, file.buffer);
+
+    return {
+      url: `/uploads/images/${fileName}`,
+      fileName,
     };
   }
 
@@ -914,13 +965,26 @@ export class AdminService {
         unitPrice: item.unitPrice,
         product: item.product
           ? {
-              id: item.product.id,
-              title: item.product.title,
-              slug: item.product.slug,
-            }
+            id: item.product.id,
+            title: item.product.title,
+            slug: item.product.slug,
+          }
           : undefined,
       })),
     };
+  }
+
+
+  private getImageUploadExtension(file: AdminUploadedImageFile) {
+    const extensionFromMimeType = IMAGE_MIME_EXTENSION[file.mimetype];
+
+    if (extensionFromMimeType) {
+      return extensionFromMimeType;
+    }
+
+    const extensionFromName = extname(file.originalname).toLowerCase();
+
+    return extensionFromName || '.jpg';
   }
 
   private getCollectionItems(body: unknown): CollectionItemPayload[] {
@@ -1058,8 +1122,8 @@ export class AdminService {
           deletedAt: null,
           id: exceptId
             ? {
-                not: exceptId,
-              }
+              not: exceptId,
+            }
             : undefined,
         },
       });
@@ -1074,8 +1138,8 @@ export class AdminService {
           deletedAt: null,
           id: exceptId
             ? {
-                not: exceptId,
-              }
+              not: exceptId,
+            }
             : undefined,
         },
       });
@@ -1088,8 +1152,8 @@ export class AdminService {
         slug,
         id: exceptId
           ? {
-              not: exceptId,
-            }
+            not: exceptId,
+          }
           : undefined,
       },
     });

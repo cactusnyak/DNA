@@ -46,6 +46,11 @@ export type AdminCatalogData = {
   orders: Order[];
 };
 
+export type AdminUploadImageResponse = {
+  url: string;
+  fileName: string;
+};
+
 export type AdminCategoryPayload = {
   name: string;
   slug?: string;

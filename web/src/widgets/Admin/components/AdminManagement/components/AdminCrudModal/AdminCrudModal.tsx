@@ -22,6 +22,7 @@ type AdminCrudModalProps = {
   data: AdminCatalogData;
   isCrudFormPending?: boolean;
   isCollectionItemsPending?: boolean;
+  onUploadImage: ComponentProps<typeof AdminCrudForm>['onUploadImage'];
   onSubmit: ComponentProps<typeof AdminCrudForm>['onSubmit'];
   onClose: () => void;
   onCollectionItemsSave: (
@@ -42,6 +43,7 @@ export function AdminCrudModal({
   data,
   isCrudFormPending = false,
   isCollectionItemsPending = false,
+  onUploadImage,
   onSubmit,
   onClose,
   onCollectionItemsSave,
@@ -54,29 +56,32 @@ export function AdminCrudModal({
       size={collectionEditingRecord ? 'xl' : activeTabId === 'orders' ? 'sm' : 'lg'}
       onClose={onClose}
     >
-      <div className="space-y-6 max-h-full overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <AdminCrudForm
           tabId={activeTabId}
           record={editingRecord}
           categories={data.categories}
           isPending={isCrudFormPending}
+          onUploadImage={onUploadImage}
           onSubmit={onSubmit}
           onCancel={onClose}
         />
 
         {collectionEditingRecord && (
-          <AdminCollectionItemsEditor
-            collection={collectionEditingRecord}
-            categories={data.categories}
-            products={data.products}
-            isPending={isCollectionItemsPending}
-            onSave={(items) =>
-              onCollectionItemsSave(collectionEditingRecord, items)
-            }
-            onQuickCreate={(title) =>
-              onQuickCreate(collectionEditingRecord, title)
-            }
-          />
+          <div className="min-h-0 flex-1 overflow-y-auto border-t border-border p-6">
+            <AdminCollectionItemsEditor
+              collection={collectionEditingRecord}
+              categories={data.categories}
+              products={data.products}
+              isPending={isCollectionItemsPending}
+              onSave={(items) =>
+                onCollectionItemsSave(collectionEditingRecord, items)
+              }
+              onQuickCreate={(title) =>
+                onQuickCreate(collectionEditingRecord, title)
+              }
+            />
+          </div>
         )}
       </div>
     </Modal>

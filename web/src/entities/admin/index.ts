@@ -17,6 +17,7 @@ export {
   updateAdminCategory,
   updateAdminOrderStatus,
   updateAdminProduct,
+  uploadAdminImage,
 } from './api/admin-catalog';
 
 export type { AdminOverview } from './types/admin-overview';
@@ -31,4 +32,5 @@ export type {
   AdminCategoryPayload,
   AdminProduct,
   AdminProductPayload,
+  AdminUploadImageResponse,
 } from './types/admin-catalog';

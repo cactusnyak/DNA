@@ -2,38 +2,84 @@ import type { OrderStatus } from '@/entities/order';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
+  AdminCrudFormValue,
   AdminCrudFormValues,
   AdminCrudPayload,
+  AdminImageUploader,
 } from '../types/admin-crud-form';
 
-export function buildAdminCrudPayload(
-  tabId: AdminManagementTabId,
-  values: AdminCrudFormValues,
-): AdminCrudPayload {
+type BuildAdminCrudPayloadParams = {
+  tabId: AdminManagementTabId;
+  values: AdminCrudFormValues;
+  uploadImage: AdminImageUploader;
+};
+
+function isFile(value: AdminCrudFormValue): value is File {
+  return typeof File !== 'undefined' && value instanceof File;
+}
+
+function getFile(value: AdminCrudFormValue) {
+  return isFile(value) ? value : null;
+}
+
+function getFiles(value: AdminCrudFormValue) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter((item): item is File => isFile(item));
+}
+
+function getImageUrls(value: AdminCrudFormValue) {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string');
+  }
+
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  return value
+    .split('\n')
+    .map((imageUrl) => imageUrl.trim())
+    .filter(Boolean);
+}
+
+export async function buildAdminCrudPayload({
+  tabId,
+  values,
+  uploadImage,
+}: BuildAdminCrudPayloadParams): Promise<AdminCrudPayload> {
   if (tabId === 'categories') {
+    const imageFile = getFile(values.imageFile);
+    const imageUrl = imageFile
+      ? await uploadImage(imageFile)
+      : String(values.imageUrl ?? '');
+
     return {
       name: String(values.name ?? ''),
       slug: String(values.slug ?? ''),
       description: String(values.description ?? ''),
       parentId: String(values.parentId ?? ''),
       sortOrder: Number(values.sortOrder ?? 0),
-      imageUrl: String(values.imageUrl ?? ''),
+      imageUrl,
       imageAlt: String(values.imageAlt ?? ''),
       isActive: Boolean(values.isActive),
     };
   }
 
   if (tabId === 'products') {
+    const existingImageUrls = getImageUrls(values.imageUrls);
+    const imageFiles = getFiles(values.imageFiles);
+    const uploadedImageUrls = await Promise.all(imageFiles.map(uploadImage));
+
     return {
       title: String(values.title ?? ''),
       slug: String(values.slug ?? ''),
       description: String(values.description ?? ''),
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
-      imageUrls: String(values.imageUrls ?? '')
-        .split('\n')
-        .map((imageUrl) => imageUrl.trim())
-        .filter(Boolean),
+      imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       isActive: Boolean(values.isActive),
     };
   }

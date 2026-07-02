@@ -25,6 +25,7 @@ export function getAdminCrudInitialValues(
       parentId: category?.parentId ?? '',
       sortOrder: String(category?.sortOrder ?? 0),
       imageUrl: category?.image?.url ?? '',
+      imageFile: null,
       imageAlt: category?.image?.alt ?? '',
       isActive: category?.isActive ?? true,
     };
@@ -39,7 +40,8 @@ export function getAdminCrudInitialValues(
       description: product?.description ?? '',
       categoryId: product?.categoryId ?? '',
       price: String(product?.price ?? 0),
-      imageUrls: product?.images.map((image) => image.url).join('\n') ?? '',
+      imageUrls: product?.images.map((image) => image.url) ?? [],
+      imageFiles: [],
       isActive: product?.isActive ?? true,
     };
   }

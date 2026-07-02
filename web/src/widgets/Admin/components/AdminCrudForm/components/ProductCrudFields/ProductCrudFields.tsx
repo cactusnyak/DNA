@@ -1,16 +1,44 @@
 import {
+  FormImageFilesField,
   FormInputField,
+  FormSelectField,
   FormTextareaField,
 } from '@/components/ui/FormField';
 
-import { SELECT_CLASS_NAME } from '../../data/select-class-name';
 import type { AdminCrudFieldsProps } from '../../types/admin-crud-form';
+
+function getStringArray(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
+}
+
+function getFileArray(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is File => item instanceof File)
+    : [];
+}
 
 export function ProductCrudFields({
   values,
   categories,
   onValueChange,
 }: AdminCrudFieldsProps) {
+  const categoryOptions = [
+    {
+      value: '',
+      label: 'Выберите категорию',
+      disabled: true,
+    },
+    ...categories.map((category) => ({
+      value: category.id,
+      label: category.name,
+    })),
+  ];
+
+  const existingImageUrls = getStringArray(values.imageUrls);
+  const imageFiles = getFileArray(values.imageFiles);
+
   return (
     <div className="flex flex-col gap-5">
       <FormInputField
@@ -27,26 +55,13 @@ export function ProductCrudFields({
         onChange={(event) => onValueChange('slug', event.target.value)}
       />
 
-      <label className="flex flex-col">
-        <span className="text-sm font-medium after:ml-1 after:text-destructive after:content-['*']">
-          Категория
-        </span>
-
-        <select
-          required
-          value={String(values.categoryId ?? '')}
-          className={SELECT_CLASS_NAME}
-          onChange={(event) => onValueChange('categoryId', event.target.value)}
-        >
-          <option value="">Выберите категорию</option>
-
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FormSelectField
+        required
+        label="Категория"
+        value={String(values.categoryId ?? '')}
+        options={categoryOptions}
+        onValueChange={(value) => onValueChange('categoryId', value)}
+      />
 
       <FormInputField
         required
@@ -56,22 +71,22 @@ export function ProductCrudFields({
         onChange={(event) => onValueChange('price', event.target.value)}
       />
 
-      <div className="md:col-span-2">
-        <FormTextareaField
-          label="Описание"
-          value={String(values.description ?? '')}
-          onChange={(event) => onValueChange('description', event.target.value)}
-        />
-      </div>
+      <FormTextareaField
+        label="Описание"
+        value={String(values.description ?? '')}
+        onChange={(event) => onValueChange('description', event.target.value)}
+      />
 
-      <div className="md:col-span-2">
-        <FormTextareaField
-          label="Изображения"
-          caption="Каждый URL с новой строки."
-          value={String(values.imageUrls ?? '')}
-          onChange={(event) => onValueChange('imageUrls', event.target.value)}
-        />
-      </div>
+      <FormImageFilesField
+        label="Изображения"
+        caption="Новые файлы будут загружены на сервер, а в товар сохранятся полученные URL."
+        files={imageFiles}
+        existingImageUrls={existingImageUrls}
+        onFilesChange={(files) => onValueChange('imageFiles', files)}
+        onExistingImageUrlsChange={(imageUrls) =>
+          onValueChange('imageUrls', imageUrls)
+        }
+      />
     </div>
   );
 }

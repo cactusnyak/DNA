@@ -22,11 +22,13 @@ export type AdminCrudPayload =
   | AdminCatalogCollectionPayload
   | { status: OrderStatus };
 
-export type AdminCrudFormValues = Record<string, string | boolean>;
+export type AdminCrudFormValue = string | boolean | File | File[] | string[] | null;
+
+export type AdminCrudFormValues = Record<string, AdminCrudFormValue>;
 
 export type AdminCrudUpdateValue = (
   field: string,
-  value: string | boolean,
+  value: AdminCrudFormValue,
 ) => void;
 
 export type AdminCrudFieldsProps = {
@@ -36,3 +38,5 @@ export type AdminCrudFieldsProps = {
   record?: AdminCrudRecord;
   onValueChange: AdminCrudUpdateValue;
 };
+
+export type AdminImageUploader = (file: File) => Promise<string>;

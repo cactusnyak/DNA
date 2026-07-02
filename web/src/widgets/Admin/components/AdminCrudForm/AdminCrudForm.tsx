@@ -19,6 +19,7 @@ import type {
   AdminCrudPayload,
   AdminCrudRecord,
   AdminCrudUpdateValue,
+  AdminImageUploader,
 } from './types/admin-crud-form';
 
 import type { AdminManagementTabId } from '../../types/admin-management';
@@ -28,6 +29,7 @@ type AdminCrudFormProps = {
   record?: AdminCrudRecord;
   categories: AdminCategory[];
   isPending?: boolean;
+  onUploadImage: AdminImageUploader;
   onSubmit: (payload: AdminCrudPayload) => void | Promise<void>;
   onCancel: () => void;
 };
@@ -37,6 +39,7 @@ export function AdminCrudForm({
   record,
   categories,
   isPending = false,
+  onUploadImage,
   onSubmit,
   onCancel,
 }: AdminCrudFormProps) {
@@ -46,9 +49,12 @@ export function AdminCrudForm({
   );
 
   const [values, setValues] = useState(initialValues);
+  const [submitError, setSubmitError] = useState<string>();
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   useEffect(() => {
     setValues(initialValues);
+    setSubmitError(undefined);
   }, [initialValues]);
 
   const updateValue: AdminCrudUpdateValue = (field, value) => {
@@ -58,9 +64,28 @@ export function AdminCrudForm({
     }));
   };
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit(buildAdminCrudPayload(tabId, values));
+    setSubmitError(undefined);
+    setIsUploadingImages(true);
+
+    try {
+      const payload = await buildAdminCrudPayload({
+        tabId,
+        values,
+        uploadImage: onUploadImage,
+      });
+
+      await onSubmit(payload);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : 'Не удалось сохранить запись.',
+      );
+    } finally {
+      setIsUploadingImages(false);
+    }
   }
 
   const fieldsProps = {
@@ -70,6 +95,8 @@ export function AdminCrudForm({
     record,
     onValueChange: updateValue,
   };
+
+  const isFormPending = isPending || isUploadingImages;
 
   return (
     <form
@@ -88,14 +115,21 @@ export function AdminCrudForm({
               label="Статус активности"
               caption="Неактивные записи можно скрывать из публичного каталога."
               checked={Boolean(values.isActive)}
+              disabled={isFormPending}
               onCheckedChange={(checked) => updateValue('isActive', checked)}
             />
+          )}
+
+          {submitError && (
+            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+              {submitError}
+            </div>
           )}
         </div>
       </div>
 
       <div className="shrink-0 border-t border-border bg-background p-6">
-        <AdminCrudFormActions isPending={isPending} onCancel={onCancel} />
+        <AdminCrudFormActions isPending={isFormPending} onCancel={onCancel} />
       </div>
     </form>
   );

@@ -3,7 +3,10 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import { getAdminCatalogData } from '@/entities/admin';
+import {
+  getAdminCatalogData,
+  uploadAdminImage,
+} from '@/entities/admin';
 
 import { AdminTabs } from '../AdminTabs';
 import { AdminToolbar } from '../AdminToolbar';
@@ -132,6 +135,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         data={data}
         isCrudFormPending={mutations.isCrudFormPending}
         isCollectionItemsPending={mutations.updateCollectionItemsMutation.isPending}
+        onUploadImage={(file) =>
+          uploadAdminImage(accessToken, file).then((response) => response.url)
+        }
         onSubmit={handlers.handleSubmit}
         onClose={state.resetEditing}
         onCollectionItemsSave={handlers.handleCollectionItemsSave}

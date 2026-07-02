@@ -9,7 +9,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  ImagePlus,
+  Trash2,
+  UploadCloud,
+  X,
+} from 'lucide-react';
 
 import { cn } from '@/shared/utils/cn';
 
@@ -68,11 +75,32 @@ type FormToggleFieldProps = FormFieldBaseProps & {
   onCheckedChange: (checked: boolean) => void;
 };
 
+type FormImageFileFieldProps = FormFieldBaseProps & {
+  file?: File | null;
+  previewUrl?: string;
+  accept?: string;
+  disabled?: boolean;
+  onFileChange: (file: File | null) => void;
+  onPreviewUrlClear?: () => void;
+};
+
+type FormImageFilesFieldProps = FormFieldBaseProps & {
+  files: File[];
+  existingImageUrls?: string[];
+  accept?: string;
+  disabled?: boolean;
+  onFilesChange: (files: File[]) => void;
+  onExistingImageUrlsChange?: (imageUrls: string[]) => void;
+};
+
 const TEXTAREA_CLASS_NAME =
   'w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm leading-5 outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 const SELECT_TRIGGER_CLASS_NAME =
   'flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm outline-none transition-colors hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
+
+const FILE_DROPZONE_CLASS_NAME =
+  'flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center transition-colors hover:border-ring hover:bg-muted/50';
 
 function FormFieldRoot({
   label,
@@ -102,6 +130,14 @@ function FormFieldRoot({
       )}
     </div>
   );
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024 * 1024) {
+    return `${Math.max(1, Math.round(size / 1024))} КБ`;
+  }
+
+  return `${(size / 1024 / 1024).toFixed(1)} МБ`;
 }
 
 export function FormInputField({
@@ -245,6 +281,7 @@ export function FormSelectField({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={listboxId}
+          aria-required={required}
           className={cn(SELECT_TRIGGER_CLASS_NAME, selectClassName)}
           onClick={() => setIsOpen((currentValue) => !currentValue)}
           onKeyDown={handleTriggerKeyDown}
@@ -356,6 +393,286 @@ export function FormToggleField({
           />
         </span>
       </button>
+    </FormFieldRoot>
+  );
+}
+
+export function FormImageFileField({
+  label,
+  caption,
+  required = false,
+  file,
+  previewUrl,
+  accept = 'image/*',
+  disabled = false,
+  className,
+  onFileChange,
+  onPreviewUrlClear,
+}: FormImageFileFieldProps) {
+  const inputId = useId();
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string>();
+
+  useEffect(() => {
+    if (!file) {
+      setFilePreviewUrl(undefined);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setFilePreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [file]);
+
+  const activePreviewUrl = filePreviewUrl ?? previewUrl;
+  const hasPreview = Boolean(activePreviewUrl);
+
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    onFileChange(event.target.files?.[0] ?? null);
+    event.target.value = '';
+  }
+
+  function handleClear() {
+    onFileChange(null);
+
+    if (!file && previewUrl) {
+      onPreviewUrlClear?.();
+    }
+  }
+
+  return (
+    <FormFieldRoot
+      label={label}
+      caption={caption}
+      required={required}
+      className={className}
+    >
+      <div className="space-y-3">
+        {hasPreview && (
+          <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
+            <div className="relative aspect-video bg-muted">
+              <img
+                src={activePreviewUrl}
+                alt="Предпросмотр изображения"
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-3 py-2">
+              <div className="min-w-0 text-xs text-muted-foreground">
+                {file ? (
+                  <>
+                    <span className="block truncate font-medium text-foreground">
+                      {file.name}
+                    </span>
+                    <span>{formatFileSize(file.size)}</span>
+                  </>
+                ) : (
+                  <span className="block truncate">Текущее изображение</span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                disabled={disabled}
+                className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleClear}
+              >
+                <Trash2 className="size-3.5" strokeWidth={1.5} />
+                Удалить
+              </button>
+            </div>
+          </div>
+        )}
+
+        <label
+          htmlFor={inputId}
+          className={cn(
+            FILE_DROPZONE_CLASS_NAME,
+            disabled && 'pointer-events-none cursor-not-allowed opacity-50',
+          )}
+        >
+          <input
+            id={inputId}
+            type="file"
+            accept={accept}
+            disabled={disabled}
+            className="sr-only"
+            onChange={handleInputChange}
+          />
+
+          <span className="mb-3 inline-flex size-10 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm">
+            {hasPreview ? (
+              <ImagePlus className="size-5" strokeWidth={1.5} />
+            ) : (
+              <UploadCloud className="size-5" strokeWidth={1.5} />
+            )}
+          </span>
+
+          <span className="text-sm font-medium text-foreground">
+            {hasPreview ? 'Заменить изображение' : 'Выбрать изображение'}
+          </span>
+
+          <span className="mt-1 text-xs text-muted-foreground">
+            PNG, JPG, WEBP, GIF или AVIF до 5 МБ
+          </span>
+        </label>
+      </div>
+    </FormFieldRoot>
+  );
+}
+
+export function FormImageFilesField({
+  label,
+  caption,
+  required = false,
+  files,
+  existingImageUrls = [],
+  accept = 'image/*',
+  disabled = false,
+  className,
+  onFilesChange,
+  onExistingImageUrlsChange,
+}: FormImageFilesFieldProps) {
+  const inputId = useId();
+  const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
+
+  useEffect(() => {
+    const objectUrls = files.map((file) => URL.createObjectURL(file));
+    setFilePreviewUrls(objectUrls);
+
+    return () => {
+      objectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
+    };
+  }, [files]);
+
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const selectedFiles = Array.from(event.target.files ?? []);
+
+    if (selectedFiles.length) {
+      onFilesChange([...files, ...selectedFiles]);
+    }
+
+    event.target.value = '';
+  }
+
+  function removeExistingImage(index: number) {
+    onExistingImageUrlsChange?.(
+      existingImageUrls.filter((_, imageIndex) => imageIndex !== index),
+    );
+  }
+
+  function removeFile(index: number) {
+    onFilesChange(files.filter((_, fileIndex) => fileIndex !== index));
+  }
+
+  const hasImages = existingImageUrls.length > 0 || files.length > 0;
+
+  return (
+    <FormFieldRoot
+      label={label}
+      caption={caption}
+      required={required}
+      className={className}
+    >
+      <div className="space-y-3">
+        {hasImages && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {existingImageUrls.map((imageUrl, index) => (
+              <div
+                key={`${imageUrl}-${index}`}
+                className="overflow-hidden rounded-xl border border-border bg-muted/30"
+              >
+                <div className="relative aspect-video bg-muted">
+                  <img
+                    src={imageUrl}
+                    alt="Изображение продукта"
+                    className="h-full w-full object-cover"
+                  />
+
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    aria-label="Удалить изображение"
+                    className="absolute right-2 top-2 inline-flex size-7 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground shadow-sm transition-colors hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={() => removeExistingImage(index)}
+                  >
+                    <X className="size-4" strokeWidth={1.5} />
+                  </button>
+                </div>
+
+                <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                  Текущее изображение #{index + 1}
+                </div>
+              </div>
+            ))}
+
+            {files.map((file, index) => (
+              <div
+                key={`${file.name}-${file.size}-${index}`}
+                className="overflow-hidden rounded-xl border border-border bg-muted/30"
+              >
+                <div className="relative aspect-video bg-muted">
+                  <img
+                    src={filePreviewUrls[index]}
+                    alt="Новое изображение продукта"
+                    className="h-full w-full object-cover"
+                  />
+
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    aria-label="Удалить изображение"
+                    className="absolute right-2 top-2 inline-flex size-7 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground shadow-sm transition-colors hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={() => removeFile(index)}
+                  >
+                    <X className="size-4" strokeWidth={1.5} />
+                  </button>
+                </div>
+
+                <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                  <span className="block truncate font-medium text-foreground">
+                    {file.name}
+                  </span>
+                  <span>{formatFileSize(file.size)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <label
+          htmlFor={inputId}
+          className={cn(
+            FILE_DROPZONE_CLASS_NAME,
+            disabled && 'pointer-events-none cursor-not-allowed opacity-50',
+          )}
+        >
+          <input
+            id={inputId}
+            type="file"
+            accept={accept}
+            multiple
+            disabled={disabled}
+            className="sr-only"
+            onChange={handleInputChange}
+          />
+
+          <span className="mb-3 inline-flex size-10 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm">
+            <UploadCloud className="size-5" strokeWidth={1.5} />
+          </span>
+
+          <span className="text-sm font-medium text-foreground">
+            {hasImages ? 'Добавить изображения' : 'Выбрать изображения'}
+          </span>
+
+          <span className="mt-1 text-xs text-muted-foreground">
+            Можно выбрать несколько файлов. PNG, JPG, WEBP, GIF или AVIF до 5 МБ
+          </span>
+        </label>
+      </div>
     </FormFieldRoot>
   );
 }

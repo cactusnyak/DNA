@@ -7,21 +7,27 @@ import {
   Patch,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserRole } from '@prisma/client';
 
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 
-import { AdminService } from './admin.service';
+import {
+  AdminService,
+  type AdminUploadedImageFile,
+} from './admin.service';
 
 @Controller('admin')
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   @Get('overview')
   getOverview() {
@@ -31,6 +37,18 @@ export class AdminController {
   @Get('catalog')
   getCatalog() {
     return this.adminService.getCatalog();
+  }
+
+  @Post('uploads/images')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
+  )
+  uploadImage(@UploadedFile() file?: AdminUploadedImageFile) {
+    return this.adminService.uploadImage(file);
   }
 
   @Post('categories')

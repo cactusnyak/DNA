@@ -10,6 +10,7 @@ import type {
   AdminCategoryPayload,
   AdminProduct,
   AdminProductPayload,
+  AdminUploadImageResponse,
 } from '../types/admin-catalog';
 
 function getAdminHeaders(accessToken: string) {
@@ -22,6 +23,24 @@ export function getAdminCatalogData(accessToken: string) {
   return httpClient<AdminCatalogData>('/admin/catalog', {
     headers: getAdminHeaders(accessToken),
   });
+}
+
+export async function uploadAdminImage(accessToken: string, file: File) {
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  const response = await fetch('/api/admin/uploads/images', {
+    method: 'POST',
+    headers: getAdminHeaders(accessToken),
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Image upload failed with status ${response.status}`);
+  }
+
+  return response.json() as Promise<AdminUploadImageResponse>;
 }
 
 export function createAdminCategory(

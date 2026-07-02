@@ -1,4 +1,5 @@
 import {
+  FormImageFileField,
   FormInputField,
   FormSelectField,
   FormTextareaField,
@@ -14,6 +15,7 @@ export function CategoryCrudFields({
   onValueChange,
 }: AdminCrudFieldsProps) {
   const categoryRecord = record as AdminCategory | undefined;
+  const imageFile = values.imageFile instanceof File ? values.imageFile : null;
 
   const parentCategoryOptions = [
     {
@@ -58,10 +60,13 @@ export function CategoryCrudFields({
         onChange={(event) => onValueChange('sortOrder', event.target.value)}
       />
 
-      <FormInputField
-        label="URL изображения"
-        value={String(values.imageUrl ?? '')}
-        onChange={(event) => onValueChange('imageUrl', event.target.value)}
+      <FormImageFileField
+        label="Изображение"
+        caption="Файл будет загружен на сервер, а в каталог сохранится полученный URL."
+        file={imageFile}
+        previewUrl={String(values.imageUrl ?? '')}
+        onFileChange={(file) => onValueChange('imageFile', file)}
+        onPreviewUrlClear={() => onValueChange('imageUrl', '')}
       />
 
       <FormInputField
