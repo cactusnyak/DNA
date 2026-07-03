@@ -2,19 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCategories } from '@/entities/category/api/get-categories';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
 import { CatalogCategoryTree } from '@/widgets/CatalogCategoryTree';
 
 type CatalogPageProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
 };
 
-export function CatalogPage({
-  section = DEFAULT_PLATFORM_SECTION_ID,
-}: CatalogPageProps) {
+export function CatalogPage({ section }: CatalogPageProps) {
   const sectionConfig = getPlatformSection(section);
 
   const {

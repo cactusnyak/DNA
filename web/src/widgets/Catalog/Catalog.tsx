@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom';
 
 import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -13,7 +12,7 @@ import { ProductGrid } from './components/ProductGrid';
 import { useCatalogProducts } from './hooks/use-catalog-products';
 
 type CatalogProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   title?: string;
   showHeader?: boolean;
   showCatalogLink?: boolean;
@@ -23,7 +22,7 @@ type CatalogProps = {
 };
 
 export function Catalog({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   title = 'Каталог',
   showHeader = true,
   showCatalogLink = false,

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 
 import type { Product } from '@/entities/product';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformProductHref,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -12,7 +11,7 @@ import { ProductCardContent } from './components/ProductCardContent';
 import { ProductGallery } from './components/ProductGallery';
 
 type ProductCardProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   product: Product;
   currentCategorySlug?: string;
   showAddToCartButton?: boolean;
@@ -20,14 +19,14 @@ type ProductCardProps = {
 };
 
 export function ProductCard({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   product,
   currentCategorySlug,
   showAddToCartButton = true,
   showBuyNowButton = true,
 }: ProductCardProps) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden p-1 rounded-xl bg-card transition-colors hover:bg-muted/40">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40">
       <Link
         to={getPlatformProductHref(product.id)}
         aria-label={`Открыть товар ${product.title}`}

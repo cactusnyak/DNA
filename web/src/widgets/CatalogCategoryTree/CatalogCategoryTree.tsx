@@ -4,7 +4,6 @@ import { SearchInput } from '@/components/ui/SearchInput';
 import { SectionHeader } from '@/components/ui/Section';
 import type { Category } from '@/entities/category';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -15,7 +14,7 @@ import { getVisibleCategories } from './logic/get-visible-categories';
 import { toggleExpandedCategoryId } from './logic/toggle-expanded-category-id';
 
 type CatalogCategoryTreeProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   categories: Category[];
   title?: string;
   description?: string;
@@ -23,7 +22,7 @@ type CatalogCategoryTreeProps = {
 };
 
 export function CatalogCategoryTree({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   categories,
   title,
   description,

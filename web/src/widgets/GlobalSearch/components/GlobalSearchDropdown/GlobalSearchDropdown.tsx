@@ -3,7 +3,6 @@ import type { UIEvent } from 'react';
 import type { Category } from '@/entities/category';
 import type { Product } from '@/entities/product';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -14,7 +13,7 @@ import { GlobalSearchSectionResults } from '../GlobalSearchSectionResults';
 import type { GlobalSearchSection } from '../../types/global-search';
 
 type GlobalSearchDropdownProps = {
-  section?: PlatformSectionId;
+  section?: PlatformSectionId | null;
   isSearchReady: boolean;
 
   sections: GlobalSearchSection[];
@@ -35,7 +34,7 @@ type GlobalSearchDropdownProps = {
 };
 
 export function GlobalSearchDropdown({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section = null,
   isSearchReady,
 
   sections,
@@ -55,14 +54,16 @@ export function GlobalSearchDropdown({
   onNavigate,
 }: GlobalSearchDropdownProps) {
   const sectionConfig = getPlatformSection(section);
+  const scopedSearchDescription = sectionConfig
+    ? `Начните вводить запрос. Сейчас поиск работает в разделе «${sectionConfig.label}» и умеет находить разделы, категории и карточки выбранного раздела.`
+    : 'Начните вводить запрос. Сейчас активный раздел не выбран, поэтому поиск покажет только разделы платформы.';
 
   return (
-    <div className="absolute left-0 right-0 top-full z-[70] pt-2">
+    <div className="absolute top-full right-0 left-0 z-[70] pt-2">
       <div className="overflow-hidden rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">
         {!isSearchReady ? (
           <div className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground">
-            Начните вводить запрос. Сейчас поиск работает в разделе «{sectionConfig.label}»
-            и умеет находить разделы, категории и товары маркета.
+            {scopedSearchDescription}
           </div>
         ) : (
           <div className="flex flex-col divide-y divide-border">
@@ -73,27 +74,36 @@ export function GlobalSearchDropdown({
               />
             </div>
 
-            <GlobalSearchCategoryResults
-              section={section}
-              categories={categories}
-              allCategories={allCategories}
-              isPending={isCategoriesPending}
-              isError={isCategoriesError}
-              onNavigate={onNavigate}
-            />
+            {section ? (
+              <>
+                <GlobalSearchCategoryResults
+                  section={section}
+                  categories={categories}
+                  allCategories={allCategories}
+                  isPending={isCategoriesPending}
+                  isError={isCategoriesError}
+                  onNavigate={onNavigate}
+                />
 
-            <div className="pt-3">
-              <GlobalSearchProductResults
-                section={section}
-                products={products}
-                totalProducts={totalProducts}
-                isPending={isProductsPending}
-                isError={isProductsError}
-                hasMoreProducts={hasMoreProducts}
-                onScroll={onProductResultsScroll}
-                onNavigate={onNavigate}
-              />
-            </div>
+                <div className="pt-3">
+                  <GlobalSearchProductResults
+                    section={section}
+                    products={products}
+                    totalProducts={totalProducts}
+                    isPending={isProductsPending}
+                    isError={isProductsError}
+                    hasMoreProducts={hasMoreProducts}
+                    onScroll={onProductResultsScroll}
+                    onNavigate={onNavigate}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="py-3 text-sm text-muted-foreground">
+                Выберите «Доска» или «Маркет», чтобы искать по категориям и
+                карточкам конкретного раздела.
+              </div>
+            )}
           </div>
         )}
       </div>

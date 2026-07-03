@@ -9,10 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getProducts } from '@/entities/product/api/get-products';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 
 import { filterGlobalSearchCategories } from '../logic/filter-global-search-categories';
 import { filterGlobalSearchProducts } from '../logic/filter-global-search-products';
@@ -23,11 +20,11 @@ const MIN_SEARCH_LENGTH = 2;
 const PRODUCT_RESULTS_STEP = 8;
 
 type UseGlobalSearchParams = {
-  section?: PlatformSectionId;
+  section?: PlatformSectionId | null;
 };
 
 export function useGlobalSearch({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section = null,
 }: UseGlobalSearchParams = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +36,7 @@ export function useGlobalSearch({
 
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const isSearchReady = normalizedSearchValue.length >= MIN_SEARCH_LENGTH;
+  const isScopedSearchEnabled = Boolean(section && isOpen && isSearchReady);
 
   const {
     data: categories = [],
@@ -47,7 +45,7 @@ export function useGlobalSearch({
   } = useQuery({
     queryKey: ['global-search-categories', section],
     queryFn: () => getCategories({ section }),
-    enabled: isOpen && isSearchReady,
+    enabled: isScopedSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -58,7 +56,7 @@ export function useGlobalSearch({
   } = useQuery({
     queryKey: ['global-search-products', section],
     queryFn: () => getProducts({ section }),
-    enabled: isOpen && isSearchReady,
+    enabled: isScopedSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -71,20 +69,20 @@ export function useGlobalSearch({
   }, [isSearchReady, searchValue]);
 
   const categoryResults = useMemo(() => {
-    if (!isSearchReady) {
+    if (!section || !isSearchReady) {
       return [];
     }
 
     return filterGlobalSearchCategories(categories, searchValue);
-  }, [categories, isSearchReady, searchValue]);
+  }, [categories, isSearchReady, searchValue, section]);
 
   const productResults = useMemo(() => {
-    if (!isSearchReady) {
+    if (!section || !isSearchReady) {
       return [];
     }
 
     return filterGlobalSearchProducts(products, searchValue);
-  }, [isSearchReady, products, searchValue]);
+  }, [isSearchReady, products, searchValue, section]);
 
   const visibleProducts = productResults.slice(0, visibleProductsLimit);
   const hasMoreProducts = visibleProductsLimit < productResults.length;

@@ -1,8 +1,5 @@
 import type { Category } from '@/entities/category';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 
 import { CategoryColumn } from './components/CategoryColumn';
 import { CollapsedAncestors } from './components/CollapsedAncestors';
@@ -11,7 +8,7 @@ import { getCategoryLevels } from './logic/get-category-levels';
 import { getVisibleCategoryLevels } from './logic/get-visible-category-levels';
 
 type CatalogDropdownTreeProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   categories: Category[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
@@ -19,7 +16,7 @@ type CatalogDropdownTreeProps = {
 };
 
 export function CatalogDropdownTree({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   categories,
   activeCategorySlug,
   onActiveCategoryChange,

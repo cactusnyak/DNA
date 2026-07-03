@@ -1,21 +1,18 @@
 import type { Product } from '@/entities/product';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
 import { ProductCard } from './components/ProductCard';
 
 type ProductGridProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   products: Product[];
   currentCategorySlug?: string;
   compact?: boolean;
 };
 
 export function ProductGrid({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   products,
   currentCategorySlug,
   compact = false,

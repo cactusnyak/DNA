@@ -9,7 +9,7 @@ import { PlatformSectionSwitcher } from './components/PlatformSectionSwitcher';
 import { useCatalogDropdown } from './logic/use-catalog-dropdown';
 
 export function Header() {
-  const activeSection = useActivePlatformSection();
+  const { activeSectionId } = useActivePlatformSection();
 
   const {
     isCatalogDropdownOpen,
@@ -33,12 +33,12 @@ export function Header() {
         <HeaderLogo onClick={closeCatalogDropdown} />
 
         <PlatformSectionSwitcher
-          activeSectionId={activeSection.id}
+          activeSectionId={activeSectionId}
           onNavigate={closeCatalogDropdown}
         />
 
         <DesktopHeaderControls
-          section={activeSection.id}
+          section={activeSectionId}
           isCatalogDropdownOpen={isCatalogDropdownOpen}
           onCatalogHover={toggleCatalogDropdown}
           onNavigate={closeCatalogDropdown}
@@ -47,14 +47,14 @@ export function Header() {
         <MainNavigation placement="header" onNavigate={closeCatalogDropdown} />
       </div>
 
-      {isCatalogDropdownOpen && (
+      {isCatalogDropdownOpen && activeSectionId && (
         <HeaderCatalogDropdown
-          section={activeSection.id}
+          section={activeSectionId}
           onClose={closeCatalogDropdown}
         />
       )}
 
-      <MobileHeaderControls section={activeSection.id} />
+      <MobileHeaderControls section={activeSectionId} />
     </header>
   );
 }

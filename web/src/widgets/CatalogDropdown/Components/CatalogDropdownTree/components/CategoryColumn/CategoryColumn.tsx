@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformCatalogHref,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -14,7 +13,7 @@ import { getChildrenCategories } from '../../logic/get-children-categories';
 import type { CategoryLevel } from '../../types/category-level';
 
 type CategoryColumnProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   categories: Category[];
   level: CategoryLevel;
   activeCategoryPath: Category[];
@@ -24,7 +23,7 @@ type CategoryColumnProps = {
 };
 
 export function CategoryColumn({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   categories,
   level,
   activeCategoryPath,

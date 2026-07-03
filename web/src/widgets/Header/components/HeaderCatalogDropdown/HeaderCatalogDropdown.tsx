@@ -1,16 +1,13 @@
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 import { CatalogDropdown } from '@/widgets/CatalogDropdown';
 
 type HeaderCatalogDropdownProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   onClose: () => void;
 };
 
 export function HeaderCatalogDropdown({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   onClose,
 }: HeaderCatalogDropdownProps) {
   return (

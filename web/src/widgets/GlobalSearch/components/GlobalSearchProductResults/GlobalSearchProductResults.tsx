@@ -2,7 +2,6 @@ import type { UIEvent } from 'react';
 
 import type { Product } from '@/entities/product';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -10,7 +9,7 @@ import {
 import { GlobalSearchProductRow } from '../GlobalSearchProductRow';
 
 type GlobalSearchProductResultsProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   products: Product[];
   totalProducts: number;
   isPending?: boolean;
@@ -21,7 +20,7 @@ type GlobalSearchProductResultsProps = {
 };
 
 export function GlobalSearchProductResults({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   products,
   totalProducts,
   isPending = false,

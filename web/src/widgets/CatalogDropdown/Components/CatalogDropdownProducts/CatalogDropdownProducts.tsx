@@ -2,14 +2,13 @@ import { Link } from 'react-router-dom';
 
 import type { Product } from '@/entities/product';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   getPlatformProductHref,
   type PlatformSectionId,
 } from '@/shared/platform';
 
 type CatalogDropdownProductsProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   products: Product[];
   activeCategoryName?: string;
   isPending?: boolean;
@@ -17,7 +16,7 @@ type CatalogDropdownProductsProps = {
 };
 
 export function CatalogDropdownProducts({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   products,
   activeCategoryName,
   isPending = false,

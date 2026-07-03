@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -10,14 +9,14 @@ import { cn } from '@/shared/utils/cn';
 import { GlobalSearch } from '@/widgets/GlobalSearch';
 
 type DesktopHeaderControlsProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId | null;
   isCatalogDropdownOpen: boolean;
   onCatalogHover: () => void;
   onNavigate: () => void;
 };
 
 export function DesktopHeaderControls({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   isCatalogDropdownOpen,
   onCatalogHover,
   onNavigate,
@@ -28,24 +27,26 @@ export function DesktopHeaderControls({
     <div className="hidden flex-1 items-center gap-3 md:flex">
       <GlobalSearch
         section={section}
-        placeholder={sectionConfig.searchPlaceholder}
+        placeholder={sectionConfig?.searchPlaceholder ?? 'Поиск по DNA'}
         onOpen={onNavigate}
       />
 
-      <Button
-        variant="outline"
-        type="button"
-        asChild
-        onMouseEnter={onCatalogHover}
-        className={cn(
-          !isCatalogDropdownOpen &&
-            'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
-        )}
-      >
-        <Link to={sectionConfig.catalogHref} onClick={onNavigate}>
-          Каталог
-        </Link>
-      </Button>
+      {sectionConfig && (
+        <Button
+          variant="outline"
+          type="button"
+          asChild
+          onMouseEnter={onCatalogHover}
+          className={cn(
+            !isCatalogDropdownOpen &&
+              'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
+          )}
+        >
+          <Link to={sectionConfig.catalogHref} onClick={onNavigate}>
+            Каталог
+          </Link>
+        </Button>
+      )}
     </div>
   );
 }

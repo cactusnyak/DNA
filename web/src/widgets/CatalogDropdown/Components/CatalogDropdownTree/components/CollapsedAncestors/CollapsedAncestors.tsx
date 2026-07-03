@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom';
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformCatalogHref,
   type PlatformSectionId,
 } from '@/shared/platform';
 
 type CollapsedAncestorsProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   categories: Category[];
   activeCategoryPath: Category[];
   hiddenLevelsCount: number;
@@ -19,7 +18,7 @@ type CollapsedAncestorsProps = {
 };
 
 export function CollapsedAncestors({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   categories,
   activeCategoryPath,
   hiddenLevelsCount,

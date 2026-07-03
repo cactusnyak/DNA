@@ -3,16 +3,13 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 
 type CategoryTreeNodeProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   category: Category;
   categories: Category[];
   expandedCategoryIds: Set<string>;
@@ -20,7 +17,7 @@ type CategoryTreeNodeProps = {
 };
 
 export function CategoryTreeNode({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   category,
   categories,
   expandedCategoryIds,

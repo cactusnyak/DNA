@@ -40,7 +40,7 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
   const { data: categories } = useQuery({
     queryKey: ['categories', activeSection],
     queryFn: () => getCategories({ section: activeSection }),
-    enabled: Boolean(categorySlug || productId),
+    enabled: Boolean(activeSection && (categorySlug || productId)),
   });
 
   const { data: product } = useQuery({

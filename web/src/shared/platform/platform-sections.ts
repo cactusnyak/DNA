@@ -53,8 +53,6 @@ export const platformSectionList = [
   platformSections[PLATFORM_SECTION.MARKET],
 ] as const;
 
-export const DEFAULT_PLATFORM_SECTION_ID = PLATFORM_SECTION.MARKET;
-
 export function isPlatformSectionId(
   value: string | undefined,
 ): value is PlatformSectionId {
@@ -62,39 +60,73 @@ export function isPlatformSectionId(
 }
 
 export function getPlatformSection(
-  sectionId: PlatformSectionId = DEFAULT_PLATFORM_SECTION_ID,
-) {
+  sectionId: PlatformSectionId,
+): PlatformSectionConfig;
+export function getPlatformSection(sectionId: null): null;
+export function getPlatformSection(
+  sectionId: PlatformSectionId | null,
+): PlatformSectionConfig | null;
+export function getPlatformSection(
+  sectionId: PlatformSectionId | null,
+): PlatformSectionConfig | null {
+  if (!sectionId) {
+    return null;
+  }
+
   return platformSections[sectionId];
 }
 
-export function getPlatformSectionIdFromPathname(pathname: string) {
+export function getPlatformSectionIdFromPathname(
+  pathname: string,
+): PlatformSectionId | null {
   const firstPathPart = pathname.split('/').filter(Boolean)[0];
 
-  return isPlatformSectionId(firstPathPart)
-    ? firstPathPart
-    : DEFAULT_PLATFORM_SECTION_ID;
+  return isPlatformSectionId(firstPathPart) ? firstPathPart : null;
 }
 
+export function getPlatformCatalogHref(sectionId: PlatformSectionId): string;
+export function getPlatformCatalogHref(sectionId: null): null;
 export function getPlatformCatalogHref(
-  sectionId: PlatformSectionId = DEFAULT_PLATFORM_SECTION_ID,
-) {
-  return getPlatformSection(sectionId).catalogHref;
+  sectionId: PlatformSectionId | null,
+): string | null;
+export function getPlatformCatalogHref(
+  sectionId: PlatformSectionId | null,
+): string | null {
+  return getPlatformSection(sectionId)?.catalogHref ?? null;
 }
 
 export function getPlatformCategoryHref(
   sectionId: PlatformSectionId,
   categoryPath: string,
-) {
+): string;
+export function getPlatformCategoryHref(
+  sectionId: null,
+  categoryPath: string,
+): null;
+export function getPlatformCategoryHref(
+  sectionId: PlatformSectionId | null,
+  categoryPath: string,
+): string | null;
+export function getPlatformCategoryHref(
+  sectionId: PlatformSectionId | null,
+  categoryPath: string,
+): string | null {
+  const catalogHref = getPlatformCatalogHref(sectionId);
+
+  if (!catalogHref) {
+    return null;
+  }
+
   const normalizedCategoryPath = categoryPath
     .split('/')
     .filter(Boolean)
     .join('/');
 
   if (!normalizedCategoryPath) {
-    return getPlatformCatalogHref(sectionId);
+    return catalogHref;
   }
 
-  return `${getPlatformCatalogHref(sectionId)}/${normalizedCategoryPath}`;
+  return `${catalogHref}/${normalizedCategoryPath}`;
 }
 
 export function getPlatformProductHref(productId: string) {

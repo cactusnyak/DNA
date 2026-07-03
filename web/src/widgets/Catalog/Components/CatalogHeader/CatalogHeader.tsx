@@ -2,19 +2,18 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformCatalogHref,
   type PlatformSectionId,
 } from '@/shared/platform';
 
 type CatalogHeaderProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   title: string;
   showCatalogLink?: boolean;
 };
 
 export function CatalogHeader({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   title,
   showCatalogLink = false,
 }: CatalogHeaderProps) {

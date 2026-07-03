@@ -18,14 +18,20 @@ import { removeDuplicateBreadcrumbs } from './remove-duplicate-breadcrumbs';
 type BuildBreadcrumbItemsParams = {
   matches: BreadcrumbMatch[];
   root: BreadcrumbItem;
-  activeSection: PlatformSectionId;
+  activeSection: PlatformSectionId | null;
   categories?: Category[];
   categorySlug?: string;
   product?: Product;
   productId?: string;
 };
 
-function getCatalogBreadcrumbItem(section: PlatformSectionId): BreadcrumbItem {
+function getCatalogBreadcrumbItem(
+  section: PlatformSectionId | null,
+): BreadcrumbItem | null {
+  if (!section) {
+    return null;
+  }
+
   return {
     id: `${section}-catalog`,
     href: getPlatformCatalogHref(section),
@@ -48,9 +54,21 @@ function getProductBreadcrumbItems({
   BuildBreadcrumbItemsParams,
   'activeSection' | 'categories' | 'product' | 'productId'
 >): BreadcrumbItem[] {
+  const catalogBreadcrumbItem = getCatalogBreadcrumbItem(activeSection);
+
+  if (!activeSection || !catalogBreadcrumbItem) {
+    return [
+      {
+        id: `product-${product?.id ?? productId ?? 'unknown'}`,
+        href: productId ? getPlatformProductHref(productId) : '/market/catalog',
+        label: product?.title ?? 'Товар',
+      },
+    ];
+  }
+
   if (!product) {
     return [
-      getCatalogBreadcrumbItem(activeSection),
+      catalogBreadcrumbItem,
       {
         id: `product-${productId ?? 'unknown'}`,
         href: productId
@@ -64,7 +82,7 @@ function getProductBreadcrumbItems({
   const productCategorySlug = getLastCategorySlugFromProduct(product);
 
   return [
-    getCatalogBreadcrumbItem(activeSection),
+    catalogBreadcrumbItem,
     ...getCategoryBreadcrumbItems(
       categories ?? [],
       productCategorySlug,
@@ -108,17 +126,26 @@ export function buildBreadcrumbItems({
       case BREADCRUMB_TYPE.HOME:
         return [];
 
-      case BREADCRUMB_TYPE.CATALOG:
+      case BREADCRUMB_TYPE.CATALOG: {
+        const catalogHref = activeSection
+          ? getPlatformCatalogHref(activeSection)
+          : breadcrumb.href;
+
+        if (!catalogHref) {
+          return [];
+        }
+
         return [
           {
-            id: `${activeSection}-catalog`,
-            href: breadcrumb.href ?? getPlatformCatalogHref(activeSection),
+            id: `${activeSection ?? 'unknown'}-catalog`,
+            href: breadcrumb.href ?? catalogHref,
             label: breadcrumb.label,
           },
         ];
+      }
 
       case BREADCRUMB_TYPE.CATEGORY:
-        if (!categorySlug) {
+        if (!categorySlug || !activeSection) {
           return [];
         }
 

@@ -1,6 +1,5 @@
 import type { Category } from '@/entities/category';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformCategoryHref,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -35,7 +34,7 @@ export function getCategoryPathSlug(categories: Category[], categoryId: string) 
 export function getCategoryHref(
   categories: Category[],
   categoryId: string,
-  section: PlatformSectionId = DEFAULT_PLATFORM_SECTION_ID,
+  section: PlatformSectionId,
 ) {
   return getPlatformCategoryHref(
     section,

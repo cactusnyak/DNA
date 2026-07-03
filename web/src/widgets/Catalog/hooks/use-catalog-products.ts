@@ -2,22 +2,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { getProducts } from '@/entities/product/api/get-products';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 
 import type { CatalogPriceFilterValue } from '../components/CatalogControls/components/CatalogFilters/types/catalog-filters';
 import type { CatalogSortRule } from '../components/CatalogControls/components/CatalogSorting/types/catalog-sorting';
 import { getPriceFilterValue } from '../logic/get-price-filter-value';
 
 type UseCatalogProductsParams = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   categorySlug?: string;
 };
 
 export function useCatalogProducts({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   categorySlug,
 }: UseCatalogProductsParams) {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);

@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getProducts } from '@/entities/product/api/get-products';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   getPlatformSection,
   type PlatformSectionId,
@@ -14,14 +13,11 @@ import { CatalogDropdownProducts } from './components/CatalogDropdownProducts';
 import { CatalogDropdownTree } from './components/CatalogDropdownTree';
 
 type CatalogDropdownProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   onClose?: () => void;
 };
 
-export function CatalogDropdown({
-  section = DEFAULT_PLATFORM_SECTION_ID,
-  onClose,
-}: CatalogDropdownProps) {
+export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
   const [activeCategorySlug, setActiveCategorySlug] = useState<string>();
   const sectionConfig = getPlatformSection(section);
 

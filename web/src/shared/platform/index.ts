@@ -1,5 +1,4 @@
 export {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   getPlatformCatalogHref,
   getPlatformCategoryHref,

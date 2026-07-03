@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button';
 import { getCategories } from '@/entities/category/api/get-categories';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   getPlatformCatalogHref,
   getPlatformSection,
   type PlatformSectionId,
@@ -14,14 +13,14 @@ import { CategoryPreviewGrid } from './components/CategoryPreviewGrid';
 import { getPreviewCategories } from './logic/get-preview-categories';
 
 type CategoryPreviewProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   title?: string;
   limit?: number;
   emptyText?: string;
 };
 
 export function CategoryPreview({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   title,
   limit = 6,
   emptyText = 'Категории не найдены.',

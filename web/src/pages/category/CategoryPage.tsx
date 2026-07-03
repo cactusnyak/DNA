@@ -4,19 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 import { Catalog } from '@/widgets/Catalog';
 
 type CategoryPageProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
 };
 
-export function CategoryPage({
-  section = DEFAULT_PLATFORM_SECTION_ID,
-}: CategoryPageProps) {
+export function CategoryPage({ section }: CategoryPageProps) {
   const { '*': categoryPath } = useParams();
   const categorySlug = getCategorySlugFromPath(categoryPath);
 

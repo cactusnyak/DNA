@@ -1,6 +1,5 @@
 import type { Product } from '@/entities/product';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   type PlatformSectionId,
 } from '@/shared/platform';
@@ -9,7 +8,7 @@ import { httpClient } from '@/shared/api/http-client';
 import type { CatalogSortRule } from '@/widgets/Catalog/components/CatalogControls/components/CatalogSorting/types/catalog-sorting';
 
 type GetProductsParams = {
-  section?: PlatformSectionId;
+  section?: PlatformSectionId | null;
   categorySlug?: string;
   priceFrom?: number;
   priceTo?: number;
@@ -28,9 +27,7 @@ function buildSortParam(sortRules?: CatalogSortRule[]) {
 }
 
 export function getProducts(params: GetProductsParams = {}) {
-  const section = params.section ?? DEFAULT_PLATFORM_SECTION_ID;
-
-  if (section === PLATFORM_SECTION.ADS) {
+  if (!params.section || params.section === PLATFORM_SECTION.ADS) {
     return Promise.resolve([] as Product[]);
   }
 

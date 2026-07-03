@@ -6,8 +6,12 @@ import {
 } from './platform-sections';
 
 export function useActivePlatformSection() {
-  const location = useLocation();
-  const sectionId = getPlatformSectionIdFromPathname(location.pathname);
+  const { pathname } = useLocation();
+  const activeSectionId = getPlatformSectionIdFromPathname(pathname);
+  const activeSection = getPlatformSection(activeSectionId);
 
-  return getPlatformSection(sectionId);
+  return {
+    activeSectionId,
+    activeSection,
+  };
 }

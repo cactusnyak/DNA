@@ -2,19 +2,16 @@ import { Link } from 'react-router-dom';
 
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
-import {
-  DEFAULT_PLATFORM_SECTION_ID,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import type { PlatformSectionId } from '@/shared/platform';
 
 type CategoryPreviewCardProps = {
-  section?: PlatformSectionId;
+  section: PlatformSectionId;
   category: Category;
   categories: Category[];
 };
 
 export function CategoryPreviewCard({
-  section = DEFAULT_PLATFORM_SECTION_ID,
+  section,
   category,
   categories,
 }: CategoryPreviewCardProps) {

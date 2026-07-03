@@ -1,13 +1,12 @@
 import type { Category } from '@/entities/category';
 import {
-  DEFAULT_PLATFORM_SECTION_ID,
   PLATFORM_SECTION,
   type PlatformSectionId,
 } from '@/shared/platform';
 import { httpClient } from '@/shared/api/http-client';
 
 type GetCategoriesParams = {
-  section?: PlatformSectionId;
+  section?: PlatformSectionId | null;
 };
 
 function getCategoriesPath(section: PlatformSectionId) {
@@ -17,7 +16,9 @@ function getCategoriesPath(section: PlatformSectionId) {
 }
 
 export function getCategories(params: GetCategoriesParams = {}) {
-  const section = params.section ?? DEFAULT_PLATFORM_SECTION_ID;
+  if (!params.section) {
+    return Promise.resolve([] as Category[]);
+  }
 
-  return httpClient<Category[]>(getCategoriesPath(section));
+  return httpClient<Category[]>(getCategoriesPath(params.section));
 }
