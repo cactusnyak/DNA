@@ -15,6 +15,32 @@ type AdminCollectionRecordsViewProps = {
   renderActions: (collection: AdminCatalogCollection) => ReactNode;
 };
 
+const collectionTypeFilterOptions = [
+  {
+    value: 'CATEGORY',
+    label: 'Категории',
+  },
+  {
+    value: 'PRODUCT',
+    label: 'Продукты',
+  },
+];
+
+const statusFilterOptions = [
+  {
+    value: 'Активно',
+    label: 'Активно',
+  },
+  {
+    value: 'Неактивно',
+    label: 'Неактивно',
+  },
+  {
+    value: 'Удалено',
+    label: 'Удалено',
+  },
+];
+
 function getCollectionTypeLabel(collection: AdminCatalogCollection) {
   return collection.type === 'CATEGORY' ? 'Категории' : 'Продукты';
 }
@@ -64,28 +90,63 @@ export function AdminCollectionRecordsView({
         {
           key: 'title',
           title: 'Название',
+          width: 260,
+          sortable: true,
+          filter: {
+            type: 'text',
+            placeholder: 'Название',
+          },
+          getValue: (collection) => collection.title,
           render: (collection) =>
             renderHighlightedText(collection.title, searchValue),
         },
         {
           key: 'slug',
           title: 'Slug',
+          width: 220,
+          sortable: true,
+          filter: {
+            type: 'text',
+            placeholder: 'Slug',
+          },
+          getValue: (collection) => collection.slug,
           render: (collection) =>
             renderHighlightedText(collection.slug, searchValue),
         },
         {
           key: 'type',
           title: 'Тип',
+          width: 160,
+          sortable: true,
+          filter: {
+            type: 'select',
+            options: collectionTypeFilterOptions,
+          },
+          getValue: (collection) => collection.type,
           render: getCollectionTypeLabel,
         },
         {
           key: 'items',
           title: 'Элементов',
+          width: 150,
+          align: 'right',
+          sortable: true,
+          filter: {
+            type: 'numberRange',
+          },
+          getValue: getCollectionItemsCount,
           render: getCollectionItemsCount,
         },
         {
           key: 'status',
           title: 'Статус',
+          width: 160,
+          sortable: true,
+          filter: {
+            type: 'select',
+            options: statusFilterOptions,
+          },
+          getValue: (collection) => getAdminRecordStatusLabel(collection),
           render: (collection) => getAdminRecordStatusLabel(collection),
         },
       ]}

@@ -16,6 +16,39 @@ type AdminProductRecordsViewProps = {
   renderActions: (product: AdminProduct) => ReactNode;
 };
 
+const statusFilterOptions = [
+  {
+    value: 'Активно',
+    label: 'Активно',
+  },
+  {
+    value: 'Неактивно',
+    label: 'Неактивно',
+  },
+  {
+    value: 'Удалено',
+    label: 'Удалено',
+  },
+];
+
+function getCategoryFilterOptions(products: AdminProduct[]) {
+  const optionsByValue = new Map<string, string>();
+
+  products.forEach((product) => {
+    const value = product.category?.name || 'Без категории';
+    optionsByValue.set(value, value);
+  });
+
+  return Array.from(optionsByValue.entries())
+    .map(([value, label]) => ({
+      value,
+      label,
+    }))
+    .sort((firstOption, secondOption) =>
+      firstOption.label.localeCompare(secondOption.label),
+    );
+}
+
 export function AdminProductRecordsView({
   products,
   viewMode,
@@ -55,23 +88,51 @@ export function AdminProductRecordsView({
         {
           key: 'title',
           title: 'Название',
+          width: 280,
+          sortable: true,
+          filter: {
+            type: 'text',
+            placeholder: 'Название',
+          },
+          getValue: (product) => product.title,
           render: (product) =>
             renderHighlightedText(product.title, searchValue),
         },
         {
           key: 'category',
           title: 'Категория',
+          width: 220,
+          sortable: true,
+          filter: {
+            type: 'select',
+            options: getCategoryFilterOptions(products),
+          },
+          getValue: (product) => product.category?.name || 'Без категории',
           render: (product) =>
             renderHighlightedText(product.category?.name ?? '', searchValue),
         },
         {
           key: 'price',
           title: 'Цена',
+          width: 160,
+          align: 'right',
+          sortable: true,
+          filter: {
+            type: 'numberRange',
+          },
+          getValue: (product) => product.price,
           render: (product) => formatPrice(product.price),
         },
         {
           key: 'status',
           title: 'Статус',
+          width: 160,
+          sortable: true,
+          filter: {
+            type: 'select',
+            options: statusFilterOptions,
+          },
+          getValue: (product) => getAdminRecordStatusLabel(product),
           render: (product) => getAdminRecordStatusLabel(product),
         },
       ]}

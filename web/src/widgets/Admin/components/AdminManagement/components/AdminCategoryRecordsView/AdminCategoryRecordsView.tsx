@@ -16,6 +16,21 @@ type AdminCategoryRecordsViewProps = {
   renderActions: (category: AdminCategory) => ReactNode;
 };
 
+const statusFilterOptions = [
+  {
+    value: 'Активно',
+    label: 'Активно',
+  },
+  {
+    value: 'Неактивно',
+    label: 'Неактивно',
+  },
+  {
+    value: 'Удалено',
+    label: 'Удалено',
+  },
+];
+
 export function AdminCategoryRecordsView({
   categories,
   viewMode,
@@ -67,23 +82,51 @@ export function AdminCategoryRecordsView({
         {
           key: 'name',
           title: 'Название',
+          width: 240,
+          sortable: true,
+          filter: {
+            type: 'text',
+            placeholder: 'Название',
+          },
+          getValue: (category) => category.name,
           render: (category) =>
             renderHighlightedText(category.name, searchValue),
         },
         {
           key: 'slug',
           title: 'Slug',
+          width: 220,
+          sortable: true,
+          filter: {
+            type: 'text',
+            placeholder: 'Slug',
+          },
+          getValue: (category) => category.slug,
           render: (category) =>
             renderHighlightedText(category.slug, searchValue),
         },
         {
           key: 'products',
           title: 'Продуктов',
+          width: 140,
+          align: 'right',
+          sortable: true,
+          filter: {
+            type: 'numberRange',
+          },
+          getValue: (category) => category.productsCount,
           render: (category) => category.productsCount,
         },
         {
           key: 'status',
           title: 'Статус',
+          width: 160,
+          sortable: true,
+          filter: {
+            type: 'select',
+            options: statusFilterOptions,
+          },
+          getValue: (category) => getAdminRecordStatusLabel(category),
           render: (category) => getAdminRecordStatusLabel(category),
         },
       ]}
