@@ -238,7 +238,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                   <th
                     key={column.key}
                     className={cn(
-                      'group relative border-r border-border/60 px-4 py-3 font-medium last:border-r-0',
+                      'group relative px-4 py-3 font-medium',
                       getAdminTableAlignClassName(column.align),
                     )}
                     style={{ width: `${width}px` }}

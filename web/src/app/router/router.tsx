@@ -20,6 +20,7 @@ import { MarketPage } from '@/pages/market/MarketPage';
 import { ProductPage } from '@/pages/product/ProductPage';
 import { ProfilePage } from '@/pages/profile/ProfilePage';
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage';
+import { SellerPage } from '@/pages/seller/SellerPage';
 import {
   PLATFORM_SECTION,
   platformSections,
@@ -167,6 +168,16 @@ export const router = createBrowserRouter([
                 } satisfies BreadcrumbHandle,
               },
             ],
+          },
+          {
+            path: 'seller',
+            element: <SellerPage />,
+            handle: {
+              breadcrumb: {
+                type: BREADCRUMB_TYPE.STATIC,
+                label: 'Аккаунт продавца',
+              },
+            } satisfies BreadcrumbHandle,
           },
           {
             path: 'product/:productId',

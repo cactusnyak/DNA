@@ -48,30 +48,11 @@ export function HomePage() {
             description="Будущий раздел объявлений пользователей: категории уже отделены, карточки объявлений подключим позже."
           />
 
-          <Button asChild variant="outline" className="mt-5">
+          <Button asChild className="mt-5">
             <Link to="/ads/catalog">Открыть каталог доски</Link>
           </Button>
         </div>
       </section>
-
-      <CategoryPreview
-        section={PLATFORM_SECTION.MARKET}
-        title="Популярные категории маркета"
-      />
-
-      <Catalog
-        section={PLATFORM_SECTION.MARKET}
-        title="Популярные товары маркета"
-        showHeader
-        showCatalogLink
-        showControls={false}
-      />
-
-      <CategoryPreview
-        section={PLATFORM_SECTION.ADS}
-        title="Категории доски"
-        emptyText="Категории доски пока не добавлены. Зато UI уже готов не смешивать объявления с маркетом."
-      />
     </div>
   );
 }

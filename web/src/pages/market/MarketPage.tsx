@@ -21,7 +21,7 @@ export function MarketPage() {
           </Button>
 
           <Button asChild variant="outline">
-            <Link to="/cart">Корзина</Link>
+            <Link to="/market/seller">Перейти в аккаунт продавца</Link>
           </Button>
         </div>
       </section>
@@ -29,14 +29,7 @@ export function MarketPage() {
       <CategoryPreview
         section={PLATFORM_SECTION.MARKET}
         title="Категории маркета"
-      />
-
-      <Catalog
-        section={PLATFORM_SECTION.MARKET}
-        title="Популярные товары маркета"
-        showHeader
-        showCatalogLink
-        showControls={false}
+        emptyText="Категории маркета пока не добавлены."
       />
     </div>
   );

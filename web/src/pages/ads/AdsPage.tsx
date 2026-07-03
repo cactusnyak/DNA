@@ -28,7 +28,7 @@ export function AdsPage() {
       <CategoryPreview
         section={PLATFORM_SECTION.ADS}
         title="Категории доски"
-        emptyText="Категории доски пока не добавлены. Зато место уже есть, как у парковки без машин."
+        emptyText="Категории доски пока не добавлены."
       />
     </div>
   );
