@@ -1,9 +1,13 @@
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import {
   getCurrentUser,
   useAuthStore,
 } from '@/entities/auth';
+import { Button } from '@/components/ui/Button';
+import { SectionHeader } from '@/components/ui/Section';
+import { PLATFORM_SECTION } from '@/shared/platform';
 import { BalanceHero } from '@/widgets/BalanceHero';
 import { Catalog } from '@/widgets/Catalog';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
@@ -26,13 +30,47 @@ export function HomePage() {
         guestText="Покупать можно без регистрации. Профиль откроет баланс, кешбэк, историю заказов и реферальную систему."
       />
 
-      <CategoryPreview />
+      <section className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <SectionHeader
+            title="Маркет"
+            description="Товары DNA и будущие предложения продавцов. Тут живёт магазинная часть платформы."
+          />
+
+          <Button asChild className="mt-5">
+            <Link to="/market/catalog">Открыть каталог маркета</Link>
+          </Button>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <SectionHeader
+            title="Доска"
+            description="Будущий раздел объявлений пользователей: категории уже отделены, карточки объявлений подключим позже."
+          />
+
+          <Button asChild variant="outline" className="mt-5">
+            <Link to="/ads/catalog">Открыть каталог доски</Link>
+          </Button>
+        </div>
+      </section>
+
+      <CategoryPreview
+        section={PLATFORM_SECTION.MARKET}
+        title="Популярные категории маркета"
+      />
 
       <Catalog
-        title="Популярные товары"
+        section={PLATFORM_SECTION.MARKET}
+        title="Популярные товары маркета"
         showHeader
         showCatalogLink
         showControls={false}
+      />
+
+      <CategoryPreview
+        section={PLATFORM_SECTION.ADS}
+        title="Категории доски"
+        emptyText="Категории доски пока не добавлены. Зато UI уже готов не смешивать объявления с маркетом."
       />
     </div>
   );

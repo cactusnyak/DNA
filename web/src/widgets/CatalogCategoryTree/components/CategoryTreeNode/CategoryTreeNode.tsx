@@ -3,11 +3,16 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 
 type CategoryTreeNodeProps = {
+  section?: PlatformSectionId;
   category: Category;
   categories: Category[];
   expandedCategoryIds: Set<string>;
@@ -15,6 +20,7 @@ type CategoryTreeNodeProps = {
 };
 
 export function CategoryTreeNode({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   category,
   categories,
   expandedCategoryIds,
@@ -46,7 +52,7 @@ export function CategoryTreeNode({
         </button>
 
         <Link
-          to={getCategoryHref(categories, category.id)}
+          to={getCategoryHref(categories, category.id, section)}
           className="text-sm font-medium underline-offset-4 hover:underline"
         >
           {category.name}
@@ -58,6 +64,7 @@ export function CategoryTreeNode({
           {childrenCategories.map((childCategory) => (
             <CategoryTreeNode
               key={childCategory.id}
+              section={section}
               category={childCategory}
               categories={categories}
               expandedCategoryIds={expandedCategoryIds}

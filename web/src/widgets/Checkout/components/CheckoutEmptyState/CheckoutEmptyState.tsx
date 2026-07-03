@@ -15,7 +15,7 @@ export function CheckoutEmptyState() {
       </div>
 
       <Button asChild>
-        <Link to="/catalog">Перейти в каталог</Link>
+        <Link to="/market/catalog">Перейти в каталог</Link>
       </Button>
     </section>
   );

@@ -1,5 +1,10 @@
 import type { Category } from '@/entities/category';
 import type { Product } from '@/entities/product';
+import {
+  getPlatformCatalogHref,
+  getPlatformProductHref,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import {
   BREADCRUMB_TYPE,
@@ -13,17 +18,20 @@ import { removeDuplicateBreadcrumbs } from './remove-duplicate-breadcrumbs';
 type BuildBreadcrumbItemsParams = {
   matches: BreadcrumbMatch[];
   root: BreadcrumbItem;
+  activeSection: PlatformSectionId;
   categories?: Category[];
   categorySlug?: string;
   product?: Product;
   productId?: string;
 };
 
-const catalogBreadcrumbItem: BreadcrumbItem = {
-  id: 'catalog',
-  href: '/catalog',
-  label: 'Каталог',
-};
+function getCatalogBreadcrumbItem(section: PlatformSectionId): BreadcrumbItem {
+  return {
+    id: `${section}-catalog`,
+    href: getPlatformCatalogHref(section),
+    label: 'Каталог',
+  };
+}
 
 function getLastCategorySlugFromProduct(product: Product) {
   const categoryPathParts = product.category.path.split('/').filter(Boolean);
@@ -32,19 +40,22 @@ function getLastCategorySlugFromProduct(product: Product) {
 }
 
 function getProductBreadcrumbItems({
+  activeSection,
   categories,
   product,
   productId,
 }: Pick<
   BuildBreadcrumbItemsParams,
-  'categories' | 'product' | 'productId'
+  'activeSection' | 'categories' | 'product' | 'productId'
 >): BreadcrumbItem[] {
   if (!product) {
     return [
-      catalogBreadcrumbItem,
+      getCatalogBreadcrumbItem(activeSection),
       {
         id: `product-${productId ?? 'unknown'}`,
-        href: productId ? `/product/${productId}` : '/catalog',
+        href: productId
+          ? getPlatformProductHref(productId)
+          : getPlatformCatalogHref(activeSection),
         label: 'Товар',
       },
     ];
@@ -53,11 +64,15 @@ function getProductBreadcrumbItems({
   const productCategorySlug = getLastCategorySlugFromProduct(product);
 
   return [
-    catalogBreadcrumbItem,
-    ...getCategoryBreadcrumbItems(categories ?? [], productCategorySlug),
+    getCatalogBreadcrumbItem(activeSection),
+    ...getCategoryBreadcrumbItems(
+      categories ?? [],
+      productCategorySlug,
+      activeSection,
+    ),
     {
       id: `product-${product.id}`,
-      href: `/product/${product.id}`,
+      href: getPlatformProductHref(product.id),
       label: product.title,
     },
   ];
@@ -66,6 +81,7 @@ function getProductBreadcrumbItems({
 export function buildBreadcrumbItems({
   matches,
   root,
+  activeSection,
   categories = [],
   categorySlug,
   product,
@@ -95,8 +111,8 @@ export function buildBreadcrumbItems({
       case BREADCRUMB_TYPE.CATALOG:
         return [
           {
-            id: 'catalog',
-            href: breadcrumb.href ?? '/catalog',
+            id: `${activeSection}-catalog`,
+            href: breadcrumb.href ?? getPlatformCatalogHref(activeSection),
             label: breadcrumb.label,
           },
         ];
@@ -106,10 +122,15 @@ export function buildBreadcrumbItems({
           return [];
         }
 
-        return getCategoryBreadcrumbItems(categories, categorySlug);
+        return getCategoryBreadcrumbItems(
+          categories,
+          categorySlug,
+          activeSection,
+        );
 
       case BREADCRUMB_TYPE.PRODUCT:
         return getProductBreadcrumbItems({
+          activeSection,
           categories,
           product,
           productId,

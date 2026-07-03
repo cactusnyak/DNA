@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import type { Product } from '@/entities/product';
+import { getPlatformProductHref } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type GlobalSearchProductRowProps = {
@@ -16,7 +17,7 @@ export function GlobalSearchProductRow({
 
   return (
     <Link
-      to={`/product/${product.id}`}
+      to={getPlatformProductHref(product.id)}
       onClick={onNavigate}
       className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-lg p-2 transition-colors hover:bg-muted/25"
     >

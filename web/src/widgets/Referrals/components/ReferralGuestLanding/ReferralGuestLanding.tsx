@@ -42,7 +42,7 @@ export function ReferralGuestLanding() {
             </Button>
 
             <Button asChild variant="outline" size="lg">
-              <Link to="/catalog">Сначала посмотреть товары</Link>
+              <Link to="/market/catalog">Сначала посмотреть товары</Link>
             </Button>
           </div>
         </div>

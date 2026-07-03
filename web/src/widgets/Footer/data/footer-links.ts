@@ -6,8 +6,12 @@ import MaxLogo from '@/assets/logos/messengers/max.svg';
 
 export const navigationLinks = [
   {
-    label: 'Каталог',
-    href: '/catalog',
+    label: 'Маркет',
+    href: '/market',
+  },
+  {
+    label: 'Доска',
+    href: '/ads',
   },
   {
     label: 'Корзина',

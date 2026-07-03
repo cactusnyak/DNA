@@ -1,10 +1,15 @@
 import { SearchInput } from '@/components/ui/SearchInput';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
 import { GlobalSearchDropdown } from './components/GlobalSearchDropdown';
 import { useGlobalSearch } from './hooks/use-global-search';
 
 type GlobalSearchProps = {
+  section?: PlatformSectionId;
   placeholder?: string;
   className?: string;
   inputClassName?: string;
@@ -12,6 +17,7 @@ type GlobalSearchProps = {
 };
 
 export function GlobalSearch({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   placeholder = 'Поиск по DNA',
   className,
   inputClassName,
@@ -40,7 +46,7 @@ export function GlobalSearch({
     openSearch,
     handleResultClick,
     handleProductResultsScroll,
-  } = useGlobalSearch();
+  } = useGlobalSearch({ section });
 
   function handleFocus() {
     openSearch();
@@ -60,6 +66,7 @@ export function GlobalSearch({
 
       {isOpen && (
         <GlobalSearchDropdown
+          section={section}
           isSearchReady={isSearchReady}
           sections={sectionResults}
           categories={categoryResults}

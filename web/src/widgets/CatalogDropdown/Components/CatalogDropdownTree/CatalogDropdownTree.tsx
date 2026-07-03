@@ -1,4 +1,8 @@
 import type { Category } from '@/entities/category';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import { CategoryColumn } from './components/CategoryColumn';
 import { CollapsedAncestors } from './components/CollapsedAncestors';
@@ -7,6 +11,7 @@ import { getCategoryLevels } from './logic/get-category-levels';
 import { getVisibleCategoryLevels } from './logic/get-visible-category-levels';
 
 type CatalogDropdownTreeProps = {
+  section?: PlatformSectionId;
   categories: Category[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
@@ -14,6 +19,7 @@ type CatalogDropdownTreeProps = {
 };
 
 export function CatalogDropdownTree({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   categories,
   activeCategorySlug,
   onActiveCategoryChange,
@@ -31,6 +37,7 @@ export function CatalogDropdownTree({
   return (
     <div className="flex h-full min-h-0 max-w-full overflow-hidden">
       <CollapsedAncestors
+        section={section}
         categories={categories}
         activeCategoryPath={activeCategoryPath}
         hiddenLevelsCount={hiddenLevels.length}
@@ -42,6 +49,7 @@ export function CatalogDropdownTree({
         {visibleLevels.map((level) => (
           <CategoryColumn
             key={`${level.level}-${level.parentId ?? 'root'}`}
+            section={section}
             categories={categories}
             level={level}
             activeCategoryPath={activeCategoryPath}

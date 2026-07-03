@@ -1,25 +1,46 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { getCategories } from '@/entities/category/api/get-categories';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  getPlatformSection,
+  type PlatformSectionId,
+} from '@/shared/platform';
 import { CatalogCategoryTree } from '@/widgets/CatalogCategoryTree';
 
-export function CatalogPage() {
+type CatalogPageProps = {
+  section?: PlatformSectionId;
+};
+
+export function CatalogPage({
+  section = DEFAULT_PLATFORM_SECTION_ID,
+}: CatalogPageProps) {
+  const sectionConfig = getPlatformSection(section);
+
   const {
     data: categories = [],
     isPending,
     error,
   } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
+    queryKey: ['categories', section],
+    queryFn: () => getCategories({ section }),
   });
 
   if (isPending) {
     return <p className="text-muted-foreground">Загрузка категорий...</p>;
   }
 
-  if (error || !categories.length) {
+  if (error) {
     return <p className="text-destructive">Не удалось загрузить категории</p>;
   }
 
-  return <CatalogCategoryTree categories={categories} />;
+  return (
+    <CatalogCategoryTree
+      categories={categories}
+      section={section}
+      title={sectionConfig.catalogLabel}
+      description={sectionConfig.catalogDescription}
+      emptyText="Категории пока не добавлены. Пустой каталог, зато честный."
+    />
+  );
 }

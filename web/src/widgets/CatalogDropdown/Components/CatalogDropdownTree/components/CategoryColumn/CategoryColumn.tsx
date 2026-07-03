@@ -3,12 +3,18 @@ import { Link } from 'react-router-dom';
 
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  getPlatformCatalogHref,
+  type PlatformSectionId,
+} from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 import type { CategoryLevel } from '../../types/category-level';
 
 type CategoryColumnProps = {
+  section?: PlatformSectionId;
   categories: Category[];
   level: CategoryLevel;
   activeCategoryPath: Category[];
@@ -18,6 +24,7 @@ type CategoryColumnProps = {
 };
 
 export function CategoryColumn({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   categories,
   level,
   activeCategoryPath,
@@ -33,7 +40,7 @@ export function CategoryColumn({
         {level.level === 0 && (
           <li>
             <Link
-              to="/catalog"
+              to={getPlatformCatalogHref(section)}
               onClick={onCategoryClick}
               onMouseEnter={() => onActiveCategoryChange(undefined)}
               className={cn(
@@ -43,7 +50,7 @@ export function CategoryColumn({
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
-              <span className="line-clamp-1">Все товары</span>
+              <span className="line-clamp-1">Все категории</span>
             </Link>
           </li>
         )}
@@ -58,7 +65,7 @@ export function CategoryColumn({
           return (
             <li key={category.id}>
               <Link
-                to={getCategoryHref(categories, category.id)}
+                to={getCategoryHref(categories, category.id, section)}
                 onClick={onCategoryClick}
                 onMouseEnter={() => onActiveCategoryChange(category.slug)}
                 className={cn(

@@ -2,8 +2,13 @@ import { Link } from 'react-router-dom';
 
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 type GlobalSearchCategoryResultsProps = {
+  section?: PlatformSectionId;
   categories: Category[];
   allCategories: Category[];
   isPending?: boolean;
@@ -12,6 +17,7 @@ type GlobalSearchCategoryResultsProps = {
 };
 
 export function GlobalSearchCategoryResults({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   categories,
   allCategories,
   isPending = false,
@@ -52,7 +58,7 @@ export function GlobalSearchCategoryResults({
           categories.map((category) => (
             <Link
               key={category.id}
-              to={getCategoryHref(allCategories, category.id)}
+              to={getCategoryHref(allCategories, category.id, section)}
               onClick={onNavigate}
               className="grid grid-cols-[44px_minmax(0,1fr)] gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
             >

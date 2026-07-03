@@ -43,7 +43,7 @@ export function CheckoutSuccessState({ order }: CheckoutSuccessStateProps) {
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button asChild>
-          <Link to="/catalog">Вернуться в каталог</Link>
+          <Link to="/market/catalog">Вернуться в каталог</Link>
         </Button>
 
         <Button asChild variant="outline">

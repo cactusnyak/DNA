@@ -1,4 +1,9 @@
 import type { Category } from '@/entities/category';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  getPlatformCategoryHref,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 export function getCategoryPath(categories: Category[], categoryId: string) {
   const categoryById = new Map(
@@ -27,8 +32,15 @@ export function getCategoryPathSlug(categories: Category[], categoryId: string) 
     .join('/');
 }
 
-export function getCategoryHref(categories: Category[], categoryId: string) {
-  return `/catalog/${getCategoryPathSlug(categories, categoryId)}`;
+export function getCategoryHref(
+  categories: Category[],
+  categoryId: string,
+  section: PlatformSectionId = DEFAULT_PLATFORM_SECTION_ID,
+) {
+  return getPlatformCategoryHref(
+    section,
+    getCategoryPathSlug(categories, categoryId),
+  );
 }
 
 export function getCategorySlugFromPath(categoryPath?: string) {

@@ -2,16 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { getProducts } from '@/entities/product/api/get-products';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import type { CatalogPriceFilterValue } from '../components/CatalogControls/components/CatalogFilters/types/catalog-filters';
 import type { CatalogSortRule } from '../components/CatalogControls/components/CatalogSorting/types/catalog-sorting';
 import { getPriceFilterValue } from '../logic/get-price-filter-value';
 
 type UseCatalogProductsParams = {
+  section?: PlatformSectionId;
   categorySlug?: string;
 };
 
 export function useCatalogProducts({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   categorySlug,
 }: UseCatalogProductsParams) {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
@@ -22,9 +28,10 @@ export function useCatalogProducts({
     isPending: isBaseProductsPending,
     error: baseProductsError,
   } = useQuery({
-    queryKey: ['products', 'base', categorySlug],
+    queryKey: ['products', section, 'base', categorySlug],
     queryFn: () =>
       getProducts({
+        section,
         categorySlug,
       }),
   });
@@ -46,7 +53,7 @@ export function useCatalogProducts({
     });
     setSelectedCategoryIds([]);
     setSortRules([]);
-  }, [categorySlug, priceBounds.from, priceBounds.to]);
+  }, [section, categorySlug, priceBounds.from, priceBounds.to]);
 
   const isFilteredQueryEnabled = baseProducts.length > 0;
 
@@ -57,6 +64,7 @@ export function useCatalogProducts({
   } = useQuery({
     queryKey: [
       'products',
+      section,
       'filtered',
       categorySlug,
       priceFilter.from,
@@ -66,6 +74,7 @@ export function useCatalogProducts({
     ],
     queryFn: () =>
       getProducts({
+        section,
         categorySlug,
         priceFrom: priceFilter.from,
         priceTo: priceFilter.to,
@@ -77,7 +86,7 @@ export function useCatalogProducts({
 
   return {
     baseProducts,
-    products: isFilteredQueryEnabled ? filteredProducts : [],
+    products: isFilteredQueryEnabled ? filteredProducts : baseProducts,
     priceFilter,
     selectedCategoryIds,
     sortRules,

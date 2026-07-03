@@ -17,13 +17,13 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
   const { product, quantity } = item;
 
   const image = product.images[0];
-  const categoryHref = `/catalog/${product.category.path ?? product.category.slug}`;
+  const categoryHref = `/market/catalog/${product.category.path ?? product.category.slug}`;
   const itemTotal = calculateCartItemTotal(item);
 
   return (
     <article className="grid gap-4 rounded-2xl border border-border bg-card p-4 sm:grid-cols-[120px_minmax(0,1fr)]">
       <Link
-        to={`/product/${product.id}`}
+        to={`/market/product/${product.id}`}
         className="block overflow-hidden rounded-xl bg-muted"
       >
         {image ? (
@@ -43,7 +43,7 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 space-y-1">
             <Link
-              to={`/product/${product.id}`}
+              to={`/market/product/${product.id}`}
               className="line-clamp-2 font-semibold underline-offset-4 hover:underline"
             >
               {product.title}

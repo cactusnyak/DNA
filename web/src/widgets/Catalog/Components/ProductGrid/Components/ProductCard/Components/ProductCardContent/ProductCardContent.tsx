@@ -1,14 +1,21 @@
 import { Link } from 'react-router-dom';
 
 import type { Product } from '@/entities/product';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  getPlatformCategoryHref,
+  type PlatformSectionId,
+} from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type ProductCardContentProps = {
+  section?: PlatformSectionId;
   product: Product;
   currentCategorySlug?: string;
 };
 
 export function ProductCardContent({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   product,
   currentCategorySlug,
 }: ProductCardContentProps) {
@@ -24,7 +31,7 @@ export function ProductCardContent({
 
         {shouldShowCategoryLink && (
           <Link
-            to={`/catalog/${product.category.path}`}
+            to={getPlatformCategoryHref(section, product.category.path)}
             className="mt-0.5 block text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground"
           >
             В категорию «{product.category.name}»

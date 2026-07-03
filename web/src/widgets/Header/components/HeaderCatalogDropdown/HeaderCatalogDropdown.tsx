@@ -1,10 +1,18 @@
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 import { CatalogDropdown } from '@/widgets/CatalogDropdown';
 
 type HeaderCatalogDropdownProps = {
+  section?: PlatformSectionId;
   onClose: () => void;
 };
 
-export function HeaderCatalogDropdown({ onClose }: HeaderCatalogDropdownProps) {
+export function HeaderCatalogDropdown({
+  section = DEFAULT_PLATFORM_SECTION_ID,
+  onClose,
+}: HeaderCatalogDropdownProps) {
   return (
     <div
       className="
@@ -14,7 +22,7 @@ export function HeaderCatalogDropdown({ onClose }: HeaderCatalogDropdownProps) {
       "
     >
       <div className="w-full">
-        <CatalogDropdown onClose={onClose} />
+        <CatalogDropdown section={section} onClose={onClose} />
       </div>
     </div>
   );

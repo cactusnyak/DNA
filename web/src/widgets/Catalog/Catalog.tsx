@@ -1,6 +1,11 @@
 import { useParams } from 'react-router-dom';
 
 import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  PLATFORM_SECTION,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import { CatalogControls } from './components/CatalogControls';
 import { CatalogHeader } from './components/CatalogHeader';
@@ -8,6 +13,7 @@ import { ProductGrid } from './components/ProductGrid';
 import { useCatalogProducts } from './hooks/use-catalog-products';
 
 type CatalogProps = {
+  section?: PlatformSectionId;
   title?: string;
   showHeader?: boolean;
   showCatalogLink?: boolean;
@@ -17,6 +23,7 @@ type CatalogProps = {
 };
 
 export function Catalog({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   title = 'Каталог',
   showHeader = true,
   showCatalogLink = false,
@@ -27,7 +34,10 @@ export function Catalog({
   const { '*': categoryPath } = useParams();
   const categorySlug = getCategorySlugFromPath(categoryPath);
 
-  const shouldShowControls = showControls && (showFilters || showSorting);
+  const shouldShowControls =
+    section === PLATFORM_SECTION.MARKET &&
+    showControls &&
+    (showFilters || showSorting);
 
   const {
     baseProducts,
@@ -41,6 +51,7 @@ export function Catalog({
     setSelectedCategoryIds,
     setSortRules,
   } = useCatalogProducts({
+    section,
     categorySlug,
   });
 
@@ -48,7 +59,11 @@ export function Catalog({
     return (
       <section className="space-y-4">
         {showHeader && (
-          <CatalogHeader title={title} showCatalogLink={showCatalogLink} />
+          <CatalogHeader
+            section={section}
+            title={title}
+            showCatalogLink={showCatalogLink}
+          />
         )}
 
         <p className="text-muted-foreground">Загрузка товаров...</p>
@@ -60,7 +75,11 @@ export function Catalog({
     return (
       <section className="space-y-4">
         {showHeader && (
-          <CatalogHeader title={title} showCatalogLink={showCatalogLink} />
+          <CatalogHeader
+            section={section}
+            title={title}
+            showCatalogLink={showCatalogLink}
+          />
         )}
 
         <p className="text-destructive">Не удалось загрузить товары</p>
@@ -68,10 +87,33 @@ export function Catalog({
     );
   }
 
+  if (section === PLATFORM_SECTION.ADS) {
+    return (
+      <section className="space-y-4">
+        {showHeader && (
+          <CatalogHeader
+            section={section}
+            title={title}
+            showCatalogLink={showCatalogLink}
+          />
+        )}
+
+        <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+          Объявления в этой категории появятся позже. Каталог уже отделён,
+          осталось заселить его людьми и их странными товарами.
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-8">
       {showHeader && (
-        <CatalogHeader title={title} showCatalogLink={showCatalogLink} />
+        <CatalogHeader
+          section={section}
+          title={title}
+          showCatalogLink={showCatalogLink}
+        />
       )}
 
       <div
@@ -96,6 +138,7 @@ export function Catalog({
         )}
 
         <ProductGrid
+          section={section}
           products={products}
           currentCategorySlug={categorySlug}
           compact={shouldShowControls}

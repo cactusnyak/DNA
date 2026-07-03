@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom';
 
 import type { Category } from '@/entities/category';
 import { getCategoryHref } from '@/entities/category/utils/category-path';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  getPlatformCatalogHref,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 type CollapsedAncestorsProps = {
+  section?: PlatformSectionId;
   categories: Category[];
   activeCategoryPath: Category[];
   hiddenLevelsCount: number;
@@ -13,6 +19,7 @@ type CollapsedAncestorsProps = {
 };
 
 export function CollapsedAncestors({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   categories,
   activeCategoryPath,
   hiddenLevelsCount,
@@ -30,20 +37,20 @@ export function CollapsedAncestors({
       <ul className="space-y-1 p-1">
         <li>
           <Link
-            to="/catalog"
+            to={getPlatformCatalogHref(section)}
             onClick={onCategoryClick}
             onMouseEnter={() => onActiveCategoryChange(undefined)}
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <MoreHorizontal className="size-4 shrink-0" />
-            <span className="line-clamp-1">Все товары</span>
+            <span className="line-clamp-1">Все категории</span>
           </Link>
         </li>
 
         {hiddenPath.map((category) => (
           <li key={category.id}>
             <Link
-              to={getCategoryHref(categories, category.id)}
+              to={getCategoryHref(categories, category.id, section)}
               onClick={onCategoryClick}
               onMouseEnter={() => onActiveCategoryChange(category.slug)}
               className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"

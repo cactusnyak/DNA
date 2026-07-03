@@ -3,6 +3,11 @@ import { useMemo, useState } from 'react';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { SectionHeader } from '@/components/ui/Section';
 import type { Category } from '@/entities/category';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  getPlatformSection,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import { CategoryTreeNode } from './components/CategoryTreeNode';
 import { getChildrenCategories } from './logic/get-children-categories';
@@ -10,16 +15,26 @@ import { getVisibleCategories } from './logic/get-visible-categories';
 import { toggleExpandedCategoryId } from './logic/toggle-expanded-category-id';
 
 type CatalogCategoryTreeProps = {
+  section?: PlatformSectionId;
   categories: Category[];
+  title?: string;
+  description?: string;
+  emptyText?: string;
 };
 
 export function CatalogCategoryTree({
+  section = DEFAULT_PLATFORM_SECTION_ID,
   categories,
+  title,
+  description,
+  emptyText = 'Категории не найдены.',
 }: CatalogCategoryTreeProps) {
   const [searchValue, setSearchValue] = useState('');
   const [expandedCategoryIds, setExpandedCategoryIds] = useState<Set<string>>(
     () => new Set(),
   );
+
+  const sectionConfig = getPlatformSection(section);
 
   const visibleCategories = useMemo(
     () => getVisibleCategories(categories, searchValue),
@@ -41,8 +56,8 @@ export function CatalogCategoryTree({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Каталог"
-        description="Полное дерево категорий с поиском и раскрытием узлов."
+        title={title ?? sectionConfig.catalogLabel}
+        description={description ?? sectionConfig.catalogDescription}
       />
 
       <SearchInput
@@ -52,17 +67,24 @@ export function CatalogCategoryTree({
         onChange={(event) => setSearchValue(event.target.value)}
       />
 
-      <ul className="space-y-2">
-        {rootCategories.map((category) => (
-          <CategoryTreeNode
-            key={category.id}
-            category={category}
-            categories={visibleCategories}
-            expandedCategoryIds={expandedCategoryIds}
-            onToggle={handleToggle}
-          />
-        ))}
-      </ul>
+      {rootCategories.length ? (
+        <ul className="space-y-2">
+          {rootCategories.map((category) => (
+            <CategoryTreeNode
+              key={category.id}
+              section={section}
+              category={category}
+              categories={visibleCategories}
+              expandedCategoryIds={expandedCategoryIds}
+              onToggle={handleToggle}
+            />
+          ))}
+        </ul>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+          {emptyText}
+        </div>
+      )}
     </div>
   );
 }

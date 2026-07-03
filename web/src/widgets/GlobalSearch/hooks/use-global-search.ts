@@ -9,6 +9,10 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getProducts } from '@/entities/product/api/get-products';
+import {
+  DEFAULT_PLATFORM_SECTION_ID,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import { filterGlobalSearchCategories } from '../logic/filter-global-search-categories';
 import { filterGlobalSearchProducts } from '../logic/filter-global-search-products';
@@ -18,7 +22,13 @@ import { normalizeSearchValue } from '../logic/normalize-search-value';
 const MIN_SEARCH_LENGTH = 2;
 const PRODUCT_RESULTS_STEP = 8;
 
-export function useGlobalSearch() {
+type UseGlobalSearchParams = {
+  section?: PlatformSectionId;
+};
+
+export function useGlobalSearch({
+  section = DEFAULT_PLATFORM_SECTION_ID,
+}: UseGlobalSearchParams = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [searchValue, setSearchValue] = useState('');
@@ -35,8 +45,8 @@ export function useGlobalSearch() {
     isPending: isCategoriesPending,
     isError: isCategoriesError,
   } = useQuery({
-    queryKey: ['global-search-categories'],
-    queryFn: getCategories,
+    queryKey: ['global-search-categories', section],
+    queryFn: () => getCategories({ section }),
     enabled: isOpen && isSearchReady,
     staleTime: 1000 * 60 * 5,
   });
@@ -46,8 +56,8 @@ export function useGlobalSearch() {
     isPending: isProductsPending,
     isError: isProductsError,
   } = useQuery({
-    queryKey: ['global-search-products'],
-    queryFn: () => getProducts(),
+    queryKey: ['global-search-products', section],
+    queryFn: () => getProducts({ section }),
     enabled: isOpen && isSearchReady,
     staleTime: 1000 * 60 * 5,
   });
@@ -108,7 +118,7 @@ export function useGlobalSearch() {
 
   useEffect(() => {
     setVisibleProductsLimit(PRODUCT_RESULTS_STEP);
-  }, [normalizedSearchValue]);
+  }, [normalizedSearchValue, section]);
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -157,6 +167,7 @@ export function useGlobalSearch() {
 
     setSearchValue,
     openSearch,
+    closeSearch,
     handleResultClick,
     handleProductResultsScroll,
   };

@@ -1,31 +1,61 @@
+import { platformSections } from '@/shared/platform';
+
 import type { GlobalSearchSection } from '../types/global-search';
 
 export const globalSearchSections: GlobalSearchSection[] = [
   {
     id: 'home',
     title: 'Главная',
-    description: 'Баланс, популярные категории и товары DNA.',
+    description: 'Баланс, категории маркета, товары и будущие объявления.',
     href: '/',
     keywords: ['главная', 'домой', 'home', 'баланс', 'популярные товары'],
   },
   {
-    id: 'catalog',
-    title: 'Каталог',
-    description: 'Категории, товары, фильтры и сортировка.',
-    href: '/catalog',
+    id: 'ads',
+    title: platformSections.ads.label,
+    description: 'Категории и будущие объявления пользователей.',
+    href: platformSections.ads.href,
+    keywords: ['доска', 'объявления', 'б/у', 'бу', 'classifieds', 'ads'],
+  },
+  {
+    id: 'ads-catalog',
+    title: platformSections.ads.catalogLabel,
+    description: 'Каталог категорий доски объявлений.',
+    href: platformSections.ads.catalogHref,
+    keywords: ['каталог доски', 'категории доски', 'объявления'],
+  },
+  {
+    id: 'market',
+    title: platformSections.market.label,
+    description: 'Товары DNA и будущие предложения продавцов.',
+    href: platformSections.market.href,
+    keywords: ['маркет', 'магазин', 'товары', 'market', 'продавцы'],
+  },
+  {
+    id: 'market-catalog',
+    title: platformSections.market.catalogLabel,
+    description: 'Категории, товары, фильтры и сортировка маркета.',
+    href: platformSections.market.catalogHref,
     keywords: ['каталог', 'товары', 'категории', 'магазин', 'маркет'],
+  },
+  {
+    id: 'favorites',
+    title: 'Избранное',
+    description: 'Сохранённые товары маркета и будущие объявления доски.',
+    href: '/favorites',
+    keywords: ['избранное', 'favorites', 'сохраненное', 'сохранённое'],
   },
   {
     id: 'cart',
     title: 'Корзина',
-    description: 'Товары, которые вы добавили для оформления заказа.',
+    description: 'Товары и будущие объявления, которые вы добавили.',
     href: '/cart',
     keywords: ['корзина', 'cart', 'покупка', 'товары в корзине'],
   },
   {
     id: 'checkout',
     title: 'Оформление заказа',
-    description: 'Контакты, доставка и подтверждение покупки.',
+    description: 'Контакты, доставка и подтверждение покупки из маркета.',
     href: '/checkout',
     keywords: ['оформление', 'заказ', 'доставка', 'купить', 'checkout'],
   },

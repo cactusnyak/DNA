@@ -104,7 +104,7 @@ export function ProfileOrdersCard({
           </p>
 
           <Link
-            to="/catalog"
+            to="/market/catalog"
             className="mt-4 inline-flex text-sm font-medium underline-offset-4 hover:underline"
           >
             Перейти в каталог

@@ -3,6 +3,7 @@ import { useMatches } from 'react-router-dom';
 
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getProduct } from '@/entities/product/api/get-product';
+import { getPlatformSectionIdFromPathname } from '@/shared/platform';
 
 import { BreadcrumbsList } from './components/BreadcrumbsList';
 import { buildBreadcrumbItems } from './logic/build-breadcrumb-items';
@@ -23,15 +24,22 @@ const defaultRoot: BreadcrumbItem = {
   label: 'Главная',
 };
 
+function getActiveBreadcrumbSection(matches: BreadcrumbMatch[]) {
+  const lastMatch = matches.at(-1);
+
+  return getPlatformSectionIdFromPathname(lastMatch?.pathname ?? '/');
+}
+
 export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
   const matches = useMatches() as BreadcrumbMatch[];
 
+  const activeSection = getActiveBreadcrumbSection(matches);
   const categorySlug = getCurrentCategorySlug(matches);
   const productId = getCurrentProductId(matches);
 
   const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
+    queryKey: ['categories', activeSection],
+    queryFn: () => getCategories({ section: activeSection }),
     enabled: Boolean(categorySlug || productId),
   });
 
@@ -44,6 +52,7 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
   const breadcrumbItems = buildBreadcrumbItems({
     matches,
     root,
+    activeSection,
     categories,
     categorySlug,
     product,
