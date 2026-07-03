@@ -89,6 +89,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         onEdit={state.handleEdit}
         onRestore={handlers.handleRestore}
         onDelete={handlers.handleDelete}
+        onHardDelete={handlers.handleHardDelete}
       />
     );
   }
@@ -154,3 +155,4 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     </section>
   );
 }
+

@@ -1,4 +1,9 @@
-import { Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import {
+  ArchiveX,
+  Pencil,
+  RotateCcw,
+  Trash2,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 
@@ -12,6 +17,7 @@ type AdminRecordActionsProps = {
   onEdit: (record: EditableRecord) => void;
   onRestore: (record: EditableRecord) => void;
   onDelete: (record: EditableRecord) => void;
+  onHardDelete: (record: EditableRecord) => void;
 };
 
 export function AdminRecordActions({
@@ -20,15 +26,32 @@ export function AdminRecordActions({
   onEdit,
   onRestore,
   onDelete,
+  onHardDelete,
 }: AdminRecordActionsProps) {
   const canRestore = canRestoreAdminRecord(record);
+  const canSoftDelete = activeTabId !== 'orders' && !canRestore;
+
+  const editLabel =
+    activeTabId === 'orders' ? 'Изменить статус заказа' : 'Изменить запись';
 
   function handleDelete() {
-    if (!window.confirm('Удалить запись?')) {
+    if (!window.confirm('Пометить запись удаленной?')) {
       return;
     }
 
     onDelete(record);
+  }
+
+  function handleHardDelete() {
+    if (
+      !window.confirm(
+        'Удалить запись навсегда? Это действие нельзя будет отменить.',
+      )
+    ) {
+      return;
+    }
+
+    onHardDelete(record);
   }
 
   return (
@@ -36,36 +59,50 @@ export function AdminRecordActions({
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        size="icon-sm"
+        aria-label={editLabel}
+        title={editLabel}
         onClick={() => onEdit(record)}
       >
-        <Pencil className="size-3.5" />
-        {activeTabId === 'orders' ? 'Статус' : 'Изменить'}
+        <Pencil className="size-3.5" strokeWidth={1.5} />
       </Button>
 
       {activeTabId !== 'orders' && canRestore && (
         <Button
           type="button"
           variant="outline"
-          size="sm"
+          size="icon-sm"
+          aria-label="Восстановить запись"
+          title="Восстановить запись"
           onClick={() => onRestore(record)}
         >
-          <RotateCcw className="size-3.5" />
-          Вернуть
+          <RotateCcw className="size-3.5" strokeWidth={1.5} />
         </Button>
       )}
 
-      {activeTabId !== 'orders' && !canRestore && (
+      {canSoftDelete && (
         <Button
           type="button"
-          variant="destructive"
-          size="sm"
+          variant="warning"
+          size="icon-sm"
+          aria-label="Пометить удаленным"
+          title="Пометить удаленным"
           onClick={handleDelete}
         >
-          <Trash2 className="size-3.5" />
-          Удалить
+          <ArchiveX className="size-3.5" strokeWidth={1.5} />
         </Button>
       )}
+
+      <Button
+        type="button"
+        variant="destructive"
+        size="icon-sm"
+        aria-label="Удалить навсегда"
+        title="Удалить навсегда"
+        onClick={handleHardDelete}
+      >
+        <Trash2 className="size-3.5" strokeWidth={1.5} />
+      </Button>
     </div>
   );
 }

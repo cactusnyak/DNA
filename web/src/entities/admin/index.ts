@@ -8,6 +8,10 @@ export {
   deleteAdminCategory,
   deleteAdminProduct,
   getAdminCatalogData,
+  hardDeleteAdminCatalogCollection,
+  hardDeleteAdminCategory,
+  hardDeleteAdminOrder,
+  hardDeleteAdminProduct,
   restoreAdminCatalogCollection,
   restoreAdminCategory,
   restoreAdminProduct,
@@ -34,3 +38,4 @@ export type {
   AdminProductPayload,
   AdminUploadImageResponse,
 } from './types/admin-catalog';
+

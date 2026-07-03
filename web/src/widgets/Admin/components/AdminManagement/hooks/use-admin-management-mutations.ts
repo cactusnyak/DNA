@@ -7,6 +7,10 @@ import {
   deleteAdminCatalogCollection,
   deleteAdminCategory,
   deleteAdminProduct,
+  hardDeleteAdminCatalogCollection,
+  hardDeleteAdminCategory,
+  hardDeleteAdminOrder,
+  hardDeleteAdminProduct,
   restoreAdminCatalogCollection,
   restoreAdminCategory,
   restoreAdminProduct,
@@ -54,6 +58,11 @@ export function useAdminManagementMutations({
     onSuccess,
   });
 
+  const hardDeleteCategoryMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminCategory(accessToken, id),
+    onSuccess,
+  });
+
   const createProductMutation = useMutation({
     mutationFn: (payload: AdminProductPayload) =>
       createAdminProduct(accessToken, payload),
@@ -73,6 +82,11 @@ export function useAdminManagementMutations({
 
   const restoreProductMutation = useMutation({
     mutationFn: (id: string) => restoreAdminProduct(accessToken, id),
+    onSuccess,
+  });
+
+  const hardDeleteProductMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminProduct(accessToken, id),
     onSuccess,
   });
 
@@ -97,6 +111,12 @@ export function useAdminManagementMutations({
 
   const restoreCollectionMutation = useMutation({
     mutationFn: (id: string) => restoreAdminCatalogCollection(accessToken, id),
+    onSuccess,
+  });
+
+  const hardDeleteCollectionMutation = useMutation({
+    mutationFn: (id: string) =>
+      hardDeleteAdminCatalogCollection(accessToken, id),
     onSuccess,
   });
 
@@ -125,21 +145,30 @@ export function useAdminManagementMutations({
     onSuccess,
   });
 
+  const hardDeleteOrderMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminOrder(accessToken, id),
+    onSuccess,
+  });
+
   return {
     createCategoryMutation,
     updateCategoryMutation,
     deleteCategoryMutation,
     restoreCategoryMutation,
+    hardDeleteCategoryMutation,
     createProductMutation,
     updateProductMutation,
     deleteProductMutation,
     restoreProductMutation,
+    hardDeleteProductMutation,
     createCollectionMutation,
     updateCollectionMutation,
     deleteCollectionMutation,
     restoreCollectionMutation,
+    hardDeleteCollectionMutation,
     updateCollectionItemsMutation,
     updateOrderStatusMutation,
+    hardDeleteOrderMutation,
     isCrudFormPending:
       createCategoryMutation.isPending ||
       updateCategoryMutation.isPending ||
@@ -150,3 +179,4 @@ export function useAdminManagementMutations({
       updateOrderStatusMutation.isPending,
   };
 }
+

@@ -66,6 +66,11 @@ export class AdminController {
     return this.adminService.deleteCategory(id);
   }
 
+  @Delete('categories/:id/permanent')
+  hardDeleteCategory(@Param('id') id: string) {
+    return this.adminService.hardDeleteCategory(id);
+  }
+
   @Patch('categories/:id/restore')
   restoreCategory(@Param('id') id: string) {
     return this.adminService.restoreCategory(id);
@@ -86,6 +91,11 @@ export class AdminController {
     return this.adminService.deleteProduct(id);
   }
 
+  @Delete('products/:id/permanent')
+  hardDeleteProduct(@Param('id') id: string) {
+    return this.adminService.hardDeleteProduct(id);
+  }
+
   @Patch('products/:id/restore')
   restoreProduct(@Param('id') id: string) {
     return this.adminService.restoreProduct(id);
@@ -104,6 +114,11 @@ export class AdminController {
   @Delete('catalog-collections/:id')
   deleteCatalogCollection(@Param('id') id: string) {
     return this.adminService.deleteCatalogCollection(id);
+  }
+
+  @Delete('catalog-collections/:id/permanent')
+  hardDeleteCatalogCollection(@Param('id') id: string) {
+    return this.adminService.hardDeleteCatalogCollection(id);
   }
 
   @Patch('catalog-collections/:id/restore')
@@ -131,4 +146,10 @@ export class AdminController {
   updateOrderStatus(@Param('id') id: string, @Body() body: unknown) {
     return this.adminService.updateOrderStatus(id, body);
   }
+
+  @Delete('orders/:id')
+  hardDeleteOrder(@Param('id') id: string) {
+    return this.adminService.hardDeleteOrder(id);
+  }
 }
+

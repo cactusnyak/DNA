@@ -374,6 +374,17 @@ export class AdminService {
     });
   }
 
+  async hardDeleteCategory(id: string) {
+    await this.getCategoryOrThrow(id);
+    await this.assertCategoryCanBeHardDeleted(id);
+
+    return this.prismaService.category.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
   async createProduct(body: unknown) {
     const payload = this.getObjectBody(body);
     const title = this.getRequiredString(payload.title, 'Product title is required');
@@ -474,6 +485,25 @@ export class AdminService {
     });
   }
 
+  async hardDeleteProduct(id: string) {
+    await this.getProductOrThrow(id);
+    await this.assertProductCanBeHardDeleted(id);
+
+    return this.prismaService.$transaction(async (transaction) => {
+      await transaction.productImage.deleteMany({
+        where: {
+          productId: id,
+        },
+      });
+
+      return transaction.product.delete({
+        where: {
+          id,
+        },
+      });
+    });
+  }
+
   async createCatalogCollection(body: unknown) {
     const payload = this.getObjectBody(body);
     const title = this.getRequiredString(
@@ -554,6 +584,16 @@ export class AdminService {
     });
   }
 
+  async hardDeleteCatalogCollection(id: string) {
+    await this.getCatalogCollectionOrThrow(id);
+
+    return this.prismaService.catalogCollection.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
   async updateCatalogCollectionCategories(id: string, body: unknown) {
     const collection = await this.getCatalogCollectionOrThrow(id);
 
@@ -629,6 +669,30 @@ export class AdminService {
       data: {
         status: payload.status as OrderStatus,
       },
+    });
+  }
+
+  async hardDeleteOrder(id: string) {
+    await this.getOrderOrThrow(id);
+
+    return this.prismaService.$transaction(async (transaction) => {
+      await transaction.referralReward.deleteMany({
+        where: {
+          orderId: id,
+        },
+      });
+
+      await transaction.orderItem.deleteMany({
+        where: {
+          orderId: id,
+        },
+      });
+
+      return transaction.order.delete({
+        where: {
+          id,
+        },
+      });
     });
   }
 
@@ -787,6 +851,20 @@ export class AdminService {
     }
 
     return collection;
+  }
+
+  private async getOrderOrThrow(id: string) {
+    const order = await this.prismaService.order.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return order;
   }
 
   private async resolveImageFromPayload(
@@ -974,6 +1052,95 @@ export class AdminService {
     };
   }
 
+
+
+  private async assertCategoryCanBeHardDeleted(id: string) {
+    const [
+      childrenCount,
+      productsCount,
+      collectionCategoriesCount,
+    ] = await Promise.all([
+      this.prismaService.category.count({
+        where: {
+          parentId: id,
+        },
+      }),
+      this.prismaService.product.count({
+        where: {
+          categoryId: id,
+        },
+      }),
+      this.prismaService.catalogCollectionCategory.count({
+        where: {
+          categoryId: id,
+        },
+      }),
+    ]);
+
+    const blockers: string[] = [];
+
+    if (childrenCount > 0) {
+      blockers.push('есть дочерние категории');
+    }
+
+    if (productsCount > 0) {
+      blockers.push('есть связанные продукты');
+    }
+
+    if (collectionCategoriesCount > 0) {
+      blockers.push('категория используется в подборках');
+    }
+
+    if (blockers.length) {
+      throw new BadRequestException(
+        `Категорию нельзя удалить навсегда: ${blockers.join(', ')}.`,
+      );
+    }
+  }
+
+  private async assertProductCanBeHardDeleted(id: string) {
+    const [
+      orderItemsCount,
+      cartItemsCount,
+      collectionProductsCount,
+    ] = await Promise.all([
+      this.prismaService.orderItem.count({
+        where: {
+          productId: id,
+        },
+      }),
+      this.prismaService.cartItem.count({
+        where: {
+          productId: id,
+        },
+      }),
+      this.prismaService.catalogCollectionProduct.count({
+        where: {
+          productId: id,
+        },
+      }),
+    ]);
+
+    const blockers: string[] = [];
+
+    if (orderItemsCount > 0) {
+      blockers.push('продукт есть в заказах');
+    }
+
+    if (cartItemsCount > 0) {
+      blockers.push('продукт есть в корзинах пользователей');
+    }
+
+    if (collectionProductsCount > 0) {
+      blockers.push('продукт используется в подборках');
+    }
+
+    if (blockers.length) {
+      throw new BadRequestException(
+        `Продукт нельзя удалить навсегда: ${blockers.join(', ')}.`,
+      );
+    }
+  }
 
   private getImageUploadExtension(file: AdminUploadedImageFile) {
     const extensionFromMimeType = IMAGE_MIME_EXTENSION[file.mimetype];
@@ -1175,3 +1342,4 @@ export class AdminService {
     );
   }
 }
+

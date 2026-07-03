@@ -76,6 +76,13 @@ export function deleteAdminCategory(accessToken: string, categoryId: string) {
   });
 }
 
+export function hardDeleteAdminCategory(accessToken: string, categoryId: string) {
+  return httpClient<void>(`/admin/categories/${categoryId}/permanent`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
 export function restoreAdminCategory(accessToken: string, categoryId: string) {
   return httpClient<AdminCategory>(`/admin/categories/${categoryId}/restore`, {
     method: 'PATCH',
@@ -111,6 +118,13 @@ export function updateAdminProduct(
 
 export function deleteAdminProduct(accessToken: string, productId: string) {
   return httpClient<void>(`/admin/products/${productId}`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function hardDeleteAdminProduct(accessToken: string, productId: string) {
+  return httpClient<void>(`/admin/products/${productId}/permanent`, {
     method: 'DELETE',
     headers: getAdminHeaders(accessToken),
   });
@@ -160,6 +174,19 @@ export function deleteAdminCatalogCollection(
     method: 'DELETE',
     headers: getAdminHeaders(accessToken),
   });
+}
+
+export function hardDeleteAdminCatalogCollection(
+  accessToken: string,
+  collectionId: string,
+) {
+  return httpClient<void>(
+    `/admin/catalog-collections/${collectionId}/permanent`,
+    {
+      method: 'DELETE',
+      headers: getAdminHeaders(accessToken),
+    },
+  );
 }
 
 export function restoreAdminCatalogCollection(
@@ -225,3 +252,11 @@ export function updateAdminOrderStatus(
     },
   );
 }
+
+export function hardDeleteAdminOrder(accessToken: string, orderId: string) {
+  return httpClient<void>(`/admin/orders/${orderId}`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+

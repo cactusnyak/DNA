@@ -118,6 +118,26 @@ export function useAdminCrudHandlers({
     }
   }
 
+
+  function handleHardDelete(record: EditableRecord) {
+    if (activeTabId === 'categories') {
+      mutations.hardDeleteCategoryMutation.mutate(record.id);
+      return;
+    }
+
+    if (activeTabId === 'products') {
+      mutations.hardDeleteProductMutation.mutate(record.id);
+      return;
+    }
+
+    if (activeTabId === 'collections') {
+      mutations.hardDeleteCollectionMutation.mutate(record.id);
+      return;
+    }
+
+    mutations.hardDeleteOrderMutation.mutate(record.id);
+  }
+
   function handleCollectionItemsSave(
     collection: AdminCatalogCollection,
     items: { id: string; sortOrder: number }[],
@@ -166,7 +186,9 @@ export function useAdminCrudHandlers({
     handleSubmit,
     handleRestore,
     handleDelete,
+    handleHardDelete,
     handleCollectionItemsSave,
     handleQuickCreate,
   };
 }
+
