@@ -105,6 +105,10 @@ export function Catalog({
     );
   }
 
+  const emptyProductsText = categorySlug
+    ? 'В этой категории пока нет товаров.'
+    : 'Товары маркета пока не добавлены. Каталог пуст, зато не врёт.';
+
   return (
     <section className="space-y-8">
       {showHeader && (
@@ -136,12 +140,18 @@ export function Catalog({
           />
         )}
 
-        <ProductGrid
-          section={section}
-          products={products}
-          currentCategorySlug={categorySlug}
-          compact={shouldShowControls}
-        />
+        {products.length ? (
+          <ProductGrid
+            section={section}
+            products={products}
+            currentCategorySlug={categorySlug}
+            compact={shouldShowControls}
+          />
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+            {emptyProductsText}
+          </div>
+        )}
       </div>
     </section>
   );

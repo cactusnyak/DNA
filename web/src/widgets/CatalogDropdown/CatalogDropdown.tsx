@@ -20,6 +20,7 @@ type CatalogDropdownProps = {
 export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
   const [activeCategorySlug, setActiveCategorySlug] = useState<string>();
   const sectionConfig = getPlatformSection(section);
+  const isMarketSection = section === PLATFORM_SECTION.MARKET;
 
   const {
     data: categories,
@@ -44,6 +45,7 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
         section,
         categorySlug: activeCategorySlug,
       }),
+    enabled: isMarketSection,
   });
 
   return (
@@ -87,7 +89,7 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
           section={section}
           products={products ?? []}
           activeCategoryName={activeCategory?.name}
-          isPending={section === PLATFORM_SECTION.MARKET && isProductsPending}
+          isPending={isMarketSection && isProductsPending}
           onProductClick={onClose}
         />
       </div>

@@ -11,14 +11,14 @@ import { GlobalSearch } from '@/widgets/GlobalSearch';
 type DesktopHeaderControlsProps = {
   section: PlatformSectionId | null;
   isCatalogDropdownOpen: boolean;
-  onCatalogHover: () => void;
+  onCatalogOpen: () => void;
   onNavigate: () => void;
 };
 
 export function DesktopHeaderControls({
   section,
   isCatalogDropdownOpen,
-  onCatalogHover,
+  onCatalogOpen,
   onNavigate,
 }: DesktopHeaderControlsProps) {
   const sectionConfig = getPlatformSection(section);
@@ -36,7 +36,7 @@ export function DesktopHeaderControls({
           variant="outline"
           type="button"
           asChild
-          onMouseEnter={onCatalogHover}
+          onMouseEnter={onCatalogOpen}
           className={cn(
             !isCatalogDropdownOpen &&
               'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',

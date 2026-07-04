@@ -9,7 +9,10 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCategories } from '@/entities/category/api/get-categories';
 import { getProducts } from '@/entities/product/api/get-products';
-import type { PlatformSectionId } from '@/shared/platform';
+import {
+  PLATFORM_SECTION,
+  type PlatformSectionId,
+} from '@/shared/platform';
 
 import { filterGlobalSearchCategories } from '../logic/filter-global-search-categories';
 import { filterGlobalSearchProducts } from '../logic/filter-global-search-products';
@@ -37,6 +40,8 @@ export function useGlobalSearch({
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const isSearchReady = normalizedSearchValue.length >= MIN_SEARCH_LENGTH;
   const isScopedSearchEnabled = Boolean(section && isOpen && isSearchReady);
+  const isMarketProductSearchEnabled =
+    section === PLATFORM_SECTION.MARKET && isOpen && isSearchReady;
 
   const {
     data: categories = [],
@@ -56,7 +61,7 @@ export function useGlobalSearch({
   } = useQuery({
     queryKey: ['global-search-products', section],
     queryFn: () => getProducts({ section }),
-    enabled: isScopedSearchEnabled,
+    enabled: isMarketProductSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -77,7 +82,7 @@ export function useGlobalSearch({
   }, [categories, isSearchReady, searchValue, section]);
 
   const productResults = useMemo(() => {
-    if (!section || !isSearchReady) {
+    if (section !== PLATFORM_SECTION.MARKET || !isSearchReady) {
       return [];
     }
 

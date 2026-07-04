@@ -1,11 +1,17 @@
 import type {
   ComponentProps,
+  ComponentType,
   ReactNode,
 } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/shared/utils/cn';
+
+type StateCardIcon = ComponentType<{
+  className?: string;
+  strokeWidth?: number;
+}>;
 
 type StateCardAction =
   | {
@@ -22,6 +28,7 @@ type StateCardAction =
     };
 
 type StateCardProps = {
+  icon?: StateCardIcon;
   title: ReactNode;
   description: ReactNode;
   action?: StateCardAction;
@@ -29,6 +36,7 @@ type StateCardProps = {
 };
 
 export function StateCard({
+  icon: Icon,
   title,
   description,
   action,
@@ -42,6 +50,12 @@ export function StateCard({
       )}
     >
       <div className="mx-auto max-w-md">
+        {Icon && (
+          <span className="mx-auto mb-5 flex size-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+            <Icon className="size-6" strokeWidth={1.5} />
+          </span>
+        )}
+
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           {title}
         </h1>

@@ -15,7 +15,7 @@ export function Header() {
     isCatalogDropdownOpen,
     dropdownContainerRef,
     closeCatalogDropdown,
-    toggleCatalogDropdown,
+    openCatalogDropdown,
   } = useCatalogDropdown();
 
   return (
@@ -40,7 +40,7 @@ export function Header() {
         <DesktopHeaderControls
           section={activeSectionId}
           isCatalogDropdownOpen={isCatalogDropdownOpen}
-          onCatalogHover={toggleCatalogDropdown}
+          onCatalogOpen={openCatalogDropdown}
           onNavigate={closeCatalogDropdown}
         />
 

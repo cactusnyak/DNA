@@ -20,7 +20,7 @@ export function ProductCardContent({
 }: ProductCardContentProps) {
   const categoryHref = getPlatformCategoryHref(section, product.category.path);
   const shouldShowCategoryLink =
-    currentCategorySlug && currentCategorySlug !== product.category.slug;
+    !currentCategorySlug || currentCategorySlug !== product.category.slug;
 
   return (
     <div className="flex flex-1 flex-col p-4">

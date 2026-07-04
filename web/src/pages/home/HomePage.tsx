@@ -10,7 +10,6 @@ import { SectionHeader } from '@/components/ui/Section';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { BalanceHero } from '@/widgets/BalanceHero';
 import { Catalog } from '@/widgets/Catalog';
-import { CategoryPreview } from '@/widgets/CategoryPreview';
 
 export function HomePage() {
   const accessToken = useAuthStore((state) => state.accessToken);

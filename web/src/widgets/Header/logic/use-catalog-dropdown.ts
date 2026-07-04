@@ -5,6 +5,10 @@ export function useCatalogDropdown() {
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
 
+  function openCatalogDropdown() {
+    setIsCatalogDropdownOpen(true);
+  }
+
   function closeCatalogDropdown() {
     setIsCatalogDropdownOpen(false);
   }
@@ -52,6 +56,7 @@ export function useCatalogDropdown() {
   return {
     isCatalogDropdownOpen,
     dropdownContainerRef,
+    openCatalogDropdown,
     closeCatalogDropdown,
     toggleCatalogDropdown,
   };

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/Section';
 import { PLATFORM_SECTION } from '@/shared/platform';
-import { Catalog } from '@/widgets/Catalog';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
 
 export function MarketPage() {
