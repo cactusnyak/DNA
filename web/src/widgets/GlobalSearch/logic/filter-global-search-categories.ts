@@ -1,9 +1,9 @@
-import type { Category } from '@/entities/category';
-import { getCategoryPath } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryPath } from '@/shared/catalog';
 
 import { getSearchTokens, normalizeSearchValue } from './normalize-search-value';
 
-function getCategorySearchableValue(category: Category, categories: Category[]) {
+function getCategorySearchableValue(category: CatalogCategory, categories: CatalogCategory[]) {
   const categoryPath = getCategoryPath(categories, category.id)
     .map((pathCategory) => pathCategory.name)
     .join(' ');
@@ -20,8 +20,8 @@ function getCategorySearchableValue(category: Category, categories: Category[]) 
 }
 
 function getCategorySearchScore(
-  category: Category,
-  categories: Category[],
+  category: CatalogCategory,
+  categories: CatalogCategory[],
   searchValue: string,
   tokens: string[],
 ) {
@@ -60,7 +60,7 @@ function getCategorySearchScore(
 }
 
 export function filterGlobalSearchCategories(
-  categories: Category[],
+  categories: CatalogCategory[],
   searchValue: string,
 ) {
   const tokens = getSearchTokens(searchValue);

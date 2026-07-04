@@ -1,18 +1,18 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { cn } from '@/shared/utils/cn';
 
 type CategoryTreeProps = {
-  categories: Category[];
+  categories: CatalogCategory[];
   selectedCategorySlug?: string;
   onCategoryChange: (categorySlug?: string) => void;
 };
 
-function getChildrenCategories(categories: Category[], parentId?: string) {
+function getChildrenCategories(categories: CatalogCategory[], parentId?: string) {
   return categories.filter((category) => category.parentId === parentId);
 }
 
 type CategoryTreeLevelProps = {
-  categories: Category[];
+  categories: CatalogCategory[];
   parentId?: string;
   selectedCategorySlug?: string;
   onCategoryChange: (categorySlug?: string) => void;

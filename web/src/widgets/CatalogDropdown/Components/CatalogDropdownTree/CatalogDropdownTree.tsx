@@ -1,4 +1,4 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { PlatformSectionId } from '@/shared/platform';
 
 import { CategoryColumn } from './components/CategoryColumn';
@@ -9,7 +9,7 @@ import { getVisibleCategoryLevels } from './logic/get-visible-category-levels';
 
 type CatalogDropdownTreeProps = {
   section: PlatformSectionId;
-  categories: Category[];
+  categories: CatalogCategory[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
   onCategoryClick?: () => void;
@@ -59,3 +59,4 @@ export function CatalogDropdownTree({
     </div>
   );
 }
+

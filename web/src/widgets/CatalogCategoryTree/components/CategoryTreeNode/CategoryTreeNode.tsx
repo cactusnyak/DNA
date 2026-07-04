@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
-import type { Category } from '@/entities/category';
-import { getCategoryHref } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
@@ -10,8 +10,8 @@ import { getChildrenCategories } from '../../logic/get-children-categories';
 
 type CategoryTreeNodeProps = {
   section: PlatformSectionId;
-  category: Category;
-  categories: Category[];
+  category: CatalogCategory;
+  categories: CatalogCategory[];
   expandedCategoryIds: Set<string>;
   onToggle: (categoryId: string) => void;
 };
@@ -73,3 +73,4 @@ export function CategoryTreeNode({
     </li>
   );
 }
+

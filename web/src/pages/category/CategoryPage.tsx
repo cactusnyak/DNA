@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
-import { getCategories } from '@/entities/category/api/get-categories';
-import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
+import { getCatalogCategories } from '@/shared/catalog';
+import { getCategorySlugFromPath } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 import { Catalog } from '@/widgets/Catalog';
 
@@ -21,7 +21,7 @@ export function CategoryPage({ section }: CategoryPageProps) {
     error,
   } = useQuery({
     queryKey: ['categories', section],
-    queryFn: () => getCategories({ section }),
+    queryFn: () => getCatalogCategories({ section }),
   });
 
   const currentCategory = useMemo(() => {
@@ -51,3 +51,4 @@ export function CategoryPage({ section }: CategoryPageProps) {
     />
   );
 }
+

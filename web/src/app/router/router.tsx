@@ -6,6 +6,9 @@ import {
 
 import { MainLayout } from '@/app/layouts/MainLayout';
 
+import { AdCreatePage } from '@/pages/ads/AdCreatePage';
+import { AdDetailsPage } from '@/pages/ads/AdDetailsPage';
+import { AdEditPage } from '@/pages/ads/AdEditPage';
 import { AdsMyPage } from '@/pages/ads/AdsMyPage';
 import { AdsPage } from '@/pages/ads/AdsPage';
 import { AdminPage } from '@/pages/admin/AdminPage';
@@ -123,6 +126,36 @@ export const router = createBrowserRouter([
               breadcrumb: {
                 type: BREADCRUMB_TYPE.STATIC,
                 label: 'Мои объявления',
+              },
+            } satisfies BreadcrumbHandle,
+          },
+          {
+            path: 'my/:adId/edit',
+            element: <AdEditPage />,
+            handle: {
+              breadcrumb: {
+                type: BREADCRUMB_TYPE.STATIC,
+                label: 'Редактирование объявления',
+              },
+            } satisfies BreadcrumbHandle,
+          },
+          {
+            path: 'new',
+            element: <AdCreatePage />,
+            handle: {
+              breadcrumb: {
+                type: BREADCRUMB_TYPE.STATIC,
+                label: 'Новое объявление',
+              },
+            } satisfies BreadcrumbHandle,
+          },
+          {
+            path: 'ad/:adId',
+            element: <AdDetailsPage />,
+            handle: {
+              breadcrumb: {
+                type: BREADCRUMB_TYPE.STATIC,
+                label: 'Объявление',
               },
             } satisfies BreadcrumbHandle,
           },
@@ -287,3 +320,4 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+

@@ -7,11 +7,14 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import {
+  AdStatus,
   CatalogCollectionType,
   OrderStatus,
+  UserRole,
 } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from '../users/users.service';
 
 const CYRILLIC_MAP: Record<string, string> = {
   а: 'a',
@@ -73,22 +76,27 @@ const IMAGE_MIME_EXTENSION: Record<string, string> = {
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly usersService: UsersService,
+  ) { }
 
   async getOverview() {
     const [
       usersCount,
-      categoriesCount,
+      marketCategoriesCount,
       productsCount,
       collectionsCount,
       ordersCount,
+      adCategoriesCount,
+      adsCount,
     ] = await this.prismaService.$transaction([
       this.prismaService.user.count({
         where: {
           deletedAt: null,
         },
       }),
-      this.prismaService.category.count({
+      this.prismaService.marketCategory.count({
         where: {
           deletedAt: null,
         },
@@ -100,14 +108,26 @@ export class AdminService {
       }),
       this.prismaService.catalogCollection.count(),
       this.prismaService.order.count(),
+      this.prismaService.adCategory.count({
+        where: {
+          deletedAt: null,
+        },
+      }),
+      this.prismaService.ad.count({
+        where: {
+          deletedAt: null,
+        },
+      }),
     ]);
 
     return {
       usersCount,
-      categoriesCount,
+      marketCategoriesCount,
       productsCount,
       collectionsCount,
       ordersCount,
+      adCategoriesCount,
+      adsCount,
     };
   }
 
@@ -143,7 +163,7 @@ export class AdminService {
   }
 
   async getCatalog() {
-    const categories = await this.prismaService.category.findMany({
+    const categories = await this.prismaService.marketCategory.findMany({
       include: {
         image: true,
         _count: {
@@ -243,9 +263,66 @@ export class AdminService {
       }),
     ]);
 
+    const adCategories = await this.prismaService.adCategory.findMany({
+      include: {
+        image: true,
+        _count: {
+          select: {
+            ads: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          sortOrder: 'asc',
+        },
+        {
+          name: 'asc',
+        },
+      ],
+    });
+
+    const adCategoryById = new Map(
+      adCategories.map((adCategory) => [adCategory.id, adCategory]),
+    );
+
+    const [ads, users] = await Promise.all([
+      this.prismaService.ad.findMany({
+        include: {
+          category: {
+            include: {
+              image: true,
+            },
+          },
+          seller: true,
+          images: {
+            include: {
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prismaService.user.findMany({
+        include: {
+          _count: {
+            select: {
+              ads: true,
+              orders: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+    ]);
+
     return {
-      categories: categories.map((category) =>
-        this.mapCategory(category, categoryById),
+      marketCategories: categories.map((category) =>
+        this.mapMarketCategory(category, categoryById),
       ),
       products: products.map((product) =>
         this.mapProduct(product, categoryById),
@@ -254,25 +331,32 @@ export class AdminService {
         this.mapCatalogCollection(collection, categoryById),
       ),
       orders: orders.map((order) => this.mapOrder(order)),
+      adCategories: adCategories.map((adCategory) =>
+        this.mapAdCategory(adCategory, adCategoryById),
+      ),
+      ads: ads.map((ad) => this.mapAd(ad, adCategoryById)),
+      users: users.map((user) => this.mapAdminUser(user)),
     };
   }
 
   async createCategory(body: unknown) {
     const payload = this.getObjectBody(body);
     const name = this.getRequiredString(payload.name, 'Category name is required');
+    const parentId = this.getOptionalString(payload.parentId);
     const slug = await this.getUniqueSlug({
-      entity: 'category',
+      entity: 'marketCategory',
       value: payload.slug,
       fallback: name,
     });
+    await this.assertValidMarketCategoryParent(parentId);
     const imageId = await this.createImageFromPayload(payload);
 
-    const category = await this.prismaService.category.create({
+    const category = await this.prismaService.marketCategory.create({
       data: {
         name,
         slug,
         description: this.getOptionalString(payload.description),
-        parentId: this.getOptionalString(payload.parentId),
+        parentId,
         imageId,
         sortOrder: this.getNumber(payload.sortOrder, 0),
         isActive: this.getBoolean(payload.isActive, true),
@@ -287,25 +371,27 @@ export class AdminService {
       },
     });
 
-    return this.mapCategory(category, new Map([[category.id, category]]));
+    return this.mapMarketCategory(category, new Map([[category.id, category]]));
   }
 
   async updateCategory(id: string, body: unknown) {
     const currentCategory = await this.getCategoryOrThrow(id);
     const payload = this.getObjectBody(body);
     const name = this.getRequiredString(payload.name, 'Category name is required');
+    const parentId = this.getOptionalString(payload.parentId);
     const slug = await this.getUniqueSlug({
-      entity: 'category',
+      entity: 'marketCategory',
       value: payload.slug,
       fallback: name,
       exceptId: id,
     });
+    await this.assertValidMarketCategoryParent(parentId, id);
     const imageId = await this.resolveImageFromPayload(
       payload,
       currentCategory.imageId,
     );
 
-    const category = await this.prismaService.category.update({
+    const category = await this.prismaService.marketCategory.update({
       where: {
         id,
       },
@@ -313,7 +399,7 @@ export class AdminService {
         name,
         slug,
         description: this.getOptionalString(payload.description),
-        parentId: this.getOptionalString(payload.parentId),
+        parentId,
         imageId,
         sortOrder: this.getNumber(payload.sortOrder, 0),
         isActive: this.getBoolean(payload.isActive, true),
@@ -328,7 +414,7 @@ export class AdminService {
       },
     });
 
-    const categories = await this.prismaService.category.findMany({
+    const categories = await this.prismaService.marketCategory.findMany({
       include: {
         image: true,
         _count: {
@@ -343,13 +429,13 @@ export class AdminService {
       categories.map((categoryItem) => [categoryItem.id, categoryItem]),
     );
 
-    return this.mapCategory(category, categoryById);
+    return this.mapMarketCategory(category, categoryById);
   }
 
   async deleteCategory(id: string) {
     await this.getCategoryOrThrow(id);
 
-    return this.prismaService.category.update({
+    return this.prismaService.marketCategory.update({
       where: {
         id,
       },
@@ -363,7 +449,7 @@ export class AdminService {
   async restoreCategory(id: string) {
     await this.getCategoryOrThrow(id);
 
-    return this.prismaService.category.update({
+    return this.prismaService.marketCategory.update({
       where: {
         id,
       },
@@ -378,7 +464,7 @@ export class AdminService {
     await this.getCategoryOrThrow(id);
     await this.assertCategoryCanBeHardDeleted(id);
 
-    return this.prismaService.category.delete({
+    return this.prismaService.marketCategory.delete({
       where: {
         id,
       },
@@ -697,7 +783,7 @@ export class AdminService {
   }
 
   private async getAdminProductById(id: string) {
-    const categories = await this.prismaService.category.findMany({
+    const categories = await this.prismaService.marketCategory.findMany({
       include: {
         image: true,
         _count: {
@@ -743,7 +829,7 @@ export class AdminService {
   }
 
   private async getCatalogCollectionById(id: string) {
-    const categories = await this.prismaService.category.findMany({
+    const categories = await this.prismaService.marketCategory.findMany({
       include: {
         image: true,
         _count: {
@@ -812,7 +898,7 @@ export class AdminService {
   }
 
   private async getCategoryOrThrow(id: string) {
-    const category = await this.prismaService.category.findUnique({
+    const category = await this.prismaService.marketCategory.findUnique({
       where: {
         id,
       },
@@ -823,6 +909,52 @@ export class AdminService {
     }
 
     return category;
+  }
+
+  private async assertValidMarketCategoryParent(
+    parentId?: string,
+    categoryId?: string,
+  ) {
+    if (!parentId) {
+      return;
+    }
+
+    if (parentId === categoryId) {
+      throw new BadRequestException('Category cannot be its own parent');
+    }
+
+    const visitedCategoryIds = new Set<string>();
+    let currentParentId: string | null | undefined = parentId;
+
+    while (currentParentId) {
+      if (visitedCategoryIds.has(currentParentId)) {
+        throw new BadRequestException('Category parent tree contains a cycle');
+      }
+
+      visitedCategoryIds.add(currentParentId);
+
+      const parentCategory = await this.prismaService.marketCategory.findUnique({
+        where: {
+          id: currentParentId,
+        },
+        select: {
+          id: true,
+          parentId: true,
+        },
+      });
+
+      if (!parentCategory) {
+        throw new NotFoundException('Parent category not found');
+      }
+
+      if (parentCategory.parentId === categoryId) {
+        throw new BadRequestException(
+          'Category cannot use its descendant as parent',
+        );
+      }
+
+      currentParentId = parentCategory.parentId;
+    }
   }
 
   private async getProductOrThrow(id: string) {
@@ -947,8 +1079,14 @@ export class AdminService {
   private getCategoryPath(category: any, categoryById: Map<string, any>) {
     const parts: string[] = [];
     let currentCategory = category;
+    const visitedCategoryIds = new Set<string>();
 
     while (currentCategory) {
+      if (visitedCategoryIds.has(currentCategory.id)) {
+        break;
+      }
+
+      visitedCategoryIds.add(currentCategory.id);
       parts.unshift(currentCategory.slug);
 
       if (!currentCategory.parentId) {
@@ -961,7 +1099,7 @@ export class AdminService {
     return parts.join('/');
   }
 
-  private mapCategory(category: any, categoryById: Map<string, any>) {
+  private mapMarketCategory(category: any, categoryById: Map<string, any>) {
     return {
       id: category.id,
       name: category.name,
@@ -982,7 +1120,7 @@ export class AdminService {
       id: product.id,
       categoryId: product.categoryId,
       category: product.category
-        ? this.mapCategory(product.category, categoryById)
+        ? this.mapMarketCategory(product.category, categoryById)
         : undefined,
       title: product.title,
       slug: product.slug,
@@ -1013,7 +1151,7 @@ export class AdminService {
       updatedAt: collection.updatedAt,
       categories: (collection.categories ?? []).map((item: any) => ({
         sortOrder: item.sortOrder,
-        category: this.mapCategory(item.category, categoryById),
+        category: this.mapMarketCategory(item.category, categoryById),
       })),
       products: (collection.products ?? []).map((item: any) => ({
         sortOrder: item.sortOrder,
@@ -1060,7 +1198,7 @@ export class AdminService {
       productsCount,
       collectionCategoriesCount,
     ] = await Promise.all([
-      this.prismaService.category.count({
+      this.prismaService.marketCategory.count({
         where: {
           parentId: id,
         },
@@ -1257,7 +1395,7 @@ export class AdminService {
   }
 
   private async getUniqueSlug(params: {
-    entity: 'category' | 'product' | 'collection';
+    entity: 'marketCategory' | 'product' | 'collection' | 'adCategory' | 'ad';
     value: unknown;
     fallback: string;
     exceptId?: string;
@@ -1278,12 +1416,12 @@ export class AdminService {
   }
 
   private async isSlugBusy(
-    entity: 'category' | 'product' | 'collection',
+    entity: 'marketCategory' | 'product' | 'collection' | 'adCategory' | 'ad',
     slug: string,
     exceptId?: string,
   ) {
-    if (entity === 'category') {
-      const category = await this.prismaService.category.findFirst({
+    if (entity === 'marketCategory') {
+      const category = await this.prismaService.marketCategory.findFirst({
         where: {
           slug,
           deletedAt: null,
@@ -1296,6 +1434,38 @@ export class AdminService {
       });
 
       return Boolean(category);
+    }
+
+    if (entity === 'adCategory') {
+      const adCategory = await this.prismaService.adCategory.findFirst({
+        where: {
+          slug,
+          deletedAt: null,
+          id: exceptId
+            ? {
+              not: exceptId,
+            }
+            : undefined,
+        },
+      });
+
+      return Boolean(adCategory);
+    }
+
+    if (entity === 'ad') {
+      const ad = await this.prismaService.ad.findFirst({
+        where: {
+          slug,
+          deletedAt: null,
+          id: exceptId
+            ? {
+              not: exceptId,
+            }
+            : undefined,
+        },
+      });
+
+      return Boolean(ad);
     }
 
     if (entity === 'product') {
@@ -1341,5 +1511,567 @@ export class AdminService {
         .replace(/(^-|-$)+/g, '') || 'item'
     );
   }
-}
 
+  // ===== Ad categories =====
+
+  async createAdCategory(body: unknown) {
+    const payload = this.getObjectBody(body);
+    const name = this.getRequiredString(
+      payload.name,
+      'Ad category name is required',
+    );
+    const parentId = this.getOptionalString(payload.parentId);
+    const slug = await this.getUniqueSlug({
+      entity: 'adCategory',
+      value: payload.slug,
+      fallback: name,
+    });
+    await this.assertValidAdCategoryParent(parentId);
+    const imageId = await this.createImageFromPayload(payload);
+
+    const adCategory = await this.prismaService.adCategory.create({
+      data: {
+        name,
+        slug,
+        description: this.getOptionalString(payload.description),
+        parentId,
+        imageId,
+        sortOrder: this.getNumber(payload.sortOrder, 0),
+        isActive: this.getBoolean(payload.isActive, true),
+      },
+      include: {
+        image: true,
+        _count: {
+          select: {
+            ads: true,
+          },
+        },
+      },
+    });
+
+    return this.mapAdCategory(adCategory, new Map([[adCategory.id, adCategory]]));
+  }
+
+  async updateAdCategory(id: string, body: unknown) {
+    const currentAdCategory = await this.getAdCategoryOrThrow(id);
+    const payload = this.getObjectBody(body);
+    const name = this.getRequiredString(
+      payload.name,
+      'Ad category name is required',
+    );
+    const parentId = this.getOptionalString(payload.parentId);
+    const slug = await this.getUniqueSlug({
+      entity: 'adCategory',
+      value: payload.slug,
+      fallback: name,
+      exceptId: id,
+    });
+    await this.assertValidAdCategoryParent(parentId, id);
+    const imageId = await this.resolveImageFromPayload(
+      payload,
+      currentAdCategory.imageId,
+    );
+
+    const adCategory = await this.prismaService.adCategory.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        slug,
+        description: this.getOptionalString(payload.description),
+        parentId,
+        imageId,
+        sortOrder: this.getNumber(payload.sortOrder, 0),
+        isActive: this.getBoolean(payload.isActive, true),
+      },
+      include: {
+        image: true,
+        _count: {
+          select: {
+            ads: true,
+          },
+        },
+      },
+    });
+
+    const adCategories = await this.prismaService.adCategory.findMany({
+      include: {
+        image: true,
+        _count: {
+          select: {
+            ads: true,
+          },
+        },
+      },
+    });
+
+    const adCategoryById = new Map(
+      adCategories.map((adCategoryItem) => [adCategoryItem.id, adCategoryItem]),
+    );
+
+    return this.mapAdCategory(adCategory, adCategoryById);
+  }
+
+  async deleteAdCategory(id: string) {
+    await this.getAdCategoryOrThrow(id);
+
+    return this.prismaService.adCategory.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+        deletedAt: new Date(),
+      },
+    });
+  }
+
+  async restoreAdCategory(id: string) {
+    await this.getAdCategoryOrThrow(id);
+
+    return this.prismaService.adCategory.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: true,
+        deletedAt: null,
+      },
+    });
+  }
+
+  async hardDeleteAdCategory(id: string) {
+    await this.getAdCategoryOrThrow(id);
+    await this.assertAdCategoryCanBeHardDeleted(id);
+
+    return this.prismaService.adCategory.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  // ===== Ads (moderation & management) =====
+
+  async updateAd(id: string, body: unknown) {
+    await this.getAdOrThrow(id);
+
+    const payload = this.getObjectBody(body);
+    const title = this.getRequiredString(payload.title, 'Ad title is required');
+    const categoryId = this.getRequiredString(
+      payload.categoryId,
+      'Ad category is required',
+    );
+
+    await this.getAdCategoryOrThrow(categoryId);
+
+    const slug = await this.getUniqueSlug({
+      entity: 'ad',
+      value: payload.slug,
+      fallback: title,
+      exceptId: id,
+    });
+
+    const status = this.getAdStatus(payload.status);
+
+    await this.prismaService.ad.update({
+      where: {
+        id,
+      },
+      data: {
+        title,
+        slug,
+        categoryId,
+        description: this.getOptionalString(payload.description) ?? '',
+        price: this.getNumber(payload.price, 0),
+        status,
+        moderatedAt: new Date(),
+        isActive: this.getBoolean(payload.isActive, true),
+      },
+    });
+
+    if ('imageUrls' in payload) {
+      await this.replaceAdImages(id, this.getImageUrls(payload));
+    }
+
+    return this.getAdminAdById(id);
+  }
+
+  async deleteAd(id: string) {
+    await this.getAdOrThrow(id);
+
+    return this.prismaService.ad.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+        status: AdStatus.ARCHIVED,
+        deletedAt: new Date(),
+      },
+    });
+  }
+
+  async restoreAd(id: string) {
+    await this.getAdOrThrow(id);
+
+    return this.prismaService.ad.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: true,
+        status: AdStatus.PUBLISHED,
+        moderatedAt: new Date(),
+        deletedAt: null,
+      },
+    });
+  }
+
+  async hardDeleteAd(id: string) {
+    await this.getAdOrThrow(id);
+
+    return this.prismaService.$transaction(async (transaction) => {
+      await transaction.adImage.deleteMany({
+        where: {
+          adId: id,
+        },
+      });
+
+      return transaction.ad.delete({
+        where: {
+          id,
+        },
+      });
+    });
+  }
+
+  // ===== Users =====
+
+  async updateUserRole(id: string, body: unknown) {
+    await this.getUserOrThrow(id);
+
+    const payload = this.getObjectBody(body);
+
+    if (
+      typeof payload.role !== 'string' ||
+      !Object.values(UserRole).includes(payload.role as UserRole)
+    ) {
+      throw new BadRequestException('Invalid user role');
+    }
+
+    await this.prismaService.user.update({
+      where: {
+        id,
+      },
+      data: {
+        role: payload.role as UserRole,
+      },
+    });
+
+    return this.getAdminUserById(id);
+  }
+
+  async deleteUser(id: string) {
+    await this.getUserOrThrow(id);
+
+    await this.usersService.softDeleteById(id);
+
+    return this.getAdminUserById(id);
+  }
+
+  // ===== Ads helpers =====
+
+  private async getAdminAdById(id: string) {
+    const adCategories = await this.prismaService.adCategory.findMany({
+      include: {
+        image: true,
+        _count: {
+          select: {
+            ads: true,
+          },
+        },
+      },
+    });
+
+    const adCategoryById = new Map(
+      adCategories.map((adCategoryItem) => [adCategoryItem.id, adCategoryItem]),
+    );
+
+    const ad = await this.prismaService.ad.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        category: {
+          include: {
+            image: true,
+          },
+        },
+        seller: true,
+        images: {
+          include: {
+            image: true,
+          },
+        },
+      },
+    });
+
+    if (!ad) {
+      throw new NotFoundException('Ad not found');
+    }
+
+    return this.mapAd(ad, adCategoryById);
+  }
+
+  private async getAdminUserById(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        _count: {
+          select: {
+            ads: true,
+            orders: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.mapAdminUser(user);
+  }
+
+  private async getAdCategoryOrThrow(id: string) {
+    const adCategory = await this.prismaService.adCategory.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!adCategory) {
+      throw new NotFoundException('Ad category not found');
+    }
+
+    return adCategory;
+  }
+
+  private async assertValidAdCategoryParent(
+    parentId?: string,
+    categoryId?: string,
+  ) {
+    if (!parentId) {
+      return;
+    }
+
+    if (parentId === categoryId) {
+      throw new BadRequestException('Ad category cannot be its own parent');
+    }
+
+    const visitedCategoryIds = new Set<string>();
+    let currentParentId: string | null | undefined = parentId;
+
+    while (currentParentId) {
+      if (visitedCategoryIds.has(currentParentId)) {
+        throw new BadRequestException(
+          'Ad category parent tree contains a cycle',
+        );
+      }
+
+      visitedCategoryIds.add(currentParentId);
+
+      const parentCategory = await this.prismaService.adCategory.findUnique({
+        where: {
+          id: currentParentId,
+        },
+        select: {
+          id: true,
+          parentId: true,
+        },
+      });
+
+      if (!parentCategory) {
+        throw new NotFoundException('Parent ad category not found');
+      }
+
+      if (parentCategory.parentId === categoryId) {
+        throw new BadRequestException(
+          'Ad category cannot use its descendant as parent',
+        );
+      }
+
+      currentParentId = parentCategory.parentId;
+    }
+  }
+
+  private async getAdOrThrow(id: string) {
+    const ad = await this.prismaService.ad.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!ad) {
+      throw new NotFoundException('Ad not found');
+    }
+
+    return ad;
+  }
+
+  private async getUserOrThrow(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  private async replaceAdImages(adId: string, imageUrls: string[]) {
+    await this.prismaService.adImage.deleteMany({
+      where: {
+        adId,
+      },
+    });
+
+    await Promise.all(
+      imageUrls.map(async (url, index) => {
+        const image = await this.prismaService.image.create({
+          data: {
+            url,
+            sortOrder: index,
+          },
+        });
+
+        return this.prismaService.adImage.create({
+          data: {
+            adId,
+            imageId: image.id,
+          },
+        });
+      }),
+    );
+  }
+
+  private async assertAdCategoryCanBeHardDeleted(id: string) {
+    const [childrenCount, adsCount] = await Promise.all([
+      this.prismaService.adCategory.count({
+        where: {
+          parentId: id,
+        },
+      }),
+      this.prismaService.ad.count({
+        where: {
+          categoryId: id,
+        },
+      }),
+    ]);
+
+    const blockers: string[] = [];
+
+    if (childrenCount > 0) {
+      blockers.push('есть дочерние категории');
+    }
+
+    if (adsCount > 0) {
+      blockers.push('есть связанные объявления');
+    }
+
+    if (blockers.length) {
+      throw new BadRequestException(
+        `Категорию объявлений нельзя удалить навсегда: ${blockers.join(', ')}.`,
+      );
+    }
+  }
+
+  private getAdStatus(value: unknown): AdStatus {
+    if (
+      typeof value === 'string' &&
+      Object.values(AdStatus).includes(value as AdStatus)
+    ) {
+      return value as AdStatus;
+    }
+
+    return AdStatus.PUBLISHED;
+  }
+
+  private mapAdCategory(adCategory: any, adCategoryById: Map<string, any>) {
+    return {
+      id: adCategory.id,
+      name: adCategory.name,
+      slug: adCategory.slug,
+      path: this.getCategoryPath(adCategory, adCategoryById),
+      sortOrder: adCategory.sortOrder,
+      description: adCategory.description ?? undefined,
+      parentId: adCategory.parentId ?? undefined,
+      image: adCategory.image ?? undefined,
+      isActive: adCategory.isActive,
+      deletedAt: adCategory.deletedAt,
+      adsCount: adCategory._count?.ads ?? 0,
+    };
+  }
+
+  private mapAd(ad: any, adCategoryById: Map<string, any>) {
+    return {
+      id: ad.id,
+      categoryId: ad.categoryId,
+      category: ad.category
+        ? this.mapAdCategory(ad.category, adCategoryById)
+        : undefined,
+      seller: ad.seller
+        ? {
+            id: ad.seller.id,
+            firstName: ad.seller.firstName,
+            lastName: ad.seller.lastName,
+            email: ad.seller.email,
+            phone: ad.seller.phone ?? undefined,
+          }
+        : undefined,
+      title: ad.title,
+      slug: ad.slug,
+      description: ad.description,
+      price: ad.price,
+      status: ad.status,
+      moderatedAt: ad.moderatedAt,
+      isActive: ad.isActive,
+      deletedAt: ad.deletedAt,
+      createdAt: ad.createdAt,
+      updatedAt: ad.updatedAt,
+      images: (ad.images ?? [])
+        .map((adImage: any) => adImage.image)
+        .sort(
+          (firstImage: any, secondImage: any) =>
+            firstImage.sortOrder - secondImage.sortOrder,
+        ),
+    };
+  }
+
+  private mapAdminUser(user: any) {
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      phone: user.phone ?? undefined,
+      referralCode: user.referralCode ?? undefined,
+      isActive: user.deletedAt === null,
+      deletedAt: user.deletedAt,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      adsCount: user._count?.ads ?? 0,
+      ordersCount: user._count?.orders ?? 0,
+    };
+  }
+
+}

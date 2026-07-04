@@ -105,7 +105,7 @@ let ProductsService = class ProductsService {
         return this.mapProduct(product, categoryById);
     }
     getActiveCategories() {
-        return this.prismaService.category.findMany({
+        return this.prismaService.marketCategory.findMany({
             where: ACTIVE_CATEGORY_WHERE,
             include: {
                 image: true,

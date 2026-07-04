@@ -28,7 +28,8 @@ export function AdminRecordActions({
   onDelete,
   onHardDelete,
 }: AdminRecordActionsProps) {
-  const canRestore = canRestoreAdminRecord(record);
+  const isUsersTab = activeTabId === 'users';
+  const canRestore = !isUsersTab && canRestoreAdminRecord(record);
   const canSoftDelete = activeTabId !== 'orders' && !canRestore;
 
   const editLabel =
@@ -67,7 +68,7 @@ export function AdminRecordActions({
         <Pencil className="size-3.5" strokeWidth={1.5} />
       </Button>
 
-      {activeTabId !== 'orders' && canRestore && (
+      {activeTabId !== 'orders' && !isUsersTab && canRestore && (
         <Button
           type="button"
           variant="outline"
@@ -93,16 +94,18 @@ export function AdminRecordActions({
         </Button>
       )}
 
-      <Button
-        type="button"
-        variant="destructive"
-        size="icon-sm"
-        aria-label="Удалить навсегда"
-        title="Удалить навсегда"
-        onClick={handleHardDelete}
-      >
-        <Trash2 className="size-3.5" strokeWidth={1.5} />
-      </Button>
+      {!isUsersTab && (
+        <Button
+          type="button"
+          variant="destructive"
+          size="icon-sm"
+          aria-label="Удалить навсегда"
+          title="Удалить навсегда"
+          onClick={handleHardDelete}
+        >
+          <Trash2 className="size-3.5" strokeWidth={1.5} />
+        </Button>
+      )}
     </div>
   );
 }

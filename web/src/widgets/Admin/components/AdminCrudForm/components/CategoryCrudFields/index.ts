@@ -1,1 +1,0 @@
-export { CategoryCrudFields } from './CategoryCrudFields';

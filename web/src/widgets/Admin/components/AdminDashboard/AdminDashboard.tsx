@@ -48,14 +48,46 @@ export function AdminDashboard({
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Сводки</h2>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <AdminOverviewCard
             label="Пользователи"
             value={getOverviewValue(overview?.usersCount, isOverviewPending)}
             description="Активные зарегистрированные пользователи."
+          />
+          <AdminOverviewCard
+            label="Категории маркета"
+            value={getOverviewValue(
+              overview?.marketCategoriesCount,
+              isOverviewPending,
+            )}
+            description="Активные категории каталога маркета."
+          />
+          <AdminOverviewCard
+            label="Товары маркета"
+            value={getOverviewValue(overview?.productsCount, isOverviewPending)}
+            description="Активные товары маркета."
+          />
+          <AdminOverviewCard
+            label="Заказы"
+            value={getOverviewValue(overview?.ordersCount, isOverviewPending)}
+            description="Всего оформленных заказов."
+          />
+          <AdminOverviewCard
+            label="Категории объявлений"
+            value={getOverviewValue(
+              overview?.adCategoriesCount,
+              isOverviewPending,
+            )}
+            description="Активные категории доски объявлений."
+          />
+          <AdminOverviewCard
+            label="Объявления"
+            value={getOverviewValue(overview?.adsCount, isOverviewPending)}
+            description="Активные объявления пользователей."
           />
         </div>
       </section>
     </div>
   );
 }
+

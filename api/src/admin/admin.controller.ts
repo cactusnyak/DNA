@@ -151,5 +151,59 @@ export class AdminController {
   hardDeleteOrder(@Param('id') id: string) {
     return this.adminService.hardDeleteOrder(id);
   }
-}
 
+  @Post('ad-categories')
+  createAdCategory(@Body() body: unknown) {
+    return this.adminService.createAdCategory(body);
+  }
+
+  @Patch('ad-categories/:id')
+  updateAdCategory(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateAdCategory(id, body);
+  }
+
+  @Delete('ad-categories/:id')
+  deleteAdCategory(@Param('id') id: string) {
+    return this.adminService.deleteAdCategory(id);
+  }
+
+  @Delete('ad-categories/:id/permanent')
+  hardDeleteAdCategory(@Param('id') id: string) {
+    return this.adminService.hardDeleteAdCategory(id);
+  }
+
+  @Patch('ad-categories/:id/restore')
+  restoreAdCategory(@Param('id') id: string) {
+    return this.adminService.restoreAdCategory(id);
+  }
+
+  @Patch('ads/:id')
+  updateAd(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateAd(id, body);
+  }
+
+  @Delete('ads/:id')
+  deleteAd(@Param('id') id: string) {
+    return this.adminService.deleteAd(id);
+  }
+
+  @Delete('ads/:id/permanent')
+  hardDeleteAd(@Param('id') id: string) {
+    return this.adminService.hardDeleteAd(id);
+  }
+
+  @Patch('ads/:id/restore')
+  restoreAd(@Param('id') id: string) {
+    return this.adminService.restoreAd(id);
+  }
+
+  @Patch('users/:id/role')
+  updateUserRole(@Param('id') id: string, @Body() body: unknown) {
+    return this.adminService.updateUserRole(id, body);
+  }
+
+  @Delete('users/:id')
+  deleteUser(@Param('id') id: string) {
+    return this.adminService.deleteUser(id);
+  }
+}

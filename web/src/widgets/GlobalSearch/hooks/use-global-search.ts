@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { getCategories } from '@/entities/category/api/get-categories';
+import { getCatalogCategories } from '@/shared/catalog';
 import { getProducts } from '@/entities/product/api/get-products';
 import {
   PLATFORM_SECTION,
@@ -49,7 +49,7 @@ export function useGlobalSearch({
     isError: isCategoriesError,
   } = useQuery({
     queryKey: ['global-search-categories', section],
-    queryFn: () => getCategories({ section }),
+    queryFn: () => getCatalogCategories({ section }),
     enabled: isScopedSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
@@ -175,3 +175,4 @@ export function useGlobalSearch({
     handleProductResultsScroll,
   };
 }
+

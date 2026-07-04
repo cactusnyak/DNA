@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { getCategories } from '@/entities/category/api/get-categories';
+import { getCatalogCategories } from '@/shared/catalog';
 import { getProducts } from '@/entities/product/api/get-products';
 import {
   PLATFORM_SECTION,
@@ -28,7 +28,7 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
     error: categoriesError,
   } = useQuery({
     queryKey: ['categories', section],
-    queryFn: () => getCategories({ section }),
+    queryFn: () => getCatalogCategories({ section }),
   });
 
   const activeCategory = categories?.find(
@@ -96,3 +96,4 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
     </div>
   );
 }
+

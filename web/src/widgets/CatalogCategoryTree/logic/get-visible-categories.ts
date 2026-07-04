@@ -1,7 +1,7 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 
 export function getVisibleCategories(
-  categories: Category[],
+  categories: CatalogCategory[],
   searchValue: string,
 ) {
   const normalizedSearchValue = searchValue.trim().toLowerCase();
@@ -14,3 +14,4 @@ export function getVisibleCategories(
     category.name.toLowerCase().includes(normalizedSearchValue),
   );
 }
+

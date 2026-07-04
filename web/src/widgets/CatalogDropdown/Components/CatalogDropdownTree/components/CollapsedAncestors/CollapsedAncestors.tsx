@@ -1,8 +1,8 @@
 import { ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import type { Category } from '@/entities/category';
-import { getCategoryHref } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryHref } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
   type PlatformSectionId,
@@ -10,8 +10,8 @@ import {
 
 type CollapsedAncestorsProps = {
   section: PlatformSectionId;
-  categories: Category[];
-  activeCategoryPath: Category[];
+  categories: CatalogCategory[];
+  activeCategoryPath: CatalogCategory[];
   hiddenLevelsCount: number;
   onActiveCategoryChange: (categorySlug?: string) => void;
   onCategoryClick?: () => void;
@@ -63,3 +63,4 @@ export function CollapsedAncestors({
     </div>
   );
 }
+

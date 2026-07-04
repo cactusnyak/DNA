@@ -9,12 +9,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const admin_module_1 = require("./admin/admin.module");
+const ad_categories_module_1 = require("./ad-categories/ad-categories.module");
 const ads_module_1 = require("./ads/ads.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
 const catalog_collections_module_1 = require("./catalog-collections/catalog-collections.module");
-const categories_module_1 = require("./categories/categories.module");
+const market_categories_module_1 = require("./market-categories/market-categories.module");
 const market_module_1 = require("./market/market.module");
 const orders_module_1 = require("./orders/orders.module");
 const prisma_module_1 = require("./prisma/prisma.module");
@@ -29,9 +30,10 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             products_module_1.ProductsModule,
-            categories_module_1.CategoriesModule,
+            market_categories_module_1.MarketCategoriesModule,
             catalog_collections_module_1.CatalogCollectionsModule,
             market_module_1.MarketModule,
+            ad_categories_module_1.AdCategoriesModule,
             ads_module_1.AdsModule,
             orders_module_1.OrdersModule,
             users_module_1.UsersModule,

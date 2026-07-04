@@ -32,14 +32,22 @@ enum CatalogCollectionType {
   PRODUCT
 }
 
+enum AdStatus {
+  DRAFT
+  PENDING_MODERATION
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
 model User {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   email     String
   firstName String
   lastName  String
-  role      UserRole @default(DEFAULT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      UserRole  @default(DEFAULT)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   passwordHash String?
@@ -53,6 +61,7 @@ model User {
 
   cartItems CartItem[]
   orders    Order[]
+  ads       Ad[]
 
   invitedReferrals Referral[] @relation("Inviter")
   receivedReferral Referral?  @relation("Invited")
@@ -74,12 +83,14 @@ model Image {
   sortOrder Int
   alt       String?
 
-  userAvatars User[]         @relation("UserAvatar")
-  categories  Category[]
-  products    ProductImage[]
+  userAvatars  User[]           @relation("UserAvatar")
+  categories   MarketCategory[]
+  adCategories AdCategory[]
+  products     ProductImage[]
+  ads          AdImage[]
 }
 
-model Category {
+model MarketCategory {
   id        String @id @default(uuid())
   name      String
   slug      String
@@ -89,16 +100,18 @@ model Category {
   parentId    String?
   imageId     String?
 
-  isActive Boolean   @default(true)
+  isActive  Boolean   @default(true)
   deletedAt DateTime?
 
-  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children Category[] @relation("CategoryTree")
+  parent   MarketCategory?  @relation("MarketCategoryTree", fields: [parentId], references: [id])
+  children MarketCategory[] @relation("MarketCategoryTree")
 
   image    Image?    @relation(fields: [imageId], references: [id])
   products Product[]
 
   collectionCategories CatalogCollectionCategory[]
+
+  @@map("Category")
 }
 
 model Product {
@@ -109,19 +122,71 @@ model Product {
   description String
   price       Int
 
-  isActive Boolean   @default(true)
+  isActive  Boolean   @default(true)
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category Category       @relation(fields: [categoryId], references: [id])
+  category MarketCategory @relation(fields: [categoryId], references: [id])
   images   ProductImage[]
 
   cartItems  CartItem[]
   orderItems OrderItem[]
 
   collectionProducts CatalogCollectionProduct[]
+}
+
+model AdCategory {
+  id        String @id @default(uuid())
+  name      String
+  slug      String
+  sortOrder Int
+
+  description String?
+  parentId    String?
+  imageId     String?
+
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+
+  parent   AdCategory?  @relation("AdCategoryTree", fields: [parentId], references: [id])
+  children AdCategory[] @relation("AdCategoryTree")
+
+  image Image? @relation(fields: [imageId], references: [id])
+  ads   Ad[]
+}
+
+model Ad {
+  id          String   @id @default(uuid())
+  categoryId  String
+  sellerId    String
+  title       String
+  slug        String
+  description String
+  price       Int
+  status      AdStatus @default(PENDING_MODERATION)
+
+  isActive    Boolean   @default(true)
+  deletedAt   DateTime?
+  moderatedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category AdCategory @relation(fields: [categoryId], references: [id])
+  seller   User       @relation(fields: [sellerId], references: [id])
+  images   AdImage[]
+}
+
+model AdImage {
+  adId    String
+  imageId String
+
+  ad    Ad    @relation(fields: [adId], references: [id])
+  image Image @relation(fields: [imageId], references: [id])
+
+  @@id([adId, imageId])
 }
 
 model ProductImage {
@@ -237,7 +302,7 @@ model CatalogCollectionCategory {
   sortOrder    Int    @default(0)
 
   collection CatalogCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   MarketCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([collectionId, categoryId])
 }

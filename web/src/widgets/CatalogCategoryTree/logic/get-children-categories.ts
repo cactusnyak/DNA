@@ -1,8 +1,9 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 
 export function getChildrenCategories(
-  categories: Category[],
+  categories: CatalogCategory[],
   parentId?: string,
 ) {
   return categories.filter((category) => category.parentId === parentId);
 }
+

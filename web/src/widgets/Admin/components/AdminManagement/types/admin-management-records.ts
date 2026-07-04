@@ -1,21 +1,30 @@
 import type {
+  AdminAd,
+  AdminAdCategory,
   AdminCatalogCollection,
-  AdminCategory,
+  AdminMarketCategory,
   AdminProduct,
+  AdminUser,
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
 
 export type EditableRecord =
-  | AdminCategory
+  | AdminMarketCategory
   | AdminProduct
   | AdminCatalogCollection
-  | Order;
+  | Order
+  | AdminAdCategory
+  | AdminAd
+  | AdminUser;
 
 export type AdminCatalogData = {
-  categories: AdminCategory[];
+  marketCategories: AdminMarketCategory[];
   products: AdminProduct[];
   collections: AdminCatalogCollection[];
   orders: Order[];
+  adCategories: AdminAdCategory[];
+  ads: AdminAd[];
+  users: AdminUser[];
 };
 
 export type FilteredAdminRecords = AdminCatalogData;

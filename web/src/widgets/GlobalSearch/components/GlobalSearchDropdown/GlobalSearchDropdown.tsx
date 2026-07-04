@@ -1,6 +1,6 @@
 import type { UIEvent } from 'react';
 
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { Product } from '@/entities/product';
 import {
   getPlatformSection,
@@ -18,8 +18,8 @@ type GlobalSearchDropdownProps = {
 
   sections: GlobalSearchSection[];
 
-  categories: Category[];
-  allCategories: Category[];
+  categories: CatalogCategory[];
+  allCategories: CatalogCategory[];
   isCategoriesPending?: boolean;
   isCategoriesError?: boolean;
 
@@ -110,3 +110,4 @@ export function GlobalSearchDropdown({
     </div>
   );
 }
+

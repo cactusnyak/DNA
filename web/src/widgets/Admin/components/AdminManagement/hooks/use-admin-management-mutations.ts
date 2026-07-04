@@ -1,29 +1,43 @@
 import { useMutation } from '@tanstack/react-query';
 
 import {
+  createAdminAdCategory,
   createAdminCatalogCollection,
-  createAdminCategory,
+  createAdminMarketCategory,
   createAdminProduct,
+  deleteAdminAd,
+  deleteAdminAdCategory,
   deleteAdminCatalogCollection,
-  deleteAdminCategory,
+  deleteAdminMarketCategory,
   deleteAdminProduct,
+  deleteAdminUser,
+  hardDeleteAdminAd,
+  hardDeleteAdminAdCategory,
   hardDeleteAdminCatalogCollection,
-  hardDeleteAdminCategory,
+  hardDeleteAdminMarketCategory,
   hardDeleteAdminOrder,
   hardDeleteAdminProduct,
+  restoreAdminAd,
+  restoreAdminAdCategory,
   restoreAdminCatalogCollection,
-  restoreAdminCategory,
+  restoreAdminMarketCategory,
   restoreAdminProduct,
+  updateAdminAd,
+  updateAdminAdCategory,
   updateAdminCatalogCollection,
   updateAdminCatalogCollectionCategories,
   updateAdminCatalogCollectionProducts,
-  updateAdminCategory,
+  updateAdminMarketCategory,
   updateAdminOrderStatus,
   updateAdminProduct,
+  updateAdminUserRole,
+  type AdminAdCategoryPayload,
+  type AdminAdPayload,
   type AdminCatalogCollection,
   type AdminCatalogCollectionPayload,
-  type AdminCategoryPayload,
+  type AdminMarketCategoryPayload,
   type AdminProductPayload,
+  type AdminUserRolePayload,
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
 
@@ -36,33 +50,35 @@ export function useAdminManagementMutations({
   accessToken,
   onSuccess,
 }: UseAdminManagementMutationsParams) {
-  const createCategoryMutation = useMutation({
-    mutationFn: (payload: AdminCategoryPayload) =>
-      createAdminCategory(accessToken, payload),
+  // ===== Market categories =====
+  const createMarketCategoryMutation = useMutation({
+    mutationFn: (payload: AdminMarketCategoryPayload) =>
+      createAdminMarketCategory(accessToken, payload),
     onSuccess,
   });
 
-  const updateCategoryMutation = useMutation({
-    mutationFn: (params: { id: string; payload: AdminCategoryPayload }) =>
-      updateAdminCategory(accessToken, params.id, params.payload),
+  const updateMarketCategoryMutation = useMutation({
+    mutationFn: (params: { id: string; payload: AdminMarketCategoryPayload }) =>
+      updateAdminMarketCategory(accessToken, params.id, params.payload),
     onSuccess,
   });
 
-  const deleteCategoryMutation = useMutation({
-    mutationFn: (id: string) => deleteAdminCategory(accessToken, id),
+  const deleteMarketCategoryMutation = useMutation({
+    mutationFn: (id: string) => deleteAdminMarketCategory(accessToken, id),
     onSuccess,
   });
 
-  const restoreCategoryMutation = useMutation({
-    mutationFn: (id: string) => restoreAdminCategory(accessToken, id),
+  const restoreMarketCategoryMutation = useMutation({
+    mutationFn: (id: string) => restoreAdminMarketCategory(accessToken, id),
     onSuccess,
   });
 
-  const hardDeleteCategoryMutation = useMutation({
-    mutationFn: (id: string) => hardDeleteAdminCategory(accessToken, id),
+  const hardDeleteMarketCategoryMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminMarketCategory(accessToken, id),
     onSuccess,
   });
 
+  // ===== Market products =====
   const createProductMutation = useMutation({
     mutationFn: (payload: AdminProductPayload) =>
       createAdminProduct(accessToken, payload),
@@ -90,6 +106,7 @@ export function useAdminManagementMutations({
     onSuccess,
   });
 
+  // ===== Collections =====
   const createCollectionMutation = useMutation({
     mutationFn: (payload: AdminCatalogCollectionPayload) =>
       createAdminCatalogCollection(accessToken, payload),
@@ -139,6 +156,7 @@ export function useAdminManagementMutations({
     onSuccess,
   });
 
+  // ===== Orders =====
   const updateOrderStatusMutation = useMutation({
     mutationFn: (params: { order: Order; status: Order['status'] }) =>
       updateAdminOrderStatus(accessToken, params.order.id, params.status),
@@ -150,12 +168,74 @@ export function useAdminManagementMutations({
     onSuccess,
   });
 
+  // ===== Ad categories =====
+  const createAdCategoryMutation = useMutation({
+    mutationFn: (payload: AdminAdCategoryPayload) =>
+      createAdminAdCategory(accessToken, payload),
+    onSuccess,
+  });
+
+  const updateAdCategoryMutation = useMutation({
+    mutationFn: (params: { id: string; payload: AdminAdCategoryPayload }) =>
+      updateAdminAdCategory(accessToken, params.id, params.payload),
+    onSuccess,
+  });
+
+  const deleteAdCategoryMutation = useMutation({
+    mutationFn: (id: string) => deleteAdminAdCategory(accessToken, id),
+    onSuccess,
+  });
+
+  const restoreAdCategoryMutation = useMutation({
+    mutationFn: (id: string) => restoreAdminAdCategory(accessToken, id),
+    onSuccess,
+  });
+
+  const hardDeleteAdCategoryMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminAdCategory(accessToken, id),
+    onSuccess,
+  });
+
+  // ===== Ads =====
+  const updateAdMutation = useMutation({
+    mutationFn: (params: { id: string; payload: AdminAdPayload }) =>
+      updateAdminAd(accessToken, params.id, params.payload),
+    onSuccess,
+  });
+
+  const deleteAdMutation = useMutation({
+    mutationFn: (id: string) => deleteAdminAd(accessToken, id),
+    onSuccess,
+  });
+
+  const restoreAdMutation = useMutation({
+    mutationFn: (id: string) => restoreAdminAd(accessToken, id),
+    onSuccess,
+  });
+
+  const hardDeleteAdMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminAd(accessToken, id),
+    onSuccess,
+  });
+
+  // ===== Users =====
+  const updateUserRoleMutation = useMutation({
+    mutationFn: (params: { id: string; payload: AdminUserRolePayload }) =>
+      updateAdminUserRole(accessToken, params.id, params.payload),
+    onSuccess,
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (id: string) => deleteAdminUser(accessToken, id),
+    onSuccess,
+  });
+
   return {
-    createCategoryMutation,
-    updateCategoryMutation,
-    deleteCategoryMutation,
-    restoreCategoryMutation,
-    hardDeleteCategoryMutation,
+    createMarketCategoryMutation,
+    updateMarketCategoryMutation,
+    deleteMarketCategoryMutation,
+    restoreMarketCategoryMutation,
+    hardDeleteMarketCategoryMutation,
     createProductMutation,
     updateProductMutation,
     deleteProductMutation,
@@ -169,14 +249,28 @@ export function useAdminManagementMutations({
     updateCollectionItemsMutation,
     updateOrderStatusMutation,
     hardDeleteOrderMutation,
+    createAdCategoryMutation,
+    updateAdCategoryMutation,
+    deleteAdCategoryMutation,
+    restoreAdCategoryMutation,
+    hardDeleteAdCategoryMutation,
+    updateAdMutation,
+    deleteAdMutation,
+    restoreAdMutation,
+    hardDeleteAdMutation,
+    updateUserRoleMutation,
+    deleteUserMutation,
     isCrudFormPending:
-      createCategoryMutation.isPending ||
-      updateCategoryMutation.isPending ||
+      createMarketCategoryMutation.isPending ||
+      updateMarketCategoryMutation.isPending ||
       createProductMutation.isPending ||
       updateProductMutation.isPending ||
       createCollectionMutation.isPending ||
       updateCollectionMutation.isPending ||
-      updateOrderStatusMutation.isPending,
+      updateOrderStatusMutation.isPending ||
+      createAdCategoryMutation.isPending ||
+      updateAdCategoryMutation.isPending ||
+      updateAdMutation.isPending ||
+      updateUserRoleMutation.isPending,
   };
 }
-

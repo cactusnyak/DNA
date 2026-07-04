@@ -1,4 +1,4 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { Product } from '@/entities/product';
 
 export type GlobalSearchSection = {
@@ -9,6 +9,6 @@ export type GlobalSearchSection = {
   keywords: string[];
 };
 
-export type GlobalSearchCategory = Category;
+export type GlobalSearchCategory = CatalogCategory;
 
 export type GlobalSearchProduct = Product;

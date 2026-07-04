@@ -6,13 +6,16 @@ import {
 } from 'react';
 
 import { FormToggleField } from '@/components/ui/FormField';
-import type { AdminCategory } from '@/entities/admin';
+import type { AdminAdCategory, AdminMarketCategory } from '@/entities/admin';
 
+import { AdCategoryCrudFields } from './components/AdCategoryCrudFields';
+import { AdCrudFields } from './components/AdCrudFields';
 import { AdminCrudFormActions } from './components/AdminCrudFormActions';
-import { CategoryCrudFields } from './components/CategoryCrudFields';
 import { CollectionCrudFields } from './components/CollectionCrudFields';
+import { MarketCategoryCrudFields } from './components/MarketCategoryCrudFields';
 import { OrderStatusCrudFields } from './components/OrderStatusCrudFields';
 import { ProductCrudFields } from './components/ProductCrudFields';
+import { UserCrudFields } from './components/UserCrudFields';
 import { buildAdminCrudPayload } from './logic/build-admin-crud-payload';
 import { getAdminCrudInitialValues } from './logic/get-admin-crud-initial-values';
 import type {
@@ -27,17 +30,21 @@ import type { AdminManagementTabId } from '../../types/admin-management';
 type AdminCrudFormProps = {
   tabId: AdminManagementTabId;
   record?: AdminCrudRecord;
-  categories: AdminCategory[];
+  categories: AdminMarketCategory[];
+  adCategories: AdminAdCategory[];
   isPending?: boolean;
   onUploadImage: AdminImageUploader;
   onSubmit: (payload: AdminCrudPayload) => void | Promise<void>;
   onCancel: () => void;
 };
 
+const TABS_WITHOUT_ACTIVE_TOGGLE: AdminManagementTabId[] = ['orders', 'users'];
+
 export function AdminCrudForm({
   tabId,
   record,
   categories,
+  adCategories,
   isPending = false,
   onUploadImage,
   onSubmit,
@@ -92,11 +99,13 @@ export function AdminCrudForm({
     tabId,
     values,
     categories,
+    adCategories,
     record,
     onValueChange: updateValue,
   };
 
   const isFormPending = isPending || isUploadingImages;
+  const showActiveToggle = !TABS_WITHOUT_ACTIVE_TOGGLE.includes(tabId);
 
   return (
     <form
@@ -105,12 +114,19 @@ export function AdminCrudForm({
     >
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="flex flex-col gap-6 p-6">
-          {tabId === 'categories' && <CategoryCrudFields {...fieldsProps} />}
-          {tabId === 'products' && <ProductCrudFields {...fieldsProps} />}
+          {tabId === 'market-categories' && (
+            <MarketCategoryCrudFields {...fieldsProps} />
+          )}
+          {tabId === 'market-products' && <ProductCrudFields {...fieldsProps} />}
           {tabId === 'collections' && <CollectionCrudFields {...fieldsProps} />}
+          {tabId === 'ad-categories' && (
+            <AdCategoryCrudFields {...fieldsProps} />
+          )}
+          {tabId === 'ads' && <AdCrudFields {...fieldsProps} />}
+          {tabId === 'users' && <UserCrudFields {...fieldsProps} />}
           {tabId === 'orders' && <OrderStatusCrudFields {...fieldsProps} />}
 
-          {tabId !== 'orders' && (
+          {showActiveToggle && (
             <FormToggleField
               label="Статус активности"
               caption="Неактивные записи можно скрывать из публичного каталога."

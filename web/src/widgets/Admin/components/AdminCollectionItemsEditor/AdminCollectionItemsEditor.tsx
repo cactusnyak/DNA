@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import type {
   AdminCatalogCollection,
   AdminCatalogCollectionItemPayload,
-  AdminCategory,
+  AdminMarketCategory,
   AdminProduct,
 } from '@/entities/admin';
 
@@ -21,7 +21,7 @@ import type { SelectedCollectionItems } from './types/admin-collection-items-edi
 
 type AdminCollectionItemsEditorProps = {
   collection: AdminCatalogCollection;
-  categories: AdminCategory[];
+  categories: AdminMarketCategory[];
   products: AdminProduct[];
   isPending?: boolean;
   onSave: (items: AdminCatalogCollectionItemPayload[]) => void;
@@ -144,3 +144,4 @@ export function AdminCollectionItemsEditor({
     </form>
   );
 }
+

@@ -2,15 +2,21 @@ import type { OrderStatus } from '@/entities/order';
 import { httpClient } from '@/shared/api/http-client';
 
 import type {
+  AdminAd,
+  AdminAdCategory,
+  AdminAdCategoryPayload,
+  AdminAdPayload,
   AdminCatalogCollection,
   AdminCatalogCollectionItemPayload,
   AdminCatalogCollectionPayload,
   AdminCatalogData,
-  AdminCategory,
-  AdminCategoryPayload,
+  AdminMarketCategory,
+  AdminMarketCategoryPayload,
   AdminProduct,
   AdminProductPayload,
   AdminUploadImageResponse,
+  AdminUser,
+  AdminUserRolePayload,
 } from '../types/admin-catalog';
 
 function getAdminHeaders(accessToken: string) {
@@ -43,23 +49,28 @@ export async function uploadAdminImage(accessToken: string, file: File) {
   return response.json() as Promise<AdminUploadImageResponse>;
 }
 
-export function createAdminCategory(
+// ===== Market categories =====
+
+export function createAdminMarketCategory(
   accessToken: string,
-  payload: AdminCategoryPayload,
+  payload: AdminMarketCategoryPayload,
 ) {
-  return httpClient<AdminCategory, AdminCategoryPayload>('/admin/categories', {
-    method: 'POST',
-    body: payload,
-    headers: getAdminHeaders(accessToken),
-  });
+  return httpClient<AdminMarketCategory, AdminMarketCategoryPayload>(
+    '/admin/categories',
+    {
+      method: 'POST',
+      body: payload,
+      headers: getAdminHeaders(accessToken),
+    },
+  );
 }
 
-export function updateAdminCategory(
+export function updateAdminMarketCategory(
   accessToken: string,
   categoryId: string,
-  payload: AdminCategoryPayload,
+  payload: AdminMarketCategoryPayload,
 ) {
-  return httpClient<AdminCategory, AdminCategoryPayload>(
+  return httpClient<AdminMarketCategory, AdminMarketCategoryPayload>(
     `/admin/categories/${categoryId}`,
     {
       method: 'PATCH',
@@ -69,26 +80,40 @@ export function updateAdminCategory(
   );
 }
 
-export function deleteAdminCategory(accessToken: string, categoryId: string) {
+export function deleteAdminMarketCategory(
+  accessToken: string,
+  categoryId: string,
+) {
   return httpClient<void>(`/admin/categories/${categoryId}`, {
     method: 'DELETE',
     headers: getAdminHeaders(accessToken),
   });
 }
 
-export function hardDeleteAdminCategory(accessToken: string, categoryId: string) {
+export function hardDeleteAdminMarketCategory(
+  accessToken: string,
+  categoryId: string,
+) {
   return httpClient<void>(`/admin/categories/${categoryId}/permanent`, {
     method: 'DELETE',
     headers: getAdminHeaders(accessToken),
   });
 }
 
-export function restoreAdminCategory(accessToken: string, categoryId: string) {
-  return httpClient<AdminCategory>(`/admin/categories/${categoryId}/restore`, {
-    method: 'PATCH',
-    headers: getAdminHeaders(accessToken),
-  });
+export function restoreAdminMarketCategory(
+  accessToken: string,
+  categoryId: string,
+) {
+  return httpClient<AdminMarketCategory>(
+    `/admin/categories/${categoryId}/restore`,
+    {
+      method: 'PATCH',
+      headers: getAdminHeaders(accessToken),
+    },
+  );
 }
+
+// ===== Market products =====
 
 export function createAdminProduct(
   accessToken: string,
@@ -136,6 +161,125 @@ export function restoreAdminProduct(accessToken: string, productId: string) {
     headers: getAdminHeaders(accessToken),
   });
 }
+
+// ===== Ad categories =====
+
+export function createAdminAdCategory(
+  accessToken: string,
+  payload: AdminAdCategoryPayload,
+) {
+  return httpClient<AdminAdCategory, AdminAdCategoryPayload>(
+    '/admin/ad-categories',
+    {
+      method: 'POST',
+      body: payload,
+      headers: getAdminHeaders(accessToken),
+    },
+  );
+}
+
+export function updateAdminAdCategory(
+  accessToken: string,
+  categoryId: string,
+  payload: AdminAdCategoryPayload,
+) {
+  return httpClient<AdminAdCategory, AdminAdCategoryPayload>(
+    `/admin/ad-categories/${categoryId}`,
+    {
+      method: 'PATCH',
+      body: payload,
+      headers: getAdminHeaders(accessToken),
+    },
+  );
+}
+
+export function deleteAdminAdCategory(accessToken: string, categoryId: string) {
+  return httpClient<void>(`/admin/ad-categories/${categoryId}`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function hardDeleteAdminAdCategory(
+  accessToken: string,
+  categoryId: string,
+) {
+  return httpClient<void>(`/admin/ad-categories/${categoryId}/permanent`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function restoreAdminAdCategory(accessToken: string, categoryId: string) {
+  return httpClient<AdminAdCategory>(
+    `/admin/ad-categories/${categoryId}/restore`,
+    {
+      method: 'PATCH',
+      headers: getAdminHeaders(accessToken),
+    },
+  );
+}
+
+// ===== Ads =====
+
+export function updateAdminAd(
+  accessToken: string,
+  adId: string,
+  payload: AdminAdPayload,
+) {
+  return httpClient<AdminAd, AdminAdPayload>(`/admin/ads/${adId}`, {
+    method: 'PATCH',
+    body: payload,
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function deleteAdminAd(accessToken: string, adId: string) {
+  return httpClient<void>(`/admin/ads/${adId}`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function hardDeleteAdminAd(accessToken: string, adId: string) {
+  return httpClient<void>(`/admin/ads/${adId}/permanent`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function restoreAdminAd(accessToken: string, adId: string) {
+  return httpClient<AdminAd>(`/admin/ads/${adId}/restore`, {
+    method: 'PATCH',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+// ===== Users =====
+
+export function updateAdminUserRole(
+  accessToken: string,
+  userId: string,
+  payload: AdminUserRolePayload,
+) {
+  return httpClient<AdminUser, AdminUserRolePayload>(
+    `/admin/users/${userId}/role`,
+    {
+      method: 'PATCH',
+      body: payload,
+      headers: getAdminHeaders(accessToken),
+    },
+  );
+}
+
+export function deleteAdminUser(accessToken: string, userId: string) {
+  return httpClient<void>(`/admin/users/${userId}`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+// ===== Collections =====
 
 export function createAdminCatalogCollection(
   accessToken: string,
@@ -236,6 +380,8 @@ export function updateAdminCatalogCollectionProducts(
   });
 }
 
+// ===== Orders =====
+
 export function updateAdminOrderStatus(
   accessToken: string,
   orderId: string,
@@ -259,4 +405,3 @@ export function hardDeleteAdminOrder(accessToken: string, orderId: string) {
     headers: getAdminHeaders(accessToken),
   });
 }
-

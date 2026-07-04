@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getCategories } from '@/entities/category/api/get-categories';
+import { getCatalogCategories } from '@/shared/catalog';
 import {
   getPlatformSection,
   type PlatformSectionId,
@@ -20,7 +20,7 @@ export function CatalogPage({ section }: CatalogPageProps) {
     error,
   } = useQuery({
     queryKey: ['categories', section],
-    queryFn: () => getCategories({ section }),
+    queryFn: () => getCatalogCategories({ section }),
   });
 
   if (isPending) {
@@ -41,3 +41,4 @@ export function CatalogPage({ section }: CatalogPageProps) {
     />
   );
 }
+

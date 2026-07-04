@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMatches } from 'react-router-dom';
 
-import { getCategories } from '@/entities/category/api/get-categories';
+import { getCatalogCategories } from '@/shared/catalog';
 import { getProduct } from '@/entities/product/api/get-product';
 import { getPlatformSectionIdFromPathname } from '@/shared/platform';
 
@@ -39,7 +39,7 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
 
   const { data: categories } = useQuery({
     queryKey: ['categories', activeSection],
-    queryFn: () => getCategories({ section: activeSection }),
+    queryFn: () => getCatalogCategories({ section: activeSection }),
     enabled: Boolean(activeSection && (categorySlug || productId)),
   });
 
@@ -65,3 +65,4 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
 
   return <BreadcrumbsList items={breadcrumbItems} />;
 }
+

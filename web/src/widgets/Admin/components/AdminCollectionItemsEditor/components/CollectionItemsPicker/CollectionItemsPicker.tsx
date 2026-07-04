@@ -1,19 +1,19 @@
 import { Input } from '@/components/ui/Input';
 import type {
-  AdminCategory,
+  AdminMarketCategory,
   AdminProduct,
 } from '@/entities/admin';
 
 import type { SelectedCollectionItems } from '../../types/admin-collection-items-editor';
 
 type CollectionItemsPickerProps = {
-  items: Array<AdminCategory | AdminProduct>;
+  items: Array<AdminMarketCategory | AdminProduct>;
   selectedItems: SelectedCollectionItems;
   onItemToggle: (itemId: string) => void;
   onSortOrderChange: (itemId: string, sortOrder: number) => void;
 };
 
-function getItemTitle(item: AdminCategory | AdminProduct) {
+function getItemTitle(item: AdminMarketCategory | AdminProduct) {
   return 'name' in item ? item.name : item.title;
 }
 
@@ -64,3 +64,4 @@ export function CollectionItemsPicker({
     </div>
   );
 }
+

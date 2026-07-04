@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 
-import type { Category } from '@/entities/category';
-import { getCategoryHref } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 
 type GlobalSearchCategoryResultsProps = {
   section: PlatformSectionId;
-  categories: Category[];
-  allCategories: Category[];
+  categories: CatalogCategory[];
+  allCategories: CatalogCategory[];
   isPending?: boolean;
   isError?: boolean;
   onNavigate: () => void;
@@ -88,3 +88,4 @@ export function GlobalSearchCategoryResults({
     </section>
   );
 }
+

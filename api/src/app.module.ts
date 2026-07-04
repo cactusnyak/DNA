@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 
 import { AdminModule } from './admin/admin.module';
+import { AdCategoriesModule } from './ad-categories/ad-categories.module';
 import { AdsModule } from './ads/ads.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CatalogCollectionsModule } from './catalog-collections/catalog-collections.module';
-import { CategoriesModule } from './categories/categories.module';
+import { MarketCategoriesModule } from './market-categories/market-categories.module';
 import { MarketModule } from './market/market.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -18,9 +19,10 @@ import { UsersModule } from './users/users.module';
   imports: [
     PrismaModule,
     ProductsModule,
-    CategoriesModule,
+    MarketCategoriesModule,
     CatalogCollectionsModule,
     MarketModule,
+    AdCategoriesModule,
     AdsModule,
     OrdersModule,
     UsersModule,

@@ -1,5 +1,11 @@
-import type { AdminCategory } from '@/entities/admin';
+export type AdminCategoryTreeRecord = {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string;
+  sortOrder: number;
+};
 
-export type AdminCategoryTreeNode = AdminCategory & {
-  children: AdminCategoryTreeNode[];
+export type AdminCategoryTreeNode<T extends AdminCategoryTreeRecord> = T & {
+  children: AdminCategoryTreeNode<T>[];
 };

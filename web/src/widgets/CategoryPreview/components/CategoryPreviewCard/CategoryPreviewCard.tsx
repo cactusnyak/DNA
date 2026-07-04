@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 
-import type { Category } from '@/entities/category';
-import { getCategoryHref } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 
 type CategoryPreviewCardProps = {
   section: PlatformSectionId;
-  category: Category;
-  categories: Category[];
+  category: CatalogCategory;
+  categories: CatalogCategory[];
 };
 
 export function CategoryPreviewCard({
@@ -24,3 +24,4 @@ export function CategoryPreviewCard({
     </Link>
   );
 }
+

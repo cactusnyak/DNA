@@ -1,11 +1,11 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 
 import type { CategoryLevel } from '../types/category-level';
 import { getChildrenCategories } from './get-children-categories';
 
 export function getCategoryLevels(
-  categories: Category[],
-  activeCategoryPath: Category[],
+  categories: CatalogCategory[],
+  activeCategoryPath: CatalogCategory[],
 ): CategoryLevel[] {
   const levels: CategoryLevel[] = [];
 

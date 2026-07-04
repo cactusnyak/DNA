@@ -1,4 +1,6 @@
+import type { AdStatus } from '@/entities/ad';
 import type { OrderStatus } from '@/entities/order';
+import type { UserRole } from '@/entities/user';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
@@ -50,7 +52,7 @@ export async function buildAdminCrudPayload({
   values,
   uploadImage,
 }: BuildAdminCrudPayloadParams): Promise<AdminCrudPayload> {
-  if (tabId === 'categories') {
+  if (tabId === 'market-categories' || tabId === 'ad-categories') {
     const imageFile = getFile(values.imageFile);
     const imageUrl = imageFile
       ? await uploadImage(imageFile)
@@ -68,7 +70,7 @@ export async function buildAdminCrudPayload({
     };
   }
 
-  if (tabId === 'products') {
+  if (tabId === 'market-products') {
     const existingImageUrls = getImageUrls(values.imageUrls);
     const imageFiles = getFiles(values.imageFiles);
     const uploadedImageUrls = await Promise.all(imageFiles.map(uploadImage));
@@ -91,6 +93,29 @@ export async function buildAdminCrudPayload({
       type: values.type === 'PRODUCT' ? 'PRODUCT' : 'CATEGORY',
       description: String(values.description ?? ''),
       isActive: Boolean(values.isActive),
+    };
+  }
+
+  if (tabId === 'ads') {
+    const existingImageUrls = getImageUrls(values.imageUrls);
+    const imageFiles = getFiles(values.imageFiles);
+    const uploadedImageUrls = await Promise.all(imageFiles.map(uploadImage));
+
+    return {
+      title: String(values.title ?? ''),
+      slug: String(values.slug ?? ''),
+      description: String(values.description ?? ''),
+      categoryId: String(values.categoryId ?? ''),
+      price: Number(values.price ?? 0),
+      status: (values.status as AdStatus) ?? 'PUBLISHED',
+      imageUrls: [...existingImageUrls, ...uploadedImageUrls],
+      isActive: Boolean(values.isActive),
+    };
+  }
+
+  if (tabId === 'users') {
+    return {
+      role: (values.role as UserRole) ?? 'DEFAULT',
     };
   }
 

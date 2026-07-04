@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 
-import { CategoriesModule } from '../categories/categories.module';
+import { MarketCategoriesModule } from '../market-categories/market-categories.module';
 import { ProductsModule } from '../products/products.module';
 
 import { MarketController } from './market.controller';
 
 @Module({
   imports: [
-    CategoriesModule,
+    MarketCategoriesModule,
     ProductsModule,
   ],
   controllers: [MarketController],
 })
 export class MarketModule {}
+

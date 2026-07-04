@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
-import { getCategories } from '@/entities/category/api/get-categories';
+import { getCatalogCategories } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
   getPlatformSection,
@@ -33,7 +33,7 @@ export function CategoryPreview({
     error,
   } = useQuery({
     queryKey: ['categories', section],
-    queryFn: () => getCategories({ section }),
+    queryFn: () => getCatalogCategories({ section }),
   });
 
   const previewTitle = title ?? sectionConfig.categoryPreviewTitle;
@@ -77,3 +77,4 @@ export function CategoryPreview({
     </section>
   );
 }
+

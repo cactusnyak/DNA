@@ -1,41 +1,62 @@
 export { getAdminOverview } from './api/get-admin-overview';
 
 export {
+  createAdminAdCategory,
   createAdminCatalogCollection,
-  createAdminCategory,
+  createAdminMarketCategory,
   createAdminProduct,
+  deleteAdminAd,
+  deleteAdminAdCategory,
   deleteAdminCatalogCollection,
-  deleteAdminCategory,
+  deleteAdminMarketCategory,
   deleteAdminProduct,
+  deleteAdminUser,
   getAdminCatalogData,
+  hardDeleteAdminAd,
+  hardDeleteAdminAdCategory,
   hardDeleteAdminCatalogCollection,
-  hardDeleteAdminCategory,
+  hardDeleteAdminMarketCategory,
   hardDeleteAdminOrder,
   hardDeleteAdminProduct,
+  restoreAdminAd,
+  restoreAdminAdCategory,
   restoreAdminCatalogCollection,
-  restoreAdminCategory,
+  restoreAdminMarketCategory,
   restoreAdminProduct,
+  updateAdminAd,
+  updateAdminAdCategory,
   updateAdminCatalogCollection,
   updateAdminCatalogCollectionCategories,
   updateAdminCatalogCollectionProducts,
-  updateAdminCategory,
+  updateAdminMarketCategory,
   updateAdminOrderStatus,
   updateAdminProduct,
+  updateAdminUserRole,
   uploadAdminImage,
 } from './api/admin-catalog';
 
 export type { AdminOverview } from './types/admin-overview';
 
 export type {
+  AdminManagementTabId,
+  AdminViewMode,
+} from './types/admin-management';
+
+export type {
+  AdminAd,
+  AdminAdCategory,
+  AdminAdCategoryPayload,
+  AdminAdPayload,
+  AdminAdSeller,
   AdminCatalogCollection,
   AdminCatalogCollectionItemPayload,
   AdminCatalogCollectionPayload,
   AdminCatalogCollectionType,
   AdminCatalogData,
-  AdminCategory,
-  AdminCategoryPayload,
+  AdminMarketCategory,
+  AdminMarketCategoryPayload,
   AdminProduct,
   AdminProductPayload,
-  AdminUploadImageResponse,
+  AdminUser,
+  AdminUserRolePayload,
 } from './types/admin-catalog';
-

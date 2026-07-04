@@ -1,8 +1,8 @@
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import type { Category } from '@/entities/category';
-import { getCategoryHref } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryHref } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
   type PlatformSectionId,
@@ -14,9 +14,9 @@ import type { CategoryLevel } from '../../types/category-level';
 
 type CategoryColumnProps = {
   section: PlatformSectionId;
-  categories: Category[];
+  categories: CatalogCategory[];
   level: CategoryLevel;
-  activeCategoryPath: Category[];
+  activeCategoryPath: CatalogCategory[];
   activeCategorySlug?: string;
   onActiveCategoryChange: (categorySlug?: string) => void;
   onCategoryClick?: () => void;
@@ -85,3 +85,4 @@ export function CategoryColumn({
     </div>
   );
 }
+

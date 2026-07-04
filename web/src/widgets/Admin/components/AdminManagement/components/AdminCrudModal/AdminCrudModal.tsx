@@ -53,14 +53,21 @@ export function AdminCrudModal({
     <Modal
       isOpen={isOpen}
       title={getCrudFormModalTitle(activeTabId, editingRecord)}
-      size={collectionEditingRecord ? 'xl' : activeTabId === 'orders' ? 'sm' : 'lg'}
+      size={
+        collectionEditingRecord
+          ? 'xl'
+          : activeTabId === 'orders' || activeTabId === 'users'
+            ? 'sm'
+            : 'lg'
+      }
       onClose={onClose}
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <AdminCrudForm
           tabId={activeTabId}
           record={editingRecord}
-          categories={data.categories}
+          categories={data.marketCategories}
+          adCategories={data.adCategories}
           isPending={isCrudFormPending}
           onUploadImage={onUploadImage}
           onSubmit={onSubmit}
@@ -71,7 +78,7 @@ export function AdminCrudModal({
           <div className="min-h-0 flex-1 overflow-y-auto border-t border-border p-6">
             <AdminCollectionItemsEditor
               collection={collectionEditingRecord}
-              categories={data.categories}
+              categories={data.marketCategories}
               products={data.products}
               isPending={isCollectionItemsPending}
               onSave={(items) =>
@@ -87,3 +94,4 @@ export function AdminCrudModal({
     </Modal>
   );
 }
+

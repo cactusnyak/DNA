@@ -98,7 +98,7 @@ export class CatalogCollectionsService {
   }
 
   private getActiveCategories() {
-    return this.prismaService.category.findMany({
+    return this.prismaService.marketCategory.findMany({
       where: ACTIVE_CATALOG_ITEM_WHERE,
       include: {
         image: true,

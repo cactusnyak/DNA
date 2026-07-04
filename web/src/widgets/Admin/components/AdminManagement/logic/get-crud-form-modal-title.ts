@@ -9,18 +9,30 @@ export function getCrudFormModalTitle(
     return 'Изменение статуса заказа';
   }
 
-  const actionLabel = record ? 'Редактирование' : 'Создание';
-
-  if (tabId === 'categories') {
-    return `${actionLabel} категории`;
+  if (tabId === 'ads') {
+    return 'Модерация объявления';
   }
 
-  if (tabId === 'products') {
-    return `${actionLabel} продукта`;
+  if (tabId === 'users') {
+    return 'Изменение роли пользователя';
+  }
+
+  const actionLabel = record ? 'Редактирование' : 'Создание';
+
+  if (tabId === 'market-categories') {
+    return `${actionLabel} категории маркета`;
+  }
+
+  if (tabId === 'market-products') {
+    return `${actionLabel} товара`;
   }
 
   if (tabId === 'collections') {
     return `${actionLabel} подборки`;
+  }
+
+  if (tabId === 'ad-categories') {
+    return `${actionLabel} категории объявлений`;
   }
 
   return 'Форма управления';

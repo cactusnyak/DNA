@@ -17,7 +17,7 @@ export function AdminTabs({
   onTabChange,
 }: AdminTabsProps) {
   return (
-    <div className="grid gap-3 md:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTabId === tab.id;
@@ -63,3 +63,4 @@ export function AdminTabs({
     </div>
   );
 }
+

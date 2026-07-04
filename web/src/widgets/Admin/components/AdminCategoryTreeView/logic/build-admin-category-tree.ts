@@ -1,8 +1,11 @@
-import type { AdminCategory } from '@/entities/admin';
+import type {
+  AdminCategoryTreeNode,
+  AdminCategoryTreeRecord,
+} from '../types/admin-category-tree';
 
-import type { AdminCategoryTreeNode } from '../types/admin-category-tree';
-
-function sortCategoryNodes(nodes: AdminCategoryTreeNode[]) {
+function sortCategoryNodes<T extends AdminCategoryTreeRecord>(
+  nodes: AdminCategoryTreeNode<T>[],
+) {
   return nodes.sort((firstNode, secondNode) => {
     if (firstNode.sortOrder !== secondNode.sortOrder) {
       return firstNode.sortOrder - secondNode.sortOrder;
@@ -12,8 +15,10 @@ function sortCategoryNodes(nodes: AdminCategoryTreeNode[]) {
   });
 }
 
-export function buildAdminCategoryTree(categories: AdminCategory[]) {
-  const nodeById = new Map<string, AdminCategoryTreeNode>();
+export function buildAdminCategoryTree<T extends AdminCategoryTreeRecord>(
+  categories: T[],
+) {
+  const nodeById = new Map<string, AdminCategoryTreeNode<T>>();
 
   categories.forEach((category) => {
     nodeById.set(category.id, {
@@ -22,7 +27,7 @@ export function buildAdminCategoryTree(categories: AdminCategory[]) {
     });
   });
 
-  const rootNodes: AdminCategoryTreeNode[] = [];
+  const rootNodes: AdminCategoryTreeNode<T>[] = [];
 
   nodeById.forEach((node) => {
     if (!node.parentId) {

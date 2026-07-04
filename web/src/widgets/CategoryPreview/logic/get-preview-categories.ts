@@ -1,6 +1,6 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 
-export function getPreviewCategories(categories: Category[], limit: number) {
+export function getPreviewCategories(categories: CatalogCategory[], limit: number) {
   return categories
     .filter((category) => !category.parentId)
     .slice(0, limit);

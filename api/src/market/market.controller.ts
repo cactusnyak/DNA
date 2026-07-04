@@ -5,19 +5,19 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { CategoriesService } from '../categories/categories.service';
+import { MarketCategoriesService } from '../market-categories/market-categories.service';
 import { ProductsService } from '../products/products.service';
 
 @Controller('market')
 export class MarketController {
   constructor(
-    private readonly categoriesService: CategoriesService,
+    private readonly marketCategoriesService: MarketCategoriesService,
     private readonly productsService: ProductsService,
   ) {}
 
   @Get('categories')
   findCategories() {
-    return this.categoriesService.findAll();
+    return this.marketCategoriesService.findAll();
   }
 
   @Get('products')
@@ -42,3 +42,4 @@ export class MarketController {
     return this.productsService.findById(productId);
   }
 }
+

@@ -1,9 +1,9 @@
-import type { Category } from '@/entities/category';
+import type { MarketCategory } from '@/entities/market-category';
 import type { Image } from '@/shared/types/image';
 
 export type Product = {
   id: string;
-  category: Category;
+  category: MarketCategory;
   title: string;
   slug: string;
   description: string;

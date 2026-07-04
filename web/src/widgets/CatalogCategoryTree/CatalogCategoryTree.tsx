@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { SearchInput } from '@/components/ui/SearchInput';
 import { SectionHeader } from '@/components/ui/Section';
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 import {
   getPlatformSection,
   type PlatformSectionId,
@@ -15,7 +15,7 @@ import { toggleExpandedCategoryId } from './logic/toggle-expanded-category-id';
 
 type CatalogCategoryTreeProps = {
   section: PlatformSectionId;
-  categories: Category[];
+  categories: CatalogCategory[];
   title?: string;
   description?: string;
   emptyText?: string;
@@ -87,3 +87,4 @@ export function CatalogCategoryTree({
     </div>
   );
 }
+

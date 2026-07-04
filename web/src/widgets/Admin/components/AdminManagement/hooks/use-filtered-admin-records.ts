@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { USER_ROLE_LABELS } from '@/entities/user';
+
 import { filterAdminRecords } from '../../../logic/filter-admin-records';
 import type {
   AdminCatalogData,
@@ -10,15 +12,19 @@ export function useFilteredAdminRecords(
   data: AdminCatalogData | undefined,
   searchValue: string,
 ): FilteredAdminRecords {
-  const filteredCategories = useMemo(
+  const filteredMarketCategories = useMemo(
     () =>
-      filterAdminRecords(data?.categories ?? [], searchValue, (category) => [
-        category.name,
-        category.slug,
-        category.path,
-        category.description,
-      ]),
-    [data?.categories, searchValue],
+      filterAdminRecords(
+        data?.marketCategories ?? [],
+        searchValue,
+        (category) => [
+          category.name,
+          category.slug,
+          category.path,
+          category.description,
+        ],
+      ),
+    [data?.marketCategories, searchValue],
   );
 
   const filteredProducts = useMemo(
@@ -58,10 +64,50 @@ export function useFilteredAdminRecords(
     [data?.orders, searchValue],
   );
 
+  const filteredAdCategories = useMemo(
+    () =>
+      filterAdminRecords(data?.adCategories ?? [], searchValue, (category) => [
+        category.name,
+        category.slug,
+        category.path,
+        category.description,
+      ]),
+    [data?.adCategories, searchValue],
+  );
+
+  const filteredAds = useMemo(
+    () =>
+      filterAdminRecords(data?.ads ?? [], searchValue, (ad) => [
+        ad.title,
+        ad.slug,
+        ad.description,
+        ad.price,
+        ad.category?.name,
+        ad.seller ? `${ad.seller.firstName} ${ad.seller.lastName}` : undefined,
+        ad.seller?.email,
+      ]),
+    [data?.ads, searchValue],
+  );
+
+  const filteredUsers = useMemo(
+    () =>
+      filterAdminRecords(data?.users ?? [], searchValue, (user) => [
+        user.firstName,
+        user.lastName,
+        user.email,
+        user.phone,
+        USER_ROLE_LABELS[user.role],
+      ]),
+    [data?.users, searchValue],
+  );
+
   return {
-    categories: filteredCategories,
+    marketCategories: filteredMarketCategories,
     products: filteredProducts,
     collections: filteredCollections,
     orders: filteredOrders,
+    adCategories: filteredAdCategories,
+    ads: filteredAds,
+    users: filteredUsers,
   };
 }

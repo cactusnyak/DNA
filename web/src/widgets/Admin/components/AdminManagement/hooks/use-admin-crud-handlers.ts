@@ -1,8 +1,11 @@
 import type {
+  AdminAdCategoryPayload,
+  AdminAdPayload,
   AdminCatalogCollection,
   AdminCatalogCollectionPayload,
-  AdminCategoryPayload,
+  AdminMarketCategoryPayload,
   AdminProductPayload,
+  AdminUserRolePayload,
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
 
@@ -32,15 +35,15 @@ export function useAdminCrudHandlers({
   resetEditing,
 }: UseAdminCrudHandlersParams) {
   async function handleSubmit(payload: AdminCrudPayload) {
-    if (activeTabId === 'categories') {
+    if (activeTabId === 'market-categories') {
       if (editingRecord) {
-        await mutations.updateCategoryMutation.mutateAsync({
+        await mutations.updateMarketCategoryMutation.mutateAsync({
           id: editingRecord.id,
-          payload: payload as AdminCategoryPayload,
+          payload: payload as AdminMarketCategoryPayload,
         });
       } else {
-        await mutations.createCategoryMutation.mutateAsync(
-          payload as AdminCategoryPayload,
+        await mutations.createMarketCategoryMutation.mutateAsync(
+          payload as AdminMarketCategoryPayload,
         );
       }
 
@@ -48,7 +51,7 @@ export function useAdminCrudHandlers({
       return;
     }
 
-    if (activeTabId === 'products') {
+    if (activeTabId === 'market-products') {
       if (editingRecord) {
         await mutations.updateProductMutation.mutateAsync({
           id: editingRecord.id,
@@ -80,6 +83,46 @@ export function useAdminCrudHandlers({
       return;
     }
 
+    if (activeTabId === 'ad-categories') {
+      if (editingRecord) {
+        await mutations.updateAdCategoryMutation.mutateAsync({
+          id: editingRecord.id,
+          payload: payload as AdminAdCategoryPayload,
+        });
+      } else {
+        await mutations.createAdCategoryMutation.mutateAsync(
+          payload as AdminAdCategoryPayload,
+        );
+      }
+
+      resetEditing();
+      return;
+    }
+
+    if (activeTabId === 'ads') {
+      if (editingRecord) {
+        await mutations.updateAdMutation.mutateAsync({
+          id: editingRecord.id,
+          payload: payload as AdminAdPayload,
+        });
+      }
+
+      resetEditing();
+      return;
+    }
+
+    if (activeTabId === 'users') {
+      if (editingRecord) {
+        await mutations.updateUserRoleMutation.mutateAsync({
+          id: editingRecord.id,
+          payload: payload as AdminUserRolePayload,
+        });
+      }
+
+      resetEditing();
+      return;
+    }
+
     if (editingRecord) {
       await mutations.updateOrderStatusMutation.mutateAsync({
         order: editingRecord as Order,
@@ -91,41 +134,60 @@ export function useAdminCrudHandlers({
   }
 
   function handleRestore(record: EditableRecord) {
-    if (activeTabId === 'categories') {
-      mutations.restoreCategoryMutation.mutate(record.id);
+    if (activeTabId === 'market-categories') {
+      mutations.restoreMarketCategoryMutation.mutate(record.id);
     }
 
-    if (activeTabId === 'products') {
+    if (activeTabId === 'market-products') {
       mutations.restoreProductMutation.mutate(record.id);
     }
 
     if (activeTabId === 'collections') {
       mutations.restoreCollectionMutation.mutate(record.id);
     }
+
+    if (activeTabId === 'ad-categories') {
+      mutations.restoreAdCategoryMutation.mutate(record.id);
+    }
+
+    if (activeTabId === 'ads') {
+      mutations.restoreAdMutation.mutate(record.id);
+    }
   }
 
   function handleDelete(record: EditableRecord) {
-    if (activeTabId === 'categories') {
-      mutations.deleteCategoryMutation.mutate(record.id);
+    if (activeTabId === 'market-categories') {
+      mutations.deleteMarketCategoryMutation.mutate(record.id);
     }
 
-    if (activeTabId === 'products') {
+    if (activeTabId === 'market-products') {
       mutations.deleteProductMutation.mutate(record.id);
     }
 
     if (activeTabId === 'collections') {
       mutations.deleteCollectionMutation.mutate(record.id);
     }
+
+    if (activeTabId === 'ad-categories') {
+      mutations.deleteAdCategoryMutation.mutate(record.id);
+    }
+
+    if (activeTabId === 'ads') {
+      mutations.deleteAdMutation.mutate(record.id);
+    }
+
+    if (activeTabId === 'users') {
+      mutations.deleteUserMutation.mutate(record.id);
+    }
   }
 
-
   function handleHardDelete(record: EditableRecord) {
-    if (activeTabId === 'categories') {
-      mutations.hardDeleteCategoryMutation.mutate(record.id);
+    if (activeTabId === 'market-categories') {
+      mutations.hardDeleteMarketCategoryMutation.mutate(record.id);
       return;
     }
 
-    if (activeTabId === 'products') {
+    if (activeTabId === 'market-products') {
       mutations.hardDeleteProductMutation.mutate(record.id);
       return;
     }
@@ -135,7 +197,19 @@ export function useAdminCrudHandlers({
       return;
     }
 
-    mutations.hardDeleteOrderMutation.mutate(record.id);
+    if (activeTabId === 'ad-categories') {
+      mutations.hardDeleteAdCategoryMutation.mutate(record.id);
+      return;
+    }
+
+    if (activeTabId === 'ads') {
+      mutations.hardDeleteAdMutation.mutate(record.id);
+      return;
+    }
+
+    if (activeTabId === 'orders') {
+      mutations.hardDeleteOrderMutation.mutate(record.id);
+    }
   }
 
   function handleCollectionItemsSave(
@@ -148,14 +222,17 @@ export function useAdminCrudHandlers({
     });
   }
 
-  async function handleQuickCreate(collection: AdminCatalogCollection, title: string) {
+  async function handleQuickCreate(
+    collection: AdminCatalogCollection,
+    title: string,
+  ) {
     if (collection.type === 'CATEGORY') {
-      const category = await mutations.createCategoryMutation.mutateAsync({
+      const category = await mutations.createMarketCategoryMutation.mutateAsync({
         name: title,
         slug: '',
         description: '',
         parentId: '',
-        sortOrder: data.categories.length,
+        sortOrder: data.marketCategories.length,
         imageUrl: '',
         imageAlt: '',
         isActive: true,
@@ -164,8 +241,8 @@ export function useAdminCrudHandlers({
       return category.id;
     }
 
-    if (!data.categories[0]) {
-      window.alert('Сначала создайте хотя бы одну категорию.');
+    if (!data.marketCategories[0]) {
+      window.alert('Сначала создайте хотя бы одну категорию маркета.');
       return undefined;
     }
 
@@ -173,7 +250,7 @@ export function useAdminCrudHandlers({
       title,
       slug: '',
       description: '',
-      categoryId: data.categories[0].id,
+      categoryId: data.marketCategories[0].id,
       price: 0,
       imageUrls: [],
       isActive: true,
@@ -191,4 +268,3 @@ export function useAdminCrudHandlers({
     handleQuickCreate,
   };
 }
-

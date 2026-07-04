@@ -1,5 +1,5 @@
-import type { Category } from '@/entities/category';
-import { getCategoryHref } from '@/entities/category/utils/category-path';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
+import { getCategoryHref } from '@/shared/catalog';
 import {
   getPlatformCategoryHref,
   type PlatformSectionId,
@@ -8,12 +8,12 @@ import {
 import type { BreadcrumbItem } from '../types/breadcrumbs';
 
 export function getCategoryBreadcrumbItems(
-  categories: Category[],
+  categories: CatalogCategory[],
   currentCategorySlug: string,
   section: PlatformSectionId,
 ): BreadcrumbItem[] {
-  const categoryBySlug = new Map<string, Category>();
-  const categoryById = new Map<string, Category>();
+  const categoryBySlug = new Map<string, CatalogCategory>();
+  const categoryById = new Map<string, CatalogCategory>();
 
   categories.forEach((category) => {
     categoryBySlug.set(category.slug, category);
@@ -32,8 +32,8 @@ export function getCategoryBreadcrumbItems(
     ];
   }
 
-  const categoryPath: Category[] = [];
-  let category: Category | undefined = currentCategory;
+  const categoryPath: CatalogCategory[] = [];
+  let category: CatalogCategory | undefined = currentCategory;
 
   while (category) {
     categoryPath.unshift(category);
@@ -51,3 +51,4 @@ export function getCategoryBreadcrumbItems(
     label: category.name,
   }));
 }
+

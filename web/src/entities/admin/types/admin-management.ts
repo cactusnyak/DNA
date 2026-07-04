@@ -1,7 +1,10 @@
 export type AdminManagementTabId =
-  | 'categories'
-  | 'products'
+  | 'market-categories'
+  | 'market-products'
   | 'collections'
-  | 'orders';
+  | 'orders'
+  | 'ad-categories'
+  | 'ads'
+  | 'users';
 
 export type AdminViewMode = 'table' | 'list' | 'tree';

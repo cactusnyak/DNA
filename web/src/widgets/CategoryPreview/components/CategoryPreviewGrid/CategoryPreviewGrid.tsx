@@ -1,12 +1,12 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { PlatformSectionId } from '@/shared/platform';
 
 import { CategoryPreviewCard } from '../CategoryPreviewCard';
 
 type CategoryPreviewGridProps = {
   section: PlatformSectionId;
-  categories: Category[];
-  previewCategories: Category[];
+  categories: CatalogCategory[];
+  previewCategories: CatalogCategory[];
 };
 
 export function CategoryPreviewGrid({
@@ -27,3 +27,4 @@ export function CategoryPreviewGrid({
     </div>
   );
 }
+

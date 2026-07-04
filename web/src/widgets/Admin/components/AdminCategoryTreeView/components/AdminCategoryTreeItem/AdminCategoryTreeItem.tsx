@@ -1,22 +1,25 @@
 import type { ReactNode } from 'react';
 
-import type { AdminCategory } from '@/entities/admin';
+import type {
+  AdminCategoryTreeNode,
+  AdminCategoryTreeRecord,
+} from '../../types/admin-category-tree';
 
-import type { AdminCategoryTreeNode } from '../../types/admin-category-tree';
-
-type AdminCategoryTreeItemProps = {
-  node: AdminCategoryTreeNode;
+type AdminCategoryTreeItemProps<T extends AdminCategoryTreeRecord> = {
+  node: AdminCategoryTreeNode<T>;
   level: number;
-  renderTitle: (category: AdminCategory) => ReactNode;
-  renderActions: (category: AdminCategory) => ReactNode;
+  renderTitle: (category: T) => ReactNode;
+  renderMeta: (category: T) => ReactNode;
+  renderActions: (category: T) => ReactNode;
 };
 
-export function AdminCategoryTreeItem({
+export function AdminCategoryTreeItem<T extends AdminCategoryTreeRecord>({
   node,
   level,
   renderTitle,
+  renderMeta,
   renderActions,
-}: AdminCategoryTreeItemProps) {
+}: AdminCategoryTreeItemProps<T>) {
   return (
     <li>
       <div
@@ -29,7 +32,7 @@ export function AdminCategoryTreeItem({
           <p className="font-semibold">{renderTitle(node)}</p>
 
           <p className="mt-1 text-xs text-muted-foreground">
-            slug: {node.slug} · продуктов: {node.productsCount}
+            {renderMeta(node)}
           </p>
         </div>
 
@@ -44,6 +47,7 @@ export function AdminCategoryTreeItem({
               node={childNode}
               level={level + 1}
               renderTitle={renderTitle}
+              renderMeta={renderMeta}
               renderActions={renderActions}
             />
           ))}

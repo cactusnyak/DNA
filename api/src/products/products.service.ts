@@ -130,7 +130,7 @@ export class ProductsService {
   }
 
   private getActiveCategories() {
-    return this.prismaService.category.findMany({
+    return this.prismaService.marketCategory.findMany({
       where: ACTIVE_CATEGORY_WHERE,
       include: {
         image: true,
@@ -323,3 +323,4 @@ export class ProductsService {
     };
   }
 }
+

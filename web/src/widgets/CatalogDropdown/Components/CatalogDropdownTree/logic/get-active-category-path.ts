@@ -1,7 +1,7 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 
 export function getActiveCategoryPath(
-  categories: Category[],
+  categories: CatalogCategory[],
   activeCategorySlug?: string,
 ) {
   if (!activeCategorySlug) {
@@ -20,8 +20,8 @@ export function getActiveCategoryPath(
     return [];
   }
 
-  const path: Category[] = [];
-  let currentCategory: Category | undefined = activeCategory;
+  const path: CatalogCategory[] = [];
+  let currentCategory: CatalogCategory | undefined = activeCategory;
 
   while (currentCategory) {
     path.unshift(currentCategory);

@@ -1,28 +1,46 @@
 import type {
+  AdminAd,
+  AdminAdCategory,
+  AdminAdCategoryPayload,
+  AdminAdPayload,
   AdminCatalogCollection,
   AdminCatalogCollectionPayload,
-  AdminCategory,
-  AdminCategoryPayload,
+  AdminMarketCategory,
+  AdminMarketCategoryPayload,
   AdminProduct,
   AdminProductPayload,
+  AdminUser,
+  AdminUserRolePayload,
 } from '@/entities/admin';
 import type { Order, OrderStatus } from '@/entities/order';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 
 export type AdminCrudRecord =
-  | AdminCategory
+  | AdminMarketCategory
   | AdminProduct
   | AdminCatalogCollection
-  | Order;
+  | Order
+  | AdminAdCategory
+  | AdminAd
+  | AdminUser;
 
 export type AdminCrudPayload =
-  | AdminCategoryPayload
+  | AdminMarketCategoryPayload
   | AdminProductPayload
   | AdminCatalogCollectionPayload
-  | { status: OrderStatus };
+  | { status: OrderStatus }
+  | AdminAdCategoryPayload
+  | AdminAdPayload
+  | AdminUserRolePayload;
 
-export type AdminCrudFormValue = string | boolean | File | File[] | string[] | null;
+export type AdminCrudFormValue =
+  | string
+  | boolean
+  | File
+  | File[]
+  | string[]
+  | null;
 
 export type AdminCrudFormValues = Record<string, AdminCrudFormValue>;
 
@@ -34,7 +52,8 @@ export type AdminCrudUpdateValue = (
 export type AdminCrudFieldsProps = {
   tabId: AdminManagementTabId;
   values: AdminCrudFormValues;
-  categories: AdminCategory[];
+  categories: AdminMarketCategory[];
+  adCategories: AdminAdCategory[];
   record?: AdminCrudRecord;
   onValueChange: AdminCrudUpdateValue;
 };

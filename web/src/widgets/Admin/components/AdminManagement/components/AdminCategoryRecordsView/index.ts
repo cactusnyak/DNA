@@ -1,1 +1,0 @@
-export { AdminCategoryRecordsView } from './AdminCategoryRecordsView';

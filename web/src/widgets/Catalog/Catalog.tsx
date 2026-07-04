@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 
-import { getCategorySlugFromPath } from '@/entities/category/utils/category-path';
+import { getCategorySlugFromPath } from '@/shared/catalog';
 import {
   PLATFORM_SECTION,
   type PlatformSectionId,
@@ -156,3 +156,4 @@ export function Catalog({
     </section>
   );
 }
+

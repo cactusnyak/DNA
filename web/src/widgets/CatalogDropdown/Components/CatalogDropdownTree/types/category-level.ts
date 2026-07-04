@@ -1,7 +1,7 @@
-import type { Category } from '@/entities/category';
+import type { CatalogCategory } from '@/shared/types/catalog-category';
 
 export type CategoryLevel = {
   level: number;
   parentId?: string;
-  categories: Category[];
+  categories: CatalogCategory[];
 };

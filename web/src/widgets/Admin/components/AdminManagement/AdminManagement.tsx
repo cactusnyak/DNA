@@ -72,10 +72,13 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     activeTabId: state.activeTabId,
     editingRecord: state.editingRecord,
     data: data ?? {
-      categories: [],
+      marketCategories: [],
       products: [],
       collections: [],
       orders: [],
+      adCategories: [],
+      ads: [],
+      users: [],
     },
     mutations,
     resetEditing: state.resetEditing,
@@ -120,8 +123,12 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       <AdminToolbar
         searchValue={state.searchValue}
         viewMode={state.viewMode}
-        canUseTree={state.activeTabId === 'categories'}
-        canCreate={state.activeTabId !== 'orders'}
+        canUseTree={['market-categories', 'ad-categories'].includes(
+          state.activeTabId,
+        )}
+        canCreate={
+          !['orders', 'ads', 'users'].includes(state.activeTabId)
+        }
         createLabel={activeTab?.createLabel}
         onSearchChange={state.setSearchValue}
         onViewModeChange={state.setViewMode}
@@ -155,4 +162,5 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     </section>
   );
 }
+
 
