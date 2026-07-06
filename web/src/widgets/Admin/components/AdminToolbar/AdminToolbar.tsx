@@ -38,12 +38,12 @@ export function AdminToolbar({
       <SearchInput
         value={searchValue}
         placeholder="Поиск по разделу..."
-        className="lg:max-w-sm"
+        className="w-full lg:max-w-sm"
         onChange={(event) => onSearchChange(event.target.value)}
       />
 
-      <div className="flex flex-wrap items-stretch gap-2">
-        <div className="inline-flex items-center gap-1 rounded-xl border border-border bg-muted/50 p-1">
+      <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:w-auto lg:grid-cols-[auto_auto]">
+        <div className="inline-flex w-full items-center gap-1 rounded-xl border border-border bg-muted/50 p-1 lg:w-auto">
           {availableViewModeOptions.map((option) => {
             const isActive = viewMode === option.value;
 
@@ -53,7 +53,7 @@ export function AdminToolbar({
                 type="button"
                 aria-pressed={isActive}
                 className={cn(
-                  'inline-flex h-9 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-colors',
+                  'inline-flex h-9 flex-1 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-colors lg:flex-none',
                   'hover:bg-background hover:text-foreground',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isActive && 'bg-background text-foreground ring-1 ring-border',
@@ -69,7 +69,7 @@ export function AdminToolbar({
         {canCreate && (
           <Button
             type="button"
-            className="h-auto cursor-pointer self-stretch rounded-xl px-4"
+            className="h-auto w-full cursor-pointer rounded-xl px-4 py-2 lg:w-auto"
             onClick={onCreateClick}
           >
             <Plus className="size-4" strokeWidth={1.5} />
