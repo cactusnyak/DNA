@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { OrderStatus } from '@prisma/client';
+
 import { PrismaService } from '../prisma/prisma.service';
 
 import type { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
@@ -96,6 +98,7 @@ export class OrdersService {
         customerEmail,
         deliveryAddress,
         comment,
+        status: OrderStatus.AWAITING_PAYMENT,
         totalAmount,
         items: {
           create: orderItems.map((item) => ({

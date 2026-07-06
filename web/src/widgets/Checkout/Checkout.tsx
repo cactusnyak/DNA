@@ -14,7 +14,7 @@ import { useSessionStore } from '@/entities/session';
 import { CheckoutCustomerForm } from './components/CheckoutCustomerForm';
 import { CheckoutEmptyState } from './components/CheckoutEmptyState';
 import { CheckoutOrderSummary } from './components/CheckoutOrderSummary';
-import { CheckoutSuccessState } from './components/CheckoutSuccessState';
+import { CheckoutPaymentState } from './components/CheckoutPaymentState';
 import { buildCreateOrderPayload } from './logic/build-create-order-payload';
 import { initialCheckoutFormValue } from './logic/initial-checkout-form-value';
 import { isCheckoutFormValid } from './logic/is-checkout-form-valid';
@@ -46,7 +46,7 @@ export function Checkout() {
   });
 
   if (createdOrder) {
-    return <CheckoutSuccessState order={createdOrder} />;
+    return <CheckoutPaymentState order={createdOrder} />;
   }
 
   if (!items.length) {
