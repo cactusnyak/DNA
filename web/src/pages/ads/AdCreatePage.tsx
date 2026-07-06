@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
-import { createAd, type CreateAdPayload } from '@/entities/ad';
+import { createAd, type CreateAdPayload, uploadAdImage } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { AdForm } from '@/widgets/AdForm';
 import { StateCard } from '@/widgets/StateCard';
@@ -42,7 +42,10 @@ export function AdCreatePage() {
       <AdForm
         submitLabel="Опубликовать"
         isPending={createMutation.isPending}
-        onSubmit={(payload) => createMutation.mutateAsync(payload)}
+        onUploadImage={(file) =>
+          uploadAdImage(accessToken, file).then((response) => response.url)
+        }
+        onSubmit={(payload) => createMutation.mutateAsync(payload).then(() => {})}
         onCancel={() => navigate('/ads/my')}
       />
     </div>

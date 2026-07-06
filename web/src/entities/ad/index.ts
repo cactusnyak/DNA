@@ -4,6 +4,7 @@ export { getMyAds } from './api/get-my-ads';
 export { createAd } from './api/create-ad';
 export { updateAd } from './api/update-ad';
 export { deleteAd } from './api/delete-ad';
+export { uploadAdImage } from './api/upload-ad-image';
 
 export { AD_STATUS_LABELS, formatAdStatus } from './utils/format-ad-status';
 

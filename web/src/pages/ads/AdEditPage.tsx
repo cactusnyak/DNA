@@ -5,6 +5,7 @@ import { SectionHeader } from '@/components/ui/Section';
 import {
   getAd,
   updateAd,
+  uploadAdImage,
   type UpdateAdPayload,
 } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
@@ -70,7 +71,10 @@ export function AdEditPage() {
         initialAd={ad}
         submitLabel="Сохранить изменения"
         isPending={updateMutation.isPending}
-        onSubmit={(payload) => updateMutation.mutateAsync(payload)}
+        onUploadImage={(file) =>
+          uploadAdImage(accessToken, file).then((response) => response.url)
+        }
+        onSubmit={(payload) => updateMutation.mutateAsync(payload).then(() => {})}
         onCancel={() => navigate('/ads/my')}
       />
     </div>

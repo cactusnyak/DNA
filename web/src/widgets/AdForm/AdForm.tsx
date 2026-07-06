@@ -2,6 +2,7 @@ import { type FormEvent, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import {
+  FormImageFilesField,
   FormInputField,
   FormSelectField,
   FormTextareaField,
@@ -14,18 +15,16 @@ type AdFormProps = {
   initialAd?: Ad;
   isPending?: boolean;
   submitLabel: string;
+  onUploadImage: (file: File) => Promise<string>;
   onSubmit: (payload: CreateAdPayload) => void | Promise<void>;
   onCancel?: () => void;
 };
-
-function getInitialImageUrls(ad?: Ad) {
-  return ad?.images.map((image) => image.url).join('\n') ?? '';
-}
 
 export function AdForm({
   initialAd,
   isPending = false,
   submitLabel,
+  onUploadImage,
   onSubmit,
   onCancel,
 }: AdFormProps) {
@@ -38,9 +37,11 @@ export function AdForm({
   const [categoryId, setCategoryId] = useState(initialAd?.categoryId ?? '');
   const [price, setPrice] = useState(String(initialAd?.price ?? ''));
   const [description, setDescription] = useState(initialAd?.description ?? '');
-  const [imageUrlsText, setImageUrlsText] = useState(
-    getInitialImageUrls(initialAd),
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>(
+    initialAd?.images.map((image) => image.url) ?? [],
   );
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   const [error, setError] = useState<string>();
 
   const categoryOptions = useMemo(
@@ -68,18 +69,19 @@ export function AdForm({
       return;
     }
 
-    const imageUrls = imageUrlsText
-      .split('\n')
-      .map((url) => url.trim())
-      .filter(Boolean);
+    setIsUploadingImages(true);
 
     try {
+      const uploadedImageUrls = await Promise.all(
+        imageFiles.map(onUploadImage),
+      );
+
       await onSubmit({
         title: title.trim(),
         description: description.trim(),
         categoryId,
         price: Number(price) || 0,
-        imageUrls,
+        imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       });
     } catch (submitError) {
       setError(
@@ -87,8 +89,12 @@ export function AdForm({
           ? submitError.message
           : 'Не удалось сохранить объявление.',
       );
+    } finally {
+      setIsUploadingImages(false);
     }
   }
+
+  const isFormPending = isPending || isUploadingImages;
 
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
@@ -121,11 +127,14 @@ export function AdForm({
         onChange={(event) => setDescription(event.target.value)}
       />
 
-      <FormTextareaField
-        label="Ссылки на изображения"
-        caption="По одной ссылке в строке."
-        value={imageUrlsText}
-        onChange={(event) => setImageUrlsText(event.target.value)}
+      <FormImageFilesField
+        label="Изображения"
+        caption="Можно выбрать несколько файлов. Новые файлы будут загружены при сохранении."
+        files={imageFiles}
+        existingImageUrls={existingImageUrls}
+        disabled={isFormPending}
+        onFilesChange={setImageFiles}
+        onExistingImageUrlsChange={setExistingImageUrls}
       />
 
       {error && (
@@ -135,15 +144,15 @@ export function AdForm({
       )}
 
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending ? 'Сохраняем...' : submitLabel}
+        <Button type="submit" disabled={isFormPending}>
+          {isUploadingImages ? 'Загружаем изображения...' : isPending ? 'Сохраняем...' : submitLabel}
         </Button>
 
         {onCancel && (
           <Button
             type="button"
             variant="outline"
-            disabled={isPending}
+            disabled={isFormPending}
             onClick={onCancel}
           >
             Отмена

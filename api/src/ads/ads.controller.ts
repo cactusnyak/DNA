@@ -9,9 +9,14 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { AuthService } from '../auth/auth.service';
+import type { AdminUploadedImageFile } from '../admin/admin.service';
+import { AdminService } from '../admin/admin.service';
 
 import { AdCategoriesService } from '../ad-categories/ad-categories.service';
 import { AdsService } from './ads.service';
@@ -24,7 +29,25 @@ export class AdsController {
     private readonly adsService: AdsService,
     private readonly adCategoriesService: AdCategoriesService,
     private readonly authService: AuthService,
+    private readonly adminService: AdminService,
   ) {}
+
+  @Post('uploads/images')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
+  )
+  async uploadImage(
+    @UploadedFile() file: AdminUploadedImageFile | undefined,
+    @Headers('authorization') authorizationHeader?: string,
+  ) {
+    await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
+
+    return this.adminService.uploadImage(file);
+  }
 
   @Get('categories')
   findCategories() {
