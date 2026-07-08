@@ -18,6 +18,7 @@ const catalog_collections_module_1 = require("./catalog-collections/catalog-coll
 const market_categories_module_1 = require("./market-categories/market-categories.module");
 const market_module_1 = require("./market/market.module");
 const orders_module_1 = require("./orders/orders.module");
+const payments_module_1 = require("./payments/payments.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const products_module_1 = require("./products/products.module");
 const referrals_module_1 = require("./referrals/referrals.module");
@@ -36,6 +37,7 @@ exports.AppModule = AppModule = __decorate([
             ad_categories_module_1.AdCategoriesModule,
             ads_module_1.AdsModule,
             orders_module_1.OrdersModule,
+            payments_module_1.PaymentsModule,
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             referrals_module_1.ReferralsModule,

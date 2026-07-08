@@ -10,6 +10,7 @@ import { CatalogCollectionsModule } from './catalog-collections/catalog-collecti
 import { MarketCategoriesModule } from './market-categories/market-categories.module';
 import { MarketModule } from './market/market.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { ReferralsModule } from './referrals/referrals.module';
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     AdCategoriesModule,
     AdsModule,
     OrdersModule,
+    PaymentsModule,
     UsersModule,
     AuthModule,
     ReferralsModule,
