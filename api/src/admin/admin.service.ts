@@ -132,6 +132,65 @@ export class AdminService {
   }
 
 
+  async getReferrals() {
+    const users = await this.prismaService.user.findMany({
+      where: { deletedAt: null },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        role: true,
+        referralCode: true,
+        createdAt: true,
+        receivedReferral: {
+          select: {
+            inviterUserId: true,
+          },
+        },
+        invitedReferrals: {
+          select: {
+            invitedUserId: true,
+            createdAt: true,
+            invited: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                deletedAt: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return users.map((user) => ({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      referralCode: user.referralCode,
+      createdAt: user.createdAt,
+      invitedBy: user.receivedReferral?.inviterUserId ?? null,
+      directReferrals: user.invitedReferrals.map((r) => ({
+        id: r.invited.id,
+        firstName: r.invited.firstName,
+        lastName: r.invited.lastName,
+        email: r.invited.email,
+        isDeleted: r.invited.deletedAt !== null,
+        joinedAt: r.createdAt,
+      })),
+      directReferralsCount: user.invitedReferrals.length,
+    }));
+  }
+
   async uploadImage(file?: AdminUploadedImageFile) {
     if (!file?.buffer) {
       throw new BadRequestException('Image file is required');

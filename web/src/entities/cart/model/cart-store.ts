@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import type { Ad } from '@/entities/ad';
 import type { Product } from '@/entities/product';
 
 export type CartStoreItem = {
@@ -8,8 +9,13 @@ export type CartStoreItem = {
   quantity: number;
 };
 
+export type CartAdItem = {
+  ad: Ad;
+};
+
 type CartStore = {
   items: CartStoreItem[];
+  adItems: CartAdItem[];
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   increaseItem: (productId: string) => void;
@@ -19,12 +25,31 @@ type CartStore = {
   getItemQuantity: (productId: string) => number;
   getTotalItems: () => number;
   getTotalAmount: () => number;
+  addAdItem: (ad: Ad) => void;
+  removeAdItem: (adId: string) => void;
+  hasAdItem: (adId: string) => boolean;
 };
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      adItems: [],
+
+      addAdItem: (ad) => {
+        if (get().hasAdItem(ad.id)) return;
+        set((state) => ({ adItems: [...state.adItems, { ad }] }));
+      },
+
+      removeAdItem: (adId) => {
+        set((state) => ({
+          adItems: state.adItems.filter((i) => i.ad.id !== adId),
+        }));
+      },
+
+      hasAdItem: (adId) => {
+        return get().adItems.some((i) => i.ad.id === adId);
+      },
 
       addItem: (product) => {
         const currentItem = get().items.find(
@@ -130,6 +155,7 @@ export const useCartStore = create<CartStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         items: state.items,
+        adItems: state.adItems,
       }),
     },
   ),

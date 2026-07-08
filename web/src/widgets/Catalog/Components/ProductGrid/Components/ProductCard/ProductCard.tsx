@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { FavouriteButton } from '@/entities/favourite';
 import type { Product } from '@/entities/product';
 import {
   getPlatformProductHref,
@@ -35,6 +36,10 @@ export function ProductCard({
 
       <div className="relative z-0">
         <ProductGallery images={product.images} title={product.title} />
+
+        <div className="absolute right-2 top-2 z-20">
+          <FavouriteButton item={{ productId: product.id }} />
+        </div>
       </div>
 
       <div className="relative z-0">

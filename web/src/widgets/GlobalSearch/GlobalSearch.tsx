@@ -39,6 +39,12 @@ export function GlobalSearch({
     isProductsPending,
     isProductsError,
 
+    adResults,
+    visibleAds,
+    hasMoreAds,
+    isAdsPending,
+    isAdsError,
+
     setSearchValue,
     openSearch,
     handleResultClick,
@@ -75,6 +81,11 @@ export function GlobalSearch({
           isProductsPending={isProductsPending}
           isProductsError={isProductsError}
           hasMoreProducts={hasMoreProducts}
+          ads={visibleAds}
+          totalAds={adResults.length}
+          isAdsPending={isAdsPending}
+          isAdsError={isAdsError}
+          hasMoreAds={hasMoreAds}
           onProductResultsScroll={handleProductResultsScroll}
           onNavigate={handleResultClick}
         />

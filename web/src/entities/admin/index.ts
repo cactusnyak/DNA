@@ -1,4 +1,6 @@
 export { getAdminOverview } from './api/get-admin-overview';
+export { getAdminReferrals } from './api/get-admin-referrals';
+export type { AdminReferralUser } from './api/get-admin-referrals';
 
 export {
   createAdminAdCategory,

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import type { Ad } from '@/entities/ad';
+import { FavouriteButton } from '@/entities/favourite';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type AdCardProps = {
@@ -15,7 +16,7 @@ export function AdCard({ ad }: AdCardProps) {
       to={`/ads/ad/${ad.id}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-foreground/30"
     >
-      <div className="aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {coverImage ? (
           <img
             src={coverImage.url}
@@ -28,6 +29,10 @@ export function AdCard({ ad }: AdCardProps) {
             Нет фото
           </div>
         )}
+
+        <div className="absolute right-2 top-2 z-10">
+          <FavouriteButton item={{ adId: ad.id }} />
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">

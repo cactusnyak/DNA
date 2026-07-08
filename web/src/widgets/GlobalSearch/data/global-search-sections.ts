@@ -39,11 +39,11 @@ export const globalSearchSections: GlobalSearchSection[] = [
     keywords: ['каталог', 'товары', 'категории', 'магазин', 'маркет'],
   },
   {
-    id: 'favorites',
+    id: 'favourites',
     title: 'Избранное',
-    description: 'Сохранённые товары маркета и будущие объявления доски.',
-    href: '/favorites',
-    keywords: ['избранное', 'favorites', 'сохраненное', 'сохранённое'],
+    description: 'Сохранённые товары маркета и объявления доски.',
+    href: '/favourites',
+    keywords: ['избранное', 'favorites', 'favourites', 'сохраненное', 'сохранённое'],
   },
   {
     id: 'cart',

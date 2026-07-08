@@ -82,12 +82,32 @@ export function MyAdsManager() {
       )}
 
       <ul className="space-y-3">
-        {ads.map((ad) => (
+        {ads.map((ad) => {
+          const cover = ad.images?.[0];
+
+          return (
           <li
             key={ad.id}
-            className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4"
+            className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4"
           >
-            <div className="min-w-0">
+            <Link
+              to={`/ads/ad/${ad.id}`}
+              className="size-16 shrink-0 overflow-hidden rounded-xl bg-muted"
+            >
+              {cover ? (
+                <img
+                  src={cover.url}
+                  alt={cover.alt ?? ad.title}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
+                  Нет фото
+                </div>
+              )}
+            </Link>
+
+            <div className="min-w-0 flex-1">
               <Link
                 to={`/ads/ad/${ad.id}`}
                 className="font-semibold underline-offset-4 hover:underline"
@@ -115,7 +135,8 @@ export function MyAdsManager() {
               </Button>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

@@ -8,12 +8,14 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 import { getCatalogCategories } from '@/shared/catalog';
+import { getAds } from '@/entities/ad/api/get-ads';
 import { getProducts } from '@/entities/product/api/get-products';
 import {
   PLATFORM_SECTION,
   type PlatformSectionId,
 } from '@/shared/platform';
 
+import { filterGlobalSearchAds } from '../logic/filter-global-search-ads';
 import { filterGlobalSearchCategories } from '../logic/filter-global-search-categories';
 import { filterGlobalSearchProducts } from '../logic/filter-global-search-products';
 import { filterGlobalSearchSections } from '../logic/filter-global-search-sections';
@@ -42,6 +44,8 @@ export function useGlobalSearch({
   const isScopedSearchEnabled = Boolean(section && isOpen && isSearchReady);
   const isMarketProductSearchEnabled =
     section === PLATFORM_SECTION.MARKET && isOpen && isSearchReady;
+  const isAdsSearchEnabled =
+    section === PLATFORM_SECTION.ADS && isOpen && isSearchReady;
 
   const {
     data: categories = [],
@@ -62,6 +66,17 @@ export function useGlobalSearch({
     queryKey: ['global-search-products', section],
     queryFn: () => getProducts({ section }),
     enabled: isMarketProductSearchEnabled,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const {
+    data: ads = [],
+    isPending: isAdsPending,
+    isError: isAdsError,
+  } = useQuery({
+    queryKey: ['global-search-ads'],
+    queryFn: () => getAds(),
+    enabled: isAdsSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -88,6 +103,17 @@ export function useGlobalSearch({
 
     return filterGlobalSearchProducts(products, searchValue);
   }, [isSearchReady, products, searchValue, section]);
+
+  const adResults = useMemo(() => {
+    if (section !== PLATFORM_SECTION.ADS || !isSearchReady) {
+      return [];
+    }
+
+    return filterGlobalSearchAds(ads, searchValue);
+  }, [ads, isSearchReady, searchValue, section]);
+
+  const visibleAds = adResults.slice(0, visibleProductsLimit);
+  const hasMoreAds = visibleProductsLimit < adResults.length;
 
   const visibleProducts = productResults.slice(0, visibleProductsLimit);
   const hasMoreProducts = visibleProductsLimit < productResults.length;
@@ -167,6 +193,12 @@ export function useGlobalSearch({
     hasMoreProducts,
     isProductsPending,
     isProductsError,
+
+    adResults,
+    visibleAds,
+    hasMoreAds,
+    isAdsPending,
+    isAdsError,
 
     setSearchValue,
     openSearch,

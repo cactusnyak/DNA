@@ -1,4 +1,5 @@
 import {
+  Heart,
   ShieldCheck,
   ShoppingCart,
   User,
@@ -12,6 +13,11 @@ export const navigationItems: MainNavigationItem[] = [
     to: '/referrals',
     label: 'Заработок',
     icon: WalletCards,
+  },
+  {
+    to: '/favourites',
+    label: 'Избранное',
+    icon: Heart,
   },
   {
     to: '/profile',

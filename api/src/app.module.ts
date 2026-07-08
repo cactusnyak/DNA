@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { CatalogCollectionsModule } from './catalog-collections/catalog-collections.module';
 import { MarketCategoriesModule } from './market-categories/market-categories.module';
 import { MarketModule } from './market/market.module';
+import { FavouritesModule } from './favourites/favourites.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     MarketModule,
     AdCategoriesModule,
     AdsModule,
+    FavouritesModule,
     OrdersModule,
     PaymentsModule,
     UsersModule,

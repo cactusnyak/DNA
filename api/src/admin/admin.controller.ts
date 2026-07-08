@@ -39,6 +39,11 @@ export class AdminController {
     return this.adminService.getCatalog();
   }
 
+  @Get('referrals')
+  getReferrals() {
+    return this.adminService.getReferrals();
+  }
+
   @Post('uploads/images')
   @UseInterceptors(
     FileInterceptor('file', {

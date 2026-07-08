@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { ShoppingBag } from 'lucide-react';
 
 import { getAd } from '@/entities/ad';
+import { useCartStore } from '@/entities/cart';
+import { FavouriteButton } from '@/entities/favourite';
+import { Button } from '@/components/ui/Button';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type AdDetailsProps = {
@@ -40,6 +44,11 @@ export function AdDetails({ adId }: AdDetailsProps) {
   const sellerName = ad.seller
     ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
     : 'Продавец';
+
+  const addAdItem = useCartStore((state) => state.addAdItem);
+  const removeAdItem = useCartStore((state) => state.removeAdItem);
+  const hasAdItem = useCartStore((state) => state.hasAdItem);
+  const isInCart = hasAdItem(ad.id);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
@@ -101,6 +110,22 @@ export function AdDetails({ adId }: AdDetailsProps) {
             </p>
           </div>
         )}
+
+        <div className="flex gap-2">
+          <Button
+            className="flex-1"
+            variant={isInCart ? 'outline' : 'default'}
+            onClick={() => isInCart ? removeAdItem(ad.id) : addAdItem(ad)}
+          >
+            <ShoppingBag className="size-4" />
+            {isInCart ? 'Убрать из корзины' : 'Сохранить в корзину'}
+          </Button>
+
+          <FavouriteButton
+            item={{ adId: ad.id }}
+            className="size-10 rounded-xl border border-border"
+          />
+        </div>
 
         <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
           <h2 className="text-sm font-semibold text-muted-foreground">

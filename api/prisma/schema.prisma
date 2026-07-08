@@ -59,13 +59,29 @@ model User {
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])
 
-  cartItems CartItem[]
-  orders    Order[]
-  ads       Ad[]
+  cartItems  CartItem[]
+  orders     Order[]
+  ads        Ad[]
+  favourites Favourite[]
 
   invitedReferrals Referral[] @relation("Inviter")
   receivedReferral Referral?  @relation("Invited")
   balance          Balance?
+}
+
+model Favourite {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String?
+  adId      String?
+  createdAt DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ad      Ad?      @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@unique([userId, adId])
 }
 
 model Balance {
@@ -133,6 +149,7 @@ model Product {
 
   cartItems  CartItem[]
   orderItems OrderItem[]
+  favourites Favourite[]
 
   collectionProducts CatalogCollectionProduct[]
 }
@@ -174,9 +191,11 @@ model Ad {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category AdCategory @relation(fields: [categoryId], references: [id])
-  seller   User       @relation(fields: [sellerId], references: [id])
-  images   AdImage[]
+  category   AdCategory  @relation(fields: [categoryId], references: [id])
+  seller     User        @relation(fields: [sellerId], references: [id])
+  images     AdImage[]
+  favourites Favourite[]
+  cartItems  CartItem[]
 }
 
 model AdImage {
@@ -200,16 +219,19 @@ model ProductImage {
 }
 
 model CartItem {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   userId    String
-  productId String
+  productId String?
+  adId      String?
   quantity  Int
   unitPrice Int
 
-  user    User    @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
+  ad      Ad?      @relation(fields: [adId], references: [id])
 
   @@unique([userId, productId])
+  @@unique([userId, adId])
 }
 
 model Order {

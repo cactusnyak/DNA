@@ -11,6 +11,10 @@ import {
   useAuthStore,
   type AuthResponse,
 } from '@/entities/auth';
+import {
+  syncFavourites,
+  useFavouriteStore,
+} from '@/entities/favourite';
 
 import { AuthorizationForm } from './components/AuthorizationForm';
 import {
@@ -50,6 +54,7 @@ export function Authorization() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const { guestItems, clearGuestItems } = useFavouriteStore();
 
   const authMutation = useMutation({
     mutationFn: () => {
@@ -62,6 +67,13 @@ export function Authorization() {
     onSuccess: (response: AuthResponse) => {
       setAccessToken(response.accessToken);
       queryClient.setQueryData(['current-user'], response.user);
+
+      if (guestItems.length > 0) {
+        syncFavourites(guestItems, response.accessToken).then(() => {
+          clearGuestItems();
+        });
+      }
+
       navigate('/profile');
     },
   });

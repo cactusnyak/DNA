@@ -17,7 +17,8 @@ import { CartPage } from '@/pages/cart/CartPage';
 import { CatalogPage } from '@/pages/catalog/CatalogPage';
 import { CategoryPage } from '@/pages/category/CategoryPage';
 import { CheckoutPage } from '@/pages/checkout/CheckoutPage';
-import { FavoritesPage } from '@/pages/favorites/FavoritesPage';
+import { CheckoutResultPage } from '@/pages/checkout/CheckoutResultPage';
+import { FavouritesPage } from '@/pages/favourites/FavouritesPage';
 import { HomePage } from '@/pages/home/HomePage';
 import { MarketPage } from '@/pages/market/MarketPage';
 import { ProductPage } from '@/pages/product/ProductPage';
@@ -242,8 +243,8 @@ export const router = createBrowserRouter([
 
 
       {
-        path: '/favorites',
-        element: <FavoritesPage />,
+        path: '/favourites',
+        element: <FavouritesPage />,
         handle: {
           breadcrumb: {
             type: BREADCRUMB_TYPE.STATIC,
@@ -270,6 +271,17 @@ export const router = createBrowserRouter([
           breadcrumb: {
             type: BREADCRUMB_TYPE.STATIC,
             label: 'Оформление заказа',
+          },
+        } satisfies BreadcrumbHandle,
+      },
+
+      {
+        path: '/checkout/result',
+        element: <CheckoutResultPage />,
+        handle: {
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Результат оплаты',
           },
         } satisfies BreadcrumbHandle,
       },

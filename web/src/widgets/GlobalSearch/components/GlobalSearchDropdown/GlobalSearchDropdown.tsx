@@ -1,12 +1,15 @@
 import type { UIEvent } from 'react';
 
+import type { Ad } from '@/entities/ad';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { Product } from '@/entities/product';
 import {
+  PLATFORM_SECTION,
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
 
+import { GlobalSearchAdRow } from '../GlobalSearchAdRow/GlobalSearchAdRow';
 import { GlobalSearchCategoryResults } from '../GlobalSearchCategoryResults';
 import { GlobalSearchProductResults } from '../GlobalSearchProductResults';
 import { GlobalSearchSectionResults } from '../GlobalSearchSectionResults';
@@ -29,6 +32,12 @@ type GlobalSearchDropdownProps = {
   isProductsError?: boolean;
   hasMoreProducts?: boolean;
 
+  ads: Ad[];
+  totalAds: number;
+  isAdsPending?: boolean;
+  isAdsError?: boolean;
+  hasMoreAds?: boolean;
+
   onProductResultsScroll: (event: UIEvent<HTMLDivElement>) => void;
   onNavigate: () => void;
 };
@@ -49,6 +58,12 @@ export function GlobalSearchDropdown({
   isProductsPending = false,
   isProductsError = false,
   hasMoreProducts = false,
+
+  ads,
+  totalAds,
+  isAdsPending = false,
+  isAdsError = false,
+  hasMoreAds = false,
 
   onProductResultsScroll,
   onNavigate,
@@ -86,16 +101,66 @@ export function GlobalSearchDropdown({
                 />
 
                 <div className="pt-3">
-                  <GlobalSearchProductResults
-                    section={section}
-                    products={products}
-                    totalProducts={totalProducts}
-                    isPending={isProductsPending}
-                    isError={isProductsError}
-                    hasMoreProducts={hasMoreProducts}
-                    onScroll={onProductResultsScroll}
-                    onNavigate={onNavigate}
-                  />
+                  {section === PLATFORM_SECTION.ADS ? (
+                    <section className="p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-sm font-semibold">Объявления</h3>
+                        <span className="text-xs text-muted-foreground">{totalAds}</span>
+                      </div>
+
+                      <div
+                        className="mt-3 max-h-80 overflow-y-auto pr-1"
+                        onScroll={onProductResultsScroll}
+                      >
+                        {isAdsPending && (
+                          <p className="rounded-lg bg-muted/40 px-3 py-3 text-sm text-muted-foreground">
+                            Ищем объявления...
+                          </p>
+                        )}
+
+                        {isAdsError && (
+                          <p className="rounded-lg bg-destructive/10 px-3 py-3 text-sm text-destructive">
+                            Не удалось загрузить объявления.
+                          </p>
+                        )}
+
+                        {!isAdsPending && !isAdsError && ads.length === 0 && (
+                          <p className="rounded-lg bg-muted/40 px-3 py-3 text-sm text-muted-foreground">
+                            Объявления не найдены.
+                          </p>
+                        )}
+
+                        {!isAdsPending && !isAdsError && ads.length > 0 && (
+                          <div className="grid gap-1">
+                            {ads.map((ad) => (
+                              <GlobalSearchAdRow
+                                key={ad.id}
+                                ad={ad}
+                                onNavigate={onNavigate}
+                              />
+                            ))}
+
+                            {hasMoreAds && (
+                              <p className="py-2 text-center text-xs text-muted-foreground">
+                                Прокрутите ниже, чтобы показать ещё.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </section>
+                  ) : (
+                    <GlobalSearchProductResults
+                      section={section}
+                      products={products}
+                      totalProducts={totalProducts}
+                      isPending={isProductsPending}
+                      isError={isProductsError}
+                      hasMoreProducts={hasMoreProducts}
+                      onScroll={onProductResultsScroll}
+                      onNavigate={onNavigate}
+                    />
+                  )}
                 </div>
               </>
             ) : (
