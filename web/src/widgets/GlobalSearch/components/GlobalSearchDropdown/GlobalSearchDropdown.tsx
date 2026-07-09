@@ -77,9 +77,9 @@ export function GlobalSearchDropdown({
     <div className="absolute top-full right-0 left-0 z-[70] min-w-[320px] pt-2">
       <div className="overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl">
         {!isSearchReady ? (
-          <div className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground">
+          <p className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground leading-[1.5]">
             {scopedSearchDescription}
-          </div>
+          </p>
         ) : (
           <div className="flex flex-col divide-y divide-border">
             <div className="pb-3">

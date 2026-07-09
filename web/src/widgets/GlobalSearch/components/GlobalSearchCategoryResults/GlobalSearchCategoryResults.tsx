@@ -22,7 +22,7 @@ export function GlobalSearchCategoryResults({
   onNavigate,
 }: GlobalSearchCategoryResultsProps) {
   return (
-    <section className="py-3">
+    <section className="p-3">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">Категории</h3>
 
@@ -33,7 +33,7 @@ export function GlobalSearchCategoryResults({
 
       <div className="mt-3 grid gap-1">
         {isPending && (
-          <p className="rounded-lg bg-muted/40 p-5 text-sm text-muted-foreground">
+          <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
             Ищем категории...
           </p>
         )}
@@ -45,7 +45,7 @@ export function GlobalSearchCategoryResults({
         )}
 
         {!isPending && !isError && categories.length === 0 && (
-          <p className="rounded-lg bg-muted/40 p-5 text-sm text-muted-foreground">
+          <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
             Категории не найдены.
           </p>
         )}

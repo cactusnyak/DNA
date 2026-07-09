@@ -5,6 +5,7 @@ import { USER_ROLE_LABELS } from '@/entities/user';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
@@ -13,6 +14,7 @@ type AdminUserRecordsViewProps = {
   viewMode: AdminViewMode;
   searchValue: string;
   renderActions: (user: AdminUser) => ReactNode;
+  bulkActions?: AdminBulkAction[];
 };
 
 function getUserName(user: AdminUser) {
@@ -33,6 +35,7 @@ export function AdminUserRecordsView({
   viewMode,
   searchValue,
   renderActions,
+  bulkActions,
 }: AdminUserRecordsViewProps) {
   if (viewMode === 'list') {
     return (
@@ -60,7 +63,20 @@ export function AdminUserRecordsView({
       getRecordKey={(user) => user.id}
       emptyText="Пользователи не найдены."
       renderActions={renderActions}
+      bulkActions={bulkActions}
       columns={[
+        {
+          key: 'id',
+          title: 'ID',
+          width: 100,
+          sortable: false,
+          getValue: (user) => user.id,
+          render: (user) => (
+            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {user.id.slice(0, 8)}
+            </code>
+          ),
+        },
         {
           key: 'name',
           title: 'Имя',

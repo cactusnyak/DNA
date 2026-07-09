@@ -207,6 +207,11 @@ export function useAdminCrudHandlers({
       return;
     }
 
+    if (activeTabId === 'users') {
+      mutations.hardDeleteUserMutation.mutate(record.id);
+      return;
+    }
+
     if (activeTabId === 'orders') {
       mutations.hardDeleteOrderMutation.mutate(record.id);
     }

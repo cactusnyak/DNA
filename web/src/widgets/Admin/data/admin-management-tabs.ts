@@ -2,6 +2,7 @@ import {
   Boxes,
   ClipboardList,
   FolderTree,
+  GitMerge,
   Layers3,
   Megaphone,
   Tags,
@@ -82,5 +83,13 @@ export const adminManagementTabs: AdminManagementTab[] = [
     title: 'Пользователи',
     description: 'Управление пользователями, ролями и доступом.',
     icon: Users,
+  },
+  {
+    id: 'referrals',
+    group: 'users',
+    groupLabel: 'Пользователи',
+    title: 'Рефералы',
+    description: 'Реферальные цепочки, уровни и участники программы.',
+    icon: GitMerge,
   },
 ];

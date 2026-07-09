@@ -1,8 +1,23 @@
 export { getAdminOverview } from './api/get-admin-overview';
 export { getAdminReferrals } from './api/get-admin-referrals';
-export type { AdminReferralUser } from './api/get-admin-referrals';
+export type { AdminReferralChild, AdminReferralUser } from './api/get-admin-referrals';
 
 export {
+  bulkDeleteAdminAdCategories,
+  bulkDeleteAdminAds,
+  bulkDeleteAdminMarketCategories,
+  bulkDeleteAdminProducts,
+  bulkDeleteAdminUsers,
+  bulkHardDeleteAdminUsers,
+  hardDeleteAdminUser,
+  bulkHardDeleteAdminAdCategories,
+  bulkHardDeleteAdminAds,
+  bulkHardDeleteAdminMarketCategories,
+  bulkHardDeleteAdminProducts,
+  bulkRestoreAdminAdCategories,
+  bulkRestoreAdminAds,
+  bulkRestoreAdminMarketCategories,
+  bulkRestoreAdminProducts,
   createAdminAdCategory,
   createAdminCatalogCollection,
   createAdminMarketCategory,

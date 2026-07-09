@@ -132,7 +132,7 @@ export class AdminService {
   }
 
 
-  async getReferrals() {
+  async getReferrals(): Promise<object[]> {
     const users = await this.prismaService.user.findMany({
       where: { deletedAt: null },
       select: {
@@ -145,13 +145,10 @@ export class AdminService {
         referralCode: true,
         createdAt: true,
         receivedReferral: {
-          select: {
-            inviterUserId: true,
-          },
+          select: { inviterUserId: true },
         },
         invitedReferrals: {
           select: {
-            invitedUserId: true,
             createdAt: true,
             invited: {
               select: {
@@ -163,32 +160,56 @@ export class AdminService {
               },
             },
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: 'asc' },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
     });
 
-    return users.map((user) => ({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      referralCode: user.referralCode,
-      createdAt: user.createdAt,
-      invitedBy: user.receivedReferral?.inviterUserId ?? null,
-      directReferrals: user.invitedReferrals.map((r) => ({
-        id: r.invited.id,
-        firstName: r.invited.firstName,
-        lastName: r.invited.lastName,
-        email: r.invited.email,
-        isDeleted: r.invited.deletedAt !== null,
-        joinedAt: r.createdAt,
-      })),
-      directReferralsCount: user.invitedReferrals.length,
-    }));
+    type FlatUser = (typeof users)[number];
+
+    const byId = new Map<string, FlatUser>(users.map((u) => [u.id, u]));
+
+    type TreeNode = {
+      id: string; firstName: string; lastName: string; email: string;
+      phone: string | null; role: string; referralCode: string | null;
+      createdAt: Date; deletedAt: null; invitedBy: string | null;
+      directReferralsCount: number; directReferrals: TreeNode[];
+    };
+
+    function buildNode(user: FlatUser, inviterChain: string | null, visited: Set<string>): TreeNode {
+      const children: TreeNode[] = user.invitedReferrals
+        .filter((r) => !visited.has(r.invited.id))
+        .map((r) => {
+          const childUser = byId.get(r.invited.id);
+          if (!childUser) return null;
+          const next = new Set(visited);
+          next.add(r.invited.id);
+          return buildNode(childUser, inviterChain
+            ? `${inviterChain} → ${user.firstName} ${user.lastName}`.trim()
+            : (`${user.firstName} ${user.lastName}`.trim() || user.email), next);
+        })
+        .filter((n): n is TreeNode => n !== null);
+
+      return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        referralCode: user.referralCode,
+        createdAt: user.createdAt,
+        deletedAt: null,
+        invitedBy: inviterChain,
+        directReferralsCount: children.length,
+        directReferrals: children,
+      };
+    }
+
+    const rootUsers = users.filter((u) => !u.receivedReferral);
+
+    return rootUsers.map((user) => buildNode(user, null, new Set([user.id])));
   }
 
   async uploadImage(file?: AdminUploadedImageFile) {
@@ -2131,6 +2152,164 @@ export class AdminService {
       adsCount: user._count?.ads ?? 0,
       ordersCount: user._count?.orders ?? 0,
     };
+  }
+
+  // ===== Bulk operations =====
+
+  private getIdsFromBody(body: unknown): string[] {
+    const payload = this.getObjectBody(body);
+    if (!Array.isArray(payload.ids)) {
+      throw new BadRequestException('ids must be an array of strings');
+    }
+    const ids = payload.ids.filter((id) => typeof id === 'string' && id.trim());
+    if (!ids.length) {
+      throw new BadRequestException('ids array must not be empty');
+    }
+    return ids as string[];
+  }
+
+  async hardDeleteUser(id: string) {
+    await this.prismaService.$transaction(async (tx) => {
+      const adIds = (await tx.ad.findMany({ where: { sellerId: id }, select: { id: true } })).map((a) => a.id);
+      const referralIds = (await tx.referral.findMany({ where: { OR: [{ inviterUserId: id }, { invitedUserId: id }] }, select: { id: true } })).map((r) => r.id);
+
+      await tx.referralReward.deleteMany({ where: { referralId: { in: referralIds } } });
+      await tx.referral.deleteMany({ where: { id: { in: referralIds } } });
+      await tx.cartItem.deleteMany({ where: { OR: [{ userId: id }, { adId: { in: adIds } }] } });
+      await tx.favourite.deleteMany({ where: { OR: [{ userId: id }, { adId: { in: adIds } }] } });
+      await tx.adImage.deleteMany({ where: { adId: { in: adIds } } });
+      await tx.ad.deleteMany({ where: { sellerId: id } });
+      await tx.cartItem.deleteMany({ where: { userId: id } });
+      await tx.balance.deleteMany({ where: { userId: id } });
+      await tx.user.delete({ where: { id } });
+    });
+    return { deleted: 1 };
+  }
+
+  async bulkDeleteUsers(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await Promise.all(ids.map((id) => this.usersService.softDeleteById(id)));
+    return { deleted: ids.length };
+  }
+
+  async bulkHardDeleteUsers(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.$transaction(async (tx) => {
+      const adIds = (await tx.ad.findMany({ where: { sellerId: { in: ids } }, select: { id: true } })).map((a) => a.id);
+      const referralIds = (await tx.referral.findMany({ where: { OR: [{ inviterUserId: { in: ids } }, { invitedUserId: { in: ids } }] }, select: { id: true } })).map((r) => r.id);
+
+      await tx.referralReward.deleteMany({ where: { referralId: { in: referralIds } } });
+      await tx.referral.deleteMany({ where: { id: { in: referralIds } } });
+      await tx.cartItem.deleteMany({ where: { OR: [{ userId: { in: ids } }, { adId: { in: adIds } }] } });
+      await tx.favourite.deleteMany({ where: { OR: [{ userId: { in: ids } }, { adId: { in: adIds } }] } });
+      await tx.adImage.deleteMany({ where: { adId: { in: adIds } } });
+      await tx.ad.deleteMany({ where: { sellerId: { in: ids } } });
+      await tx.balance.deleteMany({ where: { userId: { in: ids } } });
+      await tx.user.deleteMany({ where: { id: { in: ids } } });
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkDeleteProducts(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.product.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: false, deletedAt: new Date() },
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkHardDeleteProducts(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.productImage.deleteMany({ where: { productId: { in: ids } } });
+      await tx.product.deleteMany({ where: { id: { in: ids } } });
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkDeleteMarketCategories(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.marketCategory.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: false, deletedAt: new Date() },
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkHardDeleteMarketCategories(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.marketCategory.deleteMany({ where: { id: { in: ids } } });
+    return { deleted: ids.length };
+  }
+
+  async bulkDeleteAdCategories(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.adCategory.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: false, deletedAt: new Date() },
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkHardDeleteAdCategories(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.adCategory.deleteMany({ where: { id: { in: ids } } });
+    return { deleted: ids.length };
+  }
+
+  async bulkDeleteAds(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.ad.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: false, status: AdStatus.ARCHIVED, deletedAt: new Date() },
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkHardDeleteAds(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.adImage.deleteMany({ where: { adId: { in: ids } } });
+      await tx.ad.deleteMany({ where: { id: { in: ids } } });
+    });
+    return { deleted: ids.length };
+  }
+
+  async bulkRestoreProducts(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.product.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: true, deletedAt: null },
+    });
+    return { restored: ids.length };
+  }
+
+  async bulkRestoreMarketCategories(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.marketCategory.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: true, deletedAt: null },
+    });
+    return { restored: ids.length };
+  }
+
+  async bulkRestoreAdCategories(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.adCategory.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: true, deletedAt: null },
+    });
+    return { restored: ids.length };
+  }
+
+  async bulkRestoreAds(body: unknown) {
+    const ids = this.getIdsFromBody(body);
+    await this.prismaService.ad.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive: true, status: AdStatus.PUBLISHED, deletedAt: null },
+    });
+    return { restored: ids.length };
   }
 
 }

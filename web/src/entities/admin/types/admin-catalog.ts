@@ -85,6 +85,7 @@ export type AdminCatalogCollection = {
   title: string;
   description?: string;
   isActive: boolean;
+  deletedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   categories: AdminCatalogCollectionCategory[];

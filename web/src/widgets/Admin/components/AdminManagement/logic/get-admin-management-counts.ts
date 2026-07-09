@@ -10,5 +10,6 @@ export function getAdminManagementCounts(data?: AdminCatalogData) {
     'ad-categories': data?.adCategories.length ?? 0,
     ads: data?.ads.length ?? 0,
     users: data?.users.length ?? 0,
+    referrals: data?.referrals.length ?? 0,
   } satisfies Record<AdminManagementTabId, number>;
 }

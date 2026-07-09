@@ -1,6 +1,21 @@
 import { useMutation } from '@tanstack/react-query';
 
 import {
+  bulkDeleteAdminAdCategories,
+  bulkDeleteAdminAds,
+  bulkDeleteAdminMarketCategories,
+  bulkDeleteAdminProducts,
+  bulkDeleteAdminUsers,
+  bulkHardDeleteAdminUsers,
+  hardDeleteAdminUser,
+  bulkHardDeleteAdminAdCategories,
+  bulkHardDeleteAdminAds,
+  bulkHardDeleteAdminMarketCategories,
+  bulkHardDeleteAdminProducts,
+  bulkRestoreAdminAdCategories,
+  bulkRestoreAdminAds,
+  bulkRestoreAdminMarketCategories,
+  bulkRestoreAdminProducts,
   createAdminAdCategory,
   createAdminCatalogCollection,
   createAdminMarketCategory,
@@ -230,6 +245,82 @@ export function useAdminManagementMutations({
     onSuccess,
   });
 
+  const hardDeleteUserMutation = useMutation({
+    mutationFn: (id: string) => hardDeleteAdminUser(accessToken, id),
+    onSuccess,
+  });
+
+  // ===== Bulk =====
+  const bulkDeleteUsersMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteAdminUsers(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkHardDeleteUsersMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkHardDeleteAdminUsers(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkDeleteProductsMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteAdminProducts(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkHardDeleteProductsMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkHardDeleteAdminProducts(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkRestoreProductsMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkRestoreAdminProducts(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkDeleteMarketCategoriesMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteAdminMarketCategories(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkHardDeleteMarketCategoriesMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkHardDeleteAdminMarketCategories(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkRestoreMarketCategoriesMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkRestoreAdminMarketCategories(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkDeleteAdCategoriesMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteAdminAdCategories(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkHardDeleteAdCategoriesMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkHardDeleteAdminAdCategories(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkRestoreAdCategoriesMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkRestoreAdminAdCategories(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkDeleteAdsMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteAdminAds(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkHardDeleteAdsMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkHardDeleteAdminAds(accessToken, ids),
+    onSuccess,
+  });
+
+  const bulkRestoreAdsMutation = useMutation({
+    mutationFn: (ids: string[]) => bulkRestoreAdminAds(accessToken, ids),
+    onSuccess,
+  });
+
   return {
     createMarketCategoryMutation,
     updateMarketCategoryMutation,
@@ -260,6 +351,21 @@ export function useAdminManagementMutations({
     hardDeleteAdMutation,
     updateUserRoleMutation,
     deleteUserMutation,
+    hardDeleteUserMutation,
+    bulkDeleteUsersMutation,
+    bulkHardDeleteUsersMutation,
+    bulkDeleteProductsMutation,
+    bulkHardDeleteProductsMutation,
+    bulkRestoreProductsMutation,
+    bulkDeleteMarketCategoriesMutation,
+    bulkHardDeleteMarketCategoriesMutation,
+    bulkRestoreMarketCategoriesMutation,
+    bulkDeleteAdCategoriesMutation,
+    bulkHardDeleteAdCategoriesMutation,
+    bulkRestoreAdCategoriesMutation,
+    bulkDeleteAdsMutation,
+    bulkHardDeleteAdsMutation,
+    bulkRestoreAdsMutation,
     isCrudFormPending:
       createMarketCategoryMutation.isPending ||
       updateMarketCategoryMutation.isPending ||

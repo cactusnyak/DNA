@@ -4,6 +4,7 @@ import type { AdminCatalogCollection } from '@/entities/admin';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
@@ -13,6 +14,7 @@ type AdminCollectionRecordsViewProps = {
   viewMode: AdminViewMode;
   searchValue: string;
   renderActions: (collection: AdminCatalogCollection) => ReactNode;
+  bulkActions?: AdminBulkAction[];
 };
 
 const collectionTypeFilterOptions = [
@@ -56,6 +58,7 @@ export function AdminCollectionRecordsView({
   viewMode,
   searchValue,
   renderActions,
+  bulkActions,
 }: AdminCollectionRecordsViewProps) {
   if (viewMode === 'list') {
     return (
@@ -86,7 +89,20 @@ export function AdminCollectionRecordsView({
       getRecordKey={(collection) => collection.id}
       emptyText="Подборки не найдены."
       renderActions={renderActions}
+      bulkActions={bulkActions}
       columns={[
+        {
+          key: 'id',
+          title: 'ID',
+          width: 100,
+          sortable: false,
+          getValue: (collection) => collection.id,
+          render: (collection) => (
+            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {collection.id.slice(0, 8)}
+            </code>
+          ),
+        },
         {
           key: 'title',
           title: 'Название',

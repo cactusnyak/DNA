@@ -6,6 +6,7 @@ import { formatPrice } from '@/shared/utils/format-price';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
@@ -14,6 +15,7 @@ type AdminAdRecordsViewProps = {
   viewMode: AdminViewMode;
   searchValue: string;
   renderActions: (ad: AdminAd) => ReactNode;
+  bulkActions?: AdminBulkAction[];
 };
 
 function getStatusFilterOptions(ads: AdminAd[]) {
@@ -38,6 +40,7 @@ export function AdminAdRecordsView({
   viewMode,
   searchValue,
   renderActions,
+  bulkActions,
 }: AdminAdRecordsViewProps) {
   if (viewMode === 'list') {
     return (
@@ -63,7 +66,20 @@ export function AdminAdRecordsView({
       getRecordKey={(ad) => ad.id}
       emptyText="Объявления не найдены."
       renderActions={renderActions}
+      bulkActions={bulkActions}
       columns={[
+        {
+          key: 'id',
+          title: 'ID',
+          width: 100,
+          sortable: false,
+          getValue: (ad) => ad.id,
+          render: (ad) => (
+            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {ad.id.slice(0, 8)}
+            </code>
+          ),
+        },
         {
           key: 'title',
           title: 'Заголовок',

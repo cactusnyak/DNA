@@ -61,6 +61,21 @@ export class AdminController {
     return this.adminService.createCategory(body);
   }
 
+  @Delete('categories/bulk')
+  bulkDeleteMarketCategories(@Body() body: unknown) {
+    return this.adminService.bulkDeleteMarketCategories(body);
+  }
+
+  @Delete('categories/bulk/permanent')
+  bulkHardDeleteMarketCategories(@Body() body: unknown) {
+    return this.adminService.bulkHardDeleteMarketCategories(body);
+  }
+
+  @Patch('categories/bulk/restore')
+  bulkRestoreMarketCategories(@Body() body: unknown) {
+    return this.adminService.bulkRestoreMarketCategories(body);
+  }
+
   @Patch('categories/:id')
   updateCategory(@Param('id') id: string, @Body() body: unknown) {
     return this.adminService.updateCategory(id, body);
@@ -84,6 +99,21 @@ export class AdminController {
   @Post('products')
   createProduct(@Body() body: unknown) {
     return this.adminService.createProduct(body);
+  }
+
+  @Delete('products/bulk')
+  bulkDeleteProducts(@Body() body: unknown) {
+    return this.adminService.bulkDeleteProducts(body);
+  }
+
+  @Delete('products/bulk/permanent')
+  bulkHardDeleteProducts(@Body() body: unknown) {
+    return this.adminService.bulkHardDeleteProducts(body);
+  }
+
+  @Patch('products/bulk/restore')
+  bulkRestoreProducts(@Body() body: unknown) {
+    return this.adminService.bulkRestoreProducts(body);
   }
 
   @Patch('products/:id')
@@ -162,6 +192,21 @@ export class AdminController {
     return this.adminService.createAdCategory(body);
   }
 
+  @Delete('ad-categories/bulk')
+  bulkDeleteAdCategories(@Body() body: unknown) {
+    return this.adminService.bulkDeleteAdCategories(body);
+  }
+
+  @Delete('ad-categories/bulk/permanent')
+  bulkHardDeleteAdCategories(@Body() body: unknown) {
+    return this.adminService.bulkHardDeleteAdCategories(body);
+  }
+
+  @Patch('ad-categories/bulk/restore')
+  bulkRestoreAdCategories(@Body() body: unknown) {
+    return this.adminService.bulkRestoreAdCategories(body);
+  }
+
   @Patch('ad-categories/:id')
   updateAdCategory(@Param('id') id: string, @Body() body: unknown) {
     return this.adminService.updateAdCategory(id, body);
@@ -180,6 +225,21 @@ export class AdminController {
   @Patch('ad-categories/:id/restore')
   restoreAdCategory(@Param('id') id: string) {
     return this.adminService.restoreAdCategory(id);
+  }
+
+  @Delete('ads/bulk')
+  bulkDeleteAds(@Body() body: unknown) {
+    return this.adminService.bulkDeleteAds(body);
+  }
+
+  @Delete('ads/bulk/permanent')
+  bulkHardDeleteAds(@Body() body: unknown) {
+    return this.adminService.bulkHardDeleteAds(body);
+  }
+
+  @Patch('ads/bulk/restore')
+  bulkRestoreAds(@Body() body: unknown) {
+    return this.adminService.bulkRestoreAds(body);
   }
 
   @Patch('ads/:id')
@@ -202,9 +262,24 @@ export class AdminController {
     return this.adminService.restoreAd(id);
   }
 
+  @Delete('users/bulk')
+  bulkDeleteUsers(@Body() body: unknown) {
+    return this.adminService.bulkDeleteUsers(body);
+  }
+
+  @Delete('users/bulk/permanent')
+  bulkHardDeleteUsers(@Body() body: unknown) {
+    return this.adminService.bulkHardDeleteUsers(body);
+  }
+
   @Patch('users/:id/role')
   updateUserRole(@Param('id') id: string, @Body() body: unknown) {
     return this.adminService.updateUserRole(id, body);
+  }
+
+  @Delete('users/:id/permanent')
+  hardDeleteUser(@Param('id') id: string) {
+    return this.adminService.hardDeleteUser(id);
   }
 
   @Delete('users/:id')

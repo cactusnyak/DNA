@@ -5,6 +5,7 @@ export type AdminManagementTabId =
   | 'orders'
   | 'ad-categories'
   | 'ads'
-  | 'users';
+  | 'users'
+  | 'referrals';
 
 export type AdminViewMode = 'table' | 'list' | 'tree';

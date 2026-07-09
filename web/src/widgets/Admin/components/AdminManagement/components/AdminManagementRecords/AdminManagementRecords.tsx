@@ -6,10 +6,12 @@ import type {
   AdminCatalogCollection,
   AdminMarketCategory,
   AdminProduct,
+  AdminReferralUser,
   AdminUser,
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
 
+import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import type {
   AdminManagementTabId,
   AdminViewMode,
@@ -20,6 +22,7 @@ import { AdminCollectionRecordsView } from '../AdminCollectionRecordsView';
 import { AdminMarketCategoryRecordsView } from '../AdminMarketCategoryRecordsView';
 import { AdminOrderRecordsView } from '../AdminOrderRecordsView';
 import { AdminProductRecordsView } from '../AdminProductRecordsView';
+import { AdminReferralRecordsView } from '../AdminReferralRecordsView/AdminReferralRecordsView';
 import { AdminUserRecordsView } from '../AdminUserRecordsView';
 
 import type {
@@ -33,6 +36,7 @@ type AdminManagementRecordsProps = {
   searchValue: string;
   records: FilteredAdminRecords;
   renderActions: (record: EditableRecord) => ReactNode;
+  bulkActions?: AdminBulkAction[];
 };
 
 export function AdminManagementRecords({
@@ -41,6 +45,7 @@ export function AdminManagementRecords({
   searchValue,
   records,
   renderActions,
+  bulkActions,
 }: AdminManagementRecordsProps) {
   if (activeTabId === 'market-categories') {
     return (
@@ -51,6 +56,7 @@ export function AdminManagementRecords({
         renderActions={(category: AdminMarketCategory) =>
           renderActions(category)
         }
+        bulkActions={bulkActions}
       />
     );
   }
@@ -62,6 +68,7 @@ export function AdminManagementRecords({
         viewMode={viewMode}
         searchValue={searchValue}
         renderActions={(product: AdminProduct) => renderActions(product)}
+        bulkActions={bulkActions}
       />
     );
   }
@@ -75,6 +82,7 @@ export function AdminManagementRecords({
         renderActions={(collection: AdminCatalogCollection) =>
           renderActions(collection)
         }
+        bulkActions={bulkActions}
       />
     );
   }
@@ -86,6 +94,7 @@ export function AdminManagementRecords({
         viewMode={viewMode}
         searchValue={searchValue}
         renderActions={(category: AdminAdCategory) => renderActions(category)}
+        bulkActions={bulkActions}
       />
     );
   }
@@ -97,6 +106,7 @@ export function AdminManagementRecords({
         viewMode={viewMode}
         searchValue={searchValue}
         renderActions={(ad: AdminAd) => renderActions(ad)}
+        bulkActions={bulkActions}
       />
     );
   }
@@ -108,6 +118,18 @@ export function AdminManagementRecords({
         viewMode={viewMode}
         searchValue={searchValue}
         renderActions={(user: AdminUser) => renderActions(user)}
+        bulkActions={bulkActions}
+      />
+    );
+  }
+
+  if (activeTabId === 'referrals') {
+    return (
+      <AdminReferralRecordsView
+        referrals={records.referrals}
+        viewMode={viewMode}
+        searchValue={searchValue}
+        renderActions={(user: AdminReferralUser) => renderActions(user)}
       />
     );
   }

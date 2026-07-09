@@ -1,10 +1,17 @@
+import { useState } from 'react';
 import {
+  ArchiveX,
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  ChevronDown,
+  ChevronRight,
   RotateCcw,
+  Trash2,
+  Undo2,
 } from 'lucide-react';
 
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/shared/utils/cn';
 
@@ -45,7 +52,13 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   getRecordKey,
   renderActions,
   emptyText,
+  bulkActions,
+  getSubRows,
+  disableSelection,
 }: AdminRecordsTableProps<TRecord>) {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
   const {
     sortState,
     filterValues,
@@ -66,12 +79,135 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
     hasActions: Boolean(renderActions),
   });
 
+  const hasBulkActions = Boolean(bulkActions?.length) && !disableSelection;
+  const hasSubRows = Boolean(getSubRows);
+  const totalColSpan = columns.length + (hasBulkActions ? 1 : 0) + (renderActions ? 1 : 0) + (hasSubRows ? 1 : 0);
+  const allVisibleIds = visibleRecords.map(getRecordKey);
+  const allSelected = allVisibleIds.length > 0 && allVisibleIds.every((id) => selectedIds.has(id));
+  const someSelected = allVisibleIds.some((id) => selectedIds.has(id));
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allVisibleIds));
+    }
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function toggleExpand(id: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
   if (!records.length) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
         {emptyText}
       </div>
     );
+  }
+
+  const selectedCount = selectedIds.size;
+
+  function getDepthBg(depth: number, hasChildren: boolean, isExpanded: boolean) {
+    if (depth === 0) {
+      if (!hasChildren) return undefined;
+      return isExpanded ? 'bg-muted/40' : 'bg-muted/20';
+    }
+    if (depth === 1) return isExpanded && hasChildren ? 'bg-muted/60' : 'bg-muted/40';
+    if (depth === 2) return isExpanded && hasChildren ? 'bg-muted/70' : 'bg-muted/55';
+    return 'bg-muted/70';
+  }
+
+  function renderRow(record: TRecord, depth = 0) {
+    const key = getRecordKey(record);
+    const isDeleted = Boolean(record.deletedAt);
+    const isSelected = selectedIds.has(key);
+    const subRows = getSubRows?.(record) ?? [];
+    const hasChildren = subRows.length > 0;
+    const isExpanded = expandedIds.has(key);
+    const depthBg = !isDeleted && !isSelected ? getDepthBg(depth, hasChildren, isExpanded) : undefined;
+
+    return [
+      <tr
+        key={key}
+        className={cn(
+          'align-top transition-colors',
+          isDeleted && 'bg-muted/30 text-muted-foreground',
+          isSelected && 'bg-primary/5',
+          depthBg,
+        )}
+      >
+        {hasBulkActions && (
+          <td className="w-10 border-r border-border px-3 py-3">
+            <input
+              type="checkbox"
+              aria-label="Выбрать запись"
+              checked={isSelected}
+              onChange={() => toggleSelect(key)}
+              className="size-4 cursor-pointer rounded border-border accent-primary"
+            />
+          </td>
+        )}
+
+        {hasSubRows && (
+          <td className="w-8 border-r border-border px-2 py-3">
+            {hasChildren ? (
+              <button
+                type="button"
+                className="flex cursor-pointer items-center text-muted-foreground hover:text-foreground"
+                onClick={() => toggleExpand(key)}
+              >
+                {isExpanded
+                  ? <ChevronDown className="size-3.5" strokeWidth={1.5} />
+                  : <ChevronRight className="size-3.5" strokeWidth={1.5} />}
+              </button>
+            ) : null}
+          </td>
+        )}
+
+        {columns.map((column) => (
+          <td
+            key={column.key}
+            className={cn(
+              'px-4 py-3',
+              getAdminTableAlignClassName(column.align),
+              isDeleted && 'opacity-60',
+            )}
+          >
+            {column.render(record)}
+          </td>
+        ))}
+
+        {renderActions && (
+          <td className="px-4 py-3 text-right">
+            {renderActions(record)}
+          </td>
+        )}
+      </tr>,
+      ...(isExpanded && hasChildren
+        ? subRows.flatMap((sub) => renderRow(sub, depth + 1))
+        : []),
+    ];
   }
 
   return (
@@ -222,6 +358,49 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         </div>
       )}
 
+      {hasBulkActions && selectedCount > 0 && (
+        <div className="flex flex-wrap items-center gap-3 border-b border-border bg-primary/5 px-4 py-3">
+          <span className="text-sm font-medium">
+            Выбрано: {selectedCount}
+          </span>
+
+          <div className="flex flex-wrap gap-2">
+            {bulkActions!.map((action, i) => (
+              <Button
+                key={i}
+                type="button"
+                size="sm"
+                variant={
+                  action.variant === 'destructive'
+                    ? 'destructive'
+                    : action.variant === 'warning'
+                      ? 'warning'
+                      : 'outline'
+                }
+                onClick={() => {
+                  if (!window.confirm(`${action.label} (${selectedCount} записей)?`)) return;
+                  action.onClick(Array.from(selectedIds));
+                  setSelectedIds(new Set());
+                }}
+              >
+                {action.icon === 'archive' && <ArchiveX className="size-3.5" strokeWidth={1.5} />}
+                {action.icon === 'trash' && <Trash2 className="size-3.5" strokeWidth={1.5} />}
+                {action.icon === 'restore' && <Undo2 className="size-3.5" strokeWidth={1.5} />}
+                {action.label}
+              </Button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="ml-auto text-xs text-muted-foreground underline-offset-2 hover:underline"
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Снять выделение
+          </button>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table
           className="w-full table-fixed text-left text-sm"
@@ -229,6 +408,23 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         >
           <thead className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
+              {hasBulkActions && (
+                <th className="w-10 px-3 py-3 border-r border-border">
+                  <input
+                    type="checkbox"
+                    aria-label="Выбрать все"
+                    checked={allSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someSelected && !allSelected;
+                    }}
+                    onChange={toggleSelectAll}
+                    className="size-4 cursor-pointer rounded border-border accent-primary"
+                  />
+                </th>
+              )}
+
+              {hasSubRows && <th className="w-8 px-2 py-3 border-r border-border" />}
+
               {columns.map((column) => {
                 const width =
                   columnWidths[column.key] ?? getDefaultColumnWidth(column);
@@ -288,42 +484,11 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
 
           <tbody className="divide-y divide-border">
             {visibleRecords.length ? (
-              visibleRecords.map((record) => {
-                const isDeleted = Boolean(record.deletedAt);
-
-                return (
-                  <tr
-                    key={getRecordKey(record)}
-                    className={cn(
-                      'align-top transition-colors',
-                      isDeleted && 'bg-muted/30 text-muted-foreground',
-                    )}
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column.key}
-                        className={cn(
-                          'px-4 py-3',
-                          getAdminTableAlignClassName(column.align),
-                          isDeleted && 'opacity-60',
-                        )}
-                      >
-                        {column.render(record)}
-                      </td>
-                    ))}
-
-                    {renderActions && (
-                      <td className="px-4 py-3 text-right">
-                        {renderActions(record)}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })
+              visibleRecords.flatMap((record) => renderRow(record))
             ) : (
               <tr>
                 <td
-                  colSpan={columns.length + (renderActions ? 1 : 0)}
+                  colSpan={totalColSpan}
                   className="px-4 py-8 text-center text-sm text-muted-foreground"
                 >
                   Записи не найдены по выбранным фильтрам.

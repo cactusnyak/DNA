@@ -5,6 +5,7 @@ import type { AdminMarketCategory } from '@/entities/admin';
 import { AdminCategoryTreeView } from '../../../AdminCategoryTreeView';
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
@@ -14,6 +15,7 @@ type AdminMarketCategoryRecordsViewProps = {
   viewMode: AdminViewMode;
   searchValue: string;
   renderActions: (category: AdminMarketCategory) => ReactNode;
+  bulkActions?: AdminBulkAction[];
 };
 
 const statusFilterOptions = [
@@ -27,6 +29,7 @@ export function AdminMarketCategoryRecordsView({
   viewMode,
   searchValue,
   renderActions,
+  bulkActions,
 }: AdminMarketCategoryRecordsViewProps) {
   if (viewMode === 'tree') {
     return (
@@ -71,7 +74,20 @@ export function AdminMarketCategoryRecordsView({
       getRecordKey={(category) => category.id}
       emptyText="Категории маркета не найдены."
       renderActions={renderActions}
+      bulkActions={bulkActions}
       columns={[
+        {
+          key: 'id',
+          title: 'ID',
+          width: 100,
+          sortable: false,
+          getValue: (category) => category.id,
+          render: (category) => (
+            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {category.id.slice(0, 8)}
+            </code>
+          ),
+        },
         {
           key: 'name',
           title: 'Название',

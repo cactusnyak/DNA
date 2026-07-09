@@ -101,6 +101,19 @@ export function useFilteredAdminRecords(
     [data?.users, searchValue],
   );
 
+  const filteredReferrals = useMemo(
+    () =>
+      filterAdminRecords(data?.referrals ?? [], searchValue, (ref) => [
+        ref.firstName,
+        ref.lastName,
+        ref.email,
+        ref.phone,
+        ref.referralCode,
+        ref.invitedBy,
+      ]),
+    [data?.referrals, searchValue],
+  );
+
   return {
     marketCategories: filteredMarketCategories,
     products: filteredProducts,
@@ -109,5 +122,6 @@ export function useFilteredAdminRecords(
     adCategories: filteredAdCategories,
     ads: filteredAds,
     users: filteredUsers,
+    referrals: filteredReferrals,
   };
 }

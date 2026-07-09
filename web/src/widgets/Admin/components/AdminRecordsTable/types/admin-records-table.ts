@@ -66,10 +66,20 @@ export type AdminTableResizeColumnHandler<TRecord> = (
   column: AdminTableColumn<TRecord>,
 ) => void;
 
+export type AdminBulkAction = {
+  label: string;
+  variant?: 'default' | 'destructive' | 'warning';
+  icon?: 'archive' | 'trash' | 'restore';
+  onClick: (selectedIds: string[]) => void;
+};
+
 export type AdminRecordsTableProps<TRecord extends DeletedAwareRecord> = {
   records: TRecord[];
   columns: AdminTableColumn<TRecord>[];
   getRecordKey: (record: TRecord) => string;
   renderActions?: (record: TRecord) => ReactNode;
   emptyText: ReactNode;
+  bulkActions?: AdminBulkAction[];
+  getSubRows?: (record: TRecord) => TRecord[];
+  disableSelection?: boolean;
 };

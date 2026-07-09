@@ -94,18 +94,16 @@ export function AdminRecordActions({
         </Button>
       )}
 
-      {!isUsersTab && (
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon-sm"
-          aria-label="Удалить навсегда"
-          title="Удалить навсегда"
-          onClick={handleHardDelete}
-        >
-          <Trash2 className="size-3.5" strokeWidth={1.5} />
-        </Button>
-      )}
+      <Button
+        type="button"
+        variant="destructive"
+        size="icon-sm"
+        aria-label="Удалить навсегда"
+        title="Удалить навсегда"
+        onClick={handleHardDelete}
+      >
+        <Trash2 className="size-3.5" strokeWidth={1.5} />
+      </Button>
     </div>
   );
 }

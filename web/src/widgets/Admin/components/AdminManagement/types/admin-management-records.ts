@@ -6,6 +6,7 @@ import type {
   AdminProduct,
   AdminUser,
 } from '@/entities/admin';
+import type { AdminReferralUser } from '@/entities/admin';
 import type { Order } from '@/entities/order';
 
 export type EditableRecord =
@@ -15,7 +16,8 @@ export type EditableRecord =
   | Order
   | AdminAdCategory
   | AdminAd
-  | AdminUser;
+  | AdminUser
+  | AdminReferralUser;
 
 export type AdminCatalogData = {
   marketCategories: AdminMarketCategory[];
@@ -25,6 +27,7 @@ export type AdminCatalogData = {
   adCategories: AdminAdCategory[];
   ads: AdminAd[];
   users: AdminUser[];
+  referrals: AdminReferralUser[];
 };
 
 export type FilteredAdminRecords = AdminCatalogData;

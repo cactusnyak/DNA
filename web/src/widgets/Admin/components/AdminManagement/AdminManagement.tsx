@@ -5,6 +5,7 @@ import {
 
 import {
   getAdminCatalogData,
+  getAdminReferrals,
   uploadAdminImage,
 } from '@/entities/admin';
 
@@ -21,6 +22,7 @@ import { useAdminManagementState } from './hooks/use-admin-management-state';
 import { useFilteredAdminRecords } from './hooks/use-filtered-admin-records';
 import { getAdminManagementCounts } from './logic/get-admin-management-counts';
 import { isAdminCatalogCollection } from './logic/is-admin-catalog-collection';
+import type { AdminBulkAction } from '../AdminRecordsTable/types/admin-records-table';
 import type { AdminCatalogData } from './types/admin-management-records';
 import type { EditableRecord } from './types/admin-management-records';
 
@@ -34,13 +36,25 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
   const state = useAdminManagementState();
 
   const {
-    data,
-    isPending,
-    isError,
+    data: catalogData,
+    isPending: isCatalogPending,
+    isError: isCatalogError,
   } = useQuery({
     queryKey: ['admin-catalog', accessToken],
-    queryFn: () => getAdminCatalogData(accessToken) as Promise<AdminCatalogData>,
+    queryFn: () => getAdminCatalogData(accessToken) as Promise<Omit<AdminCatalogData, 'referrals'>>,
   });
+
+  const { data: referralsData = [] } = useQuery({
+    queryKey: ['admin-referrals', accessToken],
+    queryFn: () => getAdminReferrals(accessToken),
+  });
+
+  const data: AdminCatalogData | undefined = catalogData
+    ? { ...catalogData, referrals: referralsData }
+    : undefined;
+
+  const isPending = isCatalogPending;
+  const isError = isCatalogError;
 
   function refreshAdminData() {
     queryClient.invalidateQueries({
@@ -48,6 +62,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     });
     queryClient.invalidateQueries({
       queryKey: ['admin-overview', accessToken],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ['admin-referrals', accessToken],
     });
   }
 
@@ -79,10 +96,49 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       adCategories: [],
       ads: [],
       users: [],
+      referrals: [],
     },
     mutations,
     resetEditing: state.resetEditing,
   });
+
+  const bulkActions: AdminBulkAction[] = (() => {
+    if (state.activeTabId === 'market-categories') {
+      return [
+        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => mutations.bulkDeleteMarketCategoriesMutation.mutate(ids) },
+        { label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => mutations.bulkRestoreMarketCategoriesMutation.mutate(ids) },
+        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => mutations.bulkHardDeleteMarketCategoriesMutation.mutate(ids) },
+      ];
+    }
+    if (state.activeTabId === 'market-products') {
+      return [
+        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => mutations.bulkDeleteProductsMutation.mutate(ids) },
+        { label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => mutations.bulkRestoreProductsMutation.mutate(ids) },
+        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => mutations.bulkHardDeleteProductsMutation.mutate(ids) },
+      ];
+    }
+    if (state.activeTabId === 'ad-categories') {
+      return [
+        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => mutations.bulkDeleteAdCategoriesMutation.mutate(ids) },
+        { label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => mutations.bulkRestoreAdCategoriesMutation.mutate(ids) },
+        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => mutations.bulkHardDeleteAdCategoriesMutation.mutate(ids) },
+      ];
+    }
+    if (state.activeTabId === 'ads') {
+      return [
+        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => mutations.bulkDeleteAdsMutation.mutate(ids) },
+        { label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => mutations.bulkRestoreAdsMutation.mutate(ids) },
+        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => mutations.bulkHardDeleteAdsMutation.mutate(ids) },
+      ];
+    }
+    if (state.activeTabId === 'users') {
+      return [
+        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => mutations.bulkDeleteUsersMutation.mutate(ids) },
+        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => mutations.bulkHardDeleteUsersMutation.mutate(ids) },
+      ];
+    }
+    return [];
+  })();
 
   function renderActions(record: EditableRecord) {
     return (
@@ -127,7 +183,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
           state.activeTabId,
         )}
         canCreate={
-          !['orders', 'ads', 'users'].includes(state.activeTabId)
+          !['orders', 'ads', 'users', 'referrals'].includes(state.activeTabId)
         }
         createLabel={activeTab?.createLabel}
         onSearchChange={state.setSearchValue}
@@ -158,6 +214,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         searchValue={state.searchValue}
         records={filteredRecords}
         renderActions={renderActions}
+        bulkActions={bulkActions}
       />
     </section>
   );

@@ -380,6 +380,130 @@ export function updateAdminCatalogCollectionProducts(
   });
 }
 
+// ===== Bulk operations =====
+
+type BulkIdsPayload = { ids: string[] };
+type BulkResult = { deleted?: number; restored?: number };
+
+export function hardDeleteAdminUser(accessToken: string, userId: string) {
+  return httpClient<void>(`/admin/users/${userId}/permanent`, {
+    method: 'DELETE',
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkDeleteAdminUsers(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/users/bulk', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkHardDeleteAdminUsers(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/users/bulk/permanent', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkDeleteAdminProducts(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/products/bulk', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkHardDeleteAdminProducts(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/products/bulk/permanent', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkRestoreAdminProducts(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/products/bulk/restore', {
+    method: 'PATCH',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkDeleteAdminMarketCategories(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/categories/bulk', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkHardDeleteAdminMarketCategories(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/categories/bulk/permanent', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkRestoreAdminMarketCategories(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/categories/bulk/restore', {
+    method: 'PATCH',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkDeleteAdminAdCategories(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/ad-categories/bulk', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkHardDeleteAdminAdCategories(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/ad-categories/bulk/permanent', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkRestoreAdminAdCategories(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/ad-categories/bulk/restore', {
+    method: 'PATCH',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkDeleteAdminAds(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/ads/bulk', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkHardDeleteAdminAds(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/ads/bulk/permanent', {
+    method: 'DELETE',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
+export function bulkRestoreAdminAds(accessToken: string, ids: string[]) {
+  return httpClient<BulkResult, BulkIdsPayload>('/admin/ads/bulk/restore', {
+    method: 'PATCH',
+    body: { ids },
+    headers: getAdminHeaders(accessToken),
+  });
+}
+
 // ===== Orders =====
 
 export function updateAdminOrderStatus(

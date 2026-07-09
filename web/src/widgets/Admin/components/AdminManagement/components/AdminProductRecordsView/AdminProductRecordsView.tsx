@@ -5,6 +5,7 @@ import { formatPrice } from '@/shared/utils/format-price';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
@@ -14,6 +15,7 @@ type AdminProductRecordsViewProps = {
   viewMode: AdminViewMode;
   searchValue: string;
   renderActions: (product: AdminProduct) => ReactNode;
+  bulkActions?: AdminBulkAction[];
 };
 
 const statusFilterOptions = [
@@ -54,6 +56,7 @@ export function AdminProductRecordsView({
   viewMode,
   searchValue,
   renderActions,
+  bulkActions,
 }: AdminProductRecordsViewProps) {
   if (viewMode === 'list') {
     return (
@@ -84,7 +87,20 @@ export function AdminProductRecordsView({
       getRecordKey={(product) => product.id}
       emptyText="Продукты не найдены."
       renderActions={renderActions}
+      bulkActions={bulkActions}
       columns={[
+        {
+          key: 'id',
+          title: 'ID',
+          width: 100,
+          sortable: false,
+          getValue: (product) => product.id,
+          render: (product) => (
+            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {product.id.slice(0, 8)}
+            </code>
+          ),
+        },
         {
           key: 'title',
           title: 'Название',
