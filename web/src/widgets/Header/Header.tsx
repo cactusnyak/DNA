@@ -26,22 +26,31 @@ export function Header() {
         border-b border-border/50
         bg-background/70
         backdrop-blur-xl
+        w-full
       "
       onMouseLeave={closeCatalogDropdown}
     >
-      <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-4 px-4 py-6 lg:gap-8">
-        <HeaderLogo onClick={closeCatalogDropdown} />
+      {/* Row 1: Logo, Switcher, Search, Catalog */}
+      <div className="w-full border-b border-border/50">
+        <div className="mx-auto flex max-w-7xl min-h-16 w-full items-center gap-4 p-4 lg:gap-8">
+          <HeaderLogo onClick={closeCatalogDropdown} />
 
-        <PlatformSectionSwitcher activeSectionId={activeSectionId} />
+          <PlatformSectionSwitcher activeSectionId={activeSectionId} />
 
-        <DesktopHeaderControls
-          section={activeSectionId}
-          isCatalogDropdownOpen={isCatalogDropdownOpen}
-          onCatalogOpen={openCatalogDropdown}
-          onNavigate={closeCatalogDropdown}
-        />
+          <DesktopHeaderControls
+            section={activeSectionId}
+            isCatalogDropdownOpen={isCatalogDropdownOpen}
+            onCatalogOpen={openCatalogDropdown}
+            onNavigate={closeCatalogDropdown}
+          />
+        </div>
+      </div>
 
-        <MainNavigation placement="header" onNavigate={closeCatalogDropdown} />
+      {/* Row 2: Navigation Menu */}
+      <div className="w-full hidden md:block">
+        <div className="flex justify-center mx-auto w-full p-4">
+          <MainNavigation placement="header" onNavigate={closeCatalogDropdown} />
+        </div>
       </div>
 
       {isCatalogDropdownOpen && activeSectionId && (

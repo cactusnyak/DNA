@@ -13,8 +13,8 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-muted/30">
-      <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="grid gap-20 md:grid-cols-[auto_auto_auto_auto]">
+      <div className="">
+        <div className="mx-auto max-w-7xl px-4 py-10 grid gap-20 md:grid-cols-[auto_auto_auto_auto]">
           <FooterBrand />
 
           <FooterLinkGroup title="Навигация сайта" links={navigationLinks} />
@@ -27,8 +27,8 @@ export function Footer() {
           />
         </div>
 
-        <div className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+        <div className="border-t border-border text-xs text-muted-foreground">
+          <div className="mx-auto max-w-7xl px-4 py-8 flex flex-col gap-2 md:flex-row md:items-center">
             <p>© {currentYear} DNA. Все права защищены.</p>
 
             <span className="hidden md:inline">|</span>

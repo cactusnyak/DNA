@@ -6,6 +6,8 @@ import {
   type PlatformSectionId,
 } from '@/shared/platform';
 
+import { AdsListing } from '@/widgets/AdsListing';
+
 import { CatalogControls } from './components/CatalogControls';
 import { CatalogHeader } from './components/CatalogHeader';
 import { ProductGrid } from './components/ProductGrid';
@@ -97,10 +99,14 @@ export function Catalog({
           />
         )}
 
-        <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
-          Объявления в этой категории появятся позже. Каталог уже отделён,
-          осталось заселить его людьми и их странными товарами.
-        </div>
+        <AdsListing
+          categorySlug={categorySlug}
+          emptyText={
+            categorySlug
+              ? 'В этой категории пока нет объявлений.'
+              : 'Объявлений пока не размещено.'
+          }
+        />
       </section>
     );
   }

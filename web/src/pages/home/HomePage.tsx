@@ -28,30 +28,6 @@ export function HomePage() {
         showReferralLink
         guestText="Покупать можно без регистрации. Профиль откроет баланс, кешбэк, историю заказов и реферальную систему."
       />
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <SectionHeader
-            title="Маркет"
-            description="Товары DNA и будущие предложения продавцов. Тут живёт магазинная часть платформы."
-          />
-
-          <Button asChild className="mt-5">
-            <Link to="/market/catalog">Открыть каталог маркета</Link>
-          </Button>
-        </div>
-
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <SectionHeader
-            title="Доска"
-            description="Будущий раздел объявлений пользователей: категории уже отделены, карточки объявлений подключим позже."
-          />
-
-          <Button asChild className="mt-5">
-            <Link to="/ads/catalog">Открыть каталог доски</Link>
-          </Button>
-        </div>
-      </section>
     </div>
   );
 }

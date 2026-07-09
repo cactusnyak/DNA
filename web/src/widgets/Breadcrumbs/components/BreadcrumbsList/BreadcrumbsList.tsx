@@ -9,7 +9,7 @@ type BreadcrumbsListProps = {
 
 export function BreadcrumbsList({ items }: BreadcrumbsListProps) {
   return (
-    <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-1 px-4 pt-4 text-sm text-muted-foreground">
+    <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-1 px-4 pt-8 text-sm text-muted-foreground">
       {items.map((item, index) => {
         const isLastItem = index === items.length - 1;
 

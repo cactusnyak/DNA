@@ -14,7 +14,6 @@ export const navigationItems: MainNavigationItem[] = [
     to: '/',
     label: 'Главная',
     icon: Home,
-    mobileOnly: true,
   },
   {
     to: '/referrals',

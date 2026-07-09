@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { getAds } from '@/entities/ad';
 import { getCatalogCategories } from '@/shared/catalog';
 import { getProducts } from '@/entities/product/api/get-products';
 import {
@@ -21,6 +22,7 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
   const [activeCategorySlug, setActiveCategorySlug] = useState<string>();
   const sectionConfig = getPlatformSection(section);
   const isMarketSection = section === PLATFORM_SECTION.MARKET;
+  const isAdsSection = section === PLATFORM_SECTION.ADS;
 
   const {
     data: categories,
@@ -46,6 +48,15 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
         categorySlug: activeCategorySlug,
       }),
     enabled: isMarketSection,
+  });
+
+  const {
+    data: ads,
+    isPending: isAdsPending,
+  } = useQuery({
+    queryKey: ['ads', { categorySlug: activeCategorySlug ?? null }],
+    queryFn: () => getAds({ categorySlug: activeCategorySlug }),
+    enabled: isAdsSection,
   });
 
   return (
@@ -88,8 +99,9 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
         <CatalogDropdownProducts
           section={section}
           products={products ?? []}
+          ads={ads ?? []}
           activeCategoryName={activeCategory?.name}
-          isPending={isMarketSection && isProductsPending}
+          isPending={(isMarketSection && isProductsPending) || (isAdsSection && isAdsPending)}
           onProductClick={onClose}
         />
       </div>
