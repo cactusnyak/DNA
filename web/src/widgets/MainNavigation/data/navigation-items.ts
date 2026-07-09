@@ -1,5 +1,6 @@
 import {
   Heart,
+  Home,
   ShieldCheck,
   ShoppingCart,
   User,
@@ -9,6 +10,12 @@ import {
 import type { MainNavigationItem } from '../types/main-navigation-item';
 
 export const navigationItems: MainNavigationItem[] = [
+  {
+    to: '/',
+    label: 'Главная',
+    icon: Home,
+    mobileOnly: true,
+  },
   {
     to: '/referrals',
     label: 'Заработок',

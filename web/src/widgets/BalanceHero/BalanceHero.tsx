@@ -11,6 +11,7 @@ type BalanceHeroProps = {
   balance?: Balance;
   isAuthenticated?: boolean;
   showReferralLink?: boolean;
+  showIllustration?: boolean;
   title?: ReactNode;
   guestText?: ReactNode;
   className?: string;
@@ -50,6 +51,7 @@ export function BalanceHero({
   balance,
   isAuthenticated = false,
   showReferralLink = true,
+  showIllustration = true,
   title = 'Деньги с DNA',
   guestText,
   className,
@@ -57,7 +59,8 @@ export function BalanceHero({
   return (
     <section
       className={cn(
-        'group relative isolate m-5 mb-30 mt-30 flex flex-col justify-end p-6 sm:p-8 md:p-10',
+        'group relative isolate flex flex-col justify-end p-6 sm:p-8 md:p-10',
+        showIllustration && 'lg:my-16 lg:mx-5 xl:my-20',
         className,
       )}
     >
@@ -71,21 +74,21 @@ export function BalanceHero({
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:56px_56px] opacity-20" />
       </div>
 
-      <img
-        src={balanceIllustration}
-        alt=""
-        loading="lazy"
-        className={cn(
-          'pointer-events-none absolute z-10 max-w-none select-none object-contain',
-          'drop-shadow-[0_36px_45px_rgba(99,102,241,0.45)]',
-          'transition-all duration-700 ease-out',
-          'hidden sm:block',
-          'sm:-right-[10%] sm:top-[50%] sm:w-[90%] sm:max-w-none sm:scale-[1.6] sm:-translate-y-1/2',
-          'md:scale-[1.5] md:-translate-y-1/2',
-          'lg:scale-[1.15] lg:-translate-y-1/2',
-          'xl:scale-[1] xl:-translate-y-1/2',
-        )}
-      />
+      {showIllustration && (
+        <img
+          src={balanceIllustration}
+          alt=""
+          loading="lazy"
+          className={cn(
+            'pointer-events-none absolute z-10 max-w-none select-none object-contain',
+            'drop-shadow-[0_36px_45px_rgba(99,102,241,0.45)]',
+            'transition-all duration-700 ease-out',
+            'hidden lg:block',
+            'lg:-right-[10%] lg:top-[50%] lg:w-[90%] lg:max-w-none lg:scale-[1.15] lg:-translate-y-1/2',
+            'xl:scale-[1] xl:-translate-y-1/2',
+          )}
+        />
+      )}
 
       <div className="relative z-20 flex w-full flex-col justify-end">
         <h2 className="max-w-xl text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">

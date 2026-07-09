@@ -7,4 +7,5 @@ export type MainNavigationItem = {
   label: string;
   icon: LucideIcon;
   allowedRoles?: UserRole[];
+  mobileOnly?: boolean;
 };

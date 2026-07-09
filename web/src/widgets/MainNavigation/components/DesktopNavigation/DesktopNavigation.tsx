@@ -17,7 +17,7 @@ export function DesktopNavigation({
 }: DesktopNavigationProps) {
   return (
     <nav className="ml-auto hidden items-center md:flex">
-      {items.map((item) => {
+      {items.filter((item) => !item.mobileOnly).map((item) => {
         const Icon = item.icon;
         const isCartLink = item.to === '/cart';
         const isFavouritesLink = item.to === '/favourites';
