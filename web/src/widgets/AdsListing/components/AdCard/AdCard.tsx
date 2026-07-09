@@ -4,31 +4,20 @@ import type { Ad } from '@/entities/ad';
 import { FavouriteButton } from '@/entities/favourite';
 import { formatPrice } from '@/shared/utils/format-price';
 
+import { AdGallery } from './components/AdGallery/AdGallery';
+
 type AdCardProps = {
   ad: Ad;
 };
 
 export function AdCard({ ad }: AdCardProps) {
-  const coverImage = ad.images[0];
-
   return (
     <Link
       to={`/ads/ad/${ad.id}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-foreground/30"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        {coverImage ? (
-          <img
-            src={coverImage.url}
-            alt={coverImage.alt ?? ad.title}
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-            Нет фото
-          </div>
-        )}
+      <div className="relative">
+        <AdGallery images={ad.images} title={ad.title} />
 
         <div className="absolute right-2 top-2 z-10">
           <FavouriteButton item={{ adId: ad.id }} />

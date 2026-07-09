@@ -59,21 +59,12 @@ export function BalanceHero({
   return (
     <section
       className={cn(
-        'group relative isolate flex flex-col justify-end p-6 sm:p-8 md:p-10',
+        'bg-gradient-to-br from-[#020817] via-[#0F1D3D] to-[#09122E]',
+        'group relative isolate flex flex-col justify-end rounded-[45px] p-8 md:p-10',
         showIllustration && 'lg:my-16 lg:mx-5 xl:my-20',
         className,
       )}
     >
-      <div className="absolute -right-28 -top-28 z-0 h-[420px] w-[420px] rounded-full bg-indigo-500/20 blur-[90px] transition-all duration-700 group-hover:bg-indigo-500/30" />
-      <div className="absolute -bottom-32 -left-32 z-0 h-[360px] w-[360px] rounded-full bg-cyan-500/15 blur-[90px]" />
-
-      <div className="absolute inset-0 z-0 overflow-hidden rounded-[2.5rem]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#020817] via-[#0F1D3D] to-[#09122E]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/30 via-indigo-950/20 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-tl from-blue-950/40 via-transparent to-cyan-900/20" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:56px_56px] opacity-20" />
-      </div>
-
       {showIllustration && (
         <img
           src={balanceIllustration}
@@ -84,7 +75,7 @@ export function BalanceHero({
             'drop-shadow-[0_36px_45px_rgba(99,102,241,0.45)]',
             'transition-all duration-700 ease-out',
             'hidden lg:block',
-            'lg:-right-[10%] lg:top-[50%] lg:w-[90%] lg:max-w-none lg:scale-[1.15] lg:-translate-y-1/2',
+            'lg:-right-[10%] lg:top-[50%] lg:w-[90%] lg:max-w-none lg:scale-[1] lg:-translate-y-1/2',
             'xl:scale-[1] xl:-translate-y-1/2',
           )}
         />

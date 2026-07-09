@@ -24,8 +24,8 @@ export function FavouriteButton({ item, className }: FavouriteButtonProps) {
         toggle();
       }}
       className={cn(
-        'flex items-center justify-center rounded-full p-1.5 transition-colors',
-        'bg-background/80 backdrop-blur-sm hover:bg-background',
+        'group/fav flex cursor-pointer items-center justify-center rounded-full p-1.5 transition-colors',
+        'backdrop-blur-sm',
         'disabled:opacity-50',
         className,
       )}
@@ -35,7 +35,7 @@ export function FavouriteButton({ item, className }: FavouriteButtonProps) {
           'size-4 transition-colors',
           isFavourite
             ? 'fill-red-500 stroke-red-500'
-            : 'stroke-muted-foreground',
+            : 'stroke-muted-foreground group-hover/fav:stroke-red-400',
         )}
       />
     </button>
