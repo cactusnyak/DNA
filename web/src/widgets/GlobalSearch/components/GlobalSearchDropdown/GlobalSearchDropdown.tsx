@@ -74,8 +74,8 @@ export function GlobalSearchDropdown({
     : 'Начните вводить запрос. Сейчас активный раздел не выбран, поэтому поиск покажет только разделы платформы.';
 
   return (
-    <div className="absolute top-full right-0 left-0 z-[70] pt-2">
-      <div className="overflow-hidden rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">
+    <div className="absolute top-full right-0 left-0 z-[70] min-w-[320px] pt-2">
+      <div className="overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl">
         {!isSearchReady ? (
           <div className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground">
             {scopedSearchDescription}
@@ -102,7 +102,7 @@ export function GlobalSearchDropdown({
 
                 <div className="pt-3">
                   {section === PLATFORM_SECTION.ADS ? (
-                    <section className="p-4">
+                    <section className="p-5">
                       <div className="flex items-center justify-between gap-3">
                         <h3 className="text-sm font-semibold">Объявления</h3>
                         <span className="text-xs text-muted-foreground">{totalAds}</span>
@@ -164,7 +164,7 @@ export function GlobalSearchDropdown({
                 </div>
               </>
             ) : (
-              <div className="py-3 text-sm text-muted-foreground">
+              <div className="p-5 text-sm text-muted-foreground">
                 Выберите «Доска» или «Маркет», чтобы искать по категориям и
                 карточкам конкретного раздела.
               </div>

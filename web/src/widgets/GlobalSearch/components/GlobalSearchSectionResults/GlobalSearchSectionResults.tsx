@@ -12,7 +12,7 @@ export function GlobalSearchSectionResults({
   onNavigate,
 }: GlobalSearchSectionResultsProps) {
   return (
-    <section className="p-4">
+    <section className="p-5">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">Разделы</h3>
 

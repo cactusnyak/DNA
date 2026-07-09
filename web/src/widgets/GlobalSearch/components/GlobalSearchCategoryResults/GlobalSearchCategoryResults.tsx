@@ -33,19 +33,19 @@ export function GlobalSearchCategoryResults({
 
       <div className="mt-3 grid gap-1">
         {isPending && (
-          <p className="rounded-lg bg-muted/40 px-3 py-3 text-sm text-muted-foreground">
+          <p className="rounded-lg bg-muted/40 p-5 text-sm text-muted-foreground">
             Ищем категории...
           </p>
         )}
 
         {isError && (
-          <p className="rounded-lg bg-destructive/10 px-3 py-3 text-sm text-destructive">
+          <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
             Не удалось загрузить категории.
           </p>
         )}
 
         {!isPending && !isError && categories.length === 0 && (
-          <p className="rounded-lg bg-muted/40 px-3 py-3 text-sm text-muted-foreground">
+          <p className="rounded-lg bg-muted/40 p-5 text-sm text-muted-foreground">
             Категории не найдены.
           </p>
         )}
