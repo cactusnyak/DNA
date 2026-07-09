@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 
 import { CartItemsBadge } from '../CartItemsBadge';
+import { FavouritesBadge } from '../FavouritesBadge/FavouritesBadge';
 import type { MainNavigationItem } from '../../types/main-navigation-item';
 
 type MobileNavigationProps = {
@@ -23,6 +24,7 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
         {items.map((item) => {
           const Icon = item.icon;
           const isCartLink = item.to === '/cart';
+          const isFavouritesLink = item.to === '/favourites';
 
           return (
             <Button key={item.to} variant="ghost" asChild className="h-12">
@@ -34,6 +36,7 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
                   <Icon className="size-4" />
 
                   {isCartLink && <CartItemsBadge />}
+                  {isFavouritesLink && <FavouritesBadge />}
                 </span>
               </Link>
             </Button>

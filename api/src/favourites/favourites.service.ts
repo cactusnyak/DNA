@@ -13,20 +13,24 @@ export class FavouritesService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getFavourites(userId: string) {
-    return this.prismaService.favourite.findMany({
+    const rows = await this.prismaService.favourite.findMany({
       where: { userId },
       include: {
         product: {
           include: {
+            category: true,
             images: {
               include: { image: true },
+              orderBy: { image: { sortOrder: 'asc' } },
             },
           },
         },
         ad: {
           include: {
+            category: true,
             images: {
               include: { image: true },
+              orderBy: { image: { sortOrder: 'asc' } },
             },
             seller: {
               select: {
@@ -34,6 +38,7 @@ export class FavouritesService {
                 firstName: true,
                 lastName: true,
                 phone: true,
+                email: true,
               },
             },
           },
@@ -41,6 +46,22 @@ export class FavouritesService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    return rows.map((fav) => ({
+      ...fav,
+      product: fav.product
+        ? {
+            ...fav.product,
+            images: fav.product.images.map((pi: any) => pi.image),
+          }
+        : null,
+      ad: fav.ad
+        ? {
+            ...fav.ad,
+            images: fav.ad.images.map((ai: any) => ai.image),
+          }
+        : null,
+    }));
   }
 
   async addFavourite(params: AddFavouriteParams) {

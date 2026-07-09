@@ -27,31 +27,32 @@ export function ProductCard({
   showBuyNowButton = true,
 }: ProductCardProps) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40">
-      <Link
-        to={getPlatformProductHref(product.id)}
-        aria-label={`Открыть товар ${product.title}`}
-        className="absolute inset-0 z-10"
-      />
-
-      <div className="relative z-0">
+    <Link
+      to={getPlatformProductHref(product.id)}
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
+    >
+      <div className="relative">
         <ProductGallery images={product.images} title={product.title} />
 
-        <div className="absolute right-2 top-2 z-20">
+        <div
+          className="absolute right-2 top-2 z-10"
+          onClick={(e) => e.preventDefault()}
+        >
           <FavouriteButton item={{ productId: product.id }} />
         </div>
       </div>
 
-      <div className="relative z-0">
-        <ProductCardContent
-          section={section}
-          product={product}
-          currentCategorySlug={currentCategorySlug}
-        />
-      </div>
+      <ProductCardContent
+        section={section}
+        product={product}
+        currentCategorySlug={currentCategorySlug}
+      />
 
       {(showAddToCartButton || showBuyNowButton) && (
-        <div className="relative z-20 mt-auto p-4 pt-0">
+        <div
+          className="relative z-10 mt-auto p-4 pt-0"
+          onClick={(e) => e.preventDefault()}
+        >
           <ProductActions
             product={product}
             variant="card"
@@ -60,6 +61,6 @@ export function ProductCard({
           />
         </div>
       )}
-    </article>
+    </Link>
   );
 }

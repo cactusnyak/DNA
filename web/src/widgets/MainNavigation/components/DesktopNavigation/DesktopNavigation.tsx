@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 
 import { CartItemsBadge } from '../CartItemsBadge';
+import { FavouritesBadge } from '../FavouritesBadge/FavouritesBadge';
 import type { MainNavigationItem } from '../../types/main-navigation-item';
 
 type DesktopNavigationProps = {
@@ -19,6 +20,7 @@ export function DesktopNavigation({
       {items.map((item) => {
         const Icon = item.icon;
         const isCartLink = item.to === '/cart';
+        const isFavouritesLink = item.to === '/favourites';
 
         return (
           <Button key={item.to} variant="ghost" size="sm" asChild>
@@ -31,6 +33,7 @@ export function DesktopNavigation({
                 <Icon className="size-4" />
 
                 {isCartLink && <CartItemsBadge />}
+                {isFavouritesLink && <FavouritesBadge />}
               </span>
 
               <span className="hidden lg:inline">{item.label}</span>

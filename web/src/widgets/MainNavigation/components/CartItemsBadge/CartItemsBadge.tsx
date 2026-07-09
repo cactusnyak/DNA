@@ -1,7 +1,9 @@
 import { useCartStore } from '@/entities/cart';
 
 export function CartItemsBadge() {
-  const totalItems = useCartStore((state) => state.getTotalItems());
+  const totalProductItems = useCartStore((state) => state.getTotalItems());
+  const totalAdItems = useCartStore((state) => state.getTotalAdItems());
+  const totalItems = totalProductItems + totalAdItems;
 
   if (totalItems <= 0) {
     return null;

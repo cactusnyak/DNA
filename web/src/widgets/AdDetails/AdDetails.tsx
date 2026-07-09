@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingBag } from 'lucide-react';
 
 import { getAd } from '@/entities/ad';
 import { useCartStore } from '@/entities/cart';
@@ -23,6 +22,12 @@ export function AdDetails({ adId }: AdDetailsProps) {
   });
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+
+  const addAdItem = useCartStore((state) => state.addAdItem);
+  const removeAdItem = useCartStore((state) => state.removeAdItem);
+  const adItems = useCartStore((state) => state.adItems);
 
   if (isPending) {
     return (
@@ -44,21 +49,32 @@ export function AdDetails({ adId }: AdDetailsProps) {
   const sellerName = ad.seller
     ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
     : 'Продавец';
-
-  const addAdItem = useCartStore((state) => state.addAdItem);
-  const removeAdItem = useCartStore((state) => state.removeAdItem);
-  const hasAdItem = useCartStore((state) => state.hasAdItem);
-  const isInCart = hasAdItem(ad.id);
+  const isInCart = adItems.some((i) => i.ad.id === ad.id);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <div className="space-y-4">
-        <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
+        <div
+          className="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted"
+          onMouseEnter={() => setIsZoomed(true)}
+          onMouseLeave={() => setIsZoomed(false)}
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            setZoomPosition({
+              x: ((e.clientX - rect.left) / rect.width) * 100,
+              y: ((e.clientY - rect.top) / rect.height) * 100,
+            });
+          }}
+        >
           {activeImage ? (
             <img
               src={activeImage.url}
               alt={activeImage.alt ?? ad.title}
-              className="size-full object-cover"
+              className="size-full object-cover transition-transform duration-200"
+              style={{
+                transform: isZoomed ? 'scale(1.65)' : 'scale(1)',
+                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+              }}
             />
           ) : (
             <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
@@ -117,7 +133,6 @@ export function AdDetails({ adId }: AdDetailsProps) {
             variant={isInCart ? 'outline' : 'default'}
             onClick={() => isInCart ? removeAdItem(ad.id) : addAdItem(ad)}
           >
-            <ShoppingBag className="size-4" />
             {isInCart ? 'Убрать из корзины' : 'Сохранить в корзину'}
           </Button>
 

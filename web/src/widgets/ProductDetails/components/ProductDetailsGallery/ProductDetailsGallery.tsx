@@ -43,7 +43,7 @@ export function ProductDetailsGallery({
   return (
     <div className="space-y-4">
       <div
-        className="overflow-hidden rounded-2xl bg-card"
+        className="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted"
         onMouseEnter={() => setIsZoomed(true)}
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}
@@ -51,7 +51,7 @@ export function ProductDetailsGallery({
         <img
           src={activeImage.url}
           alt={activeImage.alt ?? title}
-          className="aspect-square w-full object-contain transition-transform duration-200"
+          className="size-full object-cover transition-transform duration-200"
           style={{
             transform: isZoomed ? 'scale(1.65)' : 'scale(1)',
             transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
@@ -60,7 +60,7 @@ export function ProductDetailsGallery({
       </div>
 
       {images.length > 1 && (
-        <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 lg:grid-cols-5">
+        <div className="flex flex-wrap gap-2">
           {images.map((image, index) => {
             const isActive = index === activeImageIndex;
 
@@ -69,7 +69,7 @@ export function ProductDetailsGallery({
                 key={image.id}
                 type="button"
                 className={cn(
-                  'overflow-hidden rounded-lg border bg-card transition-colors',
+                  'size-16 overflow-hidden rounded-xl border transition-colors',
                   isActive
                     ? 'border-foreground'
                     : 'border-border hover:border-foreground/40',
@@ -79,7 +79,7 @@ export function ProductDetailsGallery({
                 <img
                   src={image.url}
                   alt={image.alt ?? title}
-                  className="aspect-square w-full object-contain"
+                  className="size-full object-cover"
                 />
               </button>
             );

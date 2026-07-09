@@ -25,6 +25,8 @@ type CartStore = {
   getItemQuantity: (productId: string) => number;
   getTotalItems: () => number;
   getTotalAmount: () => number;
+  getTotalAdItems: () => number;
+  getTotalAdAmount: () => number;
   addAdItem: (ad: Ad) => void;
   removeAdItem: (adId: string) => void;
   hasAdItem: (adId: string) => boolean;
@@ -148,6 +150,14 @@ export const useCartStore = create<CartStore>()(
           (sum, item) => sum + item.product.price * item.quantity,
           0,
         );
+      },
+
+      getTotalAdItems: () => {
+        return get().adItems.length;
+      },
+
+      getTotalAdAmount: () => {
+        return get().adItems.reduce((sum, item) => sum + item.ad.price, 0);
       },
     }),
     {
