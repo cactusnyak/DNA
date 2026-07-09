@@ -1,4 +1,0 @@
-# Backend-specific ignores
-generated
-/generated
-/generated/prisma

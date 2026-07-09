@@ -37,3 +37,11 @@ lerna-debug.log*
 
 # Uploaded files
 api/uploads/
+
+# API build cache
+api/tsconfig.build.tsbuildinfo
+api/dist/tsconfig.build.tsbuildinfo
+
+# API Prisma generated client
+api/generated/
+api/src/generated/
