@@ -170,11 +170,11 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         )}
 
         {hasSubRows && (
-          <td className="w-8 border-r border-border px-2 py-3">
+          <td className="w-8 border-r border-border px-2 py-3 text-center">
             {hasChildren ? (
               <button
                 type="button"
-                className="flex cursor-pointer items-center text-muted-foreground hover:text-foreground"
+                className="inline-flex cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground"
                 onClick={() => toggleExpand(key)}
               >
                 {isExpanded

@@ -12,6 +12,7 @@ export type AdminMarketCategory = MarketCategory & {
   isActive: boolean;
   deletedAt?: string | null;
   productsCount: number;
+  children?: AdminMarketCategory[];
 };
 
 export type AdminProduct = Product & {
@@ -24,6 +25,7 @@ export type AdminAdCategory = AdCategory & {
   isActive: boolean;
   deletedAt?: string | null;
   adsCount: number;
+  children?: AdminAdCategory[];
 };
 
 export type AdminAdSeller = {

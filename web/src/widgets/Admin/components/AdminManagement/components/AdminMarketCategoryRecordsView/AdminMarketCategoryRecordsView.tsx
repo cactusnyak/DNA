@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { AdminMarketCategory } from '@/entities/admin';
 
+import { buildCategoryTree } from '../../../../logic/build-category-tree';
 import { AdminCategoryTreeView } from '../../../AdminCategoryTreeView';
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -68,13 +69,16 @@ export function AdminMarketCategoryRecordsView({
     );
   }
 
+  const tree = buildCategoryTree(categories);
+
   return (
     <AdminRecordsTable
-      records={categories}
+      records={tree}
       getRecordKey={(category) => category.id}
       emptyText="Категории маркета не найдены."
       renderActions={renderActions}
       bulkActions={bulkActions}
+      getSubRows={(category) => category.children ?? []}
       columns={[
         {
           key: 'id',
