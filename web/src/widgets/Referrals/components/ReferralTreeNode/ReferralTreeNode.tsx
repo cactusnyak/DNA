@@ -2,6 +2,7 @@ import type { ReferralTreeUser } from '@/entities/referral';
 
 type ReferralTreeNodeProps = {
   user: ReferralTreeUser;
+  isLast?: boolean;
 };
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
@@ -10,45 +11,42 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   year: 'numeric',
 });
 
-export function ReferralTreeNode({ user }: ReferralTreeNodeProps) {
+export function ReferralTreeNode({ user, isLast: _isLast = false }: ReferralTreeNodeProps) {
   const fullName = `${user.firstName} ${user.lastName}`;
+  const formattedDate = user.invitedAt
+    ? dateFormatter.format(new Date(user.invitedAt))
+    : 'Дата неизвестна';
 
   return (
-    <li className="relative pl-5">
-      <div className="absolute bottom-0 left-0 top-0 w-px bg-border" />
-      <div className="absolute left-0 top-5 h-px w-4 bg-border" />
+    <li className="relative flex">
+      <div className="mt-[13px] h-fit p-2">
+        <div className="h-[2px] w-2 rounded-full bg-border" />
+      </div>
 
-      <article className="rounded-2xl border border-border bg-background p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="font-medium">{fullName}</p>
-
-            <p className="mt-1 text-xs text-muted-foreground">
-              Приглашён: {dateFormatter.format(new Date(user.invitedAt))}
-            </p>
+      <div className="w-fit">
+        <article className="w-fit rounded-xl bg-muted/50 px-4 py-3 transition-colors hover:bg-muted/80">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <p className="text-sm">{fullName}</p>
+              <time className="text-xs text-muted-foreground" dateTime={user.invitedAt}>
+                {formattedDate}
+              </time>
+            </div>
           </div>
+        </article>
 
-          <div className="flex items-center gap-2">
-            <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
-              Уровень {user.level}
-            </span>
-
-            {user.children.length > 0 && (
-              <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                +{user.children.length}
-              </span>
-            )}
-          </div>
-        </div>
-      </article>
-
-      {user.children.length > 0 && (
-        <ul className="mt-3 space-y-3">
-          {user.children.map((childUser) => (
-            <ReferralTreeNode key={childUser.id} user={childUser} />
-          ))}
-        </ul>
-      )}
+        {user.children.length > 0 && (
+          <ul className="mt-3 space-y-3">
+            {user.children.map((childUser, index) => (
+              <ReferralTreeNode
+                key={childUser.id}
+                user={childUser}
+                isLast={index === user.children.length - 1}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
     </li>
   );
 }
