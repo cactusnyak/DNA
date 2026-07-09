@@ -32,10 +32,7 @@ export function Header() {
       <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-4 px-4 py-6 lg:gap-8">
         <HeaderLogo onClick={closeCatalogDropdown} />
 
-        <PlatformSectionSwitcher
-          activeSectionId={activeSectionId}
-          onNavigate={closeCatalogDropdown}
-        />
+        <PlatformSectionSwitcher activeSectionId={activeSectionId} />
 
         <DesktopHeaderControls
           section={activeSectionId}

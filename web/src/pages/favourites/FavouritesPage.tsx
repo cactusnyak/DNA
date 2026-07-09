@@ -7,6 +7,7 @@ import { FavouriteButton, getFavourites, useFavouriteStore } from '@/entities/fa
 import { formatPrice } from '@/shared/utils/format-price';
 import { SectionHeader } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 
 type Tab = 'products' | 'ads';
 
@@ -40,33 +41,14 @@ export function FavouritesPage() {
         description="Сохранённые товары маркета и объявления доски."
       />
 
-      <div className="flex gap-1 rounded-xl bg-muted p-1 w-fit">
-        <button
-          type="button"
-          onClick={() => setTab('products')}
-          className={[
-            'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
-            tab === 'products'
-              ? 'bg-background shadow-sm'
-              : 'text-muted-foreground hover:text-foreground',
-          ].join(' ')}
-        >
-          Товары {productCount > 0 && `(${productCount})`}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setTab('ads')}
-          className={[
-            'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
-            tab === 'ads'
-              ? 'bg-background shadow-sm'
-              : 'text-muted-foreground hover:text-foreground',
-          ].join(' ')}
-        >
-          Объявления {adCount > 0 && `(${adCount})`}
-        </button>
-      </div>
+      <SegmentedControl
+        options={[
+          { value: 'products', label: `Товары${productCount > 0 ? ` (${productCount})` : ''}` },
+          { value: 'ads', label: `Объявления${adCount > 0 ? ` (${adCount})` : ''}` },
+        ]}
+        value={tab}
+        onChange={(v) => setTab(v as Tab)}
+      />
 
       {!accessToken && (guestProductItems.length > 0 || guestAdItems.length > 0) && (
         <p className="rounded-xl border border-border px-4 py-3 text-sm text-muted-foreground">

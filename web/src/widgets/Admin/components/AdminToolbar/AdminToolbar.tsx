@@ -2,7 +2,7 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { SearchInput } from '@/components/ui/SearchInput';
-import { cn } from '@/shared/utils/cn';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 
 import { viewModeOptions } from './data/view-mode-options';
 
@@ -43,28 +43,12 @@ export function AdminToolbar({
       />
 
       <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:w-auto lg:grid-cols-[auto_auto]">
-        <div className="inline-flex w-full items-center gap-1 rounded-xl border border-border bg-muted/50 p-1 lg:w-auto">
-          {availableViewModeOptions.map((option) => {
-            const isActive = viewMode === option.value;
-
-            return (
-              <button
-                key={option.value}
-                type="button"
-                aria-pressed={isActive}
-                className={cn(
-                  'inline-flex h-9 flex-1 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-colors lg:flex-none',
-                  'hover:bg-background hover:text-foreground',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  isActive && 'bg-background text-foreground ring-1 ring-border',
-                )}
-                onClick={() => onViewModeChange(option.value)}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
+        <SegmentedControl
+          options={availableViewModeOptions}
+          value={viewMode}
+          onChange={onViewModeChange}
+          className="w-full lg:w-auto"
+        />
 
         {canCreate && (
           <Button
