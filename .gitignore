@@ -45,3 +45,7 @@ api/dist/tsconfig.build.tsbuildinfo
 # API Prisma generated client
 api/generated/
 api/src/generated/
+api/prisma/seed.ts
+api/dist/prisma/seed.js.map
+api/dist/prisma/seed.js
+api/dist/prisma/seed.d.ts
