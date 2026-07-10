@@ -1,10 +1,17 @@
 import type { Ad } from '@/entities/ad';
-import { AddToCartButton } from '@/widgets/ProductActions';
+import { ItemActions } from '@/widgets/ItemActions';
 
 type AdDetailsActionsProps = {
   ad: Ad;
 };
 
 export function AdDetailsActions({ ad }: AdDetailsActionsProps) {
-  return <AddToCartButton itemType="ad" item={ad} variant="details" />;
+  return (
+    <ItemActions
+      itemType="ad"
+      item={ad}
+      variant="details"
+      showFavouriteButton
+    />
+  );
 }

@@ -5,7 +5,7 @@ import type { Product } from '@/entities/product';
 import { getPlatformProductHref, PLATFORM_SECTION } from '@/shared/platform';
 import { ProductCardContent } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/components/ProductCardContent';
 import { ProductGallery } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/components/ProductGallery';
-import { ProductActions } from '@/widgets/ProductActions';
+import { ItemActions } from '@/widgets/ItemActions';
 
 type ProductCardProps = {
   product: Product;
@@ -37,7 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
         className="relative z-10 mt-auto p-4 pt-0"
         onClick={(e) => e.preventDefault()}
       >
-        <ProductActions product={product} variant="card" />
+        <ItemActions itemType="product" item={product} variant="card" />
       </div>
     </Link>
   );

@@ -4,7 +4,7 @@ import type { Ad } from '@/entities/ad';
 import { FavouriteButton } from '@/entities/favourite';
 import { formatPrice } from '@/shared/utils/format-price';
 
-import { AddToCartButton } from '@/widgets/ProductActions';
+import { ItemActions } from '@/widgets/ItemActions';
 import { AdGallery } from './components/AdGallery/AdGallery';
 
 type AdCardProps = {
@@ -46,7 +46,7 @@ export function AdCard({ ad }: AdCardProps) {
         className="relative z-10 mt-auto p-4 pt-0"
         onClick={(e) => e.preventDefault()}
       >
-        <AddToCartButton itemType="ad" item={ad} variant="card" />
+        <ItemActions itemType="ad" item={ad} variant="card" />
       </div>
     </Link>
   );

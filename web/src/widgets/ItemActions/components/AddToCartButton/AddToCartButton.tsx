@@ -12,9 +12,9 @@ import {
 type AddToCartButtonProps = {
   variant?: ProductQuantityCounterVariant;
 } & (
-  | { itemType: 'product'; item: Product }
-  | { itemType: 'ad'; item: Ad }
-);
+    | { itemType: 'product'; item: Product }
+    | { itemType: 'ad'; item: Ad }
+  );
 
 export function AddToCartButton({
   variant = 'card',
@@ -35,10 +35,7 @@ export function AddToCartButton({
         type="button"
         variant={isInCart ? 'outline' : 'default'}
         size={variant === 'details' ? 'lg' : 'default'}
-        className={cn(
-          variant === 'details' ? 'flex-1' : 'w-full',
-          getProductActionHeightClass(variant),
-        )}
+        className={cn('w-full', getProductActionHeightClass(variant))}
         onClick={() => (isInCart ? removeAdItem(item.id) : addAdItem(item))}
       >
         {isInCart ? 'Убрать из корзины' : 'В корзину'}

@@ -6,7 +6,7 @@ import {
   getPlatformProductHref,
   type PlatformSectionId,
 } from '@/shared/platform';
-import { ProductActions } from '@/widgets/ProductActions';
+import { ItemActions } from '@/widgets/ItemActions';
 
 import { ProductCardContent } from './components/ProductCardContent';
 import { ProductGallery } from './components/ProductGallery';
@@ -53,8 +53,9 @@ export function ProductCard({
           className="relative z-10 mt-auto p-4 pt-0"
           onClick={(e) => e.preventDefault()}
         >
-          <ProductActions
-            product={product}
+          <ItemActions
+            itemType="product"
+            item={product}
             variant="card"
             showAddToCartButton={showAddToCartButton}
             showBuyNowButton={showBuyNowButton}

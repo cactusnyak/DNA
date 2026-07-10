@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { getAd } from '@/entities/ad';
-import { FavouriteButton } from '@/entities/favourite';
 import { Gallery } from '@/widgets/Gallery';
 import { formatPrice } from '@/shared/utils/format-price';
 
@@ -64,14 +63,7 @@ export function AdDetails({ adId }: AdDetailsProps) {
           </div>
         )}
 
-        <div className="flex gap-2">
-          <AdDetailsActions ad={ad} />
-
-          <FavouriteButton
-            item={{ adId: ad.id }}
-            className="size-10 rounded-xl border border-border"
-          />
-        </div>
+        <AdDetailsActions ad={ad} />
 
         <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
           <h2 className="text-sm font-semibold text-muted-foreground">
