@@ -39,7 +39,7 @@ export function ProductActions({
   return (
     <div className="space-y-2">
       {showAddToCartButton && (
-        <AddToCartButton product={product} variant={variant} />
+        <AddToCartButton itemType="product" item={product} variant={variant} />
       )}
 
       {showBuyNowButton && (

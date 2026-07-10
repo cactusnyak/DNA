@@ -31,7 +31,7 @@ export function AdGallery({ images, title }: AdGalleryProps) {
 
   if (!activeImage) {
     return (
-      <div className="flex aspect-[4/3] items-center justify-center bg-muted text-sm text-muted-foreground">
+      <div className="flex aspect-square items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
         Нет фото
       </div>
     );
@@ -39,14 +39,14 @@ export function AdGallery({ images, title }: AdGalleryProps) {
 
   return (
     <div
-      className="relative aspect-[4/3] overflow-hidden bg-muted"
+      className="relative aspect-square overflow-hidden rounded-lg bg-muted"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setActiveIndex(0)}
     >
       <img
         src={activeImage.url}
         alt={activeImage.alt ?? title}
-        className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+        className="size-full object-cover"
         loading="lazy"
       />
 

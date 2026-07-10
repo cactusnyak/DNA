@@ -37,7 +37,7 @@ export function AdsPage() {
       />
 
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Свежие объявления</h2>
+        <h2 className="text-xl font-semibold">Последние объявления</h2>
         <AdsListing />
       </section>
     </div>

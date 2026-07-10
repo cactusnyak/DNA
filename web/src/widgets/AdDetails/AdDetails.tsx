@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { getAd } from '@/entities/ad';
-import { useCartStore } from '@/entities/cart';
 import { FavouriteButton } from '@/entities/favourite';
-import { Button } from '@/components/ui/Button';
+import { Gallery } from '@/widgets/Gallery';
 import { formatPrice } from '@/shared/utils/format-price';
+
+import { AdDetailsActions } from './components/AdDetailsActions';
 
 type AdDetailsProps = {
   adId: string;
@@ -20,14 +20,6 @@ export function AdDetails({ adId }: AdDetailsProps) {
     queryKey: ['ad', adId],
     queryFn: () => getAd(adId),
   });
-
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
-
-  const addAdItem = useCartStore((state) => state.addAdItem);
-  const removeAdItem = useCartStore((state) => state.removeAdItem);
-  const adItems = useCartStore((state) => state.adItems);
 
   if (isPending) {
     return (
@@ -45,67 +37,12 @@ export function AdDetails({ adId }: AdDetailsProps) {
     );
   }
 
-  const activeImage = ad.images[activeImageIndex] ?? ad.images[0];
   const sellerName = ad.seller
     ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
     : 'Продавец';
-  const isInCart = adItems.some((i) => i.ad.id === ad.id);
-
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-      <div className="space-y-4">
-        <div
-          className="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted"
-          onMouseEnter={() => setIsZoomed(true)}
-          onMouseLeave={() => setIsZoomed(false)}
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setZoomPosition({
-              x: ((e.clientX - rect.left) / rect.width) * 100,
-              y: ((e.clientY - rect.top) / rect.height) * 100,
-            });
-          }}
-        >
-          {activeImage ? (
-            <img
-              src={activeImage.url}
-              alt={activeImage.alt ?? ad.title}
-              className="size-full object-cover transition-transform duration-200"
-              style={{
-                transform: isZoomed ? 'scale(1.65)' : 'scale(1)',
-                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-              }}
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-              Нет фото
-            </div>
-          )}
-        </div>
-
-        {ad.images.length > 1 && (
-          <div className="flex flex-wrap gap-2">
-            {ad.images.map((image, index) => (
-              <button
-                key={image.id}
-                type="button"
-                className={`size-16 overflow-hidden rounded-xl border ${
-                  index === activeImageIndex
-                    ? 'border-foreground'
-                    : 'border-border'
-                }`}
-                onClick={() => setActiveImageIndex(index)}
-              >
-                <img
-                  src={image.url}
-                  alt={image.alt ?? ad.title}
-                  className="size-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <Gallery images={ad.images} title={ad.title} />
 
       <div className="space-y-6">
         <div className="space-y-2">
@@ -128,13 +65,7 @@ export function AdDetails({ adId }: AdDetailsProps) {
         )}
 
         <div className="flex gap-2">
-          <Button
-            className="flex-1"
-            variant={isInCart ? 'outline' : 'default'}
-            onClick={() => isInCart ? removeAdItem(ad.id) : addAdItem(ad)}
-          >
-            {isInCart ? 'Убрать из корзины' : 'Сохранить в корзину'}
-          </Button>
+          <AdDetailsActions ad={ad} />
 
           <FavouriteButton
             item={{ adId: ad.id }}

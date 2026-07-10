@@ -25,12 +25,6 @@ export function DesktopHeaderControls({
 
   return (
     <div className="hidden flex-1 items-center gap-3 md:flex">
-      <GlobalSearch
-        section={section}
-        placeholder={sectionConfig?.searchPlaceholder ?? 'Поиск по DNA'}
-        onOpen={onNavigate}
-      />
-
       {sectionConfig && (
         <Button
           variant="outline"
@@ -39,7 +33,7 @@ export function DesktopHeaderControls({
           onMouseEnter={onCatalogOpen}
           className={cn(
             !isCatalogDropdownOpen &&
-              'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
+            'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
           )}
         >
           <Link to={sectionConfig.catalogHref} onClick={onNavigate}>
@@ -47,6 +41,12 @@ export function DesktopHeaderControls({
           </Link>
         </Button>
       )}
+      
+      <GlobalSearch
+        section={section}
+        placeholder={sectionConfig?.searchPlaceholder ?? 'Поиск по DNA'}
+        onOpen={onNavigate}
+      />
     </div>
   );
 }

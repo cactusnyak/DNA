@@ -3,22 +3,18 @@ import { useState } from 'react';
 import type { Image } from '@/shared/types/image';
 import { cn } from '@/shared/utils/cn';
 
-import { getActiveGalleryImage } from './logic/get-active-gallery-image';
-
-type ProductDetailsGalleryProps = {
+type GalleryProps = {
   images: Image[];
   title: string;
 };
 
-export function ProductDetailsGallery({
-  images,
-  title,
-}: ProductDetailsGalleryProps) {
+function getActiveGalleryImage(images: Image[], activeIndex: number) {
+  return images[activeIndex] ?? images[0];
+}
+
+export function Gallery({ images, title }: GalleryProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [zoomPosition, setZoomPosition] = useState({
-    x: 50,
-    y: 50,
-  });
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [isZoomed, setIsZoomed] = useState(false);
 
   const activeImage = getActiveGalleryImage(images, activeImageIndex);
@@ -34,33 +30,16 @@ export function ProductDetailsGallery({
 
   if (!activeImage) {
     return (
-      <div className="flex aspect-square items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted text-muted-foreground">
         Нет изображения
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div
-        className="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted"
-        onMouseEnter={() => setIsZoomed(true)}
-        onMouseLeave={() => setIsZoomed(false)}
-        onMouseMove={handleMouseMove}
-      >
-        <img
-          src={activeImage.url}
-          alt={activeImage.alt ?? title}
-          className="size-full object-cover transition-transform duration-200"
-          style={{
-            transform: isZoomed ? 'scale(1.65)' : 'scale(1)',
-            transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-          }}
-        />
-      </div>
-
+    <div className="flex gap-4">
       {images.length > 1 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-16 shrink-0 flex-col gap-2">
           {images.map((image, index) => {
             const isActive = index === activeImageIndex;
 
@@ -69,7 +48,7 @@ export function ProductDetailsGallery({
                 key={image.id}
                 type="button"
                 className={cn(
-                  'size-16 overflow-hidden rounded-xl border transition-colors',
+                  'size-16 overflow-hidden rounded-xl border transition-colors cursor-pointer',
                   isActive
                     ? 'border-foreground'
                     : 'border-border hover:border-foreground/40',
@@ -86,6 +65,23 @@ export function ProductDetailsGallery({
           })}
         </div>
       )}
+
+      <div
+        className="aspect-[4/3] flex-1 overflow-hidden rounded-2xl border border-border bg-muted cursor-zoom-in"
+        onMouseEnter={() => setIsZoomed(true)}
+        onMouseLeave={() => setIsZoomed(false)}
+        onMouseMove={handleMouseMove}
+      >
+        <img
+          src={activeImage.url}
+          alt={activeImage.alt ?? title}
+          className="size-full object-cover transition-transform duration-200"
+          style={{
+            transform: isZoomed ? 'scale(1.65)' : 'scale(1)',
+            transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+          }}
+        />
+      </div>
     </div>
   );
 }

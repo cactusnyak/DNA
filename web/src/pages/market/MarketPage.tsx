@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/Section';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
+import { ProductsListing } from '@/widgets/ProductsListing';
 
 export function MarketPage() {
   return (
@@ -30,6 +31,11 @@ export function MarketPage() {
         title="Категории маркета"
         emptyText="Категории маркета пока не добавлены."
       />
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Последние товары</h2>
+        <ProductsListing />
+      </section>
     </div>
   );
 }

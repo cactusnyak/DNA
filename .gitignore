@@ -46,6 +46,7 @@ api/dist/tsconfig.build.tsbuildinfo
 api/generated/
 api/src/generated/
 api/prisma/seed.ts
+api/prisma/seed-images.ts
 api/dist/prisma/seed.js.map
 api/dist/prisma/seed.js
 api/dist/prisma/seed.d.ts

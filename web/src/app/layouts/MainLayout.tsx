@@ -12,7 +12,7 @@ export function MainLayout() {
 
       <Breadcrumbs />
 
-      <main className="mx-auto min-h-[calc(100vh-4rem)] max-w-7xl px-4 py-8 pb-24">
+      <main className="mx-auto max-w-7xl px-4 py-8 pb-24">
         <Outlet />
       </main>
 
