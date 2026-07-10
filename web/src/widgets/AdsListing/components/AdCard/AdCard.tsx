@@ -1,7 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import type { Ad } from '@/entities/ad';
 import { FavouriteButton } from '@/entities/favourite';
+import {
+  getPlatformCategoryHref,
+  PLATFORM_SECTION,
+} from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
 import { ItemActions } from '@/widgets/ItemActions';
@@ -9,9 +13,18 @@ import { AdGallery } from './components/AdGallery/AdGallery';
 
 type AdCardProps = {
   ad: Ad;
+  currentCategorySlug?: string;
 };
 
-export function AdCard({ ad }: AdCardProps) {
+export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
+  const navigate = useNavigate();
+  const categoryHref = ad.category
+    ? getPlatformCategoryHref(PLATFORM_SECTION.ADS, ad.category.path)
+    : null;
+  const shouldShowCategoryLink =
+    !!ad.category &&
+    !!categoryHref &&
+    (!currentCategorySlug || currentCategorySlug !== ad.category.slug);
   return (
     <Link
       to={`/ads/ad/${ad.id}`}
@@ -34,10 +47,14 @@ export function AdCard({ ad }: AdCardProps) {
         <div className="mt-2">
           <h3 className="line-clamp-2 font-semibold">{ad.title}</h3>
 
-          {ad.category && (
-            <p className="mt-0.5 text-xs text-muted-foreground/70">
-              {ad.category.name}
-            </p>
+          {shouldShowCategoryLink && (
+            <span
+              role="link"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(categoryHref!); }}
+              className="mt-0.5 block cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground"
+            >
+              В категорию «{ad.category!.name}»
+            </span>
           )}
         </div>
       </div>

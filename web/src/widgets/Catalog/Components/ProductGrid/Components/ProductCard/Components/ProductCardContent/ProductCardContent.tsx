@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import type { Product } from '@/entities/product';
 import {
@@ -18,6 +18,7 @@ export function ProductCardContent({
   product,
   currentCategorySlug,
 }: ProductCardContentProps) {
+  const navigate = useNavigate();
   const categoryHref = getPlatformCategoryHref(section, product.category.path);
   const shouldShowCategoryLink =
     !currentCategorySlug || currentCategorySlug !== product.category.slug;
@@ -30,12 +31,13 @@ export function ProductCardContent({
         <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
 
         {shouldShowCategoryLink && (
-          <Link
-            to={categoryHref}
-            className="mt-0.5 block text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground"
+          <span
+            role="link"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(categoryHref); }}
+            className="mt-0.5 block cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground"
           >
             В категорию «{product.category.name}»
-          </Link>
+          </span>
         )}
       </div>
 
