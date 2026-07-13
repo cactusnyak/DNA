@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminMarketCategory } from '@/entities/admin';
-import { MarkHighlight } from '@/shared/ui/MarkHighlight';
+import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 import { buildCategoryTree } from '../../../../logic/build-category-tree';
 import { AdminCategoryTreeView } from '../../../AdminCategoryTreeView';

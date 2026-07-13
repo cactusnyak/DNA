@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
-import { MarkHighlight } from '@/shared/ui/MarkHighlight';
+import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 type GlobalSearchCategoryResultsProps = {
   section: PlatformSectionId;

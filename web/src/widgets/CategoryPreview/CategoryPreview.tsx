@@ -8,6 +8,7 @@ import {
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
+import { SectionTitle } from '@/shared/ui/SectionTitle';
 
 import { CategoryPreviewGrid } from './components/CategoryPreviewGrid';
 import { getPreviewCategories } from './logic/get-preview-categories';
@@ -41,7 +42,7 @@ export function CategoryPreview({
   if (isPending) {
     return (
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold">{previewTitle}</h2>
+        <SectionTitle title={previewTitle} level={2} />
         <p className="text-sm text-muted-foreground">Загрузка категорий...</p>
       </section>
     );
@@ -56,11 +57,11 @@ export function CategoryPreview({
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">{previewTitle}</h2>
-
-        <Button variant="outline" asChild>
-          <Link to={getPlatformCatalogHref(section)}>Все категории</Link>
-        </Button>
+        <SectionTitle
+          title={previewTitle}
+          href={getPlatformCatalogHref(section)}
+          level={2}
+        />
       </div>
 
       {previewCategories.length ? (

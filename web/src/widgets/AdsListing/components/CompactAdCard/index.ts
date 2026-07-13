@@ -1,0 +1,1 @@
+export { CompactAdCard } from './CompactAdCard';

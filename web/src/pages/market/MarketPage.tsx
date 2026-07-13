@@ -33,7 +33,7 @@ export function MarketPage() {
       />
 
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Последние товары</h2>
+        <h2 className="text-xl font-semibold">Товары</h2>
         <ProductsListing />
       </section>
     </div>

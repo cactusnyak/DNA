@@ -36,7 +36,7 @@ export function DesktopNavigation({
                 {isFavouritesLink && <FavouritesBadge />}
               </span>
 
-              <span className="hidden lg:inline">{item.label}</span>
+              <span className="inline">{item.label}</span>
             </Link>
           </Button>
         );

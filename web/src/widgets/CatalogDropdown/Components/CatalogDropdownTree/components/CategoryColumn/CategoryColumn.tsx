@@ -8,7 +8,7 @@ import {
   type PlatformSectionId,
 } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
-import { CategoryImage } from '@/shared/ui/CategoryImage/CategoryImage';
+import { CategoryImage } from '@/widgets/CategoryImage';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 import type { CategoryLevel } from '../../types/category-level';

@@ -6,8 +6,8 @@ import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
-import { CategoryImage } from '@/shared/ui/CategoryImage/CategoryImage';
-import { MarkHighlight } from '@/shared/ui/MarkHighlight';
+import { CategoryImage } from '@/widgets/CategoryImage';
+import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 

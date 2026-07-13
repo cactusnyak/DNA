@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { MarkHighlight } from '@/shared/ui/MarkHighlight';
+import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 export function renderHighlightedText(
   value: ReactNode,

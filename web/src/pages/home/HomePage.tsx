@@ -1,15 +1,12 @@
-import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import {
   getCurrentUser,
   useAuthStore,
 } from '@/entities/auth';
-import { Button } from '@/components/ui/Button';
-import { SectionHeader } from '@/components/ui/Section';
-import { PLATFORM_SECTION } from '@/shared/platform';
 import { BalanceHero } from '@/widgets/BalanceHero';
-import { Catalog } from '@/widgets/Catalog';
+import { LatestProducts } from '@/widgets/LatestProducts/LatestProducts';
+import { LatestAds } from '@/widgets/LatestAds/LatestAds';
 
 export function HomePage() {
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -27,6 +24,20 @@ export function HomePage() {
         isAuthenticated={Boolean(user)}
         showReferralLink
         guestText="Покупать можно без регистрации. Профиль откроет баланс, кешбэк, историю заказов и реферальную систему."
+      />
+
+      {/* Latest Products Section */}
+      <LatestProducts
+        initialChunkSize={8}
+        chunkSize={4}
+        className="px-4 md:px-6 lg:px-8"
+      />
+
+      {/* Latest Ads Section */}
+      <LatestAds
+        initialChunkSize={8}
+        chunkSize={4}
+        className="px-4 md:px-6 lg:px-8"
       />
     </div>
   );

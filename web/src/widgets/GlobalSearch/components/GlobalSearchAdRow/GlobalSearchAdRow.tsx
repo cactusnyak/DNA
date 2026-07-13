@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 import type { Ad } from '@/entities/ad';
 import { formatPrice } from '@/shared/utils/format-price';
-import { MarkHighlight } from '@/shared/ui/MarkHighlight';
+import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 type GlobalSearchAdRowProps = {
   ad: Ad;

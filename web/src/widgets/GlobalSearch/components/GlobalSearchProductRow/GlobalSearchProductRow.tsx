@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Product } from '@/entities/product';
 import { getPlatformProductHref } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
-import { MarkHighlight } from '@/shared/ui/MarkHighlight';
+import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 type GlobalSearchProductRowProps = {
   product: Product;
