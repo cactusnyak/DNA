@@ -117,6 +117,22 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => mutations.bulkHardDeleteProductsMutation.mutate(ids) },
       ];
     }
+    if (state.activeTabId === 'collections') {
+      return [
+        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => {
+          // For now, use individual delete operations for each selected collection
+          ids.forEach(id => mutations.deleteCollectionMutation.mutate(id));
+        }},
+        { label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => {
+          // For now, use individual restore operations for each selected collection
+          ids.forEach(id => mutations.restoreCollectionMutation.mutate(id));
+        }},
+        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => {
+          // For now, use individual hard delete operations for each selected collection
+          ids.forEach(id => mutations.hardDeleteCollectionMutation.mutate(id));
+        }},
+      ];
+    }
     if (state.activeTabId === 'ad-categories') {
       return [
         { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => mutations.bulkDeleteAdCategoriesMutation.mutate(ids) },
