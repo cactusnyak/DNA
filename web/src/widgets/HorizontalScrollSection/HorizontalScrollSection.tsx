@@ -24,15 +24,6 @@ export const HorizontalScrollSection = forwardRef<HTMLDivElement, HorizontalScro
             onClick={onSeeAllClick}
             level={titleLevel}
           />
-          
-          {onSeeAllClick && (
-            <button
-              onClick={onSeeAllClick}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {seeAllText}
-            </button>
-          )}
         </div>
 
         <div
