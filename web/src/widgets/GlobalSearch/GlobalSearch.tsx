@@ -86,6 +86,7 @@ export function GlobalSearch({
           isAdsPending={isAdsPending}
           isAdsError={isAdsError}
           hasMoreAds={hasMoreAds}
+          searchValue={searchValue}
           onProductResultsScroll={handleProductResultsScroll}
           onNavigate={handleResultClick}
         />

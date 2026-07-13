@@ -38,6 +38,8 @@ type GlobalSearchDropdownProps = {
   isAdsError?: boolean;
   hasMoreAds?: boolean;
 
+  searchValue: string;
+
   onProductResultsScroll: (event: UIEvent<HTMLDivElement>) => void;
   onNavigate: () => void;
 };
@@ -64,6 +66,8 @@ export function GlobalSearchDropdown({
   isAdsPending = false,
   isAdsError = false,
   hasMoreAds = false,
+
+  searchValue,
 
   onProductResultsScroll,
   onNavigate,
@@ -95,6 +99,7 @@ export function GlobalSearchDropdown({
                   section={section}
                   categories={categories}
                   allCategories={allCategories}
+                  searchValue={searchValue}
                   isPending={isCategoriesPending}
                   isError={isCategoriesError}
                   onNavigate={onNavigate}
@@ -136,6 +141,7 @@ export function GlobalSearchDropdown({
                               <GlobalSearchAdRow
                                 key={ad.id}
                                 ad={ad}
+                                searchValue={searchValue}
                                 onNavigate={onNavigate}
                               />
                             ))}
@@ -154,6 +160,7 @@ export function GlobalSearchDropdown({
                       section={section}
                       products={products}
                       totalProducts={totalProducts}
+                      searchValue={searchValue}
                       isPending={isProductsPending}
                       isError={isProductsError}
                       hasMoreProducts={hasMoreProducts}

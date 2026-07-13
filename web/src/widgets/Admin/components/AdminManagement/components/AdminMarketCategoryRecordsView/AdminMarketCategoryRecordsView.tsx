@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminMarketCategory } from '@/entities/admin';
+import { MarkHighlight } from '@/shared/ui/MarkHighlight';
 
 import { buildCategoryTree } from '../../../../logic/build-category-tree';
 import { AdminCategoryTreeView } from '../../../AdminCategoryTreeView';
@@ -8,7 +9,6 @@ import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
-import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
 type AdminMarketCategoryRecordsViewProps = {
@@ -37,7 +37,7 @@ export function AdminMarketCategoryRecordsView({
       <AdminCategoryTreeView
         categories={categories}
         renderTitle={(category) =>
-          renderHighlightedText(category.name, searchValue)
+          <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
         }
         renderMeta={(category) =>
           `slug: ${category.slug} · продуктов: ${category.productsCount}`
@@ -53,11 +53,11 @@ export function AdminMarketCategoryRecordsView({
         records={categories}
         getRecordKey={(category) => category.id}
         getTitle={(category) =>
-          renderHighlightedText(category.name, searchValue)
+          <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
         }
         getDescription={(category) =>
           category.description
-            ? renderHighlightedText(category.description, searchValue)
+            ? <MarkHighlight text={category.description} searchValue={searchValue} level={2} />
             : 'Без описания'
         }
         getMeta={(category) =>
@@ -100,7 +100,7 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'text', placeholder: 'Название' },
           getValue: (category) => category.name,
           render: (category) =>
-            renderHighlightedText(category.name, searchValue),
+            <MarkHighlight text={category.name} searchValue={searchValue} level={1} />,
         },
         {
           key: 'slug',
@@ -110,7 +110,7 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'text', placeholder: 'Slug' },
           getValue: (category) => category.slug,
           render: (category) =>
-            renderHighlightedText(category.slug, searchValue),
+            <MarkHighlight text={category.slug} searchValue={searchValue} level={2} />,
         },
         {
           key: 'products',

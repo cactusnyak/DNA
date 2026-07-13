@@ -8,6 +8,7 @@ import {
   type PlatformSectionId,
 } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
+import { CategoryImage } from '@/shared/ui/CategoryImage/CategoryImage';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 import type { CategoryLevel } from '../../types/category-level';
@@ -74,7 +75,10 @@ export function CategoryColumn({
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
-                <span className="line-clamp-1">{category.name}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <CategoryImage category={category} size="md" />
+                  <span className="line-clamp-1">{category.name}</span>
+                </div>
 
                 {hasChildren && <ChevronRight className="size-4 shrink-0" />}
               </Link>

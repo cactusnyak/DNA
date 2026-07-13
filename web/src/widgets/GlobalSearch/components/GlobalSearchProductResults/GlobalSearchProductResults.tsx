@@ -12,6 +12,7 @@ type GlobalSearchProductResultsProps = {
   section: PlatformSectionId;
   products: Product[];
   totalProducts: number;
+  searchValue: string;
   isPending?: boolean;
   isError?: boolean;
   hasMoreProducts?: boolean;
@@ -23,6 +24,7 @@ export function GlobalSearchProductResults({
   section,
   products,
   totalProducts,
+  searchValue,
   isPending = false,
   isError = false,
   hasMoreProducts = false,
@@ -77,6 +79,7 @@ export function GlobalSearchProductResults({
                   <GlobalSearchProductRow
                     key={product.id}
                     product={product}
+                    searchValue={searchValue}
                     onNavigate={onNavigate}
                   />
                 ))}

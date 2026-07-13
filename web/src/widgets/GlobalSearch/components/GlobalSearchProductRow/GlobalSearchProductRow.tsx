@@ -3,14 +3,17 @@ import { Link } from 'react-router-dom';
 import type { Product } from '@/entities/product';
 import { getPlatformProductHref } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
+import { MarkHighlight } from '@/shared/ui/MarkHighlight';
 
 type GlobalSearchProductRowProps = {
   product: Product;
+  searchValue: string;
   onNavigate: () => void;
 };
 
 export function GlobalSearchProductRow({
   product,
+  searchValue,
   onNavigate,
 }: GlobalSearchProductRowProps) {
   const image = product.images[0];
@@ -19,9 +22,9 @@ export function GlobalSearchProductRow({
     <Link
       to={getPlatformProductHref(product.id)}
       onClick={onNavigate}
-      className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-lg p-2 transition-colors hover:bg-muted/25"
+      className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-xl p-2 transition-colors hover:bg-muted"
     >
-      <div className="size-14 overflow-hidden rounded-lg bg-muted">
+      <div className="size-14 overflow-hidden rounded-md bg-muted">
         {image ? (
           <img
             src={image.url}
@@ -37,7 +40,7 @@ export function GlobalSearchProductRow({
 
       <div className="min-w-0 p-1">
         <p className="line-clamp-2 text-sm font-medium leading-5">
-          {product.title}
+          <MarkHighlight text={product.title} searchValue={searchValue} level={1} />
         </p>
 
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -46,7 +49,7 @@ export function GlobalSearchProductRow({
           </span>
 
           <span className="text-xs text-muted-foreground">
-            {product.category.name}
+            <MarkHighlight text={product.category.name} searchValue={searchValue} level={2} />
           </span>
         </div>
       </div>

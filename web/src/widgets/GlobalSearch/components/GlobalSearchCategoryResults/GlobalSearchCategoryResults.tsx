@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
+import { MarkHighlight } from '@/shared/ui/MarkHighlight';
 
 type GlobalSearchCategoryResultsProps = {
   section: PlatformSectionId;
   categories: CatalogCategory[];
   allCategories: CatalogCategory[];
+  searchValue: string;
   isPending?: boolean;
   isError?: boolean;
   onNavigate: () => void;
@@ -17,6 +19,7 @@ export function GlobalSearchCategoryResults({
   section,
   categories,
   allCategories,
+  searchValue,
   isPending = false,
   isError = false,
   onNavigate,
@@ -57,9 +60,9 @@ export function GlobalSearchCategoryResults({
               key={category.id}
               to={getCategoryHref(allCategories, category.id, section)}
               onClick={onNavigate}
-              className="grid grid-cols-[44px_minmax(0,1fr)] gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
+              className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-xl p-2 transition-colors hover:bg-muted"
             >
-              <div className="size-11 overflow-hidden rounded-lg">
+              <div className="size-14 overflow-hidden rounded-md bg-muted">
                 {category.image ? (
                   <img
                     src={category.image.url}
@@ -75,11 +78,15 @@ export function GlobalSearchCategoryResults({
 
               <div className="min-w-0">
                 <p className="line-clamp-1 text-sm font-medium">
-                  {category.name}
+                  <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
                 </p>
 
                 <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                  {category.description ?? category.path}
+                  {category.description ? (
+                    <MarkHighlight text={category.description} searchValue={searchValue} level={2} />
+                  ) : (
+                    <MarkHighlight text={category.path} searchValue={searchValue} level={2} />
+                  )}
                 </p>
               </div>
             </Link>

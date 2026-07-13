@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+import { MarkHighlight } from '@/shared/ui/MarkHighlight';
 
 export function renderHighlightedText(
   value: ReactNode,
@@ -19,27 +17,11 @@ export function renderHighlightedText(
     return text;
   }
 
-  const parts = text.split(
-    new RegExp(`(${escapeRegExp(normalizedSearchValue)})`, 'gi'),
-  );
-
   return (
-    <>
-      {parts.map((part, index) => {
-        const isMatch =
-          part.toLowerCase() === normalizedSearchValue.toLowerCase();
-
-        return isMatch ? (
-          <mark
-            key={`${part}-${index}`}
-            className="rounded bg-primary/15 px-0.5 text-foreground"
-          >
-            {part}
-          </mark>
-        ) : (
-          part
-        );
-      })}
-    </>
+    <MarkHighlight 
+      text={text} 
+      searchValue={searchValue} 
+      level={1}
+    />
   );
 }
