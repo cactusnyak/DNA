@@ -7,12 +7,12 @@ import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
 
 export function MainLayout() {
   return (
-    <div className="min-h-screen overflow-hidden bg-background text-foreground">
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <Header />
 
       <Breadcrumbs />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 pb-24">
+      <main className="mx-auto max-w-7xl px-4 pt-24 pb-24 md:pt-36">
         <Outlet />
       </main>
 

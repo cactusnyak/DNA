@@ -7,6 +7,7 @@ import { HeaderLogo } from './components/HeaderLogo';
 import { MobileHeaderControls } from './components/MobileHeaderControls';
 import { PlatformSectionSwitcher } from './components/PlatformSectionSwitcher';
 import { useCatalogDropdown } from './logic/use-catalog-dropdown';
+import { useScrollHide } from './logic/use-scroll-hide';
 
 export function Header() {
   const { activeSectionId } = useActivePlatformSection();
@@ -18,16 +19,20 @@ export function Header() {
     openCatalogDropdown,
   } = useCatalogDropdown();
 
+  const { isHidden } = useScrollHide({ threshold: 80 });
+
   return (
     <header
       ref={dropdownContainerRef}
       className="
-        sticky top-0 z-40
+        fixed top-0 left-0 right-0 z-40
         border-b border-border/50
         bg-background/70
         backdrop-blur-xl
         w-full
+        transition-transform duration-300 ease-in-out
       "
+      style={{ transform: isHidden ? 'translateY(-100%)' : 'translateY(0)' }}
       onMouseLeave={closeCatalogDropdown}
     >
       {/* Row 1: Logo, Switcher, Search, Catalog */}
