@@ -8,8 +8,8 @@ import {
 } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
+import { ItemGallery } from '@/shared/ui/ItemGallery';
 import { ItemActions } from '@/widgets/ItemActions';
-import { AdGallery } from './components/AdGallery/AdGallery';
 
 type AdCardProps = {
   ad: Ad;
@@ -31,7 +31,7 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
       className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
     >
       <div className="relative">
-        <AdGallery images={ad.images} title={ad.title} />
+        <ItemGallery images={ad.images} title={ad.title} />
 
         <div
           className="absolute right-2 top-2 z-10"
