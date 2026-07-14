@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getAd } from '@/entities/ad';
 import { Gallery } from '@/widgets/Gallery';
 import { formatPrice } from '@/shared/utils/format-price';
+import { LinkifyText } from '@/shared/utils/linkify';
 
 import { AdDetailsActions } from './components/AdDetailsActions';
 
@@ -10,57 +11,21 @@ type AdDetailsProps = {
   adId: string;
 };
 
-type ContactItem = {
-  value: string;
-  href?: string;
-  external?: boolean;
-};
+const contactBadgeClass =
+  'inline items-center rounded-md bg-muted/60 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted';
 
-function getContactItems(ad: {
+function getContactValues(ad: {
   contactPhone?: string;
   contactTelegram?: string;
   contactEmail?: string;
   contactOther?: string;
-}): ContactItem[] {
-  const items: ContactItem[] = [];
-
-  if (ad.contactPhone) {
-    items.push({ value: ad.contactPhone, href: `tel:${ad.contactPhone}` });
-  }
-  if (ad.contactTelegram) {
-    items.push({
-      value: ad.contactTelegram,
-      href: `https://t.me/${ad.contactTelegram.replace(/^@/, '')}`,
-      external: true,
-    });
-  }
-  if (ad.contactEmail) {
-    items.push({ value: ad.contactEmail, href: `mailto:${ad.contactEmail}` });
-  }
-  if (ad.contactOther) {
-    items.push({ value: ad.contactOther });
-  }
-
-  return items;
-}
-
-const contactBadgeClass =
-  'inline-flex items-center rounded-md bg-muted/60 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted';
-
-function ContactBadge({ item }: { item: ContactItem }) {
-  if (item.href) {
-    return (
-      <a
-        href={item.href}
-        className={contactBadgeClass}
-        {...(item.external && { target: '_blank', rel: 'noopener noreferrer' })}
-      >
-        {item.value}
-      </a>
-    );
-  }
-
-  return <span className={contactBadgeClass}>{item.value}</span>;
+}): string[] {
+  return [
+    ad.contactPhone,
+    ad.contactTelegram,
+    ad.contactEmail,
+    ad.contactOther,
+  ].filter((value): value is string => Boolean(value));
 }
 
 export function AdDetails({ adId }: AdDetailsProps) {
@@ -93,7 +58,7 @@ export function AdDetails({ adId }: AdDetailsProps) {
     ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
     : 'Продавец';
 
-  const contactItems = getContactItems(ad);
+  const contactValues = getContactValues(ad);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
@@ -126,10 +91,12 @@ export function AdDetails({ adId }: AdDetailsProps) {
         <div className="flex flex-col gap-2.5">
           <span className="font-semibold">{sellerName}</span>
 
-          {contactItems.length > 0 ? (
+          {contactValues.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {contactItems.map((item, index) => (
-                <ContactBadge key={index} item={item} />
+              {contactValues.map((value, index) => (
+                <span key={index} className={contactBadgeClass}>
+                  <LinkifyText text={value} />
+                </span>
               ))}
             </div>
           ) : (
