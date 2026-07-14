@@ -22,7 +22,7 @@ export function Header() {
     openCatalogDropdown,
   } = useCatalogDropdown();
 
-  const { isHidden } = useScrollHide({ threshold: 80 });
+  const { isHidden } = useScrollHide();
 
   useEffect(() => {
     const element = dropdownContainerRef.current;
