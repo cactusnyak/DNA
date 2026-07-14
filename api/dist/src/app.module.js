@@ -15,6 +15,7 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
 const catalog_collections_module_1 = require("./catalog-collections/catalog-collections.module");
+const feed_module_1 = require("./feed/feed.module");
 const market_categories_module_1 = require("./market-categories/market-categories.module");
 const market_module_1 = require("./market/market.module");
 const favourites_module_1 = require("./favourites/favourites.module");
@@ -37,6 +38,7 @@ exports.AppModule = AppModule = __decorate([
             market_module_1.MarketModule,
             ad_categories_module_1.AdCategoriesModule,
             ads_module_1.AdsModule,
+            feed_module_1.FeedModule,
             favourites_module_1.FavouritesModule,
             orders_module_1.OrdersModule,
             payments_module_1.PaymentsModule,

@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CatalogCollectionsModule } from './catalog-collections/catalog-collections.module';
+import { FeedModule } from './feed/feed.module';
 import { MarketCategoriesModule } from './market-categories/market-categories.module';
 import { MarketModule } from './market/market.module';
 import { FavouritesModule } from './favourites/favourites.module';
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     MarketModule,
     AdCategoriesModule,
     AdsModule,
+    FeedModule,
     FavouritesModule,
     OrdersModule,
     PaymentsModule,

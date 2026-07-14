@@ -1,23 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { getAds } from '@/entities/ad/api/get-ads';
-import { getProducts } from '@/entities/product/api/get-products';
-import type { Ad } from '@/entities/ad';
-import type { Product } from '@/entities/product';
+import { getFeed } from '@/entities/feed';
+import type { FeedItem } from '@/entities/feed';
+import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
+import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 import { AdCard } from '@/widgets/AdsListing/components/AdCard';
 import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/ProductCard';
-
-type FeedItem =
-  | { kind: 'product'; data: Product; createdAt: string }
-  | { kind: 'ad'; data: Ad; createdAt: string };
-
-type CombinedFeedProps = {
-  initialChunkSize?: number;
-  chunkSize?: number;
-  threshold?: number;
-};
 
 function CardSkeleton() {
   return (
@@ -32,91 +20,14 @@ function CardSkeleton() {
   );
 }
 
-export function CombinedFeed({
-  initialChunkSize = 12,
-  chunkSize = 12,
-  threshold = 0.9,
-}: CombinedFeedProps) {
-  const [visibleItems, setVisibleItems] = useState<FeedItem[]>([]);
-  const [allItems, setAllItems] = useState<FeedItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function CombinedFeed() {
+  const { initialChunkSize, chunkSize } = useFeedChunkSize('default');
 
-  const offsetRef = useRef(0);
-  const isInitializedRef = useRef(false);
-  const loadingRef = useRef(false);
-
-  useEffect(() => {
-    if (isInitializedRef.current) return;
-
-    const fetchAll = async () => {
-      setIsLoading(true);
-      loadingRef.current = true;
-
-      try {
-        const [products, ads] = await Promise.all([
-          getProducts({ section: PLATFORM_SECTION.MARKET }),
-          getAds({ sort: 'createdAt:desc' }),
-        ]);
-
-        const productItems: FeedItem[] = products.map((p) => ({
-          kind: 'product',
-          data: p,
-          createdAt: p.createdAt,
-        }));
-
-        const adItems: FeedItem[] = ads.map((a) => ({
-          kind: 'ad',
-          data: a,
-          createdAt: a.createdAt,
-        }));
-
-        const merged = [...productItems, ...adItems].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-
-        setAllItems(merged);
-        setVisibleItems(merged.slice(0, initialChunkSize));
-        offsetRef.current = initialChunkSize;
-        setHasMore(merged.length > initialChunkSize);
-        isInitializedRef.current = true;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ошибка загрузки');
-      } finally {
-        setIsLoading(false);
-        loadingRef.current = false;
-      }
-    };
-
-    fetchAll();
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!hasMore || loadingRef.current) return;
-
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = window.innerHeight;
-      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
-
-      if (scrollPercentage > threshold) {
-        loadingRef.current = true;
-        const start = offsetRef.current;
-        const end = start + chunkSize;
-        const next = allItems.slice(start, end);
-
-        setVisibleItems((prev) => [...prev, ...next]);
-        offsetRef.current = end;
-        setHasMore(end < allItems.length);
-        loadingRef.current = false;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, allItems, chunkSize, threshold]);
+  const { items, isLoading, hasMore, error } = usePageScrollLazyLoading<FeedItem>({
+    fetchFunction: getFeed,
+    initialChunkSize,
+    chunkSize,
+  });
 
   if (error) {
     return (
@@ -126,7 +37,7 @@ export function CombinedFeed({
     );
   }
 
-  if (isLoading && visibleItems.length === 0) {
+  if (isLoading && items.length === 0) {
     return (
       <div className={getItemGridClasses()}>
         {Array.from({ length: initialChunkSize }).map((_, i) => (
@@ -136,7 +47,7 @@ export function CombinedFeed({
     );
   }
 
-  if (!isLoading && visibleItems.length === 0) {
+  if (!isLoading && items.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
         Товаров и объявлений пока нет.
@@ -147,30 +58,30 @@ export function CombinedFeed({
   return (
     <div className="space-y-4">
       <div className={getItemGridClasses()}>
-        {visibleItems.map((item) =>
-          item.kind === 'product' ? (
+        {items.map((item) =>
+          item.type === 'PRODUCT' ? (
             <ProductCard
-              key={`product-${item.data.id}`}
+              key={`product-${item.product.id}`}
               section={PLATFORM_SECTION.MARKET}
-              product={item.data}
+              product={item.product}
               showAddToCartButton
               showBuyNowButton
             />
           ) : (
-            <AdCard key={`ad-${item.data.id}`} ad={item.data} />
+            <AdCard key={`ad-${item.ad.id}`} ad={item.ad} />
           ),
         )}
       </div>
 
-      {isLoading && visibleItems.length > 0 && (
+      {isLoading && items.length > 0 && (
         <div className={getItemGridClasses()}>
-          {Array.from({ length: Math.min(chunkSize, 4) }).map((_, i) => (
+          {Array.from({ length: chunkSize }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </div>
       )}
 
-      {!hasMore && visibleItems.length > 0 && (
+      {!hasMore && items.length > 0 && (
         <div className="text-center py-8 text-sm text-muted-foreground">
           Показаны все товары и объявления
         </div>

@@ -27,7 +27,7 @@ export function HomePage() {
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Товары и объявления</h2>
-        <CombinedFeed initialChunkSize={12} chunkSize={12} />
+        <CombinedFeed />
       </section>
     </div>
   );

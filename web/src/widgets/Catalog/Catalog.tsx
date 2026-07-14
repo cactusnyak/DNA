@@ -8,7 +8,7 @@ import {
   type PlatformSectionId,
 } from '@/shared/platform';
 
-import { AdsListing } from '@/widgets/AdsListing';
+import { AdsFeed } from '@/widgets/AdsFeed';
 
 import { CatalogControls } from './components/CatalogControls';
 import { CatalogHeader } from './components/CatalogHeader';
@@ -129,7 +129,7 @@ export function Catalog({
             />
           )}
 
-          <AdsListing
+          <AdsFeed
             ads={ads}
             compact={shouldShowControls}
             emptyText={

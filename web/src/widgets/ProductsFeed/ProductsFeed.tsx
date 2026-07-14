@@ -1,30 +1,23 @@
 import { getProducts } from '@/entities/product/api/get-products';
 import { PLATFORM_SECTION } from '@/shared/platform';
-import { useGridColumns } from '@/shared/hooks/use-grid-columns';
+import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
-import { ProductCard } from './components/ProductCard';
+import { ProductCard } from '@/widgets/ProductsListing/components/ProductCard';
 
-type ProductsListingProps = {
+type ProductsFeedProps = {
   categorySlug?: string;
   emptyText?: string;
 };
 
-export function ProductsListing({
+export function ProductsFeed({
   categorySlug,
   emptyText = 'Товары пока не добавлены.',
-}: ProductsListingProps) {
-  const columns = useGridColumns('default');
-  const chunkSize = columns * 2;
-  const initialChunkSize = columns * 3;
+}: ProductsFeedProps) {
+  const { initialChunkSize, chunkSize } = useFeedChunkSize('default');
 
-  const {
-    items,
-    isLoading,
-    hasMore,
-    error,
-  } = usePageScrollLazyLoading({
+  const { items, isLoading, hasMore, error } = usePageScrollLazyLoading({
     fetchFunction: async () => {
       const response = await getProducts({
         section: PLATFORM_SECTION.MARKET,
@@ -65,7 +58,7 @@ export function ProductsListing({
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-      
+
       {isLoading && items.length > 0 && (
         <div className="flex justify-center py-8">
           <div className="flex gap-2">
@@ -78,7 +71,7 @@ export function ProductsListing({
           </div>
         </div>
       )}
-      
+
       {!hasMore && items.length > 0 && (
         <div className="text-center py-8 text-sm text-muted-foreground">
           Показаны все товары

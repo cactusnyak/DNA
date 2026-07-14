@@ -1,12 +1,12 @@
 import { getAds } from '@/entities/ad';
 import type { Ad } from '@/entities/ad';
-import { useGridColumns } from '@/shared/hooks/use-grid-columns';
+import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
-import { AdCard } from './components/AdCard';
+import { AdCard } from '@/widgets/AdsListing/components/AdCard';
 
-type AdsListingProps = {
+type AdsFeedProps = {
   categorySlug?: string;
   emptyText?: string;
   ads?: Ad[];
@@ -30,7 +30,7 @@ function AdGrid({ ads, emptyText, categorySlug, compact = false }: { ads: Ad[]; 
   );
 }
 
-function AdsListingFetched({
+function AdsFeedFetched({
   categorySlug,
   emptyText,
   initialChunkSize,
@@ -92,22 +92,20 @@ function AdsListingFetched({
   );
 }
 
-export function AdsListing({
+export function AdsFeed({
   categorySlug,
   emptyText = 'Объявления пока не размещены.',
   ads: externalAds,
   compact = false,
-}: AdsListingProps) {
-  const columns = useGridColumns(compact ? 'compact' : 'default');
-  const chunkSize = columns * 2;
-  const initialChunkSize = columns * 3;
+}: AdsFeedProps) {
+  const { initialChunkSize, chunkSize } = useFeedChunkSize(compact ? 'compact' : 'default');
 
   if (externalAds !== undefined) {
     return <AdGrid ads={externalAds} emptyText={emptyText} categorySlug={categorySlug} compact={compact} />;
   }
 
   return (
-    <AdsListingFetched
+    <AdsFeedFetched
       categorySlug={categorySlug}
       emptyText={emptyText}
       initialChunkSize={initialChunkSize}
