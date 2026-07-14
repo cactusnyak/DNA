@@ -12,16 +12,18 @@ import {
 } from '@/widgets/ProductQuantityCounter';
 
 import { AddToCartButton } from './components/AddToCartButton';
+import { SellerContactsButton } from './components/SellerContactsButton';
 
 type ItemActionsProps = {
   variant?: ProductQuantityCounterVariant;
   showAddToCartButton?: boolean;
   showBuyNowButton?: boolean;
   showFavouriteButton?: boolean;
+  showSellerContactsButton?: boolean;
 } & (
-  | { itemType: 'product'; item: Product }
-  | { itemType: 'ad'; item: Ad }
-);
+    | { itemType: 'product'; item: Product }
+    | { itemType: 'ad'; item: Ad }
+  );
 
 export function ItemActions({
   itemType,
@@ -30,6 +32,7 @@ export function ItemActions({
   showAddToCartButton = true,
   showBuyNowButton = true,
   showFavouriteButton = false,
+  showSellerContactsButton = false,
 }: ItemActionsProps) {
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
@@ -43,12 +46,21 @@ export function ItemActions({
 
   const isProduct = itemType === 'product';
 
-  if (!showAddToCartButton && !showBuyNowButton && !showFavouriteButton) {
+  if (
+    !showAddToCartButton &&
+    !showBuyNowButton &&
+    !showFavouriteButton &&
+    !(itemType === 'ad' && showSellerContactsButton)
+  ) {
     return null;
   }
 
   return (
     <div className="space-y-2">
+      {!isProduct && showSellerContactsButton && (
+        <SellerContactsButton ad={item} variant={variant} />
+      )}
+      
       {(showAddToCartButton || showFavouriteButton) && (
         <div className="flex items-start gap-2">
           {showAddToCartButton && (
@@ -84,6 +96,8 @@ export function ItemActions({
           )}
         </div>
       )}
+
+
 
       {isProduct && showBuyNowButton && (
         <Button

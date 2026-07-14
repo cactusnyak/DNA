@@ -63,7 +63,12 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
         className="relative z-10 mt-auto p-4 pt-0"
         onClick={(e) => e.preventDefault()}
       >
-        <ItemActions itemType="ad" item={ad} variant="card" />
+        <ItemActions
+          itemType="ad"
+          item={ad}
+          variant="card"
+          showSellerContactsButton
+        />
       </div>
     </Link>
   );
