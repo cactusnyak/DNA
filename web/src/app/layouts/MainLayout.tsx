@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router-dom';
 
 import { headerHeightVar } from '@/shared/header';
 
@@ -33,6 +33,8 @@ export function MainLayout() {
         id="app-notification-root"
         className="pointer-events-none fixed inset-x-0 top-0 z-[90] h-0"
       />
+
+      <ScrollRestoration />
     </div>
   );
 }
