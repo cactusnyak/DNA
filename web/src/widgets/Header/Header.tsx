@@ -27,7 +27,7 @@ export function Header() {
       className="
         fixed top-0 left-0 right-0 z-40
         border-b border-border/50
-        bg-background/70
+        bg-background/90
         backdrop-blur-xl
         w-full
         transition-transform duration-300 ease-in-out
@@ -53,7 +53,7 @@ export function Header() {
 
       {/* Row 2: Navigation Menu */}
       <div className="w-full hidden md:block">
-        <div className="flex justify-center mx-auto w-full p-4">
+        <div className="flex justify-center mx-auto w-full p-2">
           <MainNavigation placement="header" onNavigate={closeCatalogDropdown} />
         </div>
       </div>
