@@ -10,11 +10,13 @@ export function MainLayout() {
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <Header />
 
-      <Breadcrumbs />
+      <div style={{ paddingTop: 'var(--header-height, 64px)' }}>
+        <Breadcrumbs />
 
-      <main className="mx-auto max-w-7xl px-4 pt-24 pb-24 md:pt-36">
-        <Outlet />
-      </main>
+        <main className="mx-auto max-w-7xl px-4 py-8 pb-24">
+          <Outlet />
+        </main>
+      </div>
 
       <Footer />
 
