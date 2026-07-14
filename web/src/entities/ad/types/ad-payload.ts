@@ -5,6 +5,10 @@ export type CreateAdPayload = {
   categoryId: string;
   price: number;
   imageUrls: string[];
+  contactPhone?: string;
+  contactTelegram?: string;
+  contactEmail?: string;
+  contactOther?: string;
 };
 
 export type UpdateAdPayload = CreateAdPayload;

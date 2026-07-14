@@ -1768,6 +1768,10 @@ export class AdminService {
         status,
         moderatedAt: new Date(),
         isActive: this.getBoolean(payload.isActive, true),
+        contactPhone: this.getOptionalString(payload.contactPhone),
+        contactTelegram: this.getOptionalString(payload.contactTelegram),
+        contactEmail: this.getOptionalString(payload.contactEmail),
+        contactOther: this.getOptionalString(payload.contactOther),
       },
     });
 
@@ -2127,6 +2131,10 @@ export class AdminService {
       deletedAt: ad.deletedAt,
       createdAt: ad.createdAt,
       updatedAt: ad.updatedAt,
+      contactPhone: ad.contactPhone ?? undefined,
+      contactTelegram: ad.contactTelegram ?? undefined,
+      contactEmail: ad.contactEmail ?? undefined,
+      contactOther: ad.contactOther ?? undefined,
       images: (ad.images ?? [])
         .map((adImage: any) => adImage.image)
         .sort(

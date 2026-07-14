@@ -10,6 +10,59 @@ type AdDetailsProps = {
   adId: string;
 };
 
+type ContactItem = {
+  value: string;
+  href?: string;
+  external?: boolean;
+};
+
+function getContactItems(ad: {
+  contactPhone?: string;
+  contactTelegram?: string;
+  contactEmail?: string;
+  contactOther?: string;
+}): ContactItem[] {
+  const items: ContactItem[] = [];
+
+  if (ad.contactPhone) {
+    items.push({ value: ad.contactPhone, href: `tel:${ad.contactPhone}` });
+  }
+  if (ad.contactTelegram) {
+    items.push({
+      value: ad.contactTelegram,
+      href: `https://t.me/${ad.contactTelegram.replace(/^@/, '')}`,
+      external: true,
+    });
+  }
+  if (ad.contactEmail) {
+    items.push({ value: ad.contactEmail, href: `mailto:${ad.contactEmail}` });
+  }
+  if (ad.contactOther) {
+    items.push({ value: ad.contactOther });
+  }
+
+  return items;
+}
+
+const contactBadgeClass =
+  'inline-flex items-center rounded-md bg-muted/60 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted';
+
+function ContactBadge({ item }: { item: ContactItem }) {
+  if (item.href) {
+    return (
+      <a
+        href={item.href}
+        className={contactBadgeClass}
+        {...(item.external && { target: '_blank', rel: 'noopener noreferrer' })}
+      >
+        {item.value}
+      </a>
+    );
+  }
+
+  return <span className={contactBadgeClass}>{item.value}</span>;
+}
+
 export function AdDetails({ adId }: AdDetailsProps) {
   const {
     data: ad,
@@ -39,58 +92,50 @@ export function AdDetails({ adId }: AdDetailsProps) {
   const sellerName = ad.seller
     ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
     : 'Продавец';
+
+  const contactItems = getContactItems(ad);
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <Gallery images={ad.images} title={ad.title} />
 
-      <div className="space-y-6">
-        <div className="space-y-2">
-          {ad.category && (
-            <p className="text-sm text-muted-foreground">{ad.category.name}</p>
-          )}
-          <h1 className="text-2xl font-semibold">{ad.title}</h1>
-          <p className="text-3xl font-semibold">{formatPrice(ad.price)}</p>
-        </div>
-
-        {ad.description && (
-          <div className="space-y-2">
-            <h2 className="text-sm font-semibold text-muted-foreground">
-              Описание
-            </h2>
-            <p className="whitespace-pre-line text-sm leading-relaxed">
-              {ad.description}
-            </p>
+      <div className="flex flex-col gap-6">
+        <div>
+          <div className="flex flex-col gap-2">
+            {ad.category && (
+              <p className="text-sm text-muted-foreground">{ad.category.name}</p>
+            )}
+            <h1 className="text-2xl font-semibold">{ad.title}</h1>
+            <p className="text-3xl font-semibold">{formatPrice(ad.price)}</p>
           </div>
-        )}
+
+          {ad.description && (
+            <div className="flex flex-col gap-2">
+              <h2 className="text-sm font-semibold text-muted-foreground">
+                Описание
+              </h2>
+              <p className="whitespace-pre-line text-sm leading-relaxed">
+                {ad.description}
+              </p>
+            </div>
+          )}
+        </div>
 
         <AdDetailsActions ad={ad} />
 
-        <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-muted-foreground">
-            Продавец
-          </h2>
-          <p className="font-semibold">{sellerName}</p>
+        <div className="flex flex-col gap-2.5">
+          <span className="font-semibold">{sellerName}</span>
 
-          {ad.seller?.phone ? (
-            <a
-              href={`tel:${ad.seller.phone}`}
-              className="inline-flex text-sm font-medium text-foreground underline underline-offset-4"
-            >
-              {ad.seller.phone}
-            </a>
+          {contactItems.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {contactItems.map((item, index) => (
+                <ContactBadge key={index} item={item} />
+              ))}
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground">
               Контакты появятся позже.
             </p>
-          )}
-
-          {ad.seller?.email && (
-            <a
-              href={`mailto:${ad.seller.email}`}
-              className="block text-sm text-muted-foreground underline underline-offset-4"
-            >
-              {ad.seller.email}
-            </a>
           )}
         </div>
       </div>

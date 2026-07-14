@@ -5,4 +5,8 @@ export type CreateAdDto = {
   categoryId?: unknown;
   price?: unknown;
   imageUrls?: unknown;
+  contactPhone?: unknown;
+  contactTelegram?: unknown;
+  contactEmail?: unknown;
+  contactOther?: unknown;
 };

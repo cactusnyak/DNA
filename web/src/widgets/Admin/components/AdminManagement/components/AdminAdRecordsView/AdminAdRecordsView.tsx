@@ -109,6 +109,79 @@ export function AdminAdRecordsView({
           render: (ad) => renderHighlightedText(getSellerName(ad), searchValue),
         },
         {
+          key: 'contactPhone',
+          title: 'Телефон',
+          width: 160,
+          sortable: false,
+          filter: { type: 'text', placeholder: 'Телефон' },
+          getValue: (ad) => ad.contactPhone ?? '',
+          render: (ad) =>
+            ad.contactPhone ? (
+              <a
+                href={`tel:${ad.contactPhone}`}
+                className="underline underline-offset-2"
+              >
+                {renderHighlightedText(ad.contactPhone, searchValue)}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            ),
+        },
+        {
+          key: 'contactTelegram',
+          title: 'Telegram',
+          width: 150,
+          sortable: false,
+          filter: { type: 'text', placeholder: 'Telegram' },
+          getValue: (ad) => ad.contactTelegram ?? '',
+          render: (ad) =>
+            ad.contactTelegram ? (
+              <a
+                href={`https://t.me/${ad.contactTelegram.replace(/^@/, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2"
+              >
+                {renderHighlightedText(ad.contactTelegram, searchValue)}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            ),
+        },
+        {
+          key: 'contactEmail',
+          title: 'Email (объявл.)',
+          width: 200,
+          sortable: false,
+          filter: { type: 'text', placeholder: 'Email' },
+          getValue: (ad) => ad.contactEmail ?? '',
+          render: (ad) =>
+            ad.contactEmail ? (
+              <a
+                href={`mailto:${ad.contactEmail}`}
+                className="underline underline-offset-2"
+              >
+                {renderHighlightedText(ad.contactEmail, searchValue)}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            ),
+        },
+        {
+          key: 'contactOther',
+          title: 'Другой контакт',
+          width: 180,
+          sortable: false,
+          filter: { type: 'text', placeholder: 'Другой контакт' },
+          getValue: (ad) => ad.contactOther ?? '',
+          render: (ad) =>
+            ad.contactOther ? (
+              renderHighlightedText(ad.contactOther, searchValue)
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            ),
+        },
+        {
           key: 'price',
           title: 'Цена',
           width: 140,

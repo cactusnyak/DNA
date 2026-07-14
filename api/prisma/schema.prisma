@@ -184,6 +184,11 @@ model Ad {
   price       Int
   status      AdStatus @default(PENDING_MODERATION)
 
+  contactPhone    String?
+  contactTelegram String?
+  contactEmail    String?
+  contactOther    String?
+
   isActive    Boolean   @default(true)
   deletedAt   DateTime?
   moderatedAt DateTime?

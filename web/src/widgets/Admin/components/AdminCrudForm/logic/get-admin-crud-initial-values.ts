@@ -90,6 +90,10 @@ export function getAdminCrudInitialValues(
       imageUrls: ad?.images.map((image) => image.url) ?? [],
       imageFiles: [],
       isActive: ad?.isActive ?? true,
+      contactPhone: ad?.contactPhone ?? '',
+      contactTelegram: ad?.contactTelegram ?? '',
+      contactEmail: ad?.contactEmail ?? '',
+      contactOther: ad?.contactOther ?? '',
     };
   }
 
