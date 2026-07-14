@@ -27,7 +27,7 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
           const isFavouritesLink = item.to === '/favourites';
 
           return (
-            <Button key={item.to} variant="ghost" asChild className="h-12">
+            <Button key={item.to} variant="ghost" asChild className="h-15">
               <Link
                 to={item.to}
                 className="relative flex items-center justify-center"
