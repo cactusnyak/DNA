@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { useParams } from 'react-router-dom';
 
 import { getCategorySlugFromPath } from '@/shared/catalog';
@@ -35,6 +37,7 @@ export function Catalog({
 }: CatalogProps) {
   const { '*': categoryPath } = useParams();
   const categorySlug = getCategorySlugFromPath(categoryPath);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const shouldShowControls = showControls && (showFilters || showSorting);
 
@@ -109,7 +112,7 @@ export function Catalog({
           />
         )}
 
-        <div className={shouldShowControls ? 'grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]' : 'grid gap-6'}>
+        <div ref={containerRef} className={shouldShowControls ? 'grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]' : 'grid gap-6'}>
           {shouldShowControls && (
             <CatalogControls
               products={baseAds}
@@ -119,6 +122,7 @@ export function Catalog({
               showFilters={showFilters}
               showSorting={showSorting}
               subcategoryOptions={adsSubcategoryOptions}
+              containerRef={containerRef}
               onPriceFilterChange={setAdsPriceFilter}
               onSelectedCategoryIdsChange={setAdsSelectedCategoryIds}
               onSortRulesChange={setAdsSortRules}
@@ -153,6 +157,7 @@ export function Catalog({
       )}
 
       <div
+        ref={containerRef}
         className={
           shouldShowControls
             ? 'grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]'
@@ -167,10 +172,10 @@ export function Catalog({
             sortRules={sortRules}
             showFilters={showFilters}
             showSorting={showSorting}
+            containerRef={containerRef}
             onPriceFilterChange={setPriceFilter}
             onSelectedCategoryIdsChange={setSelectedCategoryIds}
             onSortRulesChange={setSortRules}
-
           />
         )}
 

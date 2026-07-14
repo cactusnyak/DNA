@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+
+import { useHeaderStore } from '@/shared/header';
 
 type UseScrollHideOptions = {
   threshold?: number;
 };
 
 export function useScrollHide({ threshold = 80 }: UseScrollHideOptions = {}) {
-  const [isHidden, setIsHidden] = useState(false);
+  const setIsHidden = useHeaderStore((s) => s.setIsHidden);
+  const isHidden = useHeaderStore((s) => s.isHidden);
   const lastScrollY = useRef(window.scrollY);
   const thresholdRef = useRef(threshold);
   thresholdRef.current = threshold;
@@ -28,7 +31,7 @@ export function useScrollHide({ threshold = 80 }: UseScrollHideOptions = {}) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [setIsHidden]);
 
   return { isHidden };
 }

@@ -414,8 +414,8 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                     type="checkbox"
                     aria-label="Выбрать все"
                     checked={allSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = someSelected && !allSelected;
+                    ref={(element) => {
+                      if (element) element.indeterminate = someSelected && !allSelected;
                     }}
                     onChange={toggleSelectAll}
                     className="size-4 cursor-pointer rounded border-border accent-primary"
