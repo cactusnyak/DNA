@@ -60,7 +60,7 @@ export function BalanceHero({
     <section
       className={cn(
         'bg-gradient-to-br from-[#020817] via-[#0F1D3D] to-[#09122E]',
-        'group relative isolate flex flex-col justify-end rounded-[30px] p-2 sm:rounded-[30px] md:rounded-[40px] md:p-5 lg:rounded-[45px] lg:p-6',
+        'group relative isolate flex flex-col justify-end rounded-[30px] p-2 sm:rounded-[30px] md:rounded-[40px] md:p-4 lg:rounded-[40px] lg:p-4',
         showIllustration && 'lg:my-25 lg:mx-5 xl:my-30',
         className,
       )}
