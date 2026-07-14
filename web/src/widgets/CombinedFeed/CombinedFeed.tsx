@@ -5,6 +5,7 @@ import { getProducts } from '@/entities/product/api/get-products';
 import type { Ad } from '@/entities/ad';
 import type { Product } from '@/entities/product';
 import { PLATFORM_SECTION } from '@/shared/platform';
+import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 import { AdCard } from '@/widgets/AdsListing/components/AdCard';
 import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/ProductCard';
 
@@ -127,7 +128,7 @@ export function CombinedFeed({
 
   if (isLoading && visibleItems.length === 0) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className={getItemGridClasses()}>
         {Array.from({ length: initialChunkSize }).map((_, i) => (
           <CardSkeleton key={i} />
         ))}
@@ -145,7 +146,7 @@ export function CombinedFeed({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className={getItemGridClasses()}>
         {visibleItems.map((item) =>
           item.kind === 'product' ? (
             <ProductCard
@@ -162,7 +163,7 @@ export function CombinedFeed({
       </div>
 
       {isLoading && visibleItems.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className={getItemGridClasses()}>
           {Array.from({ length: Math.min(chunkSize, 4) }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}

@@ -1,6 +1,7 @@
 import { getAds } from '@/entities/ad';
 import type { Ad } from '@/entities/ad';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
+import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
 import { AdCard } from './components/AdCard';
 
@@ -10,9 +11,10 @@ type AdsListingProps = {
   initialChunkSize?: number;
   chunkSize?: number;
   ads?: Ad[];
+  compact?: boolean;
 };
 
-function AdGrid({ ads, emptyText, categorySlug }: { ads: Ad[]; emptyText: string; categorySlug?: string }) {
+function AdGrid({ ads, emptyText, categorySlug, compact = false }: { ads: Ad[]; emptyText: string; categorySlug?: string; compact?: boolean }) {
   if (!ads.length) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -21,7 +23,7 @@ function AdGrid({ ads, emptyText, categorySlug }: { ads: Ad[]; emptyText: string
     );
   }
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className={getItemGridClasses(compact ? 'compact' : 'default')}>
       {ads.map((ad) => (
         <AdCard key={ad.id} ad={ad} currentCategorySlug={categorySlug} />
       ))}
@@ -34,11 +36,13 @@ function AdsListingFetched({
   emptyText,
   initialChunkSize,
   chunkSize,
+  compact = false,
 }: {
   categorySlug?: string;
   emptyText: string;
   initialChunkSize: number;
   chunkSize: number;
+  compact?: boolean;
 }) {
   const { items, isLoading, hasMore, error } = usePageScrollLazyLoading({
     fetchFunction: () => getAds({ categorySlug, sort: 'createdAt:desc' }),
@@ -64,7 +68,7 @@ function AdsListingFetched({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className={getItemGridClasses(compact ? 'compact' : 'default')}>
         {items.map((ad) => (
           <AdCard key={ad.id} ad={ad} currentCategorySlug={categorySlug} />
         ))}
@@ -95,9 +99,10 @@ export function AdsListing({
   initialChunkSize = 12,
   chunkSize = 12,
   ads: externalAds,
+  compact = false,
 }: AdsListingProps) {
   if (externalAds !== undefined) {
-    return <AdGrid ads={externalAds} emptyText={emptyText} categorySlug={categorySlug} />;
+    return <AdGrid ads={externalAds} emptyText={emptyText} categorySlug={categorySlug} compact={compact} />;
   }
 
   return (
@@ -106,6 +111,7 @@ export function AdsListing({
       emptyText={emptyText}
       initialChunkSize={initialChunkSize}
       chunkSize={chunkSize}
+      compact={compact}
     />
   );
 }

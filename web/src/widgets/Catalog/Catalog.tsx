@@ -131,6 +131,7 @@ export function Catalog({
 
           <AdsListing
             ads={ads}
+            compact={shouldShowControls}
             emptyText={
               categorySlug
                 ? 'В этой категории пока нет объявлений.'

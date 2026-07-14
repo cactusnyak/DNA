@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/entities/auth';
 import { FavouriteButton, getFavourites, useFavouriteStore } from '@/entities/favourite';
 import { formatPrice } from '@/shared/utils/format-price';
+import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 import { SectionHeader } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -89,7 +90,7 @@ export function FavouritesPage() {
           )}
 
           {accessToken && productFavourites.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={getItemGridClasses()}>
               {productFavourites.map((fav) => {
                 const product = fav.product!;
                 const cover = product.images?.[0];
@@ -165,7 +166,7 @@ export function FavouritesPage() {
           )}
 
           {accessToken && adFavourites.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={getItemGridClasses()}>
               {adFavourites.map((fav) => {
                 const ad = fav.ad!;
                 const cover = ad.images?.[0];

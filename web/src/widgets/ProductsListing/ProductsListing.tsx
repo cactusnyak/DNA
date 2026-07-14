@@ -1,6 +1,7 @@
 import { getProducts } from '@/entities/product/api/get-products';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
+import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
 import { ProductCard } from './components/ProductCard';
 
@@ -59,7 +60,7 @@ export function ProductsListing({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className={getItemGridClasses()}>
         {items.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
