@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/Section';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { useCartStore } from '@/entities/cart';
@@ -18,6 +19,7 @@ export function Cart() {
   const removeItem = useCartStore((state) => state.removeItem);
   const removeAdItem = useCartStore((state) => state.removeAdItem);
   const clearCart = useCartStore((state) => state.clearCart);
+  const clearAdItems = useCartStore((state) => state.clearAdItems);
   const totalProductItems = useCartStore((state) => state.getTotalItems());
   const totalProductAmount = useCartStore((state) => state.getTotalAmount());
   const totalAdItems = useCartStore((state) => state.getTotalAdItems());
@@ -44,9 +46,21 @@ export function Cart() {
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div>
+        <div className="space-y-4">
           {tab === 'products' && items.length > 0 && (
-            <CartItemsList items={items} onRemove={removeItem} />
+            <div className="space-y-4">
+              <CartItemsList items={items} onRemove={removeItem} />
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full sm:w-auto"
+                onClick={clearCart}
+              >
+                Очистить товары
+              </Button>
+            </div>
           )}
 
           {tab === 'products' && items.length === 0 && (
@@ -56,11 +70,21 @@ export function Cart() {
           )}
 
           {tab === 'ads' && adItems.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 Для покупки свяжитесь с продавцом напрямую.
               </p>
               <CartAdItemsList adItems={adItems} onRemove={removeAdItem} />
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full sm:w-auto"
+                onClick={clearAdItems}
+              >
+                Очистить объявления
+              </Button>
             </div>
           )}
 
@@ -76,7 +100,6 @@ export function Cart() {
           totalProductAmount={totalProductAmount}
           totalAdItems={totalAdItems}
           totalAdAmount={totalAdAmount}
-          onClear={clearCart}
         />
       </div>
     </div>

@@ -22,6 +22,7 @@ type CartStore = {
   decreaseItem: (productId: string) => void;
   setItemQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  clearAdItems: () => void;
   getItemQuantity: (productId: string) => number;
   getTotalItems: () => number;
   getTotalAmount: () => number;
@@ -131,6 +132,12 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => {
         set({
           items: [],
+        });
+      },
+
+      clearAdItems: () => {
+        set({
+          adItems: [],
         });
       },
 

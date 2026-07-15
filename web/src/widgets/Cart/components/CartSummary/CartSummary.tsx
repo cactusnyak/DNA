@@ -8,7 +8,6 @@ type CartSummaryProps = {
   totalProductAmount: number;
   totalAdItems: number;
   totalAdAmount: number;
-  onClear: () => void;
 };
 
 export function CartSummary({
@@ -16,7 +15,6 @@ export function CartSummary({
   totalProductAmount,
   totalAdItems,
   totalAdAmount,
-  onClear,
 }: CartSummaryProps) {
   const grandTotal = totalProductAmount + totalAdAmount;
   const hasProducts = totalProductItems > 0;
@@ -95,14 +93,6 @@ export function CartSummary({
         </div>
       )}
 
-      <Button
-        type="button"
-        variant="ghost"
-        className="w-full"
-        onClick={onClear}
-      >
-        Очистить корзину
-      </Button>
     </aside>
   );
 }
