@@ -60,7 +60,7 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
             <div className="flex flex-wrap gap-2">
               {contactValues.map((value, index) => (
                 <span key={`${value}-${index}`} className={contactBadgeClass}>
-                  <LinkifyText text={value} />
+                  <LinkifyText text={value} renderLinks={false} />
                 </span>
               ))}
             </div>

@@ -69,7 +69,7 @@ function getSiteHref(value: string): string {
   return `https://${value}`;
 }
 
-function getContactLink(value: string): ReactNode | null {
+function getContactLink(value: string, renderAsLink = true): ReactNode | null {
   let href: string | null = null;
 
   if (isPhone(value)) {
@@ -84,10 +84,21 @@ function getContactLink(value: string): ReactNode | null {
 
   if (!href) return null;
 
+  if (!renderAsLink) {
+    return (
+      <span
+        role="link"
+        className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+      >
+        {value}
+      </span>
+    );
+  }
+
   return <ResourceLink href={href}>{value}</ResourceLink>;
 }
 
-export function linkifyText(text: string): ReactNode {
+export function linkifyText(text: string, renderLinks = true): ReactNode {
   const parts: ReactNode[] = [];
   const regex = new RegExp(TOKEN_REGEX, 'gi');
   let match: RegExpExecArray | null;
@@ -101,7 +112,7 @@ export function linkifyText(text: string): ReactNode {
     }
 
     const [core, trailing] = trimTrailingPunctuation(match[0]);
-    const link = getContactLink(core);
+    const link = getContactLink(core, renderLinks);
 
     if (link) {
       parts.push(
@@ -126,6 +137,12 @@ export function linkifyText(text: string): ReactNode {
   return parts;
 }
 
-export function LinkifyText({ text }: { text: string }) {
-  return <>{linkifyText(text)}</>;
+export function LinkifyText({
+  text,
+  renderLinks = true,
+}: {
+  text: string;
+  renderLinks?: boolean;
+}) {
+  return <>{linkifyText(text, renderLinks)}</>;
 }
