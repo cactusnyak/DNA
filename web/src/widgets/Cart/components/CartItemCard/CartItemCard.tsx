@@ -2,87 +2,101 @@ import { Link } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import type { CartStoreItem } from '@/entities/cart';
-import { formatPrice } from '@/shared/utils/format-price';
-import { ProductQuantityCounter } from '@/widgets/ProductQuantityCounter';
-
-import { calculateCartItemTotal } from '../../logic/calculate-cart-item-total';
+import { cn } from '@/shared/utils/cn';
 
 type CartItemCardProps = {
-  item: CartStoreItem;
-  onRemove: (productId: string) => void;
+  href: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  placeholderText?: string;
+  title: string;
+  category?: React.ReactNode;
+  price: React.ReactNode;
+  priceMeta?: React.ReactNode;
+  actions: React.ReactNode;
+  favouriteButton?: React.ReactNode;
+  onRemove: () => void;
+  className?: string;
 };
 
-export function CartItemCard({ item, onRemove }: CartItemCardProps) {
-  const { product, quantity } = item;
-
-  const image = product.images[0];
-  const categoryHref = `/market/catalog/${product.category.path ?? product.category.slug}`;
-  const itemTotal = calculateCartItemTotal(item);
-
+export function CartItemCard({
+  href,
+  imageUrl,
+  imageAlt,
+  placeholderText = 'Нет фото',
+  title,
+  category,
+  price,
+  priceMeta,
+  actions,
+  favouriteButton,
+  onRemove,
+  className,
+}: CartItemCardProps) {
   return (
-    <article className="grid gap-4 rounded-2xl border border-border bg-card p-4 sm:grid-cols-[120px_minmax(0,1fr)]">
-      <Link
-        to={`/market/product/${product.id}`}
-        className="block overflow-hidden rounded-xl bg-muted"
-      >
-        {image ? (
-          <img
-            src={image.url}
-            alt={image.alt ?? product.title}
-            className="aspect-square w-full object-cover"
-          />
-        ) : (
-          <div className="flex aspect-square items-center justify-center p-10 text-sm text-center text-muted-foreground">
-            Нет изображения
-          </div>
+    <Link to={href} className="block">
+      <article
+        className={cn(
+          'grid gap-0 rounded-2xl border border-border bg-card sm:grid-cols-[120px_minmax(0,1fr)]',
+          className,
         )}
-      </Link>
-
-      <div className="min-w-0 space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 space-y-1">
-            <Link
-              to={`/market/product/${product.id}`}
-              className="line-clamp-2 font-semibold underline-offset-4 hover:underline"
-            >
-              {product.title}
-            </Link>
-
-            <Link
-              to={categoryHref}
-              className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-            >
-              {product.category.name}
-            </Link>
-          </div>
-
-          <div className="shrink-0 text-left sm:text-right">
-            <p className="text-lg font-semibold">{formatPrice(itemTotal)}</p>
-
-            <p className="text-xs text-muted-foreground">
-              {quantity} × {formatPrice(product.price)}
-            </p>
+      >
+        <div className="border-b border-border p-3 sm:border-b-0 sm:border-r">
+          <div className="aspect-square max-h-32 overflow-hidden rounded-sm bg-muted sm:max-h-none">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={imageAlt ?? title}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                {placeholderText}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="w-full sm:w-40">
-            <ProductQuantityCounter productId={product.id} variant="details" />
+        <div className="min-w-0 space-y-4 p-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <h3 className="line-clamp-2 font-semibold">
+                {title}
+              </h3>
+
+              {category}
+            </div>
+
+            <div className="shrink-0 text-left sm:text-right">
+              {price}
+              {priceMeta && (
+                <p className="text-xs text-muted-foreground">{priceMeta}</p>
+              )}
+            </div>
           </div>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="justify-start text-muted-foreground hover:text-destructive sm:justify-center"
-            onClick={() => onRemove(product.id)}
-          >
-            <Trash2 className="size-4" />
-            Удалить
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            {actions}
+
+            <div className="flex items-center gap-2">
+              {favouriteButton}
+
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                aria-label="Удалить"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }
