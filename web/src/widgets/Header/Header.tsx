@@ -16,6 +16,7 @@ export function Header() {
   const { activeSectionId } = useActivePlatformSection();
 
   const {
+    activeCatalogSection,
     isCatalogDropdownOpen,
     dropdownContainerRef,
     closeCatalogDropdown,
@@ -52,6 +53,7 @@ export function Header() {
 
           <DesktopHeaderControls
             section={activeSectionId}
+            activeCatalogSection={activeCatalogSection}
             isCatalogDropdownOpen={isCatalogDropdownOpen}
             onCatalogOpen={openCatalogDropdown}
             onNavigate={closeCatalogDropdown}
@@ -65,9 +67,9 @@ export function Header() {
         </div>
       </div>
 
-      {isCatalogDropdownOpen && activeSectionId && (
+      {isCatalogDropdownOpen && activeCatalogSection && (
         <HeaderCatalogDropdown
-          section={activeSectionId}
+          section={activeCatalogSection}
           onClose={closeCatalogDropdown}
         />
       )}

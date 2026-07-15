@@ -10,10 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getCatalogCategories } from '@/shared/catalog';
 import { getAds } from '@/entities/ad/api/get-ads';
 import { getProducts } from '@/entities/product/api/get-products';
-import {
-  PLATFORM_SECTION,
-  type PlatformSectionId,
-} from '@/shared/platform';
+import { PLATFORM_SECTION } from '@/shared/platform';
 
 import { filterGlobalSearchAds } from '../logic/filter-global-search-ads';
 import { filterGlobalSearchCategories } from '../logic/filter-global-search-categories';
@@ -24,13 +21,7 @@ import { normalizeSearchValue } from '../logic/normalize-search-value';
 const MIN_SEARCH_LENGTH = 2;
 const PRODUCT_RESULTS_STEP = 8;
 
-type UseGlobalSearchParams = {
-  section?: PlatformSectionId | null;
-};
-
-export function useGlobalSearch({
-  section = null,
-}: UseGlobalSearchParams = {}) {
+export function useGlobalSearch() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [searchValue, setSearchValue] = useState('');
@@ -38,23 +29,31 @@ export function useGlobalSearch({
   const [visibleProductsLimit, setVisibleProductsLimit] = useState(
     PRODUCT_RESULTS_STEP,
   );
+  const [visibleAdsLimit, setVisibleAdsLimit] = useState(PRODUCT_RESULTS_STEP);
 
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const isSearchReady = normalizedSearchValue.length >= MIN_SEARCH_LENGTH;
-  const isScopedSearchEnabled = Boolean(section && isOpen && isSearchReady);
-  const isMarketProductSearchEnabled =
-    section === PLATFORM_SECTION.MARKET && isOpen && isSearchReady;
-  const isAdsSearchEnabled =
-    section === PLATFORM_SECTION.ADS && isOpen && isSearchReady;
+  const isGlobalSearchEnabled = isOpen && isSearchReady;
 
   const {
-    data: categories = [],
-    isPending: isCategoriesPending,
-    isError: isCategoriesError,
+    data: marketCategories = [],
+    isPending: isMarketCategoriesPending,
+    isError: isMarketCategoriesError,
   } = useQuery({
-    queryKey: ['global-search-categories', section],
-    queryFn: () => getCatalogCategories({ section }),
-    enabled: isScopedSearchEnabled,
+    queryKey: ['global-search-categories', PLATFORM_SECTION.MARKET],
+    queryFn: () => getCatalogCategories({ section: PLATFORM_SECTION.MARKET }),
+    enabled: isGlobalSearchEnabled,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const {
+    data: adsCategories = [],
+    isPending: isAdsCategoriesPending,
+    isError: isAdsCategoriesError,
+  } = useQuery({
+    queryKey: ['global-search-categories', PLATFORM_SECTION.ADS],
+    queryFn: () => getCatalogCategories({ section: PLATFORM_SECTION.ADS }),
+    enabled: isGlobalSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -63,9 +62,9 @@ export function useGlobalSearch({
     isPending: isProductsPending,
     isError: isProductsError,
   } = useQuery({
-    queryKey: ['global-search-products', section],
-    queryFn: () => getProducts({ section }),
-    enabled: isMarketProductSearchEnabled,
+    queryKey: ['global-search-products'],
+    queryFn: () => getProducts({ section: PLATFORM_SECTION.MARKET }),
+    enabled: isGlobalSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -76,7 +75,7 @@ export function useGlobalSearch({
   } = useQuery({
     queryKey: ['global-search-ads'],
     queryFn: () => getAds(),
-    enabled: isAdsSearchEnabled,
+    enabled: isGlobalSearchEnabled,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -88,32 +87,40 @@ export function useGlobalSearch({
     return filterGlobalSearchSections(searchValue);
   }, [isSearchReady, searchValue]);
 
-  const categoryResults = useMemo(() => {
-    if (!section || !isSearchReady) {
+  const marketCategoryResults = useMemo(() => {
+    if (!isSearchReady) {
       return [];
     }
 
-    return filterGlobalSearchCategories(categories, searchValue);
-  }, [categories, isSearchReady, searchValue, section]);
+    return filterGlobalSearchCategories(marketCategories, searchValue);
+  }, [marketCategories, isSearchReady, searchValue]);
+
+  const adsCategoryResults = useMemo(() => {
+    if (!isSearchReady) {
+      return [];
+    }
+
+    return filterGlobalSearchCategories(adsCategories, searchValue);
+  }, [adsCategories, isSearchReady, searchValue]);
 
   const productResults = useMemo(() => {
-    if (section !== PLATFORM_SECTION.MARKET || !isSearchReady) {
+    if (!isSearchReady) {
       return [];
     }
 
     return filterGlobalSearchProducts(products, searchValue);
-  }, [isSearchReady, products, searchValue, section]);
+  }, [isSearchReady, products, searchValue]);
 
   const adResults = useMemo(() => {
-    if (section !== PLATFORM_SECTION.ADS || !isSearchReady) {
+    if (!isSearchReady) {
       return [];
     }
 
     return filterGlobalSearchAds(ads, searchValue);
-  }, [ads, isSearchReady, searchValue, section]);
+  }, [ads, isSearchReady, searchValue]);
 
-  const visibleAds = adResults.slice(0, visibleProductsLimit);
-  const hasMoreAds = visibleProductsLimit < adResults.length;
+  const visibleAds = adResults.slice(0, visibleAdsLimit);
+  const hasMoreAds = visibleAdsLimit < adResults.length;
 
   const visibleProducts = productResults.slice(0, visibleProductsLimit);
   const hasMoreProducts = visibleProductsLimit < productResults.length;
@@ -145,9 +152,24 @@ export function useGlobalSearch({
     );
   }
 
+  function handleAdResultsScroll(event: UIEvent<HTMLDivElement>) {
+    const element = event.currentTarget;
+    const distanceToBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight;
+
+    if (distanceToBottom > 32 || !hasMoreAds) {
+      return;
+    }
+
+    setVisibleAdsLimit((currentLimit) =>
+      Math.min(currentLimit + PRODUCT_RESULTS_STEP, adResults.length),
+    );
+  }
+
   useEffect(() => {
     setVisibleProductsLimit(PRODUCT_RESULTS_STEP);
-  }, [normalizedSearchValue, section]);
+    setVisibleAdsLimit(PRODUCT_RESULTS_STEP);
+  }, [normalizedSearchValue]);
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -183,10 +205,14 @@ export function useGlobalSearch({
 
     sectionResults,
 
-    categories,
-    categoryResults,
-    isCategoriesPending,
-    isCategoriesError,
+    marketCategories,
+    adsCategories,
+    marketCategoryResults,
+    adsCategoryResults,
+    isMarketCategoriesPending,
+    isAdsCategoriesPending,
+    isMarketCategoriesError,
+    isAdsCategoriesError,
 
     productResults,
     visibleProducts,
@@ -205,6 +231,7 @@ export function useGlobalSearch({
     closeSearch,
     handleResultClick,
     handleProductResultsScroll,
+    handleAdResultsScroll,
   };
 }
 

@@ -1,38 +1,36 @@
 import type { UIEvent } from 'react';
 
-import type { Product } from '@/entities/product';
+import type { Ad } from '@/entities/ad';
 
-import { GlobalSearchProductRow } from '../GlobalSearchProductRow';
+import { GlobalSearchAdRow } from '../GlobalSearchAdRow';
 
-type GlobalSearchProductResultsProps = {
-  products: Product[];
-  totalProducts: number;
+type GlobalSearchAdResultsProps = {
+  ads: Ad[];
+  totalAds: number;
   searchValue: string;
   isPending?: boolean;
   isError?: boolean;
-  hasMoreProducts?: boolean;
+  hasMoreAds?: boolean;
   onScroll: (event: UIEvent<HTMLDivElement>) => void;
   onNavigate: () => void;
 };
 
-export function GlobalSearchProductResults({
-  products,
-  totalProducts,
+export function GlobalSearchAdResults({
+  ads,
+  totalAds,
   searchValue,
   isPending = false,
   isError = false,
-  hasMoreProducts = false,
+  hasMoreAds = false,
   onScroll,
   onNavigate,
-}: GlobalSearchProductResultsProps) {
+}: GlobalSearchAdResultsProps) {
   return (
     <section className="p-5">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold">Товары</h3>
+        <h3 className="text-sm font-semibold">Объявления</h3>
 
-        <span className="text-xs text-muted-foreground">
-          {totalProducts}
-        </span>
+        <span className="text-xs text-muted-foreground">{totalAds}</span>
       </div>
 
       <div
@@ -41,34 +39,34 @@ export function GlobalSearchProductResults({
       >
         {isPending && (
           <p className="rounded-lg bg-muted/40 px-3 py-3 text-sm text-muted-foreground">
-            Ищем товары...
+            Ищем объявления...
           </p>
         )}
 
         {isError && (
           <p className="rounded-lg bg-destructive/10 px-3 py-3 text-sm text-destructive">
-            Не удалось загрузить товары.
+            Не удалось загрузить объявления.
           </p>
         )}
 
-        {!isPending && !isError && products.length === 0 && (
+        {!isPending && !isError && ads.length === 0 && (
           <p className="rounded-lg bg-muted/40 px-3 py-3 text-sm text-muted-foreground">
-            Товары не найдены.
+            Объявления не найдены.
           </p>
         )}
 
-        {!isPending && !isError && products.length > 0 && (
+        {!isPending && !isError && ads.length > 0 && (
           <div className="grid gap-1">
-            {products.map((product) => (
-              <GlobalSearchProductRow
-                key={product.id}
-                product={product}
+            {ads.map((ad) => (
+              <GlobalSearchAdRow
+                key={ad.id}
+                ad={ad}
                 searchValue={searchValue}
                 onNavigate={onNavigate}
               />
             ))}
 
-            {hasMoreProducts && (
+            {hasMoreAds && (
               <p className="py-2 text-center text-xs text-muted-foreground">
                 Прокрутите ниже, чтобы показать ещё.
               </p>

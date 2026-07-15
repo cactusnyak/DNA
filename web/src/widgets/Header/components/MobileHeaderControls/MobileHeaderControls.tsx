@@ -2,23 +2,25 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import {
+  PLATFORM_SECTION,
   getPlatformSection,
+  platformSections,
   type PlatformSectionId,
 } from '@/shared/platform';
 import { GlobalSearch } from '@/widgets/GlobalSearch';
 
 function MobileCatalogButton({
-  section,
+  to,
+  label,
   className,
 }: {
-  section: PlatformSectionId;
+  to: string;
+  label: string;
   className?: string;
 }) {
-  const sectionConfig = getPlatformSection(section);
-
   return (
     <Button variant="outline" type="button" className={className} asChild>
-      <Link to={sectionConfig.catalogHref}>Каталог</Link>
+      <Link to={to}>{label}</Link>
     </Button>
   );
 }
@@ -33,10 +35,28 @@ export function MobileHeaderControls({ section }: MobileHeaderControlsProps) {
   return (
     <div className="border-t border-border/50 px-4 py-3 md:hidden">
       <div className="mx-auto flex max-w-7xl items-center gap-2">
-        {section && <MobileCatalogButton section={section} className="shrink-0" />}
+        {sectionConfig ? (
+          <MobileCatalogButton
+            to={sectionConfig.catalogHref}
+            label={sectionConfig.catalogLabel}
+            className="shrink-0"
+          />
+        ) : (
+          <>
+            <MobileCatalogButton
+              to={platformSections[PLATFORM_SECTION.ADS].catalogHref}
+              label={platformSections[PLATFORM_SECTION.ADS].catalogLabel}
+              className="shrink-0"
+            />
+            <MobileCatalogButton
+              to={platformSections[PLATFORM_SECTION.MARKET].catalogHref}
+              label={platformSections[PLATFORM_SECTION.MARKET].catalogLabel}
+              className="shrink-0"
+            />
+          </>
+        )}
 
         <GlobalSearch
-          section={section}
           placeholder={sectionConfig?.searchPlaceholder ?? 'Поиск по DNA'}
           className="min-w-0 flex-1"
         />
