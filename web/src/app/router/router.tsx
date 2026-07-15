@@ -151,7 +151,7 @@ export const router = createBrowserRouter([
             } satisfies BreadcrumbHandle,
           },
           {
-            path: 'ad/:adId',
+            path: 'ad/:adSlug',
             element: <AdDetailsPage />,
             handle: {
               breadcrumb: {
@@ -214,7 +214,7 @@ export const router = createBrowserRouter([
             } satisfies BreadcrumbHandle,
           },
           {
-            path: 'product/:productId',
+            path: 'product/:productSlug',
             element: <ProductPage />,
             handle: {
               breadcrumb: {

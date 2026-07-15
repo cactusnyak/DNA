@@ -129,6 +129,10 @@ export function getPlatformCategoryHref(
   return `${catalogHref}/${normalizedCategoryPath}`;
 }
 
-export function getPlatformProductHref(productId: string) {
-  return `/market/product/${productId}`;
+export function getPlatformProductHref(productSlugOrId: string) {
+  return `/market/product/${productSlugOrId}`;
+}
+
+export function getPlatformAdHref(adSlugOrId: string) {
+  return `/ads/ad/${adSlugOrId}`;
 }

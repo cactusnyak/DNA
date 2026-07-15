@@ -29,7 +29,7 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Link
-      to={getPlatformProductHref(product.id)}
+      to={getPlatformProductHref(product.slug)}
       className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
     >
       <div className="relative">

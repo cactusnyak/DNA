@@ -23,9 +23,9 @@ type BuildBreadcrumbItemsParams = {
   categories?: CatalogCategory[];
   categorySlug?: string;
   product?: Product;
-  productId?: string;
+  productSlug?: string;
   ad?: Ad;
-  adId?: string;
+  adSlug?: string;
 };
 
 function getCatalogBreadcrumbItem(
@@ -52,18 +52,18 @@ function getAdBreadcrumbItems({
   activeSection,
   categories,
   ad,
-  adId,
+  adSlug,
 }: Pick<
   BuildBreadcrumbItemsParams,
-  'activeSection' | 'categories' | 'ad' | 'adId'
+  'activeSection' | 'categories' | 'ad' | 'adSlug'
 >): BreadcrumbItem[] {
   const catalogBreadcrumbItem = getCatalogBreadcrumbItem(activeSection);
 
   if (!activeSection || !catalogBreadcrumbItem) {
     return [
       {
-        id: `ad-${ad?.id ?? adId ?? 'unknown'}`,
-        href: adId ? `/ads/ad/${adId}` : '/ads/catalog',
+        id: `ad-${ad?.id ?? adSlug ?? 'unknown'}`,
+        href: adSlug ? `/ads/ad/${adSlug}` : '/ads/catalog',
         label: ad?.title ?? 'Объявление',
       },
     ];
@@ -73,8 +73,8 @@ function getAdBreadcrumbItems({
     return [
       catalogBreadcrumbItem,
       {
-        id: `ad-${adId ?? 'unknown'}`,
-        href: adId ? `/ads/ad/${adId}` : catalogBreadcrumbItem.href,
+        id: `ad-${adSlug ?? 'unknown'}`,
+        href: adSlug ? `/ads/ad/${adSlug}` : catalogBreadcrumbItem.href,
         label: 'Объявление',
       },
     ];
@@ -93,7 +93,7 @@ function getAdBreadcrumbItems({
     ...categoryItems,
     {
       id: `ad-${ad.id}`,
-      href: `/ads/ad/${ad.id}`,
+      href: `/ads/ad/${ad.slug}`,
       label: ad.title,
     },
   ];
@@ -103,18 +103,20 @@ function getProductBreadcrumbItems({
   activeSection,
   categories,
   product,
-  productId,
+  productSlug,
 }: Pick<
   BuildBreadcrumbItemsParams,
-  'activeSection' | 'categories' | 'product' | 'productId'
+  'activeSection' | 'categories' | 'product' | 'productSlug'
 >): BreadcrumbItem[] {
   const catalogBreadcrumbItem = getCatalogBreadcrumbItem(activeSection);
 
   if (!activeSection || !catalogBreadcrumbItem) {
     return [
       {
-        id: `product-${product?.id ?? productId ?? 'unknown'}`,
-        href: productId ? getPlatformProductHref(productId) : '/market/catalog',
+        id: `product-${product?.id ?? productSlug ?? 'unknown'}`,
+        href: productSlug
+          ? getPlatformProductHref(productSlug)
+          : '/market/catalog',
         label: product?.title ?? 'Товар',
       },
     ];
@@ -124,10 +126,10 @@ function getProductBreadcrumbItems({
     return [
       catalogBreadcrumbItem,
       {
-        id: `product-${productId ?? 'unknown'}`,
-        href: productId
-          ? getPlatformProductHref(productId)
-          : getPlatformCatalogHref(activeSection),
+        id: `product-${productSlug ?? 'unknown'}`,
+        href: productSlug
+          ? getPlatformProductHref(productSlug)
+          : catalogBreadcrumbItem.href,
         label: 'Товар',
       },
     ];
@@ -144,7 +146,7 @@ function getProductBreadcrumbItems({
     ),
     {
       id: `product-${product.id}`,
-      href: getPlatformProductHref(product.id),
+      href: getPlatformProductHref(product.slug),
       label: product.title,
     },
   ];
@@ -157,9 +159,9 @@ export function buildBreadcrumbItems({
   categories = [],
   categorySlug,
   product,
-  productId,
+  productSlug,
   ad,
-  adId,
+  adSlug,
 }: BuildBreadcrumbItemsParams) {
   const isHomePage = matches.some(
     (match) =>
@@ -216,7 +218,7 @@ export function buildBreadcrumbItems({
           activeSection,
           categories,
           product,
-          productId,
+          productSlug,
         });
 
       case BREADCRUMB_TYPE.AD:
@@ -224,7 +226,7 @@ export function buildBreadcrumbItems({
           activeSection,
           categories,
           ad,
-          adId,
+          adSlug,
         });
 
       case BREADCRUMB_TYPE.STATIC:

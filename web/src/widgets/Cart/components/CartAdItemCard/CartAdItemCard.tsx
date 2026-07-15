@@ -32,7 +32,7 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
 
   return (
     <CartItemCard
-      href={`/ads/ad/${ad.id}`}
+      href={`/ads/ad/${ad.slug}`}
       imageUrl={image?.url}
       imageAlt={image?.alt ?? ad.title}
       title={ad.title}

@@ -78,7 +78,7 @@ export function CartItemCard({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             {actions}
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {favouriteButton}
 
               <Button

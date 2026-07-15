@@ -5,19 +5,19 @@ import { getAd } from '@/entities/ad';
 import { AdDetails } from '@/widgets/AdDetails';
 
 export function AdDetailsPage() {
-  const { adId } = useParams();
+  const { adSlug } = useParams();
 
   const {
     data: ad,
     isPending,
     isError,
   } = useQuery({
-    queryKey: ['ad', adId],
-    queryFn: () => getAd(adId ?? ''),
-    enabled: Boolean(adId),
+    queryKey: ['ad', adSlug],
+    queryFn: () => getAd(adSlug ?? ''),
+    enabled: Boolean(adSlug),
   });
 
-  if (!adId) {
+  if (!adSlug) {
     return (
       <p className="text-sm text-muted-foreground">Объявление не найдено.</p>
     );

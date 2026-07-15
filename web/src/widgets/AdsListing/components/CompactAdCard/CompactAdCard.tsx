@@ -14,7 +14,7 @@ export function AdCard({ ad, className }: AdCardProps) {
 
   return (
     <Link
-      to={`/ads/ad/${ad.id}`}
+      to={`/ads/ad/${ad.slug}`}
       className={cn(
         'group flex flex-col bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200 min-w-0 max-w-[280px]',
         className

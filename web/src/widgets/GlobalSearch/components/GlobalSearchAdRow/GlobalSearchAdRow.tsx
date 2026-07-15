@@ -15,7 +15,7 @@ export function GlobalSearchAdRow({ ad, searchValue, onNavigate }: GlobalSearchA
 
   return (
     <Link
-      to={`/ads/ad/${ad.id}`}
+      to={`/ads/ad/${ad.slug}`}
       onClick={onNavigate}
       className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-xl p-2 transition-colors hover:bg-muted"
     >

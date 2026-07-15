@@ -99,15 +99,19 @@ export class AdsService {
     return ads.map((ad) => this.mapAd(ad, categoryById));
   }
 
-  async findById(adId: string) {
+  async findById(adIdOrSlug: string) {
     const activeCategories = await this.getActiveCategories();
     const categoryById = new Map(
       activeCategories.map((category) => [category.id, category]),
     );
 
+    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      adIdOrSlug,
+    );
+
     const ad = await this.prismaService.ad.findFirst({
       where: {
-        id: adId,
+        ...(isId ? { id: adIdOrSlug } : { slug: adIdOrSlug }),
         ...PUBLISHED_AD_WHERE,
         category: ACTIVE_AD_CATEGORY_WHERE,
       },

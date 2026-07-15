@@ -51,7 +51,7 @@ export function CatalogDropdownProducts({
               return (
                 <Link
                   key={ad.id}
-                  to={`/ads/ad/${ad.id}`}
+                  to={`/ads/ad/${ad.slug}`}
                   onClick={onProductClick}
                   className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/30"
                 >
@@ -106,7 +106,7 @@ export function CatalogDropdownProducts({
             return (
               <Link
                 key={product.id}
-                to={getPlatformProductHref(product.id)}
+                to={getPlatformProductHref(product.slug)}
                 onClick={onProductClick}
                 className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/30"
               >

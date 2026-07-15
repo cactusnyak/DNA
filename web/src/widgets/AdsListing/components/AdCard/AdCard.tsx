@@ -27,7 +27,7 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
     (!currentCategorySlug || currentCategorySlug !== ad.category.slug);
   return (
     <Link
-      to={`/ads/ad/${ad.id}`}
+      to={`/ads/ad/${ad.slug}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
     >
       <div className="relative">

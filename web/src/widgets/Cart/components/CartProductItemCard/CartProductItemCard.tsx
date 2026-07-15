@@ -18,7 +18,7 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
 
   return (
     <CartItemCard
-      href={`/market/product/${product.id}`}
+      href={`/market/product/${product.slug}`}
       imageUrl={image?.url}
       imageAlt={image?.alt ?? product.title}
       placeholderText="Нет изображения"

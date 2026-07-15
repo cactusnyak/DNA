@@ -8,9 +8,9 @@ import { getPlatformSectionIdFromPathname } from '@/shared/platform';
 
 import { BreadcrumbsList } from './components/BreadcrumbsList';
 import { buildBreadcrumbItems } from './logic/build-breadcrumb-items';
-import { getCurrentAdId } from './logic/get-current-ad-id';
+import { getCurrentAdSlug } from './logic/get-current-ad-slug';
 import { getCurrentCategorySlug } from './logic/get-current-category-slug';
-import { getCurrentProductId } from './logic/get-current-product-id';
+import { getCurrentProductSlug } from './logic/get-current-product-slug';
 import type {
   BreadcrumbItem,
   BreadcrumbMatch,
@@ -37,25 +37,25 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
 
   const activeSection = getActiveBreadcrumbSection(matches);
   const categorySlug = getCurrentCategorySlug(matches);
-  const productId = getCurrentProductId(matches);
-  const adId = getCurrentAdId(matches);
+  const productSlug = getCurrentProductSlug(matches);
+  const adSlug = getCurrentAdSlug(matches);
 
   const { data: categories } = useQuery({
     queryKey: ['categories', activeSection],
     queryFn: () => getCatalogCategories({ section: activeSection }),
-    enabled: Boolean(activeSection && (categorySlug || productId || adId)),
+    enabled: Boolean(activeSection && (categorySlug || productSlug || adSlug)),
   });
 
   const { data: product } = useQuery({
-    queryKey: ['product', productId],
-    queryFn: () => getProduct(productId ?? ''),
-    enabled: Boolean(productId),
+    queryKey: ['product', productSlug],
+    queryFn: () => getProduct(productSlug ?? ''),
+    enabled: Boolean(productSlug),
   });
 
   const { data: ad } = useQuery({
-    queryKey: ['ad', adId],
-    queryFn: () => getAd(adId ?? ''),
-    enabled: Boolean(adId),
+    queryKey: ['ad', adSlug],
+    queryFn: () => getAd(adSlug ?? ''),
+    enabled: Boolean(adSlug),
   });
 
   const breadcrumbItems = buildBreadcrumbItems({
@@ -65,9 +65,9 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
     categories,
     categorySlug,
     product,
-    productId,
+    productSlug,
     ad,
-    adId,
+    adSlug,
   });
 
   if (breadcrumbItems.length <= 1) {

@@ -44,7 +44,7 @@ export function CheckoutOrderSummary({
 
               <div className="min-w-0 flex-1">
                 <Link
-                  to={`/market/product/${item.product.id}`}
+                  to={`/market/product/${item.product.slug}`}
                   className="line-clamp-2 text-sm font-medium underline-offset-4 hover:underline"
                 >
                   {item.product.title}
