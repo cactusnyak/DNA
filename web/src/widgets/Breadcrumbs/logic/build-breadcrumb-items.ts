@@ -1,4 +1,5 @@
 import type { CatalogCategory } from '@/shared/types/catalog-category';
+import type { Ad } from '@/entities/ad';
 import type { Product } from '@/entities/product';
 import {
   getPlatformCatalogHref,
@@ -23,6 +24,8 @@ type BuildBreadcrumbItemsParams = {
   categorySlug?: string;
   product?: Product;
   productId?: string;
+  ad?: Ad;
+  adId?: string;
 };
 
 function getCatalogBreadcrumbItem(
@@ -43,6 +46,57 @@ function getLastCategorySlugFromProduct(product: Product) {
   const categoryPathParts = product.category.path.split('/').filter(Boolean);
 
   return categoryPathParts.at(-1) ?? product.category.slug;
+}
+
+function getAdBreadcrumbItems({
+  activeSection,
+  categories,
+  ad,
+  adId,
+}: Pick<
+  BuildBreadcrumbItemsParams,
+  'activeSection' | 'categories' | 'ad' | 'adId'
+>): BreadcrumbItem[] {
+  const catalogBreadcrumbItem = getCatalogBreadcrumbItem(activeSection);
+
+  if (!activeSection || !catalogBreadcrumbItem) {
+    return [
+      {
+        id: `ad-${ad?.id ?? adId ?? 'unknown'}`,
+        href: adId ? `/ads/ad/${adId}` : '/ads/catalog',
+        label: ad?.title ?? 'Объявление',
+      },
+    ];
+  }
+
+  if (!ad) {
+    return [
+      catalogBreadcrumbItem,
+      {
+        id: `ad-${adId ?? 'unknown'}`,
+        href: adId ? `/ads/ad/${adId}` : catalogBreadcrumbItem.href,
+        label: 'Объявление',
+      },
+    ];
+  }
+
+  const adCategorySlug = ad.category
+    ? ad.category.path.split('/').filter(Boolean).at(-1) ?? ad.category.slug
+    : null;
+
+  const categoryItems = adCategorySlug
+    ? getCategoryBreadcrumbItems(categories ?? [], adCategorySlug, activeSection)
+    : [];
+
+  return [
+    catalogBreadcrumbItem,
+    ...categoryItems,
+    {
+      id: `ad-${ad.id}`,
+      href: `/ads/ad/${ad.id}`,
+      label: ad.title,
+    },
+  ];
 }
 
 function getProductBreadcrumbItems({
@@ -104,6 +158,8 @@ export function buildBreadcrumbItems({
   categorySlug,
   product,
   productId,
+  ad,
+  adId,
 }: BuildBreadcrumbItemsParams) {
   const isHomePage = matches.some(
     (match) =>
@@ -161,6 +217,14 @@ export function buildBreadcrumbItems({
           categories,
           product,
           productId,
+        });
+
+      case BREADCRUMB_TYPE.AD:
+        return getAdBreadcrumbItems({
+          activeSection,
+          categories,
+          ad,
+          adId,
         });
 
       case BREADCRUMB_TYPE.STATIC:

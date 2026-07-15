@@ -155,8 +155,8 @@ export const router = createBrowserRouter([
             element: <AdDetailsPage />,
             handle: {
               breadcrumb: {
-                type: BREADCRUMB_TYPE.STATIC,
-                label: 'Объявление',
+                type: BREADCRUMB_TYPE.AD,
+                fallbackLabel: 'Объявление',
               },
             } satisfies BreadcrumbHandle,
           },
