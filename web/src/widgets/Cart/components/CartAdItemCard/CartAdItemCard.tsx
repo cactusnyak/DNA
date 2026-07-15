@@ -11,7 +11,7 @@ type CartAdItemCardProps = {
 };
 
 const contactBadgeClass =
-  'inline items-center rounded-md bg-muted/60 px-3 py-1.5 text-sm font-medium text-foreground transition-colors';
+  'inline items-center rounded-md bg-muted/60 px-2 py-1 text-xs font-medium text-foreground transition-colors sm:px-3 sm:py-1.5 sm:text-sm';
 
 function getContactValues(ad: CartAdItem['ad']): string[] {
   return [
@@ -38,10 +38,10 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
       title={ad.title}
       category={
         ad.category ? (
-          <p className="text-sm text-muted-foreground">{ad.category.name}</p>
+          <p className="text-xs text-muted-foreground sm:text-sm">{ad.category.name}</p>
         ) : undefined
       }
-      price={<p className="text-lg font-semibold">{formatPrice(ad.price)}</p>}
+      price={<p className="text-base font-semibold sm:text-lg">{formatPrice(ad.price)}</p>}
       priceMeta="Объявление"
       favouriteButton={
         <FavouriteButton
@@ -51,7 +51,7 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
       }
       actions={
         <div
-          className="flex flex-col gap-2 rounded-xl text-sm"
+          className="flex flex-col gap-1 rounded-xl text-xs sm:gap-2 sm:text-sm"
           onClick={(e) => e.stopPropagation()}
         >
           <span className="font-medium text-foreground">{sellerName}</span>

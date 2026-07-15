@@ -28,11 +28,11 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
           {product.category.name}
         </p>
       }
-      price={<p className="text-lg font-semibold">{formatPrice(itemTotal)}</p>}
+      price={<p className="text-base font-semibold sm:text-lg">{formatPrice(itemTotal)}</p>}
       priceMeta={`${quantity} × ${formatPrice(product.price)}`}
       actions={
         <div
-          className="w-full sm:w-40"
+          className="w-36 sm:w-40"
           onClick={(e) => e.stopPropagation()}
         >
           <ProductQuantityCounter productId={product.id} variant="details" />

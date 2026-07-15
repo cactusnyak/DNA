@@ -37,12 +37,12 @@ export function CartItemCard({
     <Link to={href} className="block">
       <article
         className={cn(
-          'grid gap-0 rounded-2xl border border-border bg-card sm:grid-cols-[120px_minmax(0,1fr)]',
+          'grid gap-0 rounded-2xl border border-border bg-card grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
           className,
         )}
       >
-        <div className="border-b border-border p-3 sm:border-b-0 sm:border-r">
-          <div className="aspect-square max-h-32 overflow-hidden rounded-sm bg-muted sm:max-h-none">
+        <div className="border-r border-border p-2 sm:p-3">
+          <div className="aspect-square overflow-hidden rounded-sm bg-muted">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -50,24 +50,24 @@ export function CartItemCard({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
+              <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground sm:p-6 sm:text-sm">
                 {placeholderText}
               </div>
             )}
           </div>
         </div>
 
-        <div className="min-w-0 space-y-4 p-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0 space-y-1">
-              <h3 className="line-clamp-2 font-semibold">
+        <div className="min-w-0 space-y-3 p-2 sm:space-y-4 sm:p-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 space-y-0.5 sm:space-y-1">
+              <h3 className="line-clamp-2 text-sm font-semibold sm:text-base">
                 {title}
               </h3>
 
               {category}
             </div>
 
-            <div className="shrink-0 text-left sm:text-right">
+            <div className="shrink-0 text-right">
               {price}
               {priceMeta && (
                 <p className="text-xs text-muted-foreground">{priceMeta}</p>
@@ -75,7 +75,7 @@ export function CartItemCard({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex items-end justify-between gap-4">
             {actions}
 
             <div className="flex items-center gap-1">
