@@ -77,6 +77,10 @@ export type FeedAdItem = {
     moderatedAt?: Date | null;
     createdAt: Date;
     updatedAt: Date;
+    contactPhone?: string;
+    contactTelegram?: string;
+    contactEmail?: string;
+    contactOther?: string;
     images: {
       id: string;
       url: string;

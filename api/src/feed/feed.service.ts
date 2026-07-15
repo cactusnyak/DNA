@@ -167,6 +167,10 @@ export class FeedService {
             moderatedAt: ad.moderatedAt,
             createdAt: ad.createdAt,
             updatedAt: ad.updatedAt,
+            contactPhone: ad.contactPhone ?? undefined,
+            contactTelegram: ad.contactTelegram ?? undefined,
+            contactEmail: ad.contactEmail ?? undefined,
+            contactOther: ad.contactOther ?? undefined,
             images: this.mapImages(ad.images),
           },
         });

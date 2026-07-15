@@ -104,7 +104,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
-        label="Телефон"
+        label="Телефон (для объявления)"
         type="tel"
         value={String(values.contactPhone ?? '')}
         onChange={(event) => onValueChange('contactPhone', event.target.value)}
@@ -118,7 +118,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
-        label="Email (объявления)"
+        label="Email (для объявления)"
         type="email"
         value={String(values.contactEmail ?? '')}
         onChange={(event) => onValueChange('contactEmail', event.target.value)}
