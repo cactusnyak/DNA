@@ -1,6 +1,6 @@
 import type { CartStoreItem } from '@/entities/cart';
 
-import { CartItemCard } from '../CartItemCard';
+import { CartProductItemCard } from '../CartProductItemCard';
 
 type CartItemsListProps = {
   items: CartStoreItem[];
@@ -11,7 +11,7 @@ export function CartItemsList({ items, onRemove }: CartItemsListProps) {
   return (
     <div className="space-y-3">
       {items.map((item) => (
-        <CartItemCard
+        <CartProductItemCard
           key={item.product.id}
           item={item}
           onRemove={onRemove}

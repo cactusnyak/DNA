@@ -1,0 +1,1 @@
+export { AdDetailsInfo } from './AdDetailsInfo';

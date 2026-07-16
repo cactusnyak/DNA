@@ -110,6 +110,10 @@ export async function buildAdminCrudPayload({
       status: (values.status as AdStatus) ?? 'PUBLISHED',
       imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       isActive: Boolean(values.isActive),
+      contactPhone: String(values.contactPhone ?? '').trim() || undefined,
+      contactTelegram: String(values.contactTelegram ?? '').trim() || undefined,
+      contactEmail: String(values.contactEmail ?? '').trim() || undefined,
+      contactOther: String(values.contactOther ?? '').trim() || undefined,
     };
   }
 

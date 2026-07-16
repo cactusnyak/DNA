@@ -1,12 +1,10 @@
 import { SearchInput } from '@/components/ui/SearchInput';
-import type { PlatformSectionId } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
 
 import { GlobalSearchDropdown } from './components/GlobalSearchDropdown';
 import { useGlobalSearch } from './hooks/use-global-search';
 
 type GlobalSearchProps = {
-  section?: PlatformSectionId | null;
   placeholder?: string;
   className?: string;
   inputClassName?: string;
@@ -14,7 +12,6 @@ type GlobalSearchProps = {
 };
 
 export function GlobalSearch({
-  section = null,
   placeholder = 'Поиск по DNA',
   className,
   inputClassName,
@@ -28,10 +25,14 @@ export function GlobalSearch({
 
     sectionResults,
 
-    categories,
-    categoryResults,
-    isCategoriesPending,
-    isCategoriesError,
+    marketCategories,
+    adsCategories,
+    marketCategoryResults,
+    adsCategoryResults,
+    isMarketCategoriesPending,
+    isAdsCategoriesPending,
+    isMarketCategoriesError,
+    isAdsCategoriesError,
 
     productResults,
     visibleProducts,
@@ -49,7 +50,8 @@ export function GlobalSearch({
     openSearch,
     handleResultClick,
     handleProductResultsScroll,
-  } = useGlobalSearch({ section });
+    handleAdResultsScroll,
+  } = useGlobalSearch();
 
   function handleFocus() {
     openSearch();
@@ -69,13 +71,16 @@ export function GlobalSearch({
 
       {isOpen && (
         <GlobalSearchDropdown
-          section={section}
           isSearchReady={isSearchReady}
           sections={sectionResults}
-          categories={categoryResults}
-          allCategories={categories}
-          isCategoriesPending={isCategoriesPending}
-          isCategoriesError={isCategoriesError}
+          marketCategories={marketCategories}
+          adsCategories={adsCategories}
+          marketCategoryResults={marketCategoryResults}
+          adsCategoryResults={adsCategoryResults}
+          isMarketCategoriesPending={isMarketCategoriesPending}
+          isAdsCategoriesPending={isAdsCategoriesPending}
+          isMarketCategoriesError={isMarketCategoriesError}
+          isAdsCategoriesError={isAdsCategoriesError}
           products={visibleProducts}
           totalProducts={productResults.length}
           isProductsPending={isProductsPending}
@@ -88,6 +93,7 @@ export function GlobalSearch({
           hasMoreAds={hasMoreAds}
           searchValue={searchValue}
           onProductResultsScroll={handleProductResultsScroll}
+          onAdResultsScroll={handleAdResultsScroll}
           onNavigate={handleResultClick}
         />
       )}

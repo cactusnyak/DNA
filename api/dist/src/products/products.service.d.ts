@@ -30,7 +30,7 @@ export declare class ProductsService {
         updatedAt: any;
         images: any;
     }[]>;
-    findById(productId: string): Promise<{
+    findById(productIdOrSlug: string): Promise<{
         id: any;
         categoryId: any;
         category: {

@@ -9,12 +9,13 @@ import { SubcategoryFilter } from './components/SubcategoryFilter';
 import { getPriceBounds } from './logic/get-price-bounds';
 import { getSubcategoryOptions } from './logic/get-subcategory-options';
 import { toggleSelectedCategoryId } from './logic/toggle-selected-category-id';
-import type { CatalogPriceFilterValue } from './types/catalog-filters';
+import type { CatalogPriceFilterValue, CatalogSubcategoryFilterOption } from './types/catalog-filters';
 
 type CatalogFiltersProps = {
-  products: Product[];
+  products: { price: number }[];
   priceFilter: CatalogPriceFilterValue;
   selectedCategoryIds: string[];
+  subcategoryOptions?: CatalogSubcategoryFilterOption[];
   onPriceFilterChange: (value: CatalogPriceFilterValue) => void;
   onSelectedCategoryIdsChange: (categoryIds: string[]) => void;
 };
@@ -23,13 +24,14 @@ export function CatalogFilters({
   products,
   priceFilter,
   selectedCategoryIds,
+  subcategoryOptions: subcategoryOptionsProp,
   onPriceFilterChange,
   onSelectedCategoryIdsChange,
 }: CatalogFiltersProps) {
-  const priceBounds = useMemo(() => getPriceBounds(products), [products]);
+  const priceBounds = useMemo(() => getPriceBounds(products as Product[]), [products]);
   const subcategoryOptions = useMemo(
-    () => getSubcategoryOptions(products),
-    [products],
+    () => subcategoryOptionsProp ?? getSubcategoryOptions(products as Product[]),
+    [products, subcategoryOptionsProp],
   );
 
   function handleToggleSubcategory(subcategoryId: string) {

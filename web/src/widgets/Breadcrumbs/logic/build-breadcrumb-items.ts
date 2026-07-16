@@ -1,4 +1,5 @@
 import type { CatalogCategory } from '@/shared/types/catalog-category';
+import type { Ad } from '@/entities/ad';
 import type { Product } from '@/entities/product';
 import {
   getPlatformCatalogHref,
@@ -22,7 +23,9 @@ type BuildBreadcrumbItemsParams = {
   categories?: CatalogCategory[];
   categorySlug?: string;
   product?: Product;
-  productId?: string;
+  productSlug?: string;
+  ad?: Ad;
+  adSlug?: string;
 };
 
 function getCatalogBreadcrumbItem(
@@ -45,22 +48,75 @@ function getLastCategorySlugFromProduct(product: Product) {
   return categoryPathParts.at(-1) ?? product.category.slug;
 }
 
-function getProductBreadcrumbItems({
+function getAdBreadcrumbItems({
   activeSection,
   categories,
-  product,
-  productId,
+  ad,
+  adSlug,
 }: Pick<
   BuildBreadcrumbItemsParams,
-  'activeSection' | 'categories' | 'product' | 'productId'
+  'activeSection' | 'categories' | 'ad' | 'adSlug'
 >): BreadcrumbItem[] {
   const catalogBreadcrumbItem = getCatalogBreadcrumbItem(activeSection);
 
   if (!activeSection || !catalogBreadcrumbItem) {
     return [
       {
-        id: `product-${product?.id ?? productId ?? 'unknown'}`,
-        href: productId ? getPlatformProductHref(productId) : '/market/catalog',
+        id: `ad-${ad?.id ?? adSlug ?? 'unknown'}`,
+        href: adSlug ? `/ads/ad/${adSlug}` : '/ads/catalog',
+        label: ad?.title ?? 'Объявление',
+      },
+    ];
+  }
+
+  if (!ad) {
+    return [
+      catalogBreadcrumbItem,
+      {
+        id: `ad-${adSlug ?? 'unknown'}`,
+        href: adSlug ? `/ads/ad/${adSlug}` : catalogBreadcrumbItem.href,
+        label: 'Объявление',
+      },
+    ];
+  }
+
+  const adCategorySlug = ad.category
+    ? ad.category.path.split('/').filter(Boolean).at(-1) ?? ad.category.slug
+    : null;
+
+  const categoryItems = adCategorySlug
+    ? getCategoryBreadcrumbItems(categories ?? [], adCategorySlug, activeSection)
+    : [];
+
+  return [
+    catalogBreadcrumbItem,
+    ...categoryItems,
+    {
+      id: `ad-${ad.id}`,
+      href: `/ads/ad/${ad.slug}`,
+      label: ad.title,
+    },
+  ];
+}
+
+function getProductBreadcrumbItems({
+  activeSection,
+  categories,
+  product,
+  productSlug,
+}: Pick<
+  BuildBreadcrumbItemsParams,
+  'activeSection' | 'categories' | 'product' | 'productSlug'
+>): BreadcrumbItem[] {
+  const catalogBreadcrumbItem = getCatalogBreadcrumbItem(activeSection);
+
+  if (!activeSection || !catalogBreadcrumbItem) {
+    return [
+      {
+        id: `product-${product?.id ?? productSlug ?? 'unknown'}`,
+        href: productSlug
+          ? getPlatformProductHref(productSlug)
+          : '/market/catalog',
         label: product?.title ?? 'Товар',
       },
     ];
@@ -70,10 +126,10 @@ function getProductBreadcrumbItems({
     return [
       catalogBreadcrumbItem,
       {
-        id: `product-${productId ?? 'unknown'}`,
-        href: productId
-          ? getPlatformProductHref(productId)
-          : getPlatformCatalogHref(activeSection),
+        id: `product-${productSlug ?? 'unknown'}`,
+        href: productSlug
+          ? getPlatformProductHref(productSlug)
+          : catalogBreadcrumbItem.href,
         label: 'Товар',
       },
     ];
@@ -90,7 +146,7 @@ function getProductBreadcrumbItems({
     ),
     {
       id: `product-${product.id}`,
-      href: getPlatformProductHref(product.id),
+      href: getPlatformProductHref(product.slug),
       label: product.title,
     },
   ];
@@ -103,7 +159,9 @@ export function buildBreadcrumbItems({
   categories = [],
   categorySlug,
   product,
-  productId,
+  productSlug,
+  ad,
+  adSlug,
 }: BuildBreadcrumbItemsParams) {
   const isHomePage = matches.some(
     (match) =>
@@ -160,7 +218,15 @@ export function buildBreadcrumbItems({
           activeSection,
           categories,
           product,
-          productId,
+          productSlug,
+        });
+
+      case BREADCRUMB_TYPE.AD:
+        return getAdBreadcrumbItems({
+          activeSection,
+          categories,
+          ad,
+          adSlug,
         });
 
       case BREADCRUMB_TYPE.STATIC:

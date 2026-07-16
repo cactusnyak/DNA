@@ -99,15 +99,19 @@ export class AdsService {
     return ads.map((ad) => this.mapAd(ad, categoryById));
   }
 
-  async findById(adId: string) {
+  async findById(adIdOrSlug: string) {
     const activeCategories = await this.getActiveCategories();
     const categoryById = new Map(
       activeCategories.map((category) => [category.id, category]),
     );
 
+    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      adIdOrSlug,
+    );
+
     const ad = await this.prismaService.ad.findFirst({
       where: {
-        id: adId,
+        ...(isId ? { id: adIdOrSlug } : { slug: adIdOrSlug }),
         ...PUBLISHED_AD_WHERE,
         category: ACTIVE_AD_CATEGORY_WHERE,
       },
@@ -171,6 +175,10 @@ export class AdsService {
         price: this.getNumber(dto.price, 0),
         status: decision.status,
         moderatedAt: decision.moderatedAt,
+        contactPhone: this.getOptionalString(dto.contactPhone),
+        contactTelegram: this.getOptionalString(dto.contactTelegram),
+        contactEmail: this.getOptionalString(dto.contactEmail),
+        contactOther: this.getOptionalString(dto.contactOther),
       },
     });
 
@@ -214,6 +222,10 @@ export class AdsService {
         price: this.getNumber(dto.price, ad.price),
         status: decision.status,
         moderatedAt: decision.moderatedAt,
+        contactPhone: this.getOptionalString(dto.contactPhone),
+        contactTelegram: this.getOptionalString(dto.contactTelegram),
+        contactEmail: this.getOptionalString(dto.contactEmail),
+        contactOther: this.getOptionalString(dto.contactOther),
       },
     });
 
@@ -538,6 +550,10 @@ export class AdsService {
       moderatedAt: ad.moderatedAt,
       createdAt: ad.createdAt,
       updatedAt: ad.updatedAt,
+      contactPhone: ad.contactPhone ?? undefined,
+      contactTelegram: ad.contactTelegram ?? undefined,
+      contactEmail: ad.contactEmail ?? undefined,
+      contactOther: ad.contactOther ?? undefined,
       images: (ad.images ?? [])
         .map((adImage: any) => adImage.image)
         .sort(

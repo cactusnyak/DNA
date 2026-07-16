@@ -1,0 +1,1 @@
+export { CartProductItemCard } from './CartProductItemCard';

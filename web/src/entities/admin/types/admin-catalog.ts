@@ -51,6 +51,10 @@ export type AdminAd = {
   deletedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  contactPhone?: string;
+  contactTelegram?: string;
+  contactEmail?: string;
+  contactOther?: string;
   images: Image[];
 };
 
@@ -150,6 +154,10 @@ export type AdminAdPayload = {
   status: AdStatus;
   imageUrls: string[];
   isActive: boolean;
+  contactPhone?: string;
+  contactTelegram?: string;
+  contactEmail?: string;
+  contactOther?: string;
 };
 
 export type AdminUserRolePayload = {

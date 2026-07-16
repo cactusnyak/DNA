@@ -3,6 +3,7 @@ export const BREADCRUMB_TYPE = {
   CATALOG: 'catalog',
   CATEGORY: 'category',
   PRODUCT: 'product',
+  AD: 'ad',
   STATIC: 'static',
 } as const;
 
@@ -25,6 +26,10 @@ export type BreadcrumbDescriptor =
   }
   | {
     type: typeof BREADCRUMB_TYPE.PRODUCT;
+    fallbackLabel?: string;
+  }
+  | {
+    type: typeof BREADCRUMB_TYPE.AD;
     fallbackLabel?: string;
   }
   | {

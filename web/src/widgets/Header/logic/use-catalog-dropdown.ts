@@ -1,20 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 
+import type { PlatformSectionId } from '@/shared/platform';
+
 export function useCatalogDropdown() {
-  const [isCatalogDropdownOpen, setIsCatalogDropdownOpen] = useState(false);
+  const [activeCatalogSection, setActiveCatalogSection] =
+    useState<PlatformSectionId | null>(null);
+
+  const isCatalogDropdownOpen = activeCatalogSection !== null;
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
 
-  function openCatalogDropdown() {
-    setIsCatalogDropdownOpen(true);
+  function openCatalogDropdown(section: PlatformSectionId) {
+    setActiveCatalogSection(section);
   }
 
   function closeCatalogDropdown() {
-    setIsCatalogDropdownOpen(false);
+    setActiveCatalogSection(null);
   }
 
-  function toggleCatalogDropdown() {
-    setIsCatalogDropdownOpen((isOpen) => !isOpen);
+  function toggleCatalogDropdown(section: PlatformSectionId) {
+    setActiveCatalogSection((currentSection) =>
+      currentSection === section ? null : section,
+    );
   }
 
   useEffect(() => {
@@ -54,6 +61,7 @@ export function useCatalogDropdown() {
   }, [isCatalogDropdownOpen]);
 
   return {
+    activeCatalogSection,
     isCatalogDropdownOpen,
     dropdownContainerRef,
     openCatalogDropdown,

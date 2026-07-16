@@ -1,4 +1,6 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router-dom';
+
+import { headerHeightVar } from '@/shared/header';
 
 import { Breadcrumbs } from '@/widgets/Breadcrumbs';
 import { Footer } from '@/widgets/Footer/Footer';
@@ -7,14 +9,16 @@ import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
 
 export function MainLayout() {
   return (
-    <div className="min-h-screen overflow-hidden bg-background text-foreground">
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <Header />
 
-      <Breadcrumbs />
+      <div style={{ marginTop: headerHeightVar() }}>
+        <Breadcrumbs />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 pb-24">
-        <Outlet />
-      </main>
+        <main className="mx-auto max-w-7xl px-4 py-8 pb-24">
+          <Outlet />
+        </main>
+      </div>
 
       <Footer />
 
@@ -29,6 +33,8 @@ export function MainLayout() {
         id="app-notification-root"
         className="pointer-events-none fixed inset-x-0 top-0 z-[90] h-0"
       />
+
+      <ScrollRestoration />
     </div>
   );
 }

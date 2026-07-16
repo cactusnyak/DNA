@@ -102,6 +102,33 @@ export function AdCrudFields({
           onValueChange('imageUrls', imageUrls)
         }
       />
+
+      <FormInputField
+        label="Телефон (для объявления)"
+        type="tel"
+        value={String(values.contactPhone ?? '')}
+        onChange={(event) => onValueChange('contactPhone', event.target.value)}
+      />
+
+      <FormInputField
+        label="Telegram"
+        placeholder="@username"
+        value={String(values.contactTelegram ?? '')}
+        onChange={(event) => onValueChange('contactTelegram', event.target.value)}
+      />
+
+      <FormInputField
+        label="Email (для объявления)"
+        type="email"
+        value={String(values.contactEmail ?? '')}
+        onChange={(event) => onValueChange('contactEmail', event.target.value)}
+      />
+
+      <FormInputField
+        label="Другой контакт"
+        value={String(values.contactOther ?? '')}
+        onChange={(event) => onValueChange('contactOther', event.target.value)}
+      />
     </div>
   );
 }

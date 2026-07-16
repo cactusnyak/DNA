@@ -5,19 +5,19 @@ import { getProduct } from '@/entities/product/api/get-product';
 import { ProductDetails } from '@/widgets/ProductDetails';
 
 export function ProductPage() {
-  const { productId } = useParams();
+  const { productSlug } = useParams();
 
   const {
     data: product,
     isPending,
     error,
   } = useQuery({
-    queryKey: ['product', productId],
-    queryFn: () => getProduct(productId ?? ''),
-    enabled: Boolean(productId),
+    queryKey: ['product', productSlug],
+    queryFn: () => getProduct(productSlug ?? ''),
+    enabled: Boolean(productSlug),
   });
 
-  if (!productId) {
+  if (!productSlug) {
     return <p className="text-destructive">Товар не найден</p>;
   }
 

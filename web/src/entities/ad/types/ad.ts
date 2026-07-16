@@ -17,5 +17,9 @@ export type Ad = {
   moderatedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  contactPhone?: string;
+  contactTelegram?: string;
+  contactEmail?: string;
+  contactOther?: string;
   images: Image[];
 };

@@ -15,7 +15,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
   return (
     <Link
-      to={getPlatformProductHref(product.id)}
+      to={getPlatformProductHref(product.slug)}
       className={cn(
         'group flex flex-col bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200 min-w-0 max-w-[280px]',
         className

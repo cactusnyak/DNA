@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/Section';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
-import { ProductsListing } from '@/widgets/ProductsListing';
+import { ProductsFeed } from '@/widgets/ProductsFeed';
 
 export function MarketPage() {
   return (
@@ -34,7 +34,7 @@ export function MarketPage() {
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Товары</h2>
-        <ProductsListing />
+        <ProductsFeed />
       </section>
     </div>
   );

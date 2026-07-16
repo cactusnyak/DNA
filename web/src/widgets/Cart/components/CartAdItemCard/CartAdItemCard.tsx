@@ -1,102 +1,75 @@
-import { Link } from 'react-router-dom';
-import { Mail, Phone, Trash2 } from 'lucide-react';
-
-import { Button } from '@/components/ui/Button';
 import type { CartAdItem } from '@/entities/cart';
+import { FavouriteButton } from '@/entities/favourite';
 import { formatPrice } from '@/shared/utils/format-price';
+import { LinkifyText } from '@/shared/utils/linkify';
+
+import { CartItemCard } from '../CartItemCard/CartItemCard';
 
 type CartAdItemCardProps = {
   item: CartAdItem;
   onRemove: (adId: string) => void;
 };
 
+const contactBadgeClass =
+  'inline items-center rounded-md bg-muted/60 px-2 py-1 text-xs font-medium text-foreground transition-colors sm:px-3 sm:py-1.5 sm:text-sm';
+
+function getContactValues(ad: CartAdItem['ad']): string[] {
+  return [
+    ad.contactPhone,
+    ad.contactTelegram,
+    ad.contactEmail,
+    ad.contactOther,
+  ].filter((value): value is string => Boolean(value));
+}
+
 export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
   const { ad } = item;
   const image = ad.images?.[0];
+  const sellerName = ad.seller
+    ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
+    : 'Продавец';
+  const contactValues = getContactValues(ad);
 
   return (
-    <article className="grid gap-4 rounded-2xl border border-border bg-card p-4 sm:grid-cols-[120px_minmax(0,1fr)]">
-      <Link
-        to={`/ads/ad/${ad.id}`}
-        className="block overflow-hidden rounded-xl bg-muted"
-      >
-        {image ? (
-          <img
-            src={image.url}
-            alt={image.alt ?? ad.title}
-            className="aspect-square w-full object-cover"
-          />
-        ) : (
-          <div className="flex aspect-square items-center justify-center p-6 text-center text-sm text-muted-foreground">
-            Нет фото
-          </div>
-        )}
-      </Link>
+    <CartItemCard
+      href={`/ads/ad/${ad.slug}`}
+      imageUrl={image?.url}
+      imageAlt={image?.alt ?? ad.title}
+      title={ad.title}
+      category={
+        ad.category ? (
+          <p className="text-xs text-muted-foreground sm:text-sm">{ad.category.name}</p>
+        ) : undefined
+      }
+      price={<p className="text-base font-semibold sm:text-lg">{formatPrice(ad.price)}</p>}
+      priceMeta="Объявление"
+      favouriteButton={
+        <FavouriteButton
+          item={{ adId: ad.id }}
+          className="size-8 rounded-lg bg-muted hover:bg-muted/80"
+        />
+      }
+      actions={
+        <div
+          className="flex flex-col gap-1 rounded-xl text-xs sm:gap-2 sm:text-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="font-medium text-foreground">{sellerName}</span>
 
-      <div className="min-w-0 space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 space-y-1">
-            <Link
-              to={`/ads/ad/${ad.id}`}
-              className="line-clamp-2 font-semibold underline-offset-4 hover:underline"
-            >
-              {ad.title}
-            </Link>
-
-            {ad.category && (
-              <p className="text-sm text-muted-foreground">{ad.category.name}</p>
-            )}
-          </div>
-
-          <div className="shrink-0 text-left sm:text-right">
-            <p className="text-lg font-semibold">{formatPrice(ad.price)}</p>
-            <p className="text-xs text-muted-foreground">Объявление</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          {ad.seller && (
-            <div className="space-y-1 rounded-xl bg-muted/60 px-3 py-2 text-sm">
-              <p className="font-medium text-foreground">
-                {ad.seller.firstName} {ad.seller.lastName}
-              </p>
-
-              {ad.seller.phone && (
-                <a
-                  href={`tel:${ad.seller.phone}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
-                >
-                  <Phone className="size-3.5" />
-                  {ad.seller.phone}
-                </a>
-              )}
-
-              {ad.seller.email && (
-                <a
-                  href={`mailto:${ad.seller.email}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
-                >
-                  <Mail className="size-3.5" />
-                  {ad.seller.email}
-                </a>
-              )}
+          {contactValues.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {contactValues.map((value, index) => (
+                <span key={`${value}-${index}`} className={contactBadgeClass}>
+                  <LinkifyText text={value} renderLinks={false} />
+                </span>
+              ))}
             </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Контакты появятся позже.</p>
           )}
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="justify-start text-muted-foreground hover:text-destructive sm:justify-center"
-            onClick={() => onRemove(ad.id)}
-          >
-            <Trash2 className="size-4" />
-            Удалить
-          </Button>
         </div>
-      </div>
-    </article>
+      }
+      onRemove={() => onRemove(ad.id)}
+    />
   );
 }

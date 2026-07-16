@@ -8,8 +8,8 @@ import {
 } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
+import { ItemGallery } from '@/shared/ui/ItemGallery';
 import { ItemActions } from '@/widgets/ItemActions';
-import { AdGallery } from './components/AdGallery/AdGallery';
 
 type AdCardProps = {
   ad: Ad;
@@ -27,11 +27,11 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
     (!currentCategorySlug || currentCategorySlug !== ad.category.slug);
   return (
     <Link
-      to={`/ads/ad/${ad.id}`}
+      to={`/ads/ad/${ad.slug}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
     >
       <div className="relative">
-        <AdGallery images={ad.images} title={ad.title} />
+        <ItemGallery images={ad.images} title={ad.title} />
 
         <div
           className="absolute right-2 top-2 z-10"
@@ -63,7 +63,12 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
         className="relative z-10 mt-auto p-4 pt-0"
         onClick={(e) => e.preventDefault()}
       >
-        <ItemActions itemType="ad" item={ad} variant="card" />
+        <ItemActions
+          itemType="ad"
+          item={ad}
+          variant="card"
+          showSellerContactsButton
+        />
       </div>
     </Link>
   );

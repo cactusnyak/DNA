@@ -58,6 +58,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
 }: AdminRecordsTableProps<TRecord>) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
   const {
     sortState,
@@ -211,18 +212,25 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-background">
+    <div className="overflow-clip rounded-2xl border border-border bg-background">
       {filterableColumns.length > 0 && (
         <div className="border-b border-border bg-muted/20 p-4">
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
+              <button
+                type="button"
+                onClick={() => setIsFiltersOpen((prev) => !prev)}
+                className="group inline-flex items-center gap-1.5 text-left"
+              >
                 <p className="text-sm font-medium">Фильтры таблицы</p>
-
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Показано {visibleRecords.length} из {records.length} записей.
-                </p>
-              </div>
+                <ChevronRight
+                  className={cn(
+                    'size-4 text-muted-foreground transition-transform',
+                    isFiltersOpen && 'rotate-90',
+                  )}
+                  strokeWidth={1.5}
+                />
+              </button>
 
               {hasActiveFilters && (
                 <button
@@ -236,6 +244,13 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               )}
             </div>
 
+            {isFiltersOpen && (
+              <p className="text-xs text-muted-foreground">
+                Показано {visibleRecords.length} из {records.length} записей.
+              </p>
+            )}
+
+            {isFiltersOpen && (
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {filterableColumns.map((column) => {
                 const filterConfig = getAdminTableFilterConfig(column);
@@ -354,6 +369,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 );
               })}
             </div>
+            )}
           </div>
         </div>
       )}
@@ -401,21 +417,21 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         </div>
       )}
 
-      <div className="overflow-x-auto">
+      <div className="overflow-auto max-h-[calc(100dvh-14rem)]">
         <table
           className="w-full table-fixed text-left text-sm"
           style={{ minWidth: `${Math.max(tableMinWidth, 760)}px` }}
         >
-          <thead className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
-                <th className="w-10 px-3 py-3 border-r border-border">
+                <th className="sticky top-0 z-10 w-10 bg-muted/80 backdrop-blur-sm px-3 py-3 border-r border-border">
                   <input
                     type="checkbox"
                     aria-label="Выбрать все"
                     checked={allSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = someSelected && !allSelected;
+                    ref={(element) => {
+                      if (element) element.indeterminate = someSelected && !allSelected;
                     }}
                     onChange={toggleSelectAll}
                     className="size-4 cursor-pointer rounded border-border accent-primary"
@@ -423,7 +439,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 </th>
               )}
 
-              {hasSubRows && <th className="w-8 px-2 py-3 border-r border-border" />}
+              {hasSubRows && <th className="sticky top-0 z-10 w-8 bg-muted/80 backdrop-blur-sm px-2 py-3 border-r border-border" />}
 
               {columns.map((column) => {
                 const width =
@@ -434,7 +450,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                   <th
                     key={column.key}
                     className={cn(
-                      'group relative px-4 py-3 font-medium',
+                      'group relative sticky top-0 z-10 bg-muted/80 backdrop-blur-sm px-4 py-3 font-medium',
                       getAdminTableAlignClassName(column.align),
                     )}
                     style={{ width: `${width}px` }}
@@ -475,7 +491,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               })}
 
               {renderActions && (
-                <th className="w-[180px] px-4 py-3 text-right font-medium">
+                <th className="sticky top-0 z-10 w-[180px] bg-muted/80 backdrop-blur-sm px-4 py-3 text-right font-medium">
                   Действия
                 </th>
               )}

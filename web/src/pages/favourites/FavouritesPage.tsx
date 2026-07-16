@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/entities/auth';
-import { FavouriteButton, getFavourites, useFavouriteStore } from '@/entities/favourite';
-import { formatPrice } from '@/shared/utils/format-price';
+import { getFavourites, useFavouriteStore } from '@/entities/favourite';
+import { PLATFORM_SECTION } from '@/shared/platform';
+import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 import { SectionHeader } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { AdCard } from '@/widgets/AdsListing/components/AdCard';
+import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard';
 
 type Tab = 'products' | 'ads';
 
@@ -89,52 +92,14 @@ export function FavouritesPage() {
           )}
 
           {accessToken && productFavourites.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {productFavourites.map((fav) => {
-                const product = fav.product!;
-                const cover = product.images?.[0];
-
-                return (
-                  <article
-                    key={fav.id}
-                    className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
-                  >
-                    <Link
-                      to={`/market/product/${product.id}`}
-                      className="aspect-[4/3] overflow-hidden bg-muted block"
-                    >
-                      {cover ? (
-                        <img
-                          src={cover.url}
-                          alt={cover.alt ?? product.title}
-                          className="size-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-                          Нет фото
-                        </div>
-                      )}
-                    </Link>
-
-                    <div className="absolute right-2 top-2">
-                      <FavouriteButton item={{ productId: product.id }} />
-                    </div>
-
-                    <div className="flex flex-1 flex-col gap-2 p-4">
-                      <Link
-                        to={`/market/product/${product.id}`}
-                        className="font-semibold line-clamp-2 hover:underline underline-offset-4"
-                      >
-                        {product.title}
-                      </Link>
-                      <p className="mt-auto text-lg font-semibold">
-                        {formatPrice(product.price)}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
+            <div className={getItemGridClasses()}>
+              {productFavourites.map((fav) => (
+                <ProductCard
+                  key={fav.id}
+                  section={PLATFORM_SECTION.MARKET}
+                  product={fav.product!}
+                />
+              ))}
             </div>
           )}
         </>
@@ -165,52 +130,10 @@ export function FavouritesPage() {
           )}
 
           {accessToken && adFavourites.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {adFavourites.map((fav) => {
-                const ad = fav.ad!;
-                const cover = ad.images?.[0];
-
-                return (
-                  <article
-                    key={fav.id}
-                    className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
-                  >
-                    <Link
-                      to={`/ads/ad/${ad.id}`}
-                      className="aspect-[4/3] overflow-hidden bg-muted block"
-                    >
-                      {cover ? (
-                        <img
-                          src={cover.url}
-                          alt={cover.alt ?? ad.title}
-                          className="size-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-                          Нет фото
-                        </div>
-                      )}
-                    </Link>
-
-                    <div className="absolute right-2 top-2">
-                      <FavouriteButton item={{ adId: ad.id }} />
-                    </div>
-
-                    <div className="flex flex-1 flex-col gap-2 p-4">
-                      <Link
-                        to={`/ads/ad/${ad.id}`}
-                        className="font-semibold line-clamp-2 hover:underline underline-offset-4"
-                      >
-                        {ad.title}
-                      </Link>
-                      <p className="mt-auto text-lg font-semibold">
-                        {formatPrice(ad.price)}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
+            <div className={getItemGridClasses()}>
+              {adFavourites.map((fav) => (
+                <AdCard key={fav.id} ad={fav.ad!} />
+              ))}
             </div>
           )}
         </>

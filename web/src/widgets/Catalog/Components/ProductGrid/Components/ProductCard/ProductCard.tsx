@@ -8,8 +8,9 @@ import {
 } from '@/shared/platform';
 import { ItemActions } from '@/widgets/ItemActions';
 
+import { ItemGallery } from '@/shared/ui/ItemGallery';
+
 import { ProductCardContent } from './components/ProductCardContent';
-import { ProductGallery } from './components/ProductGallery';
 
 type ProductCardProps = {
   section: PlatformSectionId;
@@ -28,11 +29,11 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Link
-      to={getPlatformProductHref(product.id)}
+      to={getPlatformProductHref(product.slug)}
       className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
     >
       <div className="relative">
-        <ProductGallery images={product.images} title={product.title} />
+        <ItemGallery images={product.images} title={product.title} />
 
         <div
           className="absolute right-2 top-2 z-10"

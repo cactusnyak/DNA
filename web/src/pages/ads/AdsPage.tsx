@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/Section';
 import { PLATFORM_SECTION } from '@/shared/platform';
-import { AdsListing } from '@/widgets/AdsListing';
+import { AdsFeed } from '@/widgets/AdsFeed';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
 
 export function AdsPage() {
@@ -38,7 +38,7 @@ export function AdsPage() {
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Последние объявления</h2>
-        <AdsListing />
+        <AdsFeed />
       </section>
     </div>
   );

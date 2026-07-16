@@ -151,12 +151,12 @@ export const router = createBrowserRouter([
             } satisfies BreadcrumbHandle,
           },
           {
-            path: 'ad/:adId',
+            path: 'ad/:adSlug',
             element: <AdDetailsPage />,
             handle: {
               breadcrumb: {
-                type: BREADCRUMB_TYPE.STATIC,
-                label: 'Объявление',
+                type: BREADCRUMB_TYPE.AD,
+                fallbackLabel: 'Объявление',
               },
             } satisfies BreadcrumbHandle,
           },
@@ -214,7 +214,7 @@ export const router = createBrowserRouter([
             } satisfies BreadcrumbHandle,
           },
           {
-            path: 'product/:productId',
+            path: 'product/:productSlug',
             element: <ProductPage />,
             handle: {
               breadcrumb: {

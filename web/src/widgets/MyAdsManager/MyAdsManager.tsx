@@ -91,7 +91,7 @@ export function MyAdsManager() {
             className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4"
           >
             <Link
-              to={`/ads/ad/${ad.id}`}
+              to={`/ads/ad/${ad.slug}`}
               className="size-16 shrink-0 overflow-hidden rounded-xl bg-muted"
             >
               {cover ? (
@@ -109,7 +109,7 @@ export function MyAdsManager() {
 
             <div className="min-w-0 flex-1">
               <Link
-                to={`/ads/ad/${ad.id}`}
+                to={`/ads/ad/${ad.slug}`}
                 className="font-semibold underline-offset-4 hover:underline"
               >
                 {ad.title}

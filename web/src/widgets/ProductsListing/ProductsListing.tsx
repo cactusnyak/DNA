@@ -1,22 +1,24 @@
 import { getProducts } from '@/entities/product/api/get-products';
 import { PLATFORM_SECTION } from '@/shared/platform';
+import { useGridColumns } from '@/shared/hooks/use-grid-columns';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
+import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
 import { ProductCard } from './components/ProductCard';
 
 type ProductsListingProps = {
   categorySlug?: string;
   emptyText?: string;
-  initialChunkSize?: number;
-  chunkSize?: number;
 };
 
 export function ProductsListing({
   categorySlug,
   emptyText = 'Товары пока не добавлены.',
-  initialChunkSize = 12,
-  chunkSize = 12,
 }: ProductsListingProps) {
+  const columns = useGridColumns('default');
+  const chunkSize = columns * 2;
+  const initialChunkSize = columns * 3;
+
   const {
     items,
     isLoading,
@@ -29,9 +31,8 @@ export function ProductsListing({
         categorySlug,
         sortRules: [{ field: 'title', direction: 'desc' }],
       });
-      
-      // Sort by creation date client-side
-      return response.sort((a, b) => 
+
+      return response.sort((a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
     },
@@ -59,7 +60,7 @@ export function ProductsListing({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className={getItemGridClasses()}>
         {items.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

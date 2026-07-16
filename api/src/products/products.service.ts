@@ -96,15 +96,19 @@ export class ProductsService {
     return products.map((product) => this.mapProduct(product, categoryById));
   }
 
-  async findById(productId: string) {
+  async findById(productIdOrSlug: string) {
     const activeCategories = await this.getActiveCategories();
     const categoryById = new Map(
       activeCategories.map((category) => [category.id, category]),
     );
 
+    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      productIdOrSlug,
+    );
+
     const product = await this.prismaService.product.findFirst({
       where: {
-        id: productId,
+        ...(isId ? { id: productIdOrSlug } : { slug: productIdOrSlug }),
         ...ACTIVE_PRODUCT_WHERE,
         category: ACTIVE_CATEGORY_WHERE,
       },
@@ -323,4 +327,3 @@ export class ProductsService {
     };
   }
 }
-

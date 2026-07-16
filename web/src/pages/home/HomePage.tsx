@@ -5,8 +5,7 @@ import {
   useAuthStore,
 } from '@/entities/auth';
 import { BalanceHero } from '@/widgets/BalanceHero';
-import { LatestProducts } from '@/widgets/LatestProducts/LatestProducts';
-import { LatestAds } from '@/widgets/LatestAds/LatestAds';
+import { CombinedFeed } from '@/widgets/CombinedFeed';
 
 export function HomePage() {
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -26,19 +25,10 @@ export function HomePage() {
         guestText="Покупать можно без регистрации. Профиль откроет баланс, кешбэк, историю заказов и реферальную систему."
       />
 
-      {/* Latest Products Section */}
-      <LatestProducts
-        initialChunkSize={8}
-        chunkSize={4}
-        className="px-4 md:px-6 lg:px-8"
-      />
-
-      {/* Latest Ads Section */}
-      <LatestAds
-        initialChunkSize={8}
-        chunkSize={4}
-        className="px-4 md:px-6 lg:px-8"
-      />
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Товары и объявления</h2>
+        <CombinedFeed />
+      </section>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 type GlobalSearchCategoryResultsProps = {
   section: PlatformSectionId;
+  title?: string;
   categories: CatalogCategory[];
   allCategories: CatalogCategory[];
   searchValue: string;
@@ -17,6 +18,7 @@ type GlobalSearchCategoryResultsProps = {
 
 export function GlobalSearchCategoryResults({
   section,
+  title = 'Категории',
   categories,
   allCategories,
   searchValue,
@@ -27,7 +29,7 @@ export function GlobalSearchCategoryResults({
   return (
     <section className="p-3">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold">Категории</h3>
+        <h3 className="text-sm font-semibold">{title}</h3>
 
         <span className="text-xs text-muted-foreground">
           {categories.length}
