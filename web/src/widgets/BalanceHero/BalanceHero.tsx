@@ -101,10 +101,6 @@ export function BalanceHero({
           </div>
         ) : (
           <div className="mt-8 grid w-full gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
-            <p className="rounded-xl bg-white p-5 leading-relaxed text-black sm:text-md">
-              {guestText}
-            </p>
-
             <BalanceHeroActionLink to="/authorization">
               Зарегистрироваться
             </BalanceHeroActionLink>
