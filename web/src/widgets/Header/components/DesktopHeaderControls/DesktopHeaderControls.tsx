@@ -33,14 +33,10 @@ function CatalogButton({
 }) {
   return (
     <Button
-      variant="outline"
       type="button"
       asChild
       onMouseEnter={onMouseEnter}
-      className={cn(
-        isActive &&
-          'border-foreground bg-foreground text-background hover:bg-foreground hover:text-background',
-      )}
+      className={cn(isActive && 'bg-white text-foreground border border-border hover:bg-white scale-95')}
     >
       <Link to={to} onClick={onClick}>
         {label}
@@ -71,7 +67,7 @@ export function DesktopHeaderControls({
           onClick={onNavigate}
         />
       ) : (
-        <>
+        <div className="flex gap-2">
           <CatalogButton
             to={platformSections[PLATFORM_SECTION.ADS].catalogHref}
             label={platformSections[PLATFORM_SECTION.ADS].catalogLabel}
@@ -90,7 +86,7 @@ export function DesktopHeaderControls({
             onMouseEnter={() => onCatalogOpen(PLATFORM_SECTION.MARKET)}
             onClick={onNavigate}
           />
-        </>
+        </div>
       )}
 
       <GlobalSearch
