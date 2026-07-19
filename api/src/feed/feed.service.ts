@@ -155,8 +155,8 @@ export class FeedService {
             seller: ad.seller
               ? {
                   id: ad.seller.id,
-                  firstName: ad.seller.firstName,
-                  lastName: ad.seller.lastName,
+                  nickname: ad.seller.nickname,
+                  nicknameSuffix: ad.seller.nicknameSuffix,
                 }
               : undefined,
             title: ad.title,

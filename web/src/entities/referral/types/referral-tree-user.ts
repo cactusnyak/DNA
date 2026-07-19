@@ -1,7 +1,7 @@
 export type ReferralTreeUser = {
   id: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix?: string;
   referralCode?: string;
   level: number;
   invitedAt: string;

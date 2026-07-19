@@ -66,8 +66,8 @@ export type FeedAdItem = {
     };
     seller?: {
       id: string;
-      firstName: string;
-      lastName: string;
+      nickname: string;
+      nicknameSuffix: string;
     };
     title: string;
     slug: string;

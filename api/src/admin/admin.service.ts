@@ -137,8 +137,8 @@ export class AdminService {
       where: { deletedAt: null },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        nickname: true,
+        nicknameSuffix: true,
         email: true,
         phone: true,
         role: true,
@@ -153,8 +153,8 @@ export class AdminService {
             invited: {
               select: {
                 id: true,
-                firstName: true,
-                lastName: true,
+                nickname: true,
+                nicknameSuffix: true,
                 email: true,
                 deletedAt: true,
               },
@@ -171,7 +171,7 @@ export class AdminService {
     const byId = new Map<string, FlatUser>(users.map((u) => [u.id, u]));
 
     type TreeNode = {
-      id: string; firstName: string; lastName: string; email: string;
+      id: string; nickname: string; nicknameSuffix?: string; email: string;
       phone: string | null; role: string; referralCode: string | null;
       createdAt: Date; deletedAt: null; invitedBy: string | null;
       directReferralsCount: number; directReferrals: TreeNode[];
@@ -186,15 +186,15 @@ export class AdminService {
           const next = new Set(visited);
           next.add(r.invited.id);
           return buildNode(childUser, inviterChain
-            ? `${inviterChain} → ${user.firstName} ${user.lastName}`.trim()
-            : (`${user.firstName} ${user.lastName}`.trim() || user.email), next);
+            ? `${inviterChain} → ${user.nickname}`.trim()
+            : (user.nickname.trim() || user.email), next);
         })
         .filter((n): n is TreeNode => n !== null);
 
       return {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        nickname: user.nickname,
+        nicknameSuffix: user.nicknameSuffix,
         email: user.email,
         phone: user.phone,
         role: user.role,
@@ -387,6 +387,7 @@ export class AdminService {
       }),
       this.prismaService.user.findMany({
         include: {
+          avatar: true,
           _count: {
             select: {
               ads: true,
@@ -1915,6 +1916,7 @@ export class AdminService {
         id,
       },
       include: {
+        avatar: true,
         _count: {
           select: {
             ads: true,
@@ -2115,8 +2117,8 @@ export class AdminService {
       seller: ad.seller
         ? {
             id: ad.seller.id,
-            firstName: ad.seller.firstName,
-            lastName: ad.seller.lastName,
+            nickname: ad.seller.nickname,
+            nicknameSuffix: ad.seller.nicknameSuffix,
             email: ad.seller.email,
             phone: ad.seller.phone ?? undefined,
           }
@@ -2148,11 +2150,15 @@ export class AdminService {
     return {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      nickname: user.nickname,
+      nicknameSuffix: user.nicknameSuffix,
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      patronymic: user.patronymic ?? undefined,
       role: user.role,
       phone: user.phone ?? undefined,
       referralCode: user.referralCode ?? undefined,
+      avatar: user.avatar ?? undefined,
       isActive: user.deletedAt === null,
       deletedAt: user.deletedAt,
       createdAt: user.createdAt,

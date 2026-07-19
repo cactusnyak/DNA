@@ -30,8 +30,8 @@ export type AdminAdCategory = AdCategory & {
 
 export type AdminAdSeller = {
   id: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix: string;
   email: string;
   phone?: string;
 };
@@ -61,11 +61,15 @@ export type AdminAd = {
 export type AdminUser = {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix: string;
+  firstName?: string;
+  lastName?: string;
+  patronymic?: string;
   role: UserRole;
   phone?: string;
   referralCode?: string;
+  avatar?: Image;
   isActive: boolean;
   deletedAt?: string | null;
   createdAt: string;

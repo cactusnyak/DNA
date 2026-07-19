@@ -32,7 +32,7 @@ function getSellerName(ad: AdminAd) {
     return 'Неизвестный продавец';
   }
 
-  return `${ad.seller.firstName} ${ad.seller.lastName}`.trim();
+  return ad.seller.nickname;
 }
 
 export function AdminAdRecordsView({

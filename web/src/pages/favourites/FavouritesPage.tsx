@@ -12,6 +12,8 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { AdCard } from '@/widgets/AdsListing/components/AdCard';
 import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard';
 
+import { FavouritesEmptyState } from './FavouritesEmptyState';
+
 type Tab = 'products' | 'ads';
 
 export function FavouritesPage() {
@@ -36,6 +38,12 @@ export function FavouritesPage() {
     ? productFavourites.length
     : guestProductItems.length;
   const adCount = accessToken ? adFavourites.length : guestAdItems.length;
+
+  const isLoading = accessToken && isPending;
+
+  if (!isLoading && productCount === 0 && adCount === 0) {
+    return <FavouritesEmptyState />;
+  }
 
   return (
     <div className="space-y-6">
@@ -63,11 +71,11 @@ export function FavouritesPage() {
         </p>
       )}
 
-      {isPending && (
+      {isLoading && (
         <p className="text-sm text-muted-foreground">Загружаем избранное...</p>
       )}
 
-      {tab === 'products' && !isPending && (
+      {tab === 'products' && !isLoading && (
         <>
           {!accessToken && guestProductItems.length === 0 && (
             <EmptyState
@@ -105,7 +113,7 @@ export function FavouritesPage() {
         </>
       )}
 
-      {tab === 'ads' && !isPending && (
+      {tab === 'ads' && !isLoading && (
         <>
           {!accessToken && guestAdItems.length === 0 && (
             <EmptyState

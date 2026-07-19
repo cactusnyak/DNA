@@ -41,14 +41,16 @@ enum AdStatus {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String
-  firstName String
-  lastName  String
-  role      UserRole  @default(DEFAULT)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id             String    @id @default(uuid())
+  email          String
+  nickname       String
+  nicknameSuffix String    @unique @default(dbgenerated("gen_random_uuid()"))
+  firstName      String?
+  lastName       String?
+  role           UserRole  @default(DEFAULT)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
   passwordHash String?
 

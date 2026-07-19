@@ -425,7 +425,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
           <thead className="text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
-                <th className="sticky top-0 z-10 w-10 bg-muted/80 backdrop-blur-sm px-3 py-3 border-r border-border">
+                <th className="sticky top-0 z-10 w-10 bg-muted/80 px-3 py-3 border-r border-border">
                   <input
                     type="checkbox"
                     aria-label="Выбрать все"
@@ -439,7 +439,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 </th>
               )}
 
-              {hasSubRows && <th className="sticky top-0 z-10 w-8 bg-muted/80 backdrop-blur-sm px-2 py-3 border-r border-border" />}
+              {hasSubRows && <th className="sticky top-0 z-10 w-8 bg-muted/80 px-2 py-3 border-r border-border" />}
 
               {columns.map((column) => {
                 const width =
@@ -450,7 +450,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                   <th
                     key={column.key}
                     className={cn(
-                      'group relative sticky top-0 z-10 bg-muted/80 backdrop-blur-sm px-4 py-3 font-medium',
+                      'group relative sticky top-0 z-10 bg-muted/80 px-4 py-3 font-medium',
                       getAdminTableAlignClassName(column.align),
                     )}
                     style={{ width: `${width}px` }}
@@ -491,7 +491,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               })}
 
               {renderActions && (
-                <th className="sticky top-0 z-10 w-[180px] bg-muted/80 backdrop-blur-sm px-4 py-3 text-right font-medium">
+                <th className="sticky top-0 z-10 w-[180px] bg-muted/80 px-4 py-3 text-right font-medium">
                   Действия
                 </th>
               )}

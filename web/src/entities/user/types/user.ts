@@ -6,8 +6,10 @@ import type { UserRole } from './user-role';
 export type User = {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix: string;
+  firstName?: string;
+  lastName?: string;
   role: UserRole;
   createdAt: string;
   updatedAt: string;

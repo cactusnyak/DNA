@@ -7,16 +7,39 @@ import {
   Prisma,
   UserRole,
 } from '@prisma/client';
+import { mkdir, writeFile } from 'fs/promises';
+import { join } from 'path';
+import { randomUUID } from 'crypto';
 
 import { PrismaService } from '../prisma/prisma.service';
+
+const IMAGE_MIME_EXTENSION: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/avif': '.avif',
+  'image/heic': '.heic',
+  'image/heif': '.heif',
+  'image/bmp': '.bmp',
+};
+
+const MAX_AVATAR_UPLOAD_SIZE = 5 * 1024 * 1024;
 
 type CreateRegisteredUserParams = {
   email: string;
   passwordHash: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
   phone?: string;
   inviterReferralCode?: string;
+};
+
+type UploadedFile = {
+  originalname: string;
+  mimetype: string;
+  size: number;
+  buffer?: Buffer;
 };
 
 @Injectable()
@@ -69,8 +92,7 @@ export class UsersService {
         data: {
           email: params.email,
           passwordHash: params.passwordHash,
-          firstName: params.firstName,
-          lastName: params.lastName,
+          nickname: params.nickname,
           phone: params.phone,
           referralCode,
           balance: {
@@ -100,6 +122,89 @@ export class UsersService {
 
       throw error;
     }
+  }
+
+  async updateCurrentUser(
+    userId: string,
+    data: {
+      nickname?: string;
+      firstName?: string;
+      lastName?: string;
+      patronymic?: string;
+      phone?: string;
+      avatarId?: string | null;
+    },
+  ) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: userId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found or deleted');
+    }
+
+    const updatedUser = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        nickname: data.nickname,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        patronymic: data.patronymic,
+        phone: data.phone,
+        avatarId: data.avatarId,
+      },
+      include: {
+        avatar: true,
+        balance: true,
+      },
+    });
+
+    return this.mapPublicUser(updatedUser);
+  }
+
+  async uploadAvatar(file: UploadedFile) {
+    if (!file?.buffer) {
+      throw new BadRequestException('Avatar file is required');
+    }
+
+    const extension = IMAGE_MIME_EXTENSION[file.mimetype];
+
+    if (!extension) {
+      throw new BadRequestException('Unsupported avatar file type');
+    }
+
+    if (file.size > MAX_AVATAR_UPLOAD_SIZE) {
+      throw new BadRequestException('Avatar file is too large');
+    }
+
+    const fileName = `${randomUUID()}${extension}`;
+    const uploadsDirectory = join(process.cwd(), 'uploads', 'avatars');
+    const filePath = join(uploadsDirectory, fileName);
+
+    await mkdir(uploadsDirectory, { recursive: true });
+    await writeFile(filePath, file.buffer);
+
+    const image = await this.prismaService.image.create({
+      data: {
+        url: `/uploads/avatars/${fileName}`,
+        sortOrder: 0,
+        alt: file.originalname,
+      },
+    });
+
+    return {
+      id: image.id,
+      url: image.url,
+      fileName,
+    };
   }
 
   async softDeleteById(userId: string) {
@@ -146,8 +251,10 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      nickname: user.nickname,
+      nicknameSuffix: user.nicknameSuffix,
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

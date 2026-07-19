@@ -1,7 +1,7 @@
 export type AdSeller = {
   id: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix: string;
   phone?: string;
   email?: string;
 };

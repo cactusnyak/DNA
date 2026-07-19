@@ -10,8 +10,8 @@ type ReferralWithInvitedUser = {
   createdAt: Date;
   invited: {
     id: string;
-    firstName: string;
-    lastName: string;
+    nickname: string;
+    nicknameSuffix: string;
     referralCode: string | null;
     deletedAt: Date | null;
   };
@@ -27,8 +27,8 @@ export class ReferralsService {
         invited: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            nickname: true,
+            nicknameSuffix: true,
             referralCode: true,
             deletedAt: true,
           },
@@ -101,12 +101,12 @@ export class ReferralsService {
 
         return {
           id: referral.invited.id,
-          firstName: isInvitedUserDeleted
-            ? 'Удалённый'
-            : referral.invited.firstName,
-          lastName: isInvitedUserDeleted
-            ? 'Пользователь'
-            : referral.invited.lastName,
+          nickname: isInvitedUserDeleted
+            ? 'Удалённый пользователь'
+            : referral.invited.nickname,
+          nicknameSuffix: isInvitedUserDeleted
+            ? undefined
+            : referral.invited.nicknameSuffix,
           referralCode: isInvitedUserDeleted
             ? undefined
             : referral.invited.referralCode ?? undefined,

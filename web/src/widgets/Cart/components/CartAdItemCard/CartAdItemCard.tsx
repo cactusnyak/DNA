@@ -25,9 +25,7 @@ function getContactValues(ad: CartAdItem['ad']): string[] {
 export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
   const { ad } = item;
   const image = ad.images?.[0];
-  const sellerName = ad.seller
-    ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
-    : 'Продавец';
+  const sellerName = ad.seller?.nickname ?? 'Продавец';
   const contactValues = getContactValues(ad);
 
   return (

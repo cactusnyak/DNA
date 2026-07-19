@@ -15,7 +15,7 @@ type AdminReferralRecordsViewProps = {
 };
 
 function getUserName(user: AdminReferralUser) {
-  return `${user.firstName} ${user.lastName}`.trim() || user.email;
+  return user.nickname || user.email;
 }
 
 
@@ -62,14 +62,26 @@ export function AdminReferralRecordsView({
           ),
         },
         {
-          key: 'name',
-          title: 'Имя',
-          width: 200,
+          key: 'nickname',
+          title: 'Имя аккаунта',
+          width: 180,
           sortable: true,
-          filter: { type: 'text', placeholder: 'Имя' },
+          filter: { type: 'text', placeholder: 'Имя аккаунта' },
           getValue: (user) => getUserName(user),
           render: (user) =>
             renderHighlightedText(getUserName(user), searchValue),
+        },
+        {
+          key: 'nicknameSuffix',
+          title: 'Суффикс',
+          width: 120,
+          sortable: true,
+          filter: { type: 'text', placeholder: 'Суффикс' },
+          getValue: (user) => user.nicknameSuffix,
+          render: (user) =>
+            <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {user.nicknameSuffix.slice(0, 8)}
+            </code>,
         },
         {
           key: 'email',

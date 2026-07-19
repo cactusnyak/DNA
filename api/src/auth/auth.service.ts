@@ -22,11 +22,7 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const email = this.getEmail(registerDto.email);
     const password = this.getPassword(registerDto.password);
-    const firstName = this.getRequiredString(
-      registerDto.firstName,
-      'firstName',
-    );
-    const lastName = this.getRequiredString(registerDto.lastName, 'lastName');
+    const nickname = this.getRequiredString(registerDto.nickname, 'nickname');
 
     const phone = this.getOptionalString(registerDto.phone);
     const inviterReferralCode = this.getOptionalString(
@@ -38,8 +34,7 @@ export class AuthService {
     const user = await this.usersService.createRegisteredUser({
       email,
       passwordHash,
-      firstName,
-      lastName,
+      nickname,
       phone,
       inviterReferralCode,
     });

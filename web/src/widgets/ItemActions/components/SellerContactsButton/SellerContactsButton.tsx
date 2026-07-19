@@ -32,9 +32,7 @@ export function SellerContactsButton({
   variant = 'card',
 }: SellerContactsButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const sellerName = ad.seller
-    ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
-    : 'Продавец';
+  const sellerName = ad.seller?.nickname ?? 'Продавец';
   const contactValues = getContactValues(ad);
 
   return (

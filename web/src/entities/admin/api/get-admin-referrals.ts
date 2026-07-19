@@ -2,8 +2,8 @@ import { httpClient } from '@/shared/api/http-client';
 
 export type AdminReferralChild = {
   id: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix?: string;
   email: string;
   isDeleted: boolean;
   joinedAt: string;
@@ -12,8 +12,8 @@ export type AdminReferralChild = {
 
 export type AdminReferralUser = {
   id: string;
-  firstName: string;
-  lastName: string;
+  nickname: string;
+  nicknameSuffix: string;
   email: string;
   phone?: string | null;
   role: string;

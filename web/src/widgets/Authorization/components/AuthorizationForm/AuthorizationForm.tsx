@@ -90,25 +90,14 @@ export function AuthorizationForm({
       >
         <div className="space-y-4">
           {isRegisterMode && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormInputField
-                required
-                label="Имя"
-                value={value.firstName}
-                placeholder=""
-                autoComplete="off"
-                onChange={getInputChangeHandler('firstName')}
-              />
-
-              <FormInputField
-                required
-                label="Фамилия"
-                value={value.lastName}
-                placeholder=""
-                autoComplete="off"
-                onChange={getInputChangeHandler('lastName')}
-              />
-            </div>
+            <FormInputField
+              required
+              label="Имя аккаунта"
+              value={value.nickname}
+              placeholder=""
+              autoComplete="off"
+              onChange={getInputChangeHandler('nickname')}
+            />
           )}
 
           <FormInputField

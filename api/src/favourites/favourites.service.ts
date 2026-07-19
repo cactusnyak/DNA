@@ -35,8 +35,8 @@ export class FavouritesService {
             seller: {
               select: {
                 id: true,
-                firstName: true,
-                lastName: true,
+                nickname: true,
+                nicknameSuffix: true,
                 phone: true,
                 email: true,
               },

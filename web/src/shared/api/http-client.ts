@@ -40,18 +40,27 @@ export async function httpClient<TResponse, TBody = unknown>(
   options: RequestOptions<TBody> = {},
 ): Promise<TResponse> {
   const headers = new Headers(options.headers);
+  const isFormData = options.body instanceof FormData;
 
-  if (options.body !== undefined && !headers.has('Content-Type')) {
+  if (
+    options.body !== undefined &&
+    !headers.has('Content-Type') &&
+    !isFormData
+  ) {
     headers.set('Content-Type', 'application/json');
   }
+
+  const body: BodyInit | undefined =
+    options.body !== undefined
+      ? isFormData
+        ? (options.body as BodyInit)
+        : JSON.stringify(options.body)
+      : undefined;
 
   const response = await fetch(buildUrl(path, options.query), {
     method: options.method ?? 'GET',
     headers,
-    body:
-      options.body !== undefined
-        ? JSON.stringify(options.body)
-        : undefined,
+    body,
   });
 
   if (!response.ok) {

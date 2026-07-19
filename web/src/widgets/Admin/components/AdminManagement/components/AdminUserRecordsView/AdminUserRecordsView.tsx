@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { AdminUser } from '@/entities/admin';
 import { USER_ROLE_LABELS } from '@/entities/user';
+import { Avatar } from '@/shared/ui/Avatar';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -18,7 +19,15 @@ type AdminUserRecordsViewProps = {
 };
 
 function getUserName(user: AdminUser) {
-  return `${user.firstName} ${user.lastName}`.trim() || user.email;
+  return user.nickname || user.email;
+}
+
+function getFullName(user: AdminUser) {
+  const parts = [user.lastName, user.firstName, user.patronymic].filter(
+    Boolean,
+  );
+
+  return parts.join(' ') || '—';
 }
 
 function getRoleFilterOptions(users: AdminUser[]) {
@@ -66,6 +75,20 @@ export function AdminUserRecordsView({
       bulkActions={bulkActions}
       columns={[
         {
+          key: 'avatar',
+          title: 'Фото',
+          width: 72,
+          sortable: false,
+          getValue: (user) => (user.avatar ? user.avatar.url : ''),
+          render: (user) => (
+            <Avatar
+              src={user.avatar?.url}
+              name={getUserName(user)}
+              size="sm"
+            />
+          ),
+        },
+        {
           key: 'id',
           title: 'ID',
           width: 100,
@@ -78,14 +101,35 @@ export function AdminUserRecordsView({
           ),
         },
         {
-          key: 'name',
-          title: 'Имя',
-          width: 220,
+          key: 'nickname',
+          title: 'Имя аккаунта',
+          width: 180,
           sortable: true,
-          filter: { type: 'text', placeholder: 'Имя' },
+          filter: { type: 'text', placeholder: 'Имя аккаунта' },
           getValue: (user) => getUserName(user),
           render: (user) =>
             renderHighlightedText(getUserName(user), searchValue),
+        },
+        {
+          key: 'fullName',
+          title: 'ФИО',
+          width: 180,
+          sortable: true,
+          filter: { type: 'text', placeholder: 'ФИО' },
+          getValue: (user) => getFullName(user),
+          render: (user) => renderHighlightedText(getFullName(user), searchValue),
+        },
+        {
+          key: 'nicknameSuffix',
+          title: 'Суффикс',
+          width: 120,
+          sortable: true,
+          filter: { type: 'text', placeholder: 'Суффикс' },
+          getValue: (user) => user.nicknameSuffix,
+          render: (user) =>
+            <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {user.nicknameSuffix.slice(0, 8)}
+            </code>,
         },
         {
           key: 'email',

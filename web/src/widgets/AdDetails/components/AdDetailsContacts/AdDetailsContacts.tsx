@@ -18,9 +18,7 @@ function getContactValues(ad: Ad): string[] {
 }
 
 export function AdDetailsContacts({ ad }: AdDetailsContactsProps) {
-  const sellerName = ad.seller
-    ? `${ad.seller.firstName} ${ad.seller.lastName}`.trim()
-    : 'Продавец';
+  const sellerName = ad.seller?.nickname ?? 'Продавец';
 
   const contactValues = getContactValues(ad);
 

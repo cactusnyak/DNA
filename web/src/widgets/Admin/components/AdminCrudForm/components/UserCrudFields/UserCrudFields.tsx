@@ -24,7 +24,10 @@ export function UserCrudFields({
       {user && (
         <div className="rounded-xl border border-border bg-muted/40 p-4 text-sm">
           <p className="font-semibold">
-            {user.firstName} {user.lastName}
+            {user.nickname}
+            <code className="ml-2 rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {user.nicknameSuffix.slice(0, 8)}
+            </code>
           </p>
           <p className="mt-1 text-muted-foreground">{user.email}</p>
         </div>

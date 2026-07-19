@@ -83,7 +83,8 @@ export function useFilteredAdminRecords(
         ad.description,
         ad.price,
         ad.category?.name,
-        ad.seller ? `${ad.seller.firstName} ${ad.seller.lastName}` : undefined,
+        ad.seller?.nickname,
+        ad.seller?.nicknameSuffix,
         ad.seller?.email,
       ]),
     [data?.ads, searchValue],
@@ -92,8 +93,8 @@ export function useFilteredAdminRecords(
   const filteredUsers = useMemo(
     () =>
       filterAdminRecords(data?.users ?? [], searchValue, (user) => [
-        user.firstName,
-        user.lastName,
+        user.nickname,
+        user.nicknameSuffix,
         user.email,
         user.phone,
         USER_ROLE_LABELS[user.role],
@@ -104,12 +105,12 @@ export function useFilteredAdminRecords(
   const filteredReferrals = useMemo(
     () =>
       filterAdminRecords(data?.referrals ?? [], searchValue, (ref) => [
-        ref.firstName,
-        ref.lastName,
+        ref.nickname,
+        ref.nicknameSuffix,
         ref.email,
-        ref.phone,
-        ref.referralCode,
-        ref.invitedBy,
+        ref.phone ?? undefined,
+        ref.referralCode ?? undefined,
+        ref.invitedBy ?? undefined,
       ]),
     [data?.referrals, searchValue],
   );

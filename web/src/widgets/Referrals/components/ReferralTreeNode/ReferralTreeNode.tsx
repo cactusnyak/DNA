@@ -12,7 +12,7 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 });
 
 export function ReferralTreeNode({ user, isLast: _isLast = false }: ReferralTreeNodeProps) {
-  const fullName = `${user.firstName} ${user.lastName}`;
+  const displayName = user.nickname;
   const formattedDate = user.invitedAt
     ? dateFormatter.format(new Date(user.invitedAt))
     : 'Дата неизвестна';
@@ -27,7 +27,7 @@ export function ReferralTreeNode({ user, isLast: _isLast = false }: ReferralTree
         <article className="w-fit rounded-xl bg-muted/50 px-4 py-3 transition-colors hover:bg-muted/80">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
-              <p className="text-sm">{fullName}</p>
+              <p className="text-sm">{displayName}</p>
               <time className="text-xs text-muted-foreground" dateTime={user.invitedAt}>
                 {formattedDate}
               </time>
