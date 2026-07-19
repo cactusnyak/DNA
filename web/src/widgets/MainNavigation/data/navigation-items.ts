@@ -4,7 +4,7 @@ import {
   ShieldCheck,
   ShoppingCart,
   User,
-  WalletCards,
+  BadgeRussianRuble,
 } from 'lucide-react';
 
 import type { MainNavigationItem } from '../types/main-navigation-item';
@@ -18,7 +18,7 @@ export const navigationItems: MainNavigationItem[] = [
   {
     to: '/referrals',
     label: 'Заработок',
-    icon: WalletCards,
+    icon: BadgeRussianRuble,
   },
   {
     to: '/favourites',
