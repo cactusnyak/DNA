@@ -4,6 +4,9 @@ export const initialAuthorizationFormValue: AuthorizationFormValue = {
   email: '',
   password: '',
   nickname: '',
+  firstName: '',
+  lastName: '',
+  patronymic: '',
   phone: '',
   inviterReferralCode: '',
 };

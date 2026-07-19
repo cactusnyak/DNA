@@ -2,8 +2,10 @@ import type { ChangeEvent, FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { FormInputField } from '@/components/ui/FormField';
+import { getOAuthUrl, type OAuthProvider } from '@/entities/auth';
 
 import { authorizationModeItems } from '../../data/authorization-mode-items';
+import { oauthProviderItems } from '../../data/oauth-provider-items';
 import type {
   AuthorizationFormValue,
   AuthorizationMode,
@@ -14,6 +16,7 @@ type AuthorizationFormProps = {
   value: AuthorizationFormValue;
   isPending?: boolean;
   errorMessage?: string;
+  availableOAuthProviders?: OAuthProvider[];
   onModeChange: (mode: AuthorizationMode) => void;
   onChange: (value: AuthorizationFormValue) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -26,11 +29,16 @@ export function AuthorizationForm({
   value,
   isPending = false,
   errorMessage,
+  availableOAuthProviders = oauthProviderItems.map((item) => item.id),
   onModeChange,
   onChange,
   onSubmit,
 }: AuthorizationFormProps) {
   const isRegisterMode = mode === 'register';
+
+  const visibleOAuthProviderItems = oauthProviderItems.filter((item) =>
+    availableOAuthProviders.includes(item.id),
+  );
 
   function updateField(
     field: keyof AuthorizationFormValue,
@@ -90,14 +98,43 @@ export function AuthorizationForm({
       >
         <div className="space-y-4">
           {isRegisterMode && (
-            <FormInputField
-              required
-              label="Имя аккаунта"
-              value={value.nickname}
-              placeholder=""
-              autoComplete="off"
-              onChange={getInputChangeHandler('nickname')}
-            />
+            <>
+              <FormInputField
+                required
+                label="Имя аккаунта"
+                value={value.nickname}
+                placeholder=""
+                autoComplete="off"
+                onChange={getInputChangeHandler('nickname')}
+              />
+
+              <FormInputField
+                required
+                label="Имя"
+                value={value.firstName}
+                placeholder=""
+                autoComplete="given-name"
+                onChange={getInputChangeHandler('firstName')}
+              />
+
+              <FormInputField
+                required
+                label="Фамилия"
+                value={value.lastName}
+                placeholder=""
+                autoComplete="family-name"
+                onChange={getInputChangeHandler('lastName')}
+              />
+
+              <FormInputField
+                label="Отчество"
+                value={value.patronymic}
+                placeholder=""
+                caption="Необязательно"
+                autoComplete="additional-name"
+                onChange={getInputChangeHandler('patronymic')}
+              />
+            </>
           )}
 
           <FormInputField
@@ -164,6 +201,44 @@ export function AuthorizationForm({
               ? 'Создать профиль'
               : 'Войти'}
         </Button>
+
+        {visibleOAuthProviderItems.length > 0 && (
+          <>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-[10px] uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  Или
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {visibleOAuthProviderItems.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <Button
+                    key={item.id}
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() =>
+                      window.location.assign(
+                        getOAuthUrl(item.id, mode, value.inviterReferralCode),
+                      )
+                    }
+                  >
+                    <Icon />
+                    {item.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </>
+        )}
       </form>
     </section>
   );

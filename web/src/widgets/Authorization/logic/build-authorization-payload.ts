@@ -27,6 +27,9 @@ export function buildRegisterPayload(
     email: value.email.trim(),
     password: value.password,
     nickname: value.nickname.trim(),
+    firstName: value.firstName.trim(),
+    lastName: value.lastName.trim(),
+    patronymic: normalizeOptionalString(value.patronymic),
     phone: normalizeOptionalString(value.phone),
     inviterReferralCode: normalizeOptionalString(value.inviterReferralCode),
   };

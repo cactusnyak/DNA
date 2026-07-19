@@ -53,6 +53,8 @@ model User {
   deletedAt      DateTime?
 
   passwordHash String?
+  oauthProvider String?
+  oauthProviderId String?
 
   patronymic   String?
   phone        String?
@@ -60,6 +62,8 @@ model User {
 
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])
+
+  @@unique([oauthProvider, oauthProviderId])
 
   cartItems  CartItem[]
   orders     Order[]

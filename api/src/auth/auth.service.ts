@@ -23,8 +23,14 @@ export class AuthService {
     const email = this.getEmail(registerDto.email);
     const password = this.getPassword(registerDto.password);
     const nickname = this.getRequiredString(registerDto.nickname, 'nickname');
+    const firstName = this.getRequiredString(
+      registerDto.firstName,
+      'firstName',
+    );
+    const lastName = this.getRequiredString(registerDto.lastName, 'lastName');
 
     const phone = this.getOptionalString(registerDto.phone);
+    const patronymic = this.getOptionalString(registerDto.patronymic);
     const inviterReferralCode = this.getOptionalString(
       registerDto.inviterReferralCode,
     );
@@ -35,6 +41,9 @@ export class AuthService {
       email,
       passwordHash,
       nickname,
+      firstName,
+      lastName,
+      patronymic,
       phone,
       inviterReferralCode,
     });

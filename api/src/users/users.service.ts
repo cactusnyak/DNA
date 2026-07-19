@@ -31,7 +31,20 @@ type CreateRegisteredUserParams = {
   email: string;
   passwordHash: string;
   nickname: string;
+  firstName: string;
+  lastName: string;
+  patronymic?: string;
   phone?: string;
+  inviterReferralCode?: string;
+};
+
+type CreateOAuthUserParams = {
+  email: string;
+  nickname: string;
+  firstName?: string;
+  lastName?: string;
+  oauthProvider: string;
+  oauthProviderId: string;
   inviterReferralCode?: string;
 };
 
@@ -74,6 +87,22 @@ export class UsersService {
     return user ? this.mapPublicUser(user) : undefined;
   }
 
+  async findByOAuthProviderId(provider: string, providerId: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        oauthProvider: provider,
+        oauthProviderId: providerId,
+        deletedAt: null,
+      },
+      include: {
+        avatar: true,
+        balance: true,
+      },
+    });
+
+    return user ? this.mapPublicUser(user) : undefined;
+  }
+
   async createRegisteredUser(params: CreateRegisteredUserParams) {
     const existingActiveUser = await this.findByEmail(params.email);
 
@@ -81,11 +110,46 @@ export class UsersService {
       throw new ConflictException('User with this email already exists');
     }
 
+    return this.createUser({
+      ...params,
+      referralCode: await this.generateUniqueReferralCode(params.email),
+    });
+  }
+
+  async createOAuthUser(params: CreateOAuthUserParams) {
+    const existingOAuthUser = await this.findByOAuthProviderId(
+      params.oauthProvider,
+      params.oauthProviderId,
+    );
+
+    if (existingOAuthUser) {
+      return existingOAuthUser;
+    }
+
+    return this.createUser({
+      ...params,
+      referralCode: await this.generateUniqueReferralCode(params.email),
+    });
+  }
+
+  private async createUser(
+    params: {
+      email: string;
+      nickname: string;
+      phone?: string;
+      firstName?: string;
+      lastName?: string;
+      patronymic?: string;
+      passwordHash?: string;
+      oauthProvider?: string;
+      oauthProviderId?: string;
+      referralCode: string;
+      inviterReferralCode?: string;
+    },
+  ) {
     const inviter = await this.getInviterByReferralCode(
       params.inviterReferralCode,
     );
-
-    const referralCode = await this.generateUniqueReferralCode(params.email);
 
     try {
       const user = await this.prismaService.user.create({
@@ -93,8 +157,13 @@ export class UsersService {
           email: params.email,
           passwordHash: params.passwordHash,
           nickname: params.nickname,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          patronymic: params.patronymic,
           phone: params.phone,
-          referralCode,
+          oauthProvider: params.oauthProvider,
+          oauthProviderId: params.oauthProviderId,
+          referralCode: params.referralCode,
           balance: {
             create: {
               value: 0,
@@ -117,6 +186,21 @@ export class UsersService {
       return this.mapPublicUser(user);
     } catch (error) {
       if (this.isUniqueConstraintError(error)) {
+        if (params.oauthProvider && params.oauthProviderId) {
+          const existing = await this.findByOAuthProviderId(
+            params.oauthProvider,
+            params.oauthProviderId,
+          );
+
+          if (existing) {
+            return existing;
+          }
+
+          throw new ConflictException(
+            'User with this OAuth account already exists',
+          );
+        }
+
         throw new ConflictException('User with this email already exists');
       }
 
