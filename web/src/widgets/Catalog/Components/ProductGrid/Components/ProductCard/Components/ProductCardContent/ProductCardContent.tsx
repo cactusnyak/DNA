@@ -19,9 +19,15 @@ export function ProductCardContent({
   currentCategorySlug,
 }: ProductCardContentProps) {
   const navigate = useNavigate();
-  const categoryHref = getPlatformCategoryHref(section, product.category.path);
+  const categoryHref = product.category
+    ? getPlatformCategoryHref(
+        section,
+        product.category.path ?? product.category.slug,
+      )
+    : null;
   const shouldShowCategoryLink =
-    !currentCategorySlug || currentCategorySlug !== product.category.slug;
+    !!categoryHref &&
+    (!currentCategorySlug || currentCategorySlug !== product.category?.slug);
 
   return (
     <div className="flex flex-1 flex-col p-4">
@@ -30,7 +36,7 @@ export function ProductCardContent({
       <div className="mt-2">
         <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
 
-        {shouldShowCategoryLink && (
+        {shouldShowCategoryLink && categoryHref && (
           <span
             role="link"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(categoryHref); }}

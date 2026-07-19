@@ -19,7 +19,10 @@ type AdCardProps = {
 export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
   const navigate = useNavigate();
   const categoryHref = ad.category
-    ? getPlatformCategoryHref(PLATFORM_SECTION.ADS, ad.category.path)
+    ? getPlatformCategoryHref(
+        PLATFORM_SECTION.ADS,
+        ad.category.path ?? ad.category.slug,
+      )
     : null;
   const shouldShowCategoryLink =
     !!ad.category &&

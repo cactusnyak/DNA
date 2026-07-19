@@ -97,24 +97,28 @@ export function getPlatformCatalogHref(
 
 export function getPlatformCategoryHref(
   sectionId: PlatformSectionId,
-  categoryPath: string,
+  categoryPath: string | null | undefined,
 ): string;
 export function getPlatformCategoryHref(
   sectionId: null,
-  categoryPath: string,
+  categoryPath: string | null | undefined,
 ): null;
 export function getPlatformCategoryHref(
   sectionId: PlatformSectionId | null,
-  categoryPath: string,
+  categoryPath: string | null | undefined,
 ): string | null;
 export function getPlatformCategoryHref(
   sectionId: PlatformSectionId | null,
-  categoryPath: string,
+  categoryPath: string | null | undefined,
 ): string | null {
   const catalogHref = getPlatformCatalogHref(sectionId);
 
   if (!catalogHref) {
     return null;
+  }
+
+  if (!categoryPath) {
+    return catalogHref;
   }
 
   const normalizedCategoryPath = categoryPath

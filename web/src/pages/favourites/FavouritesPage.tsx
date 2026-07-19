@@ -46,8 +46,8 @@ export function FavouritesPage() {
 
       <SegmentedControl
         options={[
-          { value: 'products', label: `Товары${productCount > 0 ? ` (${productCount})` : ''}` },
-          { value: 'ads', label: `Объявления${adCount > 0 ? ` (${adCount})` : ''}` },
+          { value: 'ads', label: `Доска${adCount > 0 ? ` (${adCount})` : ''}` },
+          { value: 'products', label: `Маркет${productCount > 0 ? ` (${productCount})` : ''}` },
         ]}
         value={tab}
         onChange={(v) => setTab(v as Tab)}

@@ -38,8 +38,8 @@ export function Cart() {
 
       <SegmentedControl
         options={[
-          { value: 'products', label: `Товары${items.length > 0 ? ` (${items.length})` : ''}` },
-          { value: 'ads', label: `Объявления${adItems.length > 0 ? ` (${adItems.length})` : ''}` },
+          { value: 'ads', label: `Доска${adItems.length > 0 ? ` (${adItems.length})` : ''}` },
+          { value: 'products', label: `Маркет${items.length > 0 ? ` (${items.length})` : ''}` },
         ]}
         value={tab}
         onChange={(v) => setTab(v as Tab)}

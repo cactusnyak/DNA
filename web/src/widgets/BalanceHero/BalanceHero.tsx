@@ -100,7 +100,7 @@ export function BalanceHero({
             )}
           </div>
         ) : (
-          <div className="mt-8 grid w-full gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
+          <div className="grid w-full gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
             <BalanceHeroActionLink to="/authorization">
               Зарегистрироваться
             </BalanceHeroActionLink>

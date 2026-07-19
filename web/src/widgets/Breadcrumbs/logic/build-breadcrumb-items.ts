@@ -43,7 +43,9 @@ function getCatalogBreadcrumbItem(
 }
 
 function getLastCategorySlugFromProduct(product: Product) {
-  const categoryPathParts = product.category.path.split('/').filter(Boolean);
+  const categoryPathParts = (product.category.path ?? product.category.slug)
+    .split('/')
+    .filter(Boolean);
 
   return categoryPathParts.at(-1) ?? product.category.slug;
 }
@@ -81,7 +83,8 @@ function getAdBreadcrumbItems({
   }
 
   const adCategorySlug = ad.category
-    ? ad.category.path.split('/').filter(Boolean).at(-1) ?? ad.category.slug
+    ? (ad.category.path ?? ad.category.slug).split('/').filter(Boolean).at(-1) ??
+      ad.category.slug
     : null;
 
   const categoryItems = adCategorySlug
