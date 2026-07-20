@@ -1,17 +1,22 @@
 # Dependencies
-**/node_modules
+**/node_modules/
 
 # Build artifacts
-**/dist
-**/coverage
+**/dist/
+**/coverage/
+*.tsbuildinfo
 
 # Environment variables
 .env
 .env.*
 *.local
 
+# Keep environment templates
+!.env.example
+!**/.env.example
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -23,8 +28,8 @@ lerna-debug.log*
 .DS_Store
 
 # IDE
-.vscode
-.idea
+.vscode/
+.idea/
 
 # Swap files
 *.sw?
@@ -38,18 +43,9 @@ lerna-debug.log*
 # Uploaded files
 api/uploads/
 
-# API build cache
-api/tsconfig.build.tsbuildinfo
-api/dist/tsconfig.build.tsbuildinfo
-
-# API Prisma generated client
+# Generated API code
 api/generated/
 api/src/generated/
-api/prisma/seed.ts
-api/prisma/seed-images.ts
-api/dist/prisma/seed.js.map
-api/dist/prisma/seed.js
-api/dist/prisma/seed.d.ts
 
 # Local Netlify folder
-.netlify
+.netlify/
