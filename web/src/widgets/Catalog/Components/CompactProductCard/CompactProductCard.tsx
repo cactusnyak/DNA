@@ -10,7 +10,7 @@ type ProductCardProps = {
   className?: string;
 };
 
-export function ProductCard({ product, className }: ProductCardProps) {
+export function CompactProductCard({ product, className }: ProductCardProps) {
   const image = product.images[0];
 
   return (

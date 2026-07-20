@@ -5,7 +5,7 @@ import { SectionHeader } from '@/components/ui/Section';
 import { createAd, type CreateAdPayload, uploadAdImage } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { AdForm } from '@/widgets/AdForm';
-import { StateCard } from '@/widgets/StateCard';
+import { StateCard } from '@/components/ui/StateCard';
 
 export function AdCreatePage() {
   const accessToken = useAuthStore((state) => state.accessToken);

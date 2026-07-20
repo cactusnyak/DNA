@@ -1,6 +1,6 @@
 import { ShoppingCart } from 'lucide-react';
 
-import { StateCard } from '@/widgets/StateCard';
+import { StateCard } from '@/components/ui/StateCard';
 
 export function CartEmptyState() {
   return (

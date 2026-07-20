@@ -1,17 +1,17 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import {
   Prisma,
   UserRole,
 } from '@prisma/client';
-import { mkdir, writeFile } from 'fs/promises';
-import { join } from 'path';
 import { randomUUID } from 'crypto';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { FILE_STORAGE, type FileStorage } from '../storage/file-storage';
 
 const IMAGE_MIME_EXTENSION: Record<string, string> = {
   'image/jpeg': '.jpg',
@@ -54,7 +54,10 @@ type UploadedFile = {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject(FILE_STORAGE) private readonly fileStorage: FileStorage,
+  ) {}
 
   async findByEmail(email: string) {
     return this.prismaService.user.findFirst({
@@ -300,15 +303,15 @@ export class UsersService {
     }
 
     const fileName = `${randomUUID()}${extension}`;
-    const uploadsDirectory = join(process.cwd(), 'uploads', 'avatars');
-    const filePath = join(uploadsDirectory, fileName);
-
-    await mkdir(uploadsDirectory, { recursive: true });
-    await writeFile(filePath, file.buffer);
+    const storedFile = await this.fileStorage.upload({
+      key: `avatars/${fileName}`,
+      body: file.buffer,
+      contentType: file.mimetype,
+    });
 
     const image = await this.prismaService.image.create({
       data: {
-        url: `/uploads/avatars/${fileName}`,
+        url: storedFile.url,
         sortOrder: 0,
         alt: file.originalname,
       },

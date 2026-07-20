@@ -7,13 +7,18 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 import { OAuthService } from './oauth.service';
 
 @Controller('auth/oauth')
 export class OAuthController {
-  constructor(private readonly oauthService: OAuthService) {}
+  constructor(
+    private readonly oauthService: OAuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('providers')
   getProviders() {
@@ -37,6 +42,7 @@ export class OAuthController {
   }
 
   @Get(':provider/callback')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async callback(
     @Param('provider') provider: string,
     @Query('code') code: string,
@@ -44,7 +50,7 @@ export class OAuthController {
     @Query('error') providerError: string | undefined,
     @Res() res: Response,
   ) {
-    const webAppUrl = process.env.WEB_APP_URL ?? 'http://localhost:5173';
+    const webAppUrl = this.configService.getOrThrow<string>('WEB_APP_URL');
 
     try {
       if (providerError) {

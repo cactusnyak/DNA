@@ -1,22 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
 @Injectable()
 export class NotificationService {
+  private readonly logger = new Logger(NotificationService.name);
   private emailTransporter?: Transporter;
 
-  constructor() {
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
+  constructor(private readonly configService: ConfigService) {
+    const smtpHost = this.configService.get<string>('SMTP_HOST');
+    const smtpPort = this.configService.get<number>('SMTP_PORT');
+    const smtpUser = this.configService.get<string>('SMTP_USER');
+    const smtpPass = this.configService.get<string>('SMTP_PASS');
 
     if (smtpHost && smtpUser && smtpPass) {
       this.emailTransporter = nodemailer.createTransport({
         host: smtpHost,
-        port: Number(smtpPort) || 587,
-        secure: Number(smtpPort) === 465,
+        port: smtpPort ?? 587,
+        secure: smtpPort === 465,
         auth: {
           user: smtpUser,
           pass: smtpPass,
@@ -39,12 +41,12 @@ export class NotificationService {
     const text = `Ваш код подтверждения: ${code}\n\nКод действителен 10 минут.`;
 
     if (!this.emailTransporter) {
-      console.log(`[EMAIL OTP] ${to}: ${code}`);
+      this.logOtpCode('EMAIL', to, code);
       return;
     }
 
     await this.emailTransporter.sendMail({
-      from: process.env.SMTP_FROM ?? 'noreply@dna.ru',
+      from: this.configService.getOrThrow<string>('SMTP_FROM'),
       to,
       subject,
       text,
@@ -52,6 +54,12 @@ export class NotificationService {
   }
 
   private sendSmsOtp(phone: string, code: string) {
-    console.log(`[SMS OTP] ${phone}: ${code}`);
+    this.logOtpCode('SMS', phone, code);
+  }
+
+  private logOtpCode(channel: 'EMAIL' | 'SMS', recipient: string, code: string) {
+    if (this.configService.get<boolean>('OTP_LOG_CODES')) {
+      this.logger.debug(`[${channel} OTP] ${recipient}: ${code}`);
+    }
   }
 }

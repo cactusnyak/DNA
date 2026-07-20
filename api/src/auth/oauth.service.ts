@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { UsersService } from '../users/users.service';
 
@@ -46,6 +47,7 @@ export class OAuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
+    private readonly configService: ConfigService,
   ) {}
 
   getAuthorizationUrl(
@@ -73,11 +75,12 @@ export class OAuthService {
   }
 
   getAvailableProviders(): OAuthProvider[] {
-    if (process.env.YANDEX_CLIENT_ID && process.env.YANDEX_CLIENT_SECRET) {
-      return ['yandex'];
-    }
+    const isConfigured =
+      this.configService.get<string>('YANDEX_CLIENT_ID') &&
+      this.configService.get<string>('YANDEX_CLIENT_SECRET') &&
+      this.configService.get<string>('YANDEX_REDIRECT_URI');
 
-    return [];
+    return isConfigured ? ['yandex'] : [];
   }
 
   async handleCallback(provider: string, code: string, state?: string) {
@@ -147,8 +150,8 @@ export class OAuthService {
     }
   }
 
-  private getEnvValue(key: string) {
-    const value = process.env[key];
+  private getConfigValue(key: string) {
+    const value = this.configService.get<string>(key);
 
     if (!value) {
       throw new InternalServerErrorException(`Missing OAuth config: ${key}`);
@@ -159,9 +162,9 @@ export class OAuthService {
 
   private getProviderConfig(provider: OAuthProvider) {
     return {
-      clientId: this.getEnvValue('YANDEX_CLIENT_ID'),
-      clientSecret: this.getEnvValue('YANDEX_CLIENT_SECRET'),
-      redirectUri: this.getEnvValue('YANDEX_REDIRECT_URI'),
+      clientId: this.getConfigValue('YANDEX_CLIENT_ID'),
+      clientSecret: this.getConfigValue('YANDEX_CLIENT_SECRET'),
+      redirectUri: this.getConfigValue('YANDEX_REDIRECT_URI'),
       authorizationEndpoint: 'https://oauth.yandex.com/authorize',
       tokenEndpoint: 'https://oauth.yandex.com/token',
       userInfoEndpoint: 'https://login.yandex.ru/info?format=json',

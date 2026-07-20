@@ -1,11 +1,11 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { extname } from 'node:path';
 import {
   AdStatus,
   CatalogCollectionType,
@@ -14,6 +14,7 @@ import {
 } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { FILE_STORAGE, type FileStorage } from '../storage/file-storage';
 import { UsersService } from '../users/users.service';
 
 const CYRILLIC_MAP: Record<string, string> = {
@@ -79,7 +80,8 @@ export class AdminService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly usersService: UsersService,
-  ) { }
+    @Inject(FILE_STORAGE) private readonly fileStorage: FileStorage,
+  ) {}
 
   async getOverview() {
     const [
@@ -227,17 +229,14 @@ export class AdminService {
 
     const fileExtension = this.getImageUploadExtension(file);
     const fileName = `${randomUUID()}${fileExtension}`;
-    const uploadsDirectory = join(process.cwd(), 'uploads', 'images');
-    const filePath = join(uploadsDirectory, fileName);
-
-    await mkdir(uploadsDirectory, {
-      recursive: true,
+    const storedFile = await this.fileStorage.upload({
+      key: `images/${fileName}`,
+      body: file.buffer,
+      contentType: file.mimetype,
     });
 
-    await writeFile(filePath, file.buffer);
-
     return {
-      url: `/uploads/images/${fileName}`,
+      url: storedFile.url,
       fileName,
     };
   }

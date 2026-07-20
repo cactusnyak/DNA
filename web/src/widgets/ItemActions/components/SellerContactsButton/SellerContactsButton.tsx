@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import type { Ad } from '@/entities/ad';
 import { LinkifyText } from '@/shared/utils/linkify';
 import { cn } from '@/shared/utils/cn';
-import { Modal } from '@/widgets/Modal';
+import { Modal } from '@/components/ui/Modal';
 import {
   getProductActionHeightClass,
   type ProductQuantityCounterVariant,

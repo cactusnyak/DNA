@@ -1,4 +1,4 @@
-import { Admin } from '@/widgets/Admin';
+import { Admin } from '@/features/admin';
 
 export function AdminPage() {
   return <Admin />;
