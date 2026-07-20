@@ -10,21 +10,12 @@ import { UsersService } from '../users/users.service';
 
 import { TokenService } from './token.service';
 
-type OAuthProvider = 'google' | 'yandex';
+type OAuthProvider = 'yandex';
 
 type OAuthState = {
   provider: OAuthProvider;
   mode: 'login' | 'register';
   inviterReferralCode?: string;
-};
-
-type GoogleUserInfo = {
-  id: string;
-  email: string;
-  name?: string;
-  given_name?: string;
-  family_name?: string;
-  picture?: string;
 };
 
 type YandexUserInfo = {
@@ -82,17 +73,11 @@ export class OAuthService {
   }
 
   getAvailableProviders(): OAuthProvider[] {
-    const providers: OAuthProvider[] = [];
-
-    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-      providers.push('google');
-    }
-
     if (process.env.YANDEX_CLIENT_ID && process.env.YANDEX_CLIENT_SECRET) {
-      providers.push('yandex');
+      return ['yandex'];
     }
 
-    return providers;
+    return [];
   }
 
   async handleCallback(provider: string, code: string, state?: string) {
@@ -135,7 +120,7 @@ export class OAuthService {
   }
 
   private validateProvider(value: string): OAuthProvider {
-    if (value === 'google' || value === 'yandex') {
+    if (value === 'yandex') {
       return value;
     }
 
@@ -173,18 +158,6 @@ export class OAuthService {
   }
 
   private getProviderConfig(provider: OAuthProvider) {
-    if (provider === 'google') {
-      return {
-        clientId: this.getEnvValue('GOOGLE_CLIENT_ID'),
-        clientSecret: this.getEnvValue('GOOGLE_CLIENT_SECRET'),
-        redirectUri: this.getEnvValue('GOOGLE_REDIRECT_URI'),
-        authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-        tokenEndpoint: 'https://oauth2.googleapis.com/token',
-        userInfoEndpoint: 'https://www.googleapis.com/oauth2/v2/userinfo',
-        scope: 'openid email profile',
-      };
-    }
-
     return {
       clientId: this.getEnvValue('YANDEX_CLIENT_ID'),
       clientSecret: this.getEnvValue('YANDEX_CLIENT_SECRET'),
@@ -207,22 +180,14 @@ export class OAuthService {
       redirect_uri: config.redirectUri,
     });
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-
-    if (provider === 'yandex') {
-      headers.Authorization = `Basic ${Buffer.from(
-        `${config.clientId}:${config.clientSecret}`,
-      ).toString('base64')}`;
-    } else {
-      bodyParams.set('client_id', config.clientId);
-      bodyParams.set('client_secret', config.clientSecret);
-    }
-
     const response = await fetch(config.tokenEndpoint, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(
+          `${config.clientId}:${config.clientSecret}`,
+        ).toString('base64')}`,
+      },
       body: bodyParams.toString(),
     });
 
@@ -243,10 +208,7 @@ export class OAuthService {
     const config = this.getProviderConfig(provider);
     const response = await fetch(config.userInfoEndpoint, {
       headers: {
-        Authorization:
-          provider === 'google'
-            ? `Bearer ${accessToken}`
-            : `OAuth ${accessToken}`,
+        Authorization: `OAuth ${accessToken}`,
       },
     });
 
@@ -255,24 +217,6 @@ export class OAuthService {
       throw new UnauthorizedException(
         `Failed to fetch ${provider} user info: ${errorText}`,
       );
-    }
-
-    if (provider === 'google') {
-      const data = (await response.json()) as GoogleUserInfo;
-
-      if (!data.email) {
-        throw new BadRequestException(
-          'Google account did not provide an email',
-        );
-      }
-
-      return {
-        providerId: data.id,
-        email: data.email.toLowerCase(),
-        firstName: data.given_name,
-        lastName: data.family_name,
-        nickname: data.name ?? data.given_name,
-      };
     }
 
     const data = (await response.json()) as YandexUserInfo;

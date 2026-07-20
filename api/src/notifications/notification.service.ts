@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
-import twilio from 'twilio';
 
 @Injectable()
 export class NotificationService {
   private emailTransporter?: Transporter;
-  private twilioClient?: ReturnType<typeof twilio>;
-  private twilioFrom?: string;
 
   constructor() {
     const smtpHost = process.env.SMTP_HOST;
@@ -26,15 +23,6 @@ export class NotificationService {
         },
       });
     }
-
-    const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
-    const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-    const twilioFrom = process.env.TWILIO_PHONE_NUMBER;
-
-    if (twilioAccountSid && twilioAuthToken && twilioFrom) {
-      this.twilioClient = twilio(twilioAccountSid, twilioAuthToken);
-      this.twilioFrom = twilioFrom;
-    }
   }
 
   async sendOtpCode(type: 'email' | 'phone', to: string, code: string) {
@@ -43,7 +31,7 @@ export class NotificationService {
       return;
     }
 
-    await this.sendSmsOtp(to, code);
+    this.sendSmsOtp(to, code);
   }
 
   private async sendEmailOtp(to: string, code: string) {
@@ -63,18 +51,7 @@ export class NotificationService {
     });
   }
 
-  private async sendSmsOtp(phone: string, code: string) {
-    const text = `DNA: код подтверждения ${code}`;
-
-    if (!this.twilioClient || !this.twilioFrom) {
-      console.log(`[SMS OTP] ${phone}: ${code}`);
-      return;
-    }
-
-    await this.twilioClient.messages.create({
-      body: text,
-      from: this.twilioFrom,
-      to: phone,
-    });
+  private sendSmsOtp(phone: string, code: string) {
+    console.log(`[SMS OTP] ${phone}: ${code}`);
   }
 }

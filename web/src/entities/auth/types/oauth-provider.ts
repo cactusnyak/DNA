@@ -1,1 +1,1 @@
-export type OAuthProvider = 'google' | 'yandex';
+export type OAuthProvider = 'yandex';

@@ -1,6 +1,6 @@
 import type { ComponentType, SVGProps } from 'react';
 
-import { Google, Yandex } from '@thesvg/react';
+import { Yandex } from '@thesvg/react';
 
 import type { OAuthProvider } from '@/entities/auth';
 
@@ -11,11 +11,6 @@ export type OAuthProviderItem = {
 };
 
 export const oauthProviderItems: OAuthProviderItem[] = [
-  {
-    id: 'google',
-    label: 'Google',
-    icon: Google,
-  },
   {
     id: 'yandex',
     label: 'Yandex',
