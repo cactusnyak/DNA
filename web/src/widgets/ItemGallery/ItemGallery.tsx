@@ -29,7 +29,9 @@ export function ItemGallery({ images, title }: ItemGalleryProps) {
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
-    setActiveIndex(getActiveImageIndex(e.clientX, rect.left, rect.width, images.length));
+    setActiveIndex(
+      getActiveImageIndex(e.clientX, rect.left, rect.width, images.length),
+    );
   }
 
   function handleTouchStart(e: React.TouchEvent<HTMLDivElement>) {

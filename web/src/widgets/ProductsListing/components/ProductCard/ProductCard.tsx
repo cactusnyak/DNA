@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FavouriteButton } from '@/entities/favourite';
 import type { Product } from '@/entities/product';
 import { getPlatformProductHref, PLATFORM_SECTION } from '@/shared/platform';
-import { ItemGallery } from '@/shared/ui/ItemGallery';
+import { ItemGallery } from '@/widgets/ItemGallery';
 import { ProductCardContent } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/components/ProductCardContent';
 import { ItemActions } from '@/widgets/ItemActions';
 

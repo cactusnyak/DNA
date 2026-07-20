@@ -2,20 +2,19 @@ import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
 
 import { cn } from '@/shared/utils/cn';
-import { SectionTitle } from '@/shared/ui/SectionTitle';
+import { SectionTitle } from '@/widgets/SectionTitle';
 
 type HorizontalScrollSectionProps = {
   title: string;
   children: ReactNode;
   className?: string;
   onSeeAllClick?: () => void;
-  seeAllText?: string;
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   titleLevel?: 2 | 3;
 };
 
 export const HorizontalScrollSection = forwardRef<HTMLDivElement, HorizontalScrollSectionProps>(
-  ({ title, children, className, onSeeAllClick, seeAllText = 'Смотреть все', onScroll, titleLevel = 2 }, ref) => {
+  ({ title, children, className, onSeeAllClick, onScroll, titleLevel = 2 }, ref) => {
     return (
       <section className={cn('space-y-4', className)}>
         <div className="flex items-center justify-between">

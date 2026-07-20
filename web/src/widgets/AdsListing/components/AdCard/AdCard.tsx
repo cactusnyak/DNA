@@ -8,7 +8,7 @@ import {
 } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
-import { ItemGallery } from '@/shared/ui/ItemGallery';
+import { ItemGallery } from '@/widgets/ItemGallery';
 import { ItemActions } from '@/widgets/ItemActions';
 
 type AdCardProps = {

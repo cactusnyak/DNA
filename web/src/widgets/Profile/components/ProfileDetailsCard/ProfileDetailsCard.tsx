@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import { Avatar } from '@/shared/ui/Avatar';
+import { Avatar } from '@/components/ui/Avatar';
 import type { User } from '@/entities/user';
 
 import { getProfileDetailItems } from './data';

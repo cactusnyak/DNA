@@ -1,6 +1,0 @@
-export type RegisterDto = {
-  login?: string;
-  password?: string;
-  nickname?: string;
-  inviterReferralCode?: string;
-};

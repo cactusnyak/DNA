@@ -11,7 +11,6 @@ import { AuthService } from './auth.service';
 import { OAuthService } from './oauth.service';
 import { OtpController } from './otp.controller';
 import { OtpService } from './otp.service';
-import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 
 @Module({
@@ -26,7 +25,6 @@ import { TokenService } from './token.service';
     AuthService,
     OAuthService,
     OtpService,
-    PasswordService,
     TokenService,
   ],
   exports: [AuthService],

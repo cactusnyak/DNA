@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { AdminUser } from '@/entities/admin';
 import { USER_ROLE_LABELS } from '@/entities/user';
-import { Avatar } from '@/shared/ui/Avatar';
+import { Avatar } from '@/components/ui/Avatar';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';

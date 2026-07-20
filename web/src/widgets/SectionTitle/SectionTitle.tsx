@@ -13,17 +13,24 @@ type SectionTitleProps = {
   arrowClassName?: string;
 };
 
-export const SectionTitle = forwardRef<HTMLButtonElement | HTMLAnchorElement, SectionTitleProps>(
-  ({ title, href, onClick, level = 2, className, arrowClassName }, ref) => {
-    const baseClasses = "group flex items-center gap-2 font-semibold hover:text-primary transition-colors cursor-pointer";
+export const SectionTitle = forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  SectionTitleProps
+>(
+  (
+    { title, href, onClick, level = 2, className, arrowClassName },
+    ref,
+  ) => {
+    const baseClasses =
+      'group flex items-center gap-2 font-semibold hover:text-primary transition-colors cursor-pointer';
     const titleClasses = cn(
       baseClasses,
-      level === 2 ? "text-lg" : "text-base",
-      className
+      level === 2 ? 'text-lg' : 'text-base',
+      className,
     );
     const arrowClasses = cn(
-      "size-4 transition-transform group-hover:translate-x-1",
-      arrowClassName
+      'size-4 transition-transform group-hover:translate-x-1',
+      arrowClassName,
     );
 
     const HeadingTag = level === 2 ? 'h2' : 'h3';
@@ -57,7 +64,7 @@ export const SectionTitle = forwardRef<HTMLButtonElement | HTMLAnchorElement, Se
         {content}
       </button>
     );
-  }
+  },
 );
 
 SectionTitle.displayName = 'SectionTitle';
