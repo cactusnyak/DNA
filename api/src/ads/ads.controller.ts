@@ -13,23 +13,26 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from '../auth/auth.service';
-import type { AdminUploadedImageFile } from '../admin/admin.service';
-import { AdminService } from '../admin/admin.service';
+import {
+  AdminUploadsService,
+  type AdminUploadedImageFile,
+} from '../admin/admin-uploads.service';
 
-import { AdCategoriesService } from '../ad-categories/ad-categories.service';
 import { AdsService } from './ads.service';
+import { AdQueryDto } from './dto/ad-query.dto';
 import type { CreateAdDto } from './dto/create-ad.dto';
 import type { UpdateAdDto } from './dto/update-ad.dto';
 
+@ApiTags('Ads')
 @Controller('ads')
 export class AdsController {
   constructor(
     private readonly adsService: AdsService,
-    private readonly adCategoriesService: AdCategoriesService,
     private readonly authService: AuthService,
-    private readonly adminService: AdminService,
+    private readonly adminUploadsService: AdminUploadsService,
   ) {}
 
   @Post('uploads/images')
@@ -46,12 +49,7 @@ export class AdsController {
   ) {
     await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
 
-    return this.adminService.uploadImage(file);
-  }
-
-  @Get('categories')
-  findCategories() {
-    return this.adCategoriesService.findAll();
+    return this.adminUploadsService.uploadImage(file);
   }
 
   @Get('my')
@@ -64,19 +62,15 @@ export class AdsController {
   }
 
   @Get()
-  findAll(
-    @Query('category') categorySlug?: string,
-    @Query('priceFrom') priceFrom?: string,
-    @Query('priceTo') priceTo?: string,
-    @Query('categoryIds') categoryIds?: string,
-    @Query('sort') sort?: string,
-  ) {
+  @ApiOperation({ summary: 'List public advertisements' })
+  @ApiOkResponse({ description: 'Public advertisements' })
+  findAll(@Query() query: AdQueryDto) {
     return this.adsService.findAll({
-      categorySlug,
-      priceFrom: priceFrom ? Number(priceFrom) : undefined,
-      priceTo: priceTo ? Number(priceTo) : undefined,
-      categoryIds: categoryIds?.split(',').filter(Boolean),
-      sort,
+      categorySlug: query.category,
+      priceFrom: query.priceFrom,
+      priceTo: query.priceTo,
+      categoryIds: query.categoryIds,
+      sort: query.sort,
     });
   }
 

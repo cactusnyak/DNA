@@ -517,8 +517,8 @@ export class AdsService {
   private mapSeller(seller: any, includeContacts: boolean) {
     return {
       id: seller.id,
-      firstName: seller.firstName,
-      lastName: seller.lastName,
+      nickname: seller.nickname,
+      nicknameSuffix: seller.nicknameSuffix,
       ...(includeContacts
         ? {
             phone: seller.phone ?? undefined,

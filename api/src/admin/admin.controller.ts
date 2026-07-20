@@ -18,20 +18,26 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 
+import { AdminService } from './admin.service';
+import { AdminDashboardService } from './admin-dashboard.service';
 import {
-  AdminService,
+  AdminUploadsService,
   type AdminUploadedImageFile,
-} from './admin.service';
+} from './admin-uploads.service';
 
 @Controller('admin')
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) { }
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly adminDashboardService: AdminDashboardService,
+    private readonly adminUploadsService: AdminUploadsService,
+  ) {}
 
   @Get('overview')
   getOverview() {
-    return this.adminService.getOverview();
+    return this.adminDashboardService.getOverview();
   }
 
   @Get('catalog')
@@ -41,7 +47,7 @@ export class AdminController {
 
   @Get('referrals')
   getReferrals() {
-    return this.adminService.getReferrals();
+    return this.adminDashboardService.getReferrals();
   }
 
   @Post('uploads/images')
@@ -53,7 +59,7 @@ export class AdminController {
     }),
   )
   uploadImage(@UploadedFile() file?: AdminUploadedImageFile) {
-    return this.adminService.uploadImage(file);
+    return this.adminUploadsService.uploadImage(file);
   }
 
   @Post('categories')

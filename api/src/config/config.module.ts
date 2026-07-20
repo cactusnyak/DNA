@@ -18,32 +18,32 @@ import * as Joi from 'joi';
         S3_ENDPOINT: Joi.string().uri().when('STORAGE_DRIVER', {
           is: 's3',
           then: Joi.required(),
-          otherwise: Joi.optional(),
+          otherwise: Joi.string().allow('').optional(),
         }),
         S3_REGION: Joi.string().when('STORAGE_DRIVER', {
           is: 's3',
           then: Joi.required(),
-          otherwise: Joi.optional(),
+          otherwise: Joi.string().allow('').optional(),
         }),
         S3_BUCKET: Joi.string().when('STORAGE_DRIVER', {
           is: 's3',
           then: Joi.required(),
-          otherwise: Joi.optional(),
+          otherwise: Joi.string().allow('').optional(),
         }),
         S3_ACCESS_KEY_ID: Joi.string().when('STORAGE_DRIVER', {
           is: 's3',
           then: Joi.required(),
-          otherwise: Joi.optional(),
+          otherwise: Joi.string().allow('').optional(),
         }),
         S3_SECRET_ACCESS_KEY: Joi.string().when('STORAGE_DRIVER', {
           is: 's3',
           then: Joi.required(),
-          otherwise: Joi.optional(),
+          otherwise: Joi.string().allow('').optional(),
         }),
         S3_PUBLIC_URL: Joi.string().uri().when('STORAGE_DRIVER', {
           is: 's3',
           then: Joi.required(),
-          otherwise: Joi.optional(),
+          otherwise: Joi.string().allow('').optional(),
         }),
         S3_FORCE_PATH_STYLE: Joi.boolean().default(false),
         YOOKASSA_SHOP_ID: Joi.string().allow('').optional(),

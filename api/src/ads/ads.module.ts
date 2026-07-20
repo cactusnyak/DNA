@@ -5,14 +5,15 @@ import { AdminModule } from '../admin/admin.module';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 
+import { AdCategoriesController } from './ad-categories.controller';
 import { AdsController } from './ads.controller';
 import { AdsModerationService } from './ads-moderation.service';
 import { AdsService } from './ads.service';
 
 @Module({
   imports: [PrismaModule, AdCategoriesModule, AuthModule, AdminModule],
-  controllers: [AdsController],
+  controllers: [AdsController, AdCategoriesController],
   providers: [AdsService, AdsModerationService],
-  exports: [AdsService],
+  exports: [AdCategoriesModule, AdsService],
 })
 export class AdsModule {}

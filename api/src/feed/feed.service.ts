@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { AdStatus } from '@prisma/client';
 
-import { PrismaService } from '../prisma/prisma.service';
+import { AdCategoriesService } from '../ad-categories/ad-categories.service';
+import { AdsService } from '../ads/ads.service';
+import { MarketCategoriesService } from '../market-categories/market-categories.service';
+import { ProductsService } from '../products/products.service';
 
 import { buildCategoryQueues, buildFeed } from './feed-builder';
 import type { FeedConfig, FeedItem } from './feed.types';
@@ -15,19 +17,14 @@ const DEFAULT_FEED_CONFIG: FeedConfig = {
   },
 };
 
-const ACTIVE_WHERE = {
-  isActive: true,
-  deletedAt: null,
-} as const;
-
-const PUBLISHED_AD_WHERE = {
-  ...ACTIVE_WHERE,
-  status: AdStatus.PUBLISHED,
-} as const;
-
 @Injectable()
 export class FeedService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly adsService: AdsService,
+    private readonly marketCategoriesService: MarketCategoriesService,
+    private readonly adCategoriesService: AdCategoriesService,
+  ) {}
 
   async buildFeed(config: FeedConfig = DEFAULT_FEED_CONFIG): Promise<FeedItem[]> {
     const [
@@ -36,44 +33,23 @@ export class FeedService {
       products,
       ads,
     ] = await Promise.all([
-      this.prismaService.marketCategory.findMany({
-        where: ACTIVE_WHERE,
-        orderBy: { sortOrder: 'asc' },
-      }),
-      this.prismaService.adCategory.findMany({
-        where: ACTIVE_WHERE,
-        orderBy: { sortOrder: 'asc' },
-      }),
-      this.prismaService.product.findMany({
-        where: {
-          ...ACTIVE_WHERE,
-          category: ACTIVE_WHERE,
-        },
-        include: {
-          category: { include: { image: true } },
-          images: { include: { image: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prismaService.ad.findMany({
-        where: {
-          ...PUBLISHED_AD_WHERE,
-          category: ACTIVE_WHERE,
-        },
-        include: {
-          category: { include: { image: true } },
-          seller: true,
-          images: { include: { image: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
+      this.marketCategoriesService.findAll(),
+      this.adCategoriesService.findAll(),
+      this.productsService.findAll({ sort: 'createdAt:desc' }),
+      this.adsService.findAll({ sort: 'createdAt:desc' }),
     ]);
 
     const marketCategoryById = new Map(
-      marketCategories.map((c) => [c.id, c]),
+      marketCategories.map((category) => [
+        category.id,
+        { ...category, parentId: category.parentId ?? null },
+      ]),
     );
     const adCategoryById = new Map(
-      adCategories.map((c) => [c.id, c]),
+      adCategories.map((category) => [
+        category.id,
+        { ...category, parentId: category.parentId ?? null },
+      ]),
     );
 
     const productsByCategoryId = new Map<string, typeof products>();
@@ -91,7 +67,10 @@ export class FeedService {
     }
 
     const productIdQueues = buildCategoryQueues(
-      marketCategories,
+      marketCategories.map((category) => ({
+        ...category,
+        parentId: category.parentId ?? null,
+      })),
       new Map(
         [...productsByCategoryId.entries()].map(([catId, prods]) => [
           catId,
@@ -101,7 +80,10 @@ export class FeedService {
     );
 
     const adIdQueues = buildCategoryQueues(
-      adCategories,
+      adCategories.map((category) => ({
+        ...category,
+        parentId: category.parentId ?? null,
+      })),
       new Map(
         [...adsByCategoryId.entries()].map(([catId, adList]) => [
           catId,
@@ -127,17 +109,14 @@ export class FeedService {
           product: {
             id: product.id,
             categoryId: product.categoryId,
-            category: this.mapMarketCategory(
-              product.category,
-              marketCategoryById,
-            ),
+            category: product.category,
             title: product.title,
             slug: product.slug,
             description: product.description,
             price: product.price,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
-            images: this.mapImages(product.images),
+            images: product.images,
           },
         });
       } else {
@@ -149,16 +128,8 @@ export class FeedService {
           ad: {
             id: ad.id,
             categoryId: ad.categoryId,
-            category: ad.category
-              ? this.mapAdCategory(ad.category, adCategoryById)
-              : undefined,
-            seller: ad.seller
-              ? {
-                  id: ad.seller.id,
-                  nickname: ad.seller.nickname,
-                  nicknameSuffix: ad.seller.nicknameSuffix,
-                }
-              : undefined,
+            category: ad.category,
+            seller: ad.seller,
             title: ad.title,
             slug: ad.slug,
             description: ad.description,
@@ -171,84 +142,12 @@ export class FeedService {
             contactTelegram: ad.contactTelegram ?? undefined,
             contactEmail: ad.contactEmail ?? undefined,
             contactOther: ad.contactOther ?? undefined,
-            images: this.mapImages(ad.images),
+            images: ad.images,
           },
         });
       }
     }
 
     return feedItems;
-  }
-
-  private mapImages(
-    imageRelations: { image: { id: string; url: string; sortOrder: number; alt?: string | null } }[],
-  ) {
-    return imageRelations
-      .map((r) => r.image)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-  }
-
-  private getCategoryPath(
-    category: { id: string; slug: string; parentId: string | null },
-    categoryById: Map<string, { id: string; slug: string; parentId: string | null }>,
-  ): string {
-    const parts: string[] = [];
-    let current: { id: string; slug: string; parentId: string | null } | undefined = category;
-
-    while (current) {
-      parts.unshift(current.slug);
-      if (!current.parentId) break;
-      current = categoryById.get(current.parentId);
-    }
-
-    return parts.join('/');
-  }
-
-  private mapMarketCategory(
-    category: {
-      id: string;
-      name: string;
-      slug: string;
-      sortOrder: number;
-      description: string | null;
-      parentId: string | null;
-      image: { id: string; url: string; sortOrder: number; alt?: string | null } | null;
-    },
-    categoryById: Map<string, any>,
-  ) {
-    return {
-      id: category.id,
-      name: category.name,
-      slug: category.slug,
-      path: this.getCategoryPath(category, categoryById),
-      sortOrder: category.sortOrder,
-      description: category.description ?? undefined,
-      parentId: category.parentId ?? undefined,
-      image: category.image ?? undefined,
-    };
-  }
-
-  private mapAdCategory(
-    category: {
-      id: string;
-      name: string;
-      slug: string;
-      sortOrder: number;
-      description: string | null;
-      parentId: string | null;
-      image: { id: string; url: string; sortOrder: number; alt?: string | null } | null;
-    },
-    categoryById: Map<string, any>,
-  ) {
-    return {
-      id: category.id,
-      name: category.name,
-      slug: category.slug,
-      path: this.getCategoryPath(category, categoryById),
-      sortOrder: category.sortOrder,
-      description: category.description ?? undefined,
-      parentId: category.parentId ?? undefined,
-      image: category.image ?? undefined,
-    };
   }
 }
