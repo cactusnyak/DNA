@@ -1,6 +1,7 @@
-export type RegisterDto = {
+export type VerifyOtpDto = {
   login?: string;
-  password?: string;
+  mode?: string;
+  code?: string;
   nickname?: string;
   inviterReferralCode?: string;
 };

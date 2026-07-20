@@ -201,18 +201,29 @@ export class OAuthService {
     code: string,
   ): Promise<OAuthTokens> {
     const config = this.getProviderConfig(provider);
+    const bodyParams = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: config.redirectUri,
+    });
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    if (provider === 'yandex') {
+      headers.Authorization = `Basic ${Buffer.from(
+        `${config.clientId}:${config.clientSecret}`,
+      ).toString('base64')}`;
+    } else {
+      bodyParams.set('client_id', config.clientId);
+      bodyParams.set('client_secret', config.clientSecret);
+    }
+
     const response = await fetch(config.tokenEndpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        client_id: config.clientId,
-        client_secret: config.clientSecret,
-        redirect_uri: config.redirectUri,
-      }).toString(),
+      headers,
+      body: bodyParams.toString(),
     });
 
     if (!response.ok) {

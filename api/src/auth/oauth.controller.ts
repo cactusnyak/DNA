@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  HttpException,
   Param,
   Query,
   Res,
@@ -43,22 +44,31 @@ export class OAuthController {
     @Query('error') providerError: string | undefined,
     @Res() res: Response,
   ) {
-    if (providerError) {
-      throw new BadRequestException(
-        `OAuth provider error: ${providerError}`,
-      );
-    }
-
-    const { accessToken } = await this.oauthService.handleCallback(
-      provider,
-      code,
-      state,
-    );
-
     const webAppUrl = process.env.WEB_APP_URL ?? 'http://localhost:5173';
 
-    res.redirect(
-      `${webAppUrl}/authorization?oauth_access_token=${accessToken}`,
-    );
+    try {
+      if (providerError) {
+        throw new BadRequestException(
+          `OAuth provider error: ${providerError}`,
+        );
+      }
+
+      const { accessToken } = await this.oauthService.handleCallback(
+        provider,
+        code,
+        state,
+      );
+
+      res.redirect(
+        `${webAppUrl}/authorization?oauth_access_token=${accessToken}`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof HttpException ? error.message : 'OAuth failed';
+
+      res.redirect(
+        `${webAppUrl}/authorization?oauth_error=${encodeURIComponent(message)}`,
+      );
+    }
   }
 }

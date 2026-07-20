@@ -1,12 +1,8 @@
 export type AuthorizationMode = 'login' | 'register';
 
 export type AuthorizationFormValue = {
-  email: string;
-  password: string;
+  login: string;
   nickname: string;
-  firstName: string;
-  lastName: string;
-  patronymic: string;
-  phone: string;
+  otpCode: string;
   inviterReferralCode: string;
 };

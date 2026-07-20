@@ -28,13 +28,10 @@ const IMAGE_MIME_EXTENSION: Record<string, string> = {
 const MAX_AVATAR_UPLOAD_SIZE = 5 * 1024 * 1024;
 
 type CreateRegisteredUserParams = {
-  email: string;
-  passwordHash: string;
-  nickname: string;
-  firstName: string;
-  lastName: string;
-  patronymic?: string;
+  email?: string;
   phone?: string;
+  passwordHash?: string;
+  nickname: string;
   inviterReferralCode?: string;
 };
 
@@ -72,6 +69,27 @@ export class UsersService {
     });
   }
 
+  async findByPhone(phone: string) {
+    return this.prismaService.user.findFirst({
+      where: {
+        phone,
+        deletedAt: null,
+      },
+      include: {
+        avatar: true,
+        balance: true,
+      },
+    });
+  }
+
+  async findByLogin(login: string) {
+    if (login.includes('@')) {
+      return this.findByEmail(login);
+    }
+
+    return this.findByPhone(login);
+  }
+
   async findById(userId: string) {
     const user = await this.prismaService.user.findFirst({
       where: {
@@ -104,15 +122,27 @@ export class UsersService {
   }
 
   async createRegisteredUser(params: CreateRegisteredUserParams) {
-    const existingActiveUser = await this.findByEmail(params.email);
+    if (params.email) {
+      const existingActiveUser = await this.findByEmail(params.email);
 
-    if (existingActiveUser) {
-      throw new ConflictException('User with this email already exists');
+      if (existingActiveUser) {
+        throw new ConflictException('User with this email already exists');
+      }
+    }
+
+    if (params.phone) {
+      const existingActiveUser = await this.findByPhone(params.phone);
+
+      if (existingActiveUser) {
+        throw new ConflictException('User with this phone already exists');
+      }
     }
 
     return this.createUser({
       ...params,
-      referralCode: await this.generateUniqueReferralCode(params.email),
+      referralCode: await this.generateUniqueReferralCode(
+        params.email ?? params.phone,
+      ),
     });
   }
 
@@ -134,7 +164,7 @@ export class UsersService {
 
   private async createUser(
     params: {
-      email: string;
+      email?: string;
       nickname: string;
       phone?: string;
       firstName?: string;
@@ -334,7 +364,7 @@ export class UsersService {
   mapPublicUser(user: any) {
     return {
       id: user.id,
-      email: user.email,
+      email: user.email ?? undefined,
       nickname: user.nickname,
       nicknameSuffix: user.nicknameSuffix,
       firstName: user.firstName ?? undefined,
@@ -414,8 +444,8 @@ export class UsersService {
     });
   }
 
-  private async generateUniqueReferralCode(email: string) {
-    const emailPrefix = email
+  private async generateUniqueReferralCode(value?: string) {
+    const emailPrefix = (value ?? '')
       .split('@')[0]
       .replace(/[^a-zA-Z0-9]/g, '')
       .toUpperCase()

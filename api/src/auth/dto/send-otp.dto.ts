@@ -1,6 +1,6 @@
-export type RegisterDto = {
+export type SendOtpDto = {
   login?: string;
-  password?: string;
+  mode?: string;
   nickname?: string;
   inviterReferralCode?: string;
 };

@@ -1,8 +1,9 @@
 import type {
-  LoginPayload,
-  RegisterPayload,
+  SendOtpPayload,
+  VerifyOtpPayload,
 } from '@/entities/auth';
 
+import type { AuthorizationMode } from '../types/authorization-form';
 import type { AuthorizationFormValue } from '../types/authorization-form';
 
 function normalizeOptionalString(value: string) {
@@ -11,26 +12,27 @@ function normalizeOptionalString(value: string) {
   return normalizedValue || undefined;
 }
 
-export function buildLoginPayload(
+export function buildSendOtpPayload(
   value: AuthorizationFormValue,
-): LoginPayload {
+  mode: AuthorizationMode,
+): SendOtpPayload {
   return {
-    email: value.email.trim(),
-    password: value.password,
+    login: value.login.trim(),
+    mode,
+    nickname: mode === 'register' ? value.nickname.trim() : undefined,
+    inviterReferralCode: normalizeOptionalString(value.inviterReferralCode),
   };
 }
 
-export function buildRegisterPayload(
+export function buildVerifyOtpPayload(
   value: AuthorizationFormValue,
-): RegisterPayload {
+  mode: AuthorizationMode,
+): VerifyOtpPayload {
   return {
-    email: value.email.trim(),
-    password: value.password,
-    nickname: value.nickname.trim(),
-    firstName: value.firstName.trim(),
-    lastName: value.lastName.trim(),
-    patronymic: normalizeOptionalString(value.patronymic),
-    phone: normalizeOptionalString(value.phone),
+    login: value.login.trim(),
+    mode,
+    code: value.otpCode.trim(),
+    nickname: mode === 'register' ? value.nickname.trim() : undefined,
     inviterReferralCode: normalizeOptionalString(value.inviterReferralCode),
   };
 }

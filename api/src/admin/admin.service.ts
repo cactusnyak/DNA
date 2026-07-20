@@ -171,7 +171,7 @@ export class AdminService {
     const byId = new Map<string, FlatUser>(users.map((u) => [u.id, u]));
 
     type TreeNode = {
-      id: string; nickname: string; nicknameSuffix?: string; email: string;
+      id: string; nickname: string; nicknameSuffix?: string; email: string | null;
       phone: string | null; role: string; referralCode: string | null;
       createdAt: Date; deletedAt: null; invitedBy: string | null;
       directReferralsCount: number; directReferrals: TreeNode[];
@@ -187,7 +187,7 @@ export class AdminService {
           next.add(r.invited.id);
           return buildNode(childUser, inviterChain
             ? `${inviterChain} → ${user.nickname}`.trim()
-            : (user.nickname.trim() || user.email), next);
+            : (user.nickname.trim() || user.email || user.phone), next);
         })
         .filter((n): n is TreeNode => n !== null);
 

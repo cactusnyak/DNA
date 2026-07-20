@@ -8,10 +8,9 @@ import {
 import {
   getCurrentUser,
   getOAuthProviders,
-  login,
-  register,
+  sendOtp,
   useAuthStore,
-  type AuthResponse,
+  verifyOtp,
 } from '@/entities/auth';
 import {
   syncFavourites,
@@ -20,8 +19,8 @@ import {
 
 import { AuthorizationForm } from './components/AuthorizationForm';
 import {
-  buildLoginPayload,
-  buildRegisterPayload,
+  buildSendOtpPayload,
+  buildVerifyOtpPayload,
 } from './logic/build-authorization-payload';
 import {
   getAuthorizationReferralCodeFromSearchParams,
@@ -33,6 +32,8 @@ import type {
   AuthorizationFormValue,
   AuthorizationMode,
 } from './types/authorization-form';
+
+type AuthorizationStep = 'login' | 'otp';
 
 export function Authorization() {
   const [searchParams] = useSearchParams();
@@ -46,6 +47,7 @@ export function Authorization() {
   const [mode, setMode] = useState<AuthorizationMode>(
     initialReferralCode ? 'register' : 'login',
   );
+  const [step, setStep] = useState<AuthorizationStep>('login');
 
   const [formValue, setFormValue] = useState<AuthorizationFormValue>(() =>
     getInitialAuthorizationFormValue({
@@ -59,6 +61,7 @@ export function Authorization() {
   const { guestItems, clearGuestItems } = useFavouriteStore();
 
   const oauthAccessToken = searchParams.get('oauth_access_token');
+  const oauthError = searchParams.get('oauth_error');
 
   const { data: availableOAuthProviders } = useQuery({
     queryKey: ['oauth-providers'],
@@ -110,15 +113,33 @@ export function Authorization() {
     oauthMutation.mutate();
   }, [oauthAccessToken]);
 
-  const authMutation = useMutation({
-    mutationFn: () => {
-      if (mode === 'register') {
-        return register(buildRegisterPayload(formValue));
-      }
+  useEffect(() => {
+    if (!oauthError) {
+      return;
+    }
 
-      return login(buildLoginPayload(formValue));
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete('oauth_error');
+
+    navigate(
+      {
+        pathname: '/authorization',
+        search: nextSearchParams.toString(),
+      },
+      { replace: true },
+    );
+  }, [oauthError]);
+
+  const sendOtpMutation = useMutation({
+    mutationFn: () => sendOtp(buildSendOtpPayload(formValue, mode)),
+    onSuccess: () => {
+      setStep('otp');
     },
-    onSuccess: (response: AuthResponse) => {
+  });
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: () => verifyOtp(buildVerifyOtpPayload(formValue, mode)),
+    onSuccess: (response) => {
       setAccessToken(response.accessToken);
       queryClient.setQueryData(['current-user'], response.user);
 
@@ -154,29 +175,48 @@ export function Authorization() {
     }
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    authMutation.mutate();
+  function handleModeChange(nextMode: AuthorizationMode) {
+    setMode(nextMode);
+    setStep('login');
+    setFormValue((currentValue) => ({
+      ...currentValue,
+      otpCode: '',
+    }));
   }
+
+  function handleSendOtp() {
+    sendOtpMutation.mutate();
+  }
+
+  function handleVerifyOtp() {
+    verifyOtpMutation.mutate();
+  }
+
+  const errorMessage =
+    sendOtpMutation.error || verifyOtpMutation.error
+      ? 'Не удалось выполнить действие. Проверьте данные и попробуйте ещё раз.'
+      : oauthError ?? undefined;
 
   return (
     <AuthorizationForm
       mode={mode}
+      step={step}
       value={formValue}
-      isPending={authMutation.isPending || oauthMutation.isPending}
-      errorMessage={
-        authMutation.isError || oauthMutation.isError
-          ? 'Не удалось выполнить действие. Проверьте данные и попробуйте ещё раз.'
-          : undefined
+      isPending={
+        sendOtpMutation.isPending ||
+        verifyOtpMutation.isPending ||
+        oauthMutation.isPending
       }
+      errorMessage={errorMessage}
       availableOAuthProviders={
         availableOAuthProviders?.length
           ? availableOAuthProviders
           : undefined
       }
-      onModeChange={setMode}
+      onModeChange={handleModeChange}
       onChange={handleFormChange}
-      onSubmit={handleSubmit}
+      onSendOtp={handleSendOtp}
+      onVerifyOtp={handleVerifyOtp}
     />
   );
 }

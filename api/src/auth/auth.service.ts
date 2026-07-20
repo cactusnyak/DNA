@@ -20,17 +20,11 @@ export class AuthService {
   ) { }
 
   async register(registerDto: RegisterDto) {
-    const email = this.getEmail(registerDto.email);
+    const { value: login, type } = this.parseLogin(
+      this.getRequiredString(registerDto.login, 'login'),
+    );
     const password = this.getPassword(registerDto.password);
     const nickname = this.getRequiredString(registerDto.nickname, 'nickname');
-    const firstName = this.getRequiredString(
-      registerDto.firstName,
-      'firstName',
-    );
-    const lastName = this.getRequiredString(registerDto.lastName, 'lastName');
-
-    const phone = this.getOptionalString(registerDto.phone);
-    const patronymic = this.getOptionalString(registerDto.patronymic);
     const inviterReferralCode = this.getOptionalString(
       registerDto.inviterReferralCode,
     );
@@ -38,13 +32,10 @@ export class AuthService {
     const passwordHash = this.passwordService.hashPassword(password);
 
     const user = await this.usersService.createRegisteredUser({
-      email,
+      email: type === 'email' ? login : undefined,
+      phone: type === 'phone' ? login : undefined,
       passwordHash,
       nickname,
-      firstName,
-      lastName,
-      patronymic,
-      phone,
       inviterReferralCode,
     });
 
@@ -52,13 +43,15 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const email = this.getEmail(loginDto.email);
+    const { value: login } = this.parseLogin(
+      this.getRequiredString(loginDto.login, 'login'),
+    );
     const password = this.getPassword(loginDto.password);
 
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByLogin(login);
 
     if (!user?.passwordHash) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid login or password');
     }
 
     const isPasswordValid = this.passwordService.verifyPassword(
@@ -67,7 +60,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid login or password');
     }
 
     return this.createAuthResponse(this.usersService.mapPublicUser(user));
@@ -98,7 +91,7 @@ export class AuthService {
       user,
       accessToken: this.tokenService.signAccessToken({
         sub: user.id,
-        email: user.email,
+        email: user.email ?? '',
         role: user.role,
       }),
     };
@@ -118,18 +111,24 @@ export class AuthService {
     return token;
   }
 
-  private getEmail(value: unknown) {
-    if (typeof value !== 'string' || !value.trim()) {
-      throw new BadRequestException('email is required');
+  private parseLogin(value: string) {
+    const trimmedValue = value.trim().toLowerCase();
+
+    if (trimmedValue.includes('@')) {
+      if (!trimmedValue.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        throw new BadRequestException('login is invalid email');
+      }
+
+      return { type: 'email' as const, value: trimmedValue };
     }
 
-    const email = value.trim().toLowerCase();
+    const normalizedPhone = trimmedValue.replace(/[\s\-()]/g, '');
 
-    if (!email.includes('@')) {
-      throw new BadRequestException('email is invalid');
+    if (!normalizedPhone.match(/^\+?[0-9]{10,15}$/)) {
+      throw new BadRequestException('login is invalid phone number');
     }
 
-    return email;
+    return { type: 'phone' as const, value: normalizedPhone };
   }
 
   private getPassword(value: unknown) {
