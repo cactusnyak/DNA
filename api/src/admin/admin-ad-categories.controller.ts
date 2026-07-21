@@ -16,7 +16,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 import { AdminAdsService } from './admin-ads.service';
 
-@ApiTags('Admin / Ad categories')
+@ApiTags('Admin / Ads / Categories')
 @ApiBearerAuth()
 @Controller('admin/ad-categories')
 @UseGuards(AuthGuard, RolesGuard)

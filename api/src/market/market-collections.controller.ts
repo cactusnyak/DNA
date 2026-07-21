@@ -1,7 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { CatalogCollectionsService } from '../catalog-collections/catalog-collections.service';
 
+@ApiTags('Market / Collections')
 @Controller('market/collections')
 export class MarketCollectionsController {
   constructor(

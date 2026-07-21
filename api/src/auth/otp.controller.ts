@@ -1,10 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { OtpService } from './otp.service';
 
+@ApiTags('Auth / OTP')
 @Controller('auth/otp')
 export class OtpController {
   constructor(private readonly otpService: OtpService) {}

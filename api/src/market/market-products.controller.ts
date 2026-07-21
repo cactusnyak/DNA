@@ -5,7 +5,7 @@ import { ProductsService } from '../products/products.service';
 
 import { MarketProductQueryDto } from './dto/market-product-query.dto';
 
-@ApiTags('Market Products')
+@ApiTags('Market / Products')
 @Controller('market/products')
 export class MarketProductsController {
   constructor(private readonly productsService: ProductsService) {}

@@ -8,11 +8,13 @@ import {
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 import { OAuthService } from './oauth.service';
 
+@ApiTags('Auth / OAuth')
 @Controller('auth/oauth')
 export class OAuthController {
   constructor(

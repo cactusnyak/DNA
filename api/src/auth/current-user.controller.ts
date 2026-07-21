@@ -13,12 +13,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
 import { UsersService } from '../users/users.service';
 import type { UpdateProfileDto } from '../users/dto/update-profile.dto';
 
 import { AuthService } from './auth.service';
 
+@ApiTags('Current User')
 @Controller('users')
 export class CurrentUserController {
   constructor(
