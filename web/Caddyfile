@@ -1,0 +1,16 @@
+www.dna-platform.shop {
+  redir https://dna-platform.shop{uri} permanent
+}
+
+dna-platform.shop {
+  encode zstd gzip
+
+  route {
+    @backend path /api /api/* /uploads /uploads/*
+    reverse_proxy @backend api:3000
+
+    root * /srv
+    try_files {path} /index.html
+    file_server
+  }
+}

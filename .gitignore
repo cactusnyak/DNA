@@ -48,4 +48,4 @@ api/generated/
 api/src/generated/
 
 # Local Netlify folder
-.netlify/
+.netlify/.env.production
