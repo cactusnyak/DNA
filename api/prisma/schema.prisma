@@ -11,6 +11,8 @@ enum UserRole {
   REFERRAL_PARTNER
   SELLER
   ADMIN
+  ULTRA_ADMIN
+  OWNER
 }
 
 enum Currency {
@@ -275,6 +277,9 @@ model Order {
   totalAmount        Int
   yookassaPaymentId  String?
 
+  archivedAt        DateTime?
+  archivedByUserId  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -364,4 +369,23 @@ model CatalogCollectionProduct {
   product    Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([collectionId, productId])
+}
+
+/// Append-only audit log for privileged / destructive operations.
+/// Records are never updated or deleted by application code.
+model AuditEvent {
+  id            String   @id @default(uuid())
+  action        String
+  actorUserId   String?
+  actorRole     String?
+  targetType    String
+  targetId      String
+  reason        String?
+  requestId     String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
 }
