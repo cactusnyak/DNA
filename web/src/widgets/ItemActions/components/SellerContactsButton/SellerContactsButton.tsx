@@ -44,7 +44,7 @@ export function SellerContactsButton({
         className={cn('w-full', getProductActionHeightClass(variant))}
         onClick={() => setIsModalOpen(true)}
       >
-        Контакты продавца
+        Контакты
       </Button>
 
       <Modal

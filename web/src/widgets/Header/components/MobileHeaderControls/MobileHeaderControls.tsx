@@ -19,7 +19,7 @@ function MobileCatalogButton({
   className?: string;
 }) {
   return (
-    <Button variant="outline" type="button" className={className} asChild>
+    <Button type="button" className={className} asChild>
       <Link to={to}>{label}</Link>
     </Button>
   );
@@ -34,7 +34,7 @@ export function MobileHeaderControls({ section }: MobileHeaderControlsProps) {
 
   return (
     <div className="border-t border-border/50 px-4 py-3 md:hidden">
-      <div className="mx-auto flex max-w-7xl items-center gap-2">
+      <div className="mx-auto flex flex-col justify-start items-start gap-2 max-w-7xl sm:flex-row">
         {sectionConfig ? (
           <MobileCatalogButton
             to={sectionConfig.catalogHref}
@@ -42,7 +42,7 @@ export function MobileHeaderControls({ section }: MobileHeaderControlsProps) {
             className="shrink-0"
           />
         ) : (
-          <>
+          <div className="flex gap-2">
             <MobileCatalogButton
               to={platformSections[PLATFORM_SECTION.ADS].catalogHref}
               label={platformSections[PLATFORM_SECTION.ADS].catalogLabel}
@@ -53,7 +53,7 @@ export function MobileHeaderControls({ section }: MobileHeaderControlsProps) {
               label={platformSections[PLATFORM_SECTION.MARKET].catalogLabel}
               className="shrink-0"
             />
-          </>
+          </div>
         )}
 
         <GlobalSearch
