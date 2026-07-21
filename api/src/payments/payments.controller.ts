@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApiTags } from '@nestjs/swagger';
 
 import { OrderStatus } from '@prisma/client';
 
@@ -17,6 +18,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PaymentsService } from './payments.service';
 import type { YookassaWebhookPayload } from './types/yookassa.types';
 
+@ApiTags('Payments')
 @Controller()
 export class PaymentsController {
   constructor(

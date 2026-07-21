@@ -16,7 +16,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 import { AdminMarketCatalogService } from './admin-market-catalog.service';
 
-@ApiTags('Admin / Market categories')
+@ApiTags('Admin / Market / Categories')
 @ApiBearerAuth()
 @Controller('admin/categories')
 @UseGuards(AuthGuard, RolesGuard)

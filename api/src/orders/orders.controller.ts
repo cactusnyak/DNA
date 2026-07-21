@@ -6,12 +6,14 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from '../auth/auth.service';
 
 import type { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
 
+@ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(

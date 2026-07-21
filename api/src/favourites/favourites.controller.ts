@@ -7,12 +7,14 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from '../auth/auth.service';
 
 import type { AddFavouriteDto, RemoveFavouriteDto } from './dto/favourite.dto';
 import { FavouritesService } from './favourites.service';
 
+@ApiTags('Favourites')
 @Controller('favourites')
 export class FavouritesController {
   constructor(
