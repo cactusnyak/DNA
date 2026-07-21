@@ -7,6 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { OrderStatus } from '@prisma/client';
 
@@ -22,6 +23,7 @@ export class PaymentsController {
     private readonly paymentsService: PaymentsService,
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('orders/:orderId/payment')
@@ -51,7 +53,8 @@ export class PaymentsController {
       );
     }
 
-    const returnUrl = `${process.env.FRONTEND_URL ?? 'http://localhost:5173'}/checkout/result?orderId=${orderId}`;
+    const webAppUrl = this.configService.getOrThrow<string>('WEB_APP_URL');
+    const returnUrl = `${webAppUrl}/checkout/result?orderId=${orderId}`;
 
     const payment = await this.paymentsService.createPayment({
       orderId: order.id,

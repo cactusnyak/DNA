@@ -9,7 +9,7 @@ type AdCardProps = {
   className?: string;
 };
 
-export function AdCard({ ad, className }: AdCardProps) {
+export function CompactAdCard({ ad, className }: AdCardProps) {
   const image = ad.images[0];
 
   return (

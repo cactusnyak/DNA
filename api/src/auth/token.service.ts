@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 type AccessTokenPayload = {
@@ -25,6 +26,8 @@ function decodeBase64Url<TValue>(value: string): TValue {
 
 @Injectable()
 export class TokenService {
+  constructor(private readonly configService: ConfigService) {}
+
   signAccessToken(payload: AccessTokenInput) {
     const header = {
       alg: 'HS256',
@@ -78,6 +81,6 @@ export class TokenService {
   }
 
   private getSecret() {
-    return process.env.JWT_SECRET ?? 'dna-dev-secret-change-me';
+    return this.configService.getOrThrow<string>('JWT_SECRET');
   }
 }

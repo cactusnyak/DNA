@@ -8,7 +8,7 @@ import {
 } from '@/shared/platform';
 import { ItemActions } from '@/widgets/ItemActions';
 
-import { ItemGallery } from '@/shared/ui/ItemGallery';
+import { ItemGallery } from '@/widgets/ItemGallery';
 
 import { ProductCardContent } from './components/ProductCardContent';
 

@@ -1,6 +1,6 @@
 import { Heart } from 'lucide-react';
 
-import { StateCard } from '@/widgets/StateCard';
+import { StateCard } from '@/components/ui/StateCard';
 
 export function FavouritesEmptyState() {
   return (

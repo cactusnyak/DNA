@@ -11,6 +11,8 @@ enum UserRole {
   REFERRAL_PARTNER
   SELLER
   ADMIN
+  ULTRA_ADMIN
+  OWNER
 }
 
 enum Currency {
@@ -42,7 +44,7 @@ enum AdStatus {
 
 model User {
   id             String    @id @default(uuid())
-  email          String
+  email          String?
   nickname       String
   nicknameSuffix String    @unique @default(dbgenerated("gen_random_uuid()"))
   firstName      String?
@@ -53,6 +55,8 @@ model User {
   deletedAt      DateTime?
 
   passwordHash String?
+  oauthProvider String?
+  oauthProviderId String?
 
   patronymic   String?
   phone        String?
@@ -60,6 +64,9 @@ model User {
 
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])
+
+  @@unique([oauthProvider, oauthProviderId])
+  @@index([phone])
 
   cartItems  CartItem[]
   orders     Order[]
@@ -69,6 +76,19 @@ model User {
   invitedReferrals Referral[] @relation("Inviter")
   receivedReferral Referral?  @relation("Invited")
   balance          Balance?
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  login     String
+  type      String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([login])
+  @@index([code])
+  @@index([login, code])
 }
 
 model Favourite {
@@ -257,6 +277,9 @@ model Order {
   totalAmount        Int
   yookassaPaymentId  String?
 
+  archivedAt        DateTime?
+  archivedByUserId  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -346,4 +369,23 @@ model CatalogCollectionProduct {
   product    Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([collectionId, productId])
+}
+
+/// Append-only audit log for privileged / destructive operations.
+/// Records are never updated or deleted by application code.
+model AuditEvent {
+  id            String   @id @default(uuid())
+  action        String
+  actorUserId   String?
+  actorRole     String?
+  targetType    String
+  targetId      String
+  reason        String?
+  requestId     String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
 }

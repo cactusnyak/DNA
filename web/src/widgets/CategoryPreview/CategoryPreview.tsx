@@ -1,14 +1,12 @@
-import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
-import { Button } from '@/components/ui/Button';
 import { getCatalogCategories } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
   getPlatformSection,
   type PlatformSectionId,
 } from '@/shared/platform';
-import { SectionTitle } from '@/shared/ui/SectionTitle';
+import { SectionTitle } from '@/widgets/SectionTitle';
 
 import { CategoryPreviewGrid } from './components/CategoryPreviewGrid';
 import { getPreviewCategories } from './logic/get-preview-categories';

@@ -30,7 +30,6 @@ export function getSearchResults(
     };
   }
 
-  const directlyMatchedIds = new Set(directlyMatchedCategories.map(cat => cat.id));
   const visibleCategoryIds = new Set<string>();
   const expandedCategoryIds = new Set<string>();
 

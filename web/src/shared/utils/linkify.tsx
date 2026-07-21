@@ -1,8 +1,26 @@
 import { Fragment, type ReactNode } from 'react';
 
-import { ResourceLink } from '@/shared/ui/ResourceLink';
-
 const TOKEN_REGEX = /(https?:\/\/[^\s<]+|www\.[^\s<]+|t(?:elegram)?\.me\/[A-Za-z0-9_]+|@[A-Za-z0-9_]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|\+?[\d\s\-\(\)]{6,}\d)/gi;
+
+type ResourceLinkProps = {
+  href: string;
+  children: ReactNode;
+};
+
+function ResourceLink({ href, children }: ResourceLinkProps) {
+  const isExternal = /^https?:/i.test(href);
+
+  return (
+    <a
+      href={href}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      className="text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+    >
+      {children}
+    </a>
+  );
+}
 
 const TELEGRAM_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:t(?:elegram)?\.me\/)?@?([A-Za-z0-9_]+)$/i;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;

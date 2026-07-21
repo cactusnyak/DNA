@@ -37,6 +37,7 @@ type FormInputFieldProps = FormFieldBaseProps & {
   value: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
+  inputMode?: ComponentProps<'input'>['inputMode'];
   disabled?: boolean;
   minLength?: number;
   autoComplete?: ComponentProps<'input'>['autoComplete'];
@@ -147,6 +148,7 @@ export function FormInputField({
   value,
   placeholder,
   type = 'text',
+  inputMode,
   disabled = false,
   minLength,
   autoComplete = 'off',
@@ -165,6 +167,7 @@ export function FormInputField({
         required={required}
         disabled={disabled}
         type={type}
+        inputMode={inputMode}
         value={value}
         minLength={minLength}
         autoComplete={autoComplete}

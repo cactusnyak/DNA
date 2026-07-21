@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { deleteAd, formatAdStatus, getMyAds } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { formatPrice } from '@/shared/utils/format-price';
-import { StateCard } from '@/widgets/StateCard';
+import { StateCard } from '@/components/ui/StateCard';
 
 export function MyAdsManager() {
   const accessToken = useAuthStore((state) => state.accessToken);

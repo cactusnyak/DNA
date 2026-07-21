@@ -1,4 +1,4 @@
-import { Profile } from '@/widgets/Profile';
+import { Profile } from '@/features/profile';
 
 export function ProfilePage() {
   return <Profile />;

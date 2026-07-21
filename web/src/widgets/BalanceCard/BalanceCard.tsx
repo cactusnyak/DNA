@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Minus, Plus, WalletCards } from 'lucide-react';
+import { WalletCards } from 'lucide-react';
 
 import type { Balance } from '@/entities/balance';
 import { Button } from '@/components/ui/Button';

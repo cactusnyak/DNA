@@ -10,7 +10,7 @@ import {
 } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { AdForm } from '@/widgets/AdForm';
-import { StateCard } from '@/widgets/StateCard';
+import { StateCard } from '@/components/ui/StateCard';
 
 export function AdEditPage() {
   const { adId } = useParams();

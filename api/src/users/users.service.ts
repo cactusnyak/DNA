@@ -1,17 +1,17 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import {
   Prisma,
   UserRole,
 } from '@prisma/client';
-import { mkdir, writeFile } from 'fs/promises';
-import { join } from 'path';
 import { randomUUID } from 'crypto';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { FILE_STORAGE, type FileStorage } from '../storage/file-storage';
 
 const IMAGE_MIME_EXTENSION: Record<string, string> = {
   'image/jpeg': '.jpg',
@@ -28,10 +28,20 @@ const IMAGE_MIME_EXTENSION: Record<string, string> = {
 const MAX_AVATAR_UPLOAD_SIZE = 5 * 1024 * 1024;
 
 type CreateRegisteredUserParams = {
-  email: string;
-  passwordHash: string;
-  nickname: string;
+  email?: string;
   phone?: string;
+  passwordHash?: string;
+  nickname: string;
+  inviterReferralCode?: string;
+};
+
+type CreateOAuthUserParams = {
+  email: string;
+  nickname: string;
+  firstName?: string;
+  lastName?: string;
+  oauthProvider: string;
+  oauthProviderId: string;
   inviterReferralCode?: string;
 };
 
@@ -44,7 +54,10 @@ type UploadedFile = {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject(FILE_STORAGE) private readonly fileStorage: FileStorage,
+  ) {}
 
   async findByEmail(email: string) {
     return this.prismaService.user.findFirst({
@@ -57,6 +70,27 @@ export class UsersService {
         balance: true,
       },
     });
+  }
+
+  async findByPhone(phone: string) {
+    return this.prismaService.user.findFirst({
+      where: {
+        phone,
+        deletedAt: null,
+      },
+      include: {
+        avatar: true,
+        balance: true,
+      },
+    });
+  }
+
+  async findByLogin(login: string) {
+    if (login.includes('@')) {
+      return this.findByEmail(login);
+    }
+
+    return this.findByPhone(login);
   }
 
   async findById(userId: string) {
@@ -74,18 +108,81 @@ export class UsersService {
     return user ? this.mapPublicUser(user) : undefined;
   }
 
-  async createRegisteredUser(params: CreateRegisteredUserParams) {
-    const existingActiveUser = await this.findByEmail(params.email);
+  async findByOAuthProviderId(provider: string, providerId: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        oauthProvider: provider,
+        oauthProviderId: providerId,
+        deletedAt: null,
+      },
+      include: {
+        avatar: true,
+        balance: true,
+      },
+    });
 
-    if (existingActiveUser) {
-      throw new ConflictException('User with this email already exists');
+    return user ? this.mapPublicUser(user) : undefined;
+  }
+
+  async createRegisteredUser(params: CreateRegisteredUserParams) {
+    if (params.email) {
+      const existingActiveUser = await this.findByEmail(params.email);
+
+      if (existingActiveUser) {
+        throw new ConflictException('User with this email already exists');
+      }
     }
 
+    if (params.phone) {
+      const existingActiveUser = await this.findByPhone(params.phone);
+
+      if (existingActiveUser) {
+        throw new ConflictException('User with this phone already exists');
+      }
+    }
+
+    return this.createUser({
+      ...params,
+      referralCode: await this.generateUniqueReferralCode(
+        params.email ?? params.phone,
+      ),
+    });
+  }
+
+  async createOAuthUser(params: CreateOAuthUserParams) {
+    const existingOAuthUser = await this.findByOAuthProviderId(
+      params.oauthProvider,
+      params.oauthProviderId,
+    );
+
+    if (existingOAuthUser) {
+      return existingOAuthUser;
+    }
+
+    return this.createUser({
+      ...params,
+      referralCode: await this.generateUniqueReferralCode(params.email),
+    });
+  }
+
+  private async createUser(
+    params: {
+      email?: string;
+      nickname: string;
+      phone?: string;
+      firstName?: string;
+      lastName?: string;
+      patronymic?: string;
+      passwordHash?: string;
+      oauthProvider?: string;
+      oauthProviderId?: string;
+      referralCode: string;
+      inviterReferralCode?: string;
+    },
+  ) {
     const inviter = await this.getInviterByReferralCode(
       params.inviterReferralCode,
     );
-
-    const referralCode = await this.generateUniqueReferralCode(params.email);
 
     try {
       const user = await this.prismaService.user.create({
@@ -93,8 +190,13 @@ export class UsersService {
           email: params.email,
           passwordHash: params.passwordHash,
           nickname: params.nickname,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          patronymic: params.patronymic,
           phone: params.phone,
-          referralCode,
+          oauthProvider: params.oauthProvider,
+          oauthProviderId: params.oauthProviderId,
+          referralCode: params.referralCode,
           balance: {
             create: {
               value: 0,
@@ -117,6 +219,21 @@ export class UsersService {
       return this.mapPublicUser(user);
     } catch (error) {
       if (this.isUniqueConstraintError(error)) {
+        if (params.oauthProvider && params.oauthProviderId) {
+          const existing = await this.findByOAuthProviderId(
+            params.oauthProvider,
+            params.oauthProviderId,
+          );
+
+          if (existing) {
+            return existing;
+          }
+
+          throw new ConflictException(
+            'User with this OAuth account already exists',
+          );
+        }
+
         throw new ConflictException('User with this email already exists');
       }
 
@@ -186,15 +303,15 @@ export class UsersService {
     }
 
     const fileName = `${randomUUID()}${extension}`;
-    const uploadsDirectory = join(process.cwd(), 'uploads', 'avatars');
-    const filePath = join(uploadsDirectory, fileName);
-
-    await mkdir(uploadsDirectory, { recursive: true });
-    await writeFile(filePath, file.buffer);
+    const storedFile = await this.fileStorage.upload({
+      key: `avatars/${fileName}`,
+      body: file.buffer,
+      contentType: file.mimetype,
+    });
 
     const image = await this.prismaService.image.create({
       data: {
-        url: `/uploads/avatars/${fileName}`,
+        url: storedFile.url,
         sortOrder: 0,
         alt: file.originalname,
       },
@@ -250,7 +367,7 @@ export class UsersService {
   mapPublicUser(user: any) {
     return {
       id: user.id,
-      email: user.email,
+      email: user.email ?? undefined,
       nickname: user.nickname,
       nicknameSuffix: user.nicknameSuffix,
       firstName: user.firstName ?? undefined,
@@ -330,8 +447,8 @@ export class UsersService {
     });
   }
 
-  private async generateUniqueReferralCode(email: string) {
-    const emailPrefix = email
+  private async generateUniqueReferralCode(value?: string) {
+    const emailPrefix = (value ?? '')
       .split('@')[0]
       .replace(/[^a-zA-Z0-9]/g, '')
       .toUpperCase()

@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
 
 import type { YookassaPayment, YookassaWebhookPayload } from './types/yookassa.types';
@@ -7,9 +8,11 @@ import type { YookassaPayment, YookassaWebhookPayload } from './types/yookassa.t
 export class PaymentsService {
   private readonly baseUrl = 'https://api.yookassa.ru/v3';
 
+  constructor(private readonly configService: ConfigService) {}
+
   private getAuthHeader(): string {
-    const shopId = process.env.YOOKASSA_SHOP_ID;
-    const secretKey = process.env.YOOKASSA_SECRET_KEY;
+    const shopId = this.configService.get<string>('YOOKASSA_SHOP_ID');
+    const secretKey = this.configService.get<string>('YOOKASSA_SECRET_KEY');
 
     if (!shopId || !secretKey) {
       throw new InternalServerErrorException(

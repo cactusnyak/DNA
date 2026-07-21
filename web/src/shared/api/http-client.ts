@@ -2,6 +2,16 @@ type QueryValue = string | number | boolean | null | undefined;
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+type ApiResponse<TData> = {
+  success: boolean;
+  data: TData;
+  error: {
+    code: string;
+    message: string | string[];
+    path: string;
+  } | null;
+};
+
 type RequestOptions<TBody = unknown> = {
   method?: HttpMethod;
   query?: Record<string, QueryValue>;
@@ -63,13 +73,18 @@ export async function httpClient<TResponse, TBody = unknown>(
     body,
   });
 
-  if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
-  }
-
   if (response.status === 204) {
     return undefined as TResponse;
   }
 
-  return response.json() as Promise<TResponse>;
+  const payload = (await response.json()) as ApiResponse<TResponse>;
+
+  if (!response.ok || !payload.success) {
+    const message = Array.isArray(payload.error?.message)
+      ? payload.error.message.join(', ')
+      : payload.error?.message ?? `Request failed with status ${response.status}`;
+    throw new Error(message);
+  }
+
+  return payload.data;
 }
