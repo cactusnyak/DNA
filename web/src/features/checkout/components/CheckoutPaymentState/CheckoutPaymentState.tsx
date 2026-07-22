@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
+import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
 import { formatPrice } from '@/shared/utils/format-price';
@@ -109,6 +110,10 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       <table className="w-full text-sm">
         <tbody>
           <tr className="border-b border-border">
+            <td className="py-3 text-muted-foreground">Дата заказа</td>
+            <td className="py-3 text-right">{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long' }).format(new Date(order.createdAt))}</td>
+          </tr>
+          <tr className="border-b border-border">
             <td className="py-3 text-muted-foreground">Сумма к оплате</td>
             <td className="py-3 text-right text-lg font-semibold">
               {formatPrice(order.totalAmount)}
@@ -118,8 +123,32 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
             <td className="py-3 text-muted-foreground">Статус</td>
             <td className="py-3 text-right font-medium">Ожидает оплаты</td>
           </tr>
+          <tr className="border-t border-border">
+            <td className="py-3 text-muted-foreground">Получатель</td>
+            <td className="py-3 text-right">{order.customerName}, {order.customerPhone}</td>
+          </tr>
+          <tr className="border-t border-border">
+            <td className="py-3 text-muted-foreground">Доставка</td>
+            <td className="py-3 text-right">{order.deliveryAddress}</td>
+          </tr>
+          <tr className="border-t border-border">
+            <td className="py-3 text-muted-foreground">Продавец и получатель оплаты</td>
+            <td className="py-3 text-right">ИП Филатов Денис Романович</td>
+          </tr>
         </tbody>
       </table>
+
+      <div className="space-y-2">
+        <h2 className="font-semibold">Состав заказа</h2>
+        <ul className="space-y-2 text-sm">
+          {order.items.map((item) => (
+            <li key={item.id} className="flex justify-between gap-4">
+              <span>{item.product?.title ?? `Товар ${item.productId}`} × {item.quantity}</span>
+              <span className="shrink-0">{formatPrice(item.unitPrice * item.quantity)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {stage === 'error' && errorMessage && (
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -128,7 +157,10 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       )}
 
       {stage === 'widget' && (
-        <div id="yookassa-widget-container" className="min-h-[300px]" />
+        <div className="space-y-3">
+          <div id="yookassa-widget-container" className="min-h-[300px]" />
+          <LegalFormNotice kind="order" />
+        </div>
       )}
 
       {stage !== 'widget' && (
@@ -137,6 +169,8 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
           Сохраните номер заказа, чтобы уточнить его статус.
         </p>
       )}
+
+      <p className="text-xs text-muted-foreground">К заказу применяется <Link className="font-medium text-foreground underline underline-offset-2" to="/public-offer">Публичная оферта</Link>.</p>
 
       {stage !== 'widget' && (
         <div className="flex flex-col gap-2 sm:flex-row">

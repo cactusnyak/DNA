@@ -37,6 +37,12 @@ const routePatterns = [
   /^\/categories(?:\/.*)?$/, /^\/product\/[^/]+$/, /^\/favourites$/,
   /^\/cart$/, /^\/checkout$/, /^\/checkout\/result$/, /^\/profile$/,
   /^\/authorization$/, /^\/referrals$/, /^\/admin$/,
+  /^\/legal-details$/, /^\/public-offer$/, /^\/terms$/,
+  /^\/privacy-policy$/, /^\/personal-data-consent$/,
+  /^\/personal-data-publication-consent$/, /^\/returns$/,
+  /^\/referral-program-rules$/, /^\/ad-posting-rules$/,
+  /^\/cookie-policy$/, /^\/payment-and-delivery$/, /^\/contacts$/,
+  /^\/about$/,
 ];
 
 const files = [];
@@ -179,6 +185,7 @@ const uniqueLinks = [...new Map(linkItems.map((item) => [`${item.file}:${item.li
 
 function linkStatus(link) {
   if (link === '#') return ['НЕ ЗАПОЛНЕНА', 'пустая ссылка-заглушка'];
+  if (link.startsWith('#')) return ['РАБОЧАЯ', 'якорь внутри текущей страницы'];
   if (/^\/legal(?:\/|$)/.test(link)) return ['БИТАЯ / СТРАНИЦА НЕ СОЗДАНА', 'маршрут /legal отсутствует в router.tsx'];
   if (link === 'mailto:hello@dna.local') return ['ЗАГЛУШКА', 'технический домен .local'];
   if (link === 'tel:+70000000000') return ['ЗАГЛУШКА', 'нулевой тестовый номер'];

@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { FormInputField } from '@/components/ui/FormField';
 import { getOAuthUrl, type OAuthProvider } from '@/entities/auth';
+import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 import { authorizationModeItems } from '../../data/authorization-mode-items';
 import { oauthProviderItems } from '../../data/oauth-provider-items';
@@ -211,6 +212,8 @@ export function AuthorizationForm({
             >
               {isPending ? 'Отправляем код...' : 'Получить код'}
             </Button>
+
+            {isRegisterMode && <LegalFormNotice />}
 
             {visibleOAuthProviderItems.length > 0 && (
               <>

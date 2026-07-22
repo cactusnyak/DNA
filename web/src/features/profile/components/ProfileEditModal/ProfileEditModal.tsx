@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { FormInputField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { User } from '@/entities/user';
+import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 type ProfileEditModalProps = {
   user: User;
@@ -117,6 +118,8 @@ export function ProfileEditModal({
               Не удалось сохранить. Проверьте соединение и попробуйте снова.
             </p>
           )}
+
+          <LegalFormNotice />
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={onClose}>

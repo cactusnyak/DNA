@@ -1,82 +1,78 @@
 import { Mail, Phone } from 'lucide-react';
 
-import TelegramLogo from '@/assets/logos/messengers/telegram.svg';
-import WhatsAppLogo from '@/assets/logos/messengers/whatsapp.svg';
-import MaxLogo from '@/assets/logos/messengers/max.svg';
-
-export const navigationLinks = [
+export const companyLinks = [
   {
-    label: 'Маркет',
-    href: '/market',
+    label: 'О платформе',
+    href: '/about',
   },
   {
-    label: 'Доска',
-    href: '/ads',
+    label: 'Контакты',
+    href: '/contacts',
   },
   {
-    label: 'Корзина',
-    href: '/cart',
-  },
-  {
-    label: 'Профиль',
-    href: '/profile',
-  },
-  {
-    label: 'Заработок',
-    href: '/referrals',
+    label: 'Юридическая информация',
+    href: '/legal-details',
   },
 ];
 
-export const legalLinks = [
-  {
-    label: 'Пользовательское соглашение',
-    href: '/legal/terms',
-  },
-  {
-    label: 'Политика конфиденциальности',
-    href: '/legal/privacy',
-  },
+export const buyerLinks = [
   {
     label: 'Публичная оферта',
-    href: '/legal/offer',
+    href: '/public-offer',
+  },
+  {
+    label: 'Оплата и доставка',
+    href: '/payment-and-delivery',
   },
   {
     label: 'Правила возврата',
-    href: '/legal/refund',
+    href: '/returns',
+  },
+];
+
+export const userLinks = [
+  {
+    label: 'Пользовательское соглашение',
+    href: '/terms',
+  },
+  {
+    label: 'Правила размещения объявлений',
+    href: '/ad-posting-rules',
   },
   {
     label: 'Правила партнёрской программы',
-    href: '/legal/referral',
+    href: '/referral-program-rules',
+  },
+];
+
+export const personalDataLinks = [
+  {
+    label: 'Политика обработки данных',
+    href: '/privacy-policy',
+  },
+  {
+    label: 'Согласие на обработку данных',
+    href: '/personal-data-consent',
+  },
+  {
+    label: 'Согласие на распространение данных',
+    href: '/personal-data-publication-consent',
+  },
+  {
+    label: 'Cookie и локальное хранение',
+    href: '/cookie-policy',
   },
 ];
 
 export const contactLinks = [
   {
-    value: 'hello@dna.local',
-    href: 'mailto:hello@dna.local',
+    value: 'dna.platform.shop@gmail.com',
+    href: 'mailto:dna.platform.shop@gmail.com',
     icon: Mail,
   },
   {
-    value: '+7 (000) 000-00-00',
-    href: 'tel:+70000000000',
+    value: '+7 977 883-40-48',
+    href: 'tel:+79778834048',
     icon: Phone,
-  },
-];
-
-export const messengerLinks = [
-  {
-    label: 'Telegram',
-    href: '#',
-    logo: TelegramLogo,
-  },
-  {
-    label: 'WhatsApp',
-    href: '#',
-    logo: WhatsAppLogo,
-  },
-  {
-    label: 'MAX',
-    href: '#',
-    logo: MaxLogo,
   },
 ];

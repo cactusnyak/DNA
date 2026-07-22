@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/FormField';
 
 import type { CheckoutFormValue } from '../../types/checkout-form';
+import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 type CheckoutCustomerFormProps = {
   value: CheckoutFormValue;
@@ -113,6 +114,8 @@ export function CheckoutCustomerForm({
       >
         {isPending ? 'Оформляем заказ...' : 'Подтвердить заказ'}
       </Button>
+
+      <LegalFormNotice />
     </form>
   );
 }

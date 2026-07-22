@@ -3,9 +3,10 @@ import { FooterContacts } from './components/FooterContacts';
 import { FooterLinkGroup } from './components/FooterLinkGroup';
 import {
   contactLinks,
-  legalLinks,
-  messengerLinks,
-  navigationLinks,
+  buyerLinks,
+  companyLinks,
+  personalDataLinks,
+  userLinks,
 } from './data/footer-links';
 
 export function Footer() {
@@ -14,17 +15,15 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-muted/30">
       <div className="">
-        <div className="mx-auto max-w-7xl px-4 py-10 grid gap-20 md:grid-cols-[auto_auto_auto_auto]">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <FooterBrand />
 
-          <FooterLinkGroup title="Навигация сайта" links={navigationLinks} />
+          <FooterLinkGroup title="Компания" links={companyLinks} />
+          <FooterLinkGroup title="Покупателям" links={buyerLinks} />
+          <FooterLinkGroup title="Пользователям" links={userLinks} />
+          <FooterLinkGroup title="Персональные данные" links={personalDataLinks} />
 
-          <FooterLinkGroup title="Документы" links={legalLinks} />
-
-          <FooterContacts
-            contacts={contactLinks}
-            messengers={messengerLinks}
-          />
+          <FooterContacts contacts={contactLinks} messengers={[]} />
         </div>
 
         <div className="border-t border-border text-xs text-muted-foreground">

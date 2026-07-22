@@ -52,9 +52,11 @@ export function FooterContacts({
         </div>
       </div>
 
-      <div className="mt-6">
-        <FooterMessengers links={messengers} />
-      </div>
+      {messengers.length > 0 && (
+        <div className="mt-6">
+          <FooterMessengers links={messengers} />
+        </div>
+      )}
     </section>
   );
 }
