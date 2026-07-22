@@ -1,5 +1,3 @@
-import { Mail, Phone } from 'lucide-react';
-
 export const companyLinks = [
   {
     label: 'О платформе',
