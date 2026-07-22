@@ -28,7 +28,7 @@ export function CategoryPreview({
 
   const {
     data: categories,
-    isPending,
+    isLoading,
     error,
   } = useQuery({
     queryKey: ['categories', section],
@@ -37,7 +37,7 @@ export function CategoryPreview({
 
   const previewTitle = title ?? sectionConfig.categoryPreviewTitle;
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <section className="space-y-4">
         <SectionTitle title={previewTitle} level={2} />
@@ -76,4 +76,3 @@ export function CategoryPreview({
     </section>
   );
 }
-
