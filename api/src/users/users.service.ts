@@ -4,10 +4,7 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import {
-  Prisma,
-  UserRole,
-} from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { randomUUID } from 'crypto';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -26,6 +23,46 @@ const IMAGE_MIME_EXTENSION: Record<string, string> = {
 };
 
 const MAX_AVATAR_UPLOAD_SIZE = 5 * 1024 * 1024;
+
+const CYRILLIC_TRANSLITERATION: Record<string, string> = {
+  а: 'a',
+  б: 'b',
+  в: 'v',
+  г: 'g',
+  д: 'd',
+  е: 'e',
+  ё: 'yo',
+  ж: 'zh',
+  з: 'z',
+  и: 'i',
+  й: 'y',
+  к: 'k',
+  л: 'l',
+  м: 'm',
+  н: 'n',
+  о: 'o',
+  п: 'p',
+  р: 'r',
+  с: 's',
+  т: 't',
+  у: 'u',
+  ф: 'f',
+  х: 'kh',
+  ц: 'ts',
+  ч: 'ch',
+  ш: 'sh',
+  щ: 'shch',
+  ъ: '',
+  ы: 'y',
+  ь: '',
+  э: 'e',
+  ю: 'yu',
+  я: 'ya',
+  і: 'i',
+  ї: 'yi',
+  є: 'ye',
+  ґ: 'g',
+};
 
 type CreateRegisteredUserParams = {
   email?: string;
@@ -141,11 +178,11 @@ export class UsersService {
       }
     }
 
+    const identity = await this.generateUserIdentity(params.nickname);
+
     return this.createUser({
       ...params,
-      referralCode: await this.generateUniqueReferralCode(
-        params.email ?? params.phone,
-      ),
+      ...identity,
     });
   }
 
@@ -159,27 +196,28 @@ export class UsersService {
       return existingOAuthUser;
     }
 
+    const identity = await this.generateUserIdentity(params.nickname);
+
     return this.createUser({
       ...params,
-      referralCode: await this.generateUniqueReferralCode(params.email),
+      ...identity,
     });
   }
 
-  private async createUser(
-    params: {
-      email?: string;
-      nickname: string;
-      phone?: string;
-      firstName?: string;
-      lastName?: string;
-      patronymic?: string;
-      passwordHash?: string;
-      oauthProvider?: string;
-      oauthProviderId?: string;
-      referralCode: string;
-      inviterReferralCode?: string;
-    },
-  ) {
+  private async createUser(params: {
+    email?: string;
+    nickname: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+    patronymic?: string;
+    passwordHash?: string;
+    oauthProvider?: string;
+    oauthProviderId?: string;
+    nicknameSuffix: string;
+    referralCode: string;
+    inviterReferralCode?: string;
+  }) {
     const inviter = await this.getInviterByReferralCode(
       params.inviterReferralCode,
     );
@@ -190,6 +228,7 @@ export class UsersService {
           email: params.email,
           passwordHash: params.passwordHash,
           nickname: params.nickname,
+          nicknameSuffix: params.nicknameSuffix,
           firstName: params.firstName,
           lastName: params.lastName,
           patronymic: params.patronymic,
@@ -447,30 +486,45 @@ export class UsersService {
     });
   }
 
-  private async generateUniqueReferralCode(value?: string) {
-    const emailPrefix = (value ?? '')
-      .split('@')[0]
-      .replace(/[^a-zA-Z0-9]/g, '')
-      .toUpperCase()
-      .slice(0, 8);
+  private async generateUserIdentity(nickname: string) {
+    const transliteratedNickname = Array.from(nickname.normalize('NFKC'))
+      .map(
+        (character) =>
+          CYRILLIC_TRANSLITERATION[character.toLowerCase()] ?? character,
+      )
+      .join('');
+
+    const nicknamePart =
+      transliteratedNickname
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .toUpperCase()
+        .slice(0, 16) || 'DNA';
 
     for (let attempt = 0; attempt < 10; attempt += 1) {
-      const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
-      const referralCode = `${emailPrefix || 'DNA'}${suffix}`;
+      const nicknameSuffix = randomUUID();
+      const shortSuffix = nicknameSuffix
+        .replaceAll('-', '')
+        .slice(0, 8)
+        .toUpperCase();
+      const referralCode = `${nicknamePart}-${shortSuffix}`;
 
-      const existingActiveUser = await this.prismaService.user.findFirst({
+      const existingUser = await this.prismaService.user.findFirst({
         where: {
           referralCode,
-          deletedAt: null,
         },
       });
 
-      if (!existingActiveUser) {
-        return referralCode;
+      if (!existingUser) {
+        return { nicknameSuffix, referralCode };
       }
     }
 
-    return `DNA${Date.now()}`;
+    const nicknameSuffix = randomUUID();
+
+    return {
+      nicknameSuffix,
+      referralCode: `${nicknamePart}-${nicknameSuffix.replaceAll('-', '').toUpperCase()}`,
+    };
   }
 
   private isUniqueConstraintError(error: unknown) {

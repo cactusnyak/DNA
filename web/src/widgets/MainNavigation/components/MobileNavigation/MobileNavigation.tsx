@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { setMobileNavigationHeight } from '@/shared/main-navigation';
 
 import { CartItemsBadge } from '../CartItemsBadge';
 import { FavouritesBadge } from '../FavouritesBadge/FavouritesBadge';
@@ -12,9 +14,27 @@ type MobileNavigationProps = {
 
 export function MobileNavigation({ items }: MobileNavigationProps) {
   const columnsCount = items.length;
+  const navigationRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const element = navigationRef.current;
+
+    if (!element) return;
+
+    const updateHeight = () => setMobileNavigationHeight(element.offsetHeight);
+    const observer = new ResizeObserver(updateHeight);
+
+    updateHeight();
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-border bg-background md:hidden">
+    <nav
+      ref={navigationRef}
+      className="fixed right-0 bottom-0 left-0 z-50 border-t border-border bg-background md:hidden"
+    >
       <div
         className="mx-auto grid max-w-md gap-1"
         style={{

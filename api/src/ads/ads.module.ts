@@ -12,7 +12,7 @@ import { AdsService } from './ads.service';
 
 @Module({
   imports: [PrismaModule, AdCategoriesModule, AuthModule, AdminModule],
-  controllers: [AdsController, AdCategoriesController],
+  controllers: [AdCategoriesController, AdsController],
   providers: [AdsService, AdsModerationService],
   exports: [AdCategoriesModule, AdsService],
 })

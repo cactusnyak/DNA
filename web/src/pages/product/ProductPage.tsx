@@ -22,7 +22,7 @@ export function ProductPage() {
   }
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загрузка товара...</p>;
+    return <p className="text-muted-foreground">Загружаем товар...</p>;
   }
 
   if (error || !product) {

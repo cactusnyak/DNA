@@ -69,7 +69,7 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
 
           {isCategoriesPending && (
             <p className="text-sm text-muted-foreground">
-              Загрузка категорий...
+              Загружаем категории...
             </p>
           )}
 
@@ -108,4 +108,3 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
     </div>
   );
 }
-

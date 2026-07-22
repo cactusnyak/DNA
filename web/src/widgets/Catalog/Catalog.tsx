@@ -81,7 +81,7 @@ export function Catalog({
             showCatalogLink={showCatalogLink}
           />
         )}
-        <p className="text-muted-foreground">Загрузка...</p>
+        <p className="text-muted-foreground">Загружаем данные...</p>
       </section>
     );
   }
@@ -145,7 +145,7 @@ export function Catalog({
 
   const emptyProductsText = categorySlug
     ? 'В этой категории пока нет товаров.'
-    : 'Товары маркета пока не добавлены. Каталог пуст, зато не врёт.';
+    : 'Здесь пока нет товаров.';
 
   return (
     <section className="space-y-8">
@@ -196,4 +196,3 @@ export function Catalog({
     </section>
   );
 }
-

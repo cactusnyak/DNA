@@ -12,7 +12,7 @@ export function GlobalSearchSectionResults({
   onNavigate,
 }: GlobalSearchSectionResultsProps) {
   return (
-    <section className="p-5">
+    <section className="flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">Разделы</h3>
 
@@ -21,7 +21,7 @@ export function GlobalSearchSectionResults({
         </span>
       </div>
 
-      <div className="mt-3 grid gap-1">
+      <div className="grid gap-1">
         {sections.length > 0 ? (
           sections.map((section) => (
             <Link

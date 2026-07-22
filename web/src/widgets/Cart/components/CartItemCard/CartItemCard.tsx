@@ -75,7 +75,13 @@ export function CartItemCard({
             </div>
           </div>
 
-          <div className="flex items-end justify-between gap-4">
+          <div
+            className="flex items-end justify-between gap-4"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
+          >
             {actions}
 
             <div className="flex items-center gap-1">
@@ -86,8 +92,9 @@ export function CartItemCard({
                 variant="destructive"
                 size="icon"
                 aria-label="Удалить"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
                   onRemove();
                 }}
               >

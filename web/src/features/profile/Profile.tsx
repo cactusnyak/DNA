@@ -118,7 +118,7 @@ export function Profile() {
   }
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загрузка профиля...</p>;
+    return <p className="text-muted-foreground">Загружаем профиль...</p>;
   }
 
   if (error || !user) {
@@ -167,22 +167,19 @@ export function Profile() {
 
       {updateProfileMutation.isError && (
         <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Не удалось сохранить изменения. Проверьте, что backend поддерживает
-          PATCH /users/me.
+          Не удалось сохранить изменения. Попробуйте ещё раз.
         </p>
       )}
 
       {updateAvatarMutation.isError && (
         <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Не удалось обновить аватар. Проверьте, что backend поддерживает
-          POST /users/me/avatar и PATCH /users/me.
+          Не удалось обновить аватар. Попробуйте ещё раз.
         </p>
       )}
 
       {deleteAccountMutation.isError && (
         <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Не удалось удалить аккаунт. Проверьте, что backend поддерживает
-          DELETE /users/me.
+          Не удалось удалить аккаунт. Попробуйте ещё раз.
         </p>
       )}
 

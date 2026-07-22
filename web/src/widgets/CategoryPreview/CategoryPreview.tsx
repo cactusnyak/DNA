@@ -40,7 +40,7 @@ export function CategoryPreview({
     return (
       <section className="space-y-4">
         <SectionTitle title={previewTitle} level={2} />
-        <p className="text-sm text-muted-foreground">Загрузка категорий...</p>
+        <p className="text-sm text-muted-foreground">Загружаем категории...</p>
       </section>
     );
   }

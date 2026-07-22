@@ -48,10 +48,7 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
         />
       }
       actions={
-        <div
-          className="flex flex-col gap-1 rounded-xl text-xs sm:gap-2 sm:text-sm"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="flex flex-col gap-1 rounded-xl text-xs sm:gap-2 sm:text-sm">
           <span className="font-medium text-foreground">{sellerName}</span>
 
           {contactValues.length > 0 ? (
@@ -63,7 +60,7 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Контакты появятся позже.</p>
+            <p className="text-sm text-muted-foreground">Продавец пока не указал контакты.</p>
           )}
         </div>
       }

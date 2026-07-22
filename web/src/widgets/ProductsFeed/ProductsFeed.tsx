@@ -4,7 +4,7 @@ import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
-import { ProductCard } from '@/widgets/ProductsListing/components/ProductCard';
+import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard';
 
 type ProductsFeedProps = {
   categorySlug?: string;
@@ -55,7 +55,11 @@ export function ProductsFeed({
     <div className="space-y-4">
       <div className={getItemGridClasses()}>
         {items.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            section={PLATFORM_SECTION.MARKET}
+            product={product}
+          />
         ))}
       </div>
 

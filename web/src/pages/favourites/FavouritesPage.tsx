@@ -67,7 +67,7 @@ export function FavouritesPage() {
           <Link to="/authorization" className="font-medium underline-offset-4 hover:underline">
             Войдите
           </Link>
-          , чтобы синхронизировать его с аккаунтом.
+          , чтобы перенести сохранённое в аккаунт и увидеть карточки.
         </p>
       )}
 
@@ -95,7 +95,8 @@ export function FavouritesPage() {
 
           {!accessToken && guestProductItems.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              Войдите в аккаунт, чтобы увидеть сохранённые товары здесь.
+              Товары сохранены на этом устройстве. Войдите, чтобы перенести их
+              в аккаунт и увидеть карточки.
             </p>
           )}
 
@@ -133,7 +134,8 @@ export function FavouritesPage() {
 
           {!accessToken && guestAdItems.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              Войдите в аккаунт, чтобы увидеть сохранённые объявления здесь.
+              Объявления сохранены на этом устройстве. Войдите, чтобы перенести
+              их в аккаунт и увидеть карточки.
             </p>
           )}
 

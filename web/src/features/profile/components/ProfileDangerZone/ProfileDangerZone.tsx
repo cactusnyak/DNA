@@ -20,7 +20,7 @@ export function ProfileDangerZone({
       </h2>
 
       <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-        Действия ниже влияют на доступ к профилю. Будь чуть аккуратнее!
+        Эти действия влияют на доступ к профилю. Перед продолжением проверьте свой выбор.
       </p>
 
       <div className="mt-5 overflow-hidden rounded-xl border border-destructive/20">

@@ -1,40 +1,38 @@
 import { useNavigate } from 'react-router-dom';
 
-import type { Product } from '@/entities/product';
+import type { Ad } from '@/entities/ad';
 import {
   getPlatformCategoryHref,
-  type PlatformSectionId,
+  PLATFORM_SECTION,
 } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 
-type ProductCardContentProps = {
-  section: PlatformSectionId;
-  product: Product;
+type AdCardContentProps = {
+  ad: Ad;
   currentCategorySlug?: string;
 };
 
-export function ProductCardContent({
-  section,
-  product,
+export function AdCardContent({
+  ad,
   currentCategorySlug,
-}: ProductCardContentProps) {
+}: AdCardContentProps) {
   const navigate = useNavigate();
-  const categoryHref = product.category
+  const categoryHref = ad.category
     ? getPlatformCategoryHref(
-        section,
-        product.category.path ?? product.category.slug,
-      )
+      PLATFORM_SECTION.ADS,
+      ad.category.path ?? ad.category.slug,
+    )
     : null;
   const shouldShowCategoryLink =
     !!categoryHref &&
-    (!currentCategorySlug || currentCategorySlug !== product.category?.slug);
+    (!currentCategorySlug || currentCategorySlug !== ad.category?.slug);
 
   return (
     <div className="flex flex-1 flex-col p-2">
-      <p className="text-xl font-bold">{formatPrice(product.price)}</p>
+      <p className="text-xl font-bold">{formatPrice(ad.price)}</p>
 
       <div className="mt-2">
-        <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
+        <h3 className="line-clamp-2 font-semibold">{ad.title}</h3>
 
         {shouldShowCategoryLink && categoryHref && (
           <span
@@ -46,7 +44,7 @@ export function ProductCardContent({
             }}
             className="mt-0.5 block cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground"
           >
-            В категорию «{product.category.name}»
+            В категорию «{ad.category?.name}»
           </span>
         )}
       </div>

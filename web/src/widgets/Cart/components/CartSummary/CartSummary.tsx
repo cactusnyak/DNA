@@ -10,89 +10,108 @@ type CartSummaryProps = {
   totalAdAmount: number;
 };
 
+function formatItemCount(
+  count: number,
+  forms: [singular: string, few: string, many: string],
+) {
+  const remainder100 = count % 100;
+  const remainder10 = count % 10;
+
+  if (remainder100 >= 11 && remainder100 <= 14) {
+    return `${count} ${forms[2]}`;
+  }
+
+  if (remainder10 === 1) {
+    return `${count} ${forms[0]}`;
+  }
+
+  if (remainder10 >= 2 && remainder10 <= 4) {
+    return `${count} ${forms[1]}`;
+  }
+
+  return `${count} ${forms[2]}`;
+}
+
 export function CartSummary({
   totalProductItems,
   totalProductAmount,
   totalAdItems,
   totalAdAmount,
 }: CartSummaryProps) {
-  const grandTotal = totalProductAmount + totalAdAmount;
   const hasProducts = totalProductItems > 0;
   const hasAds = totalAdItems > 0;
 
   return (
-    <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold">Итого</h2>
+    <aside className="overflow-hidden rounded-2xl border border-border bg-card lg:sticky lg:top-28 lg:self-start">
+      <div className="divide-y divide-border">
+        {hasProducts && (
+          <section className="flex flex-col gap-4 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <h2 className="font-semibold">Маркет</h2>
+                <p className="text-sm text-muted-foreground">
+                  {formatItemCount(totalProductItems, [
+                    'товар',
+                    'товара',
+                    'товаров',
+                  ])}
+                </p>
+              </div>
 
-        <div className="mt-4 space-y-3 border-t border-border pt-4">
-          {hasProducts && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-muted-foreground">
-                Маркет ({totalProductItems} шт.)
-              </span>
-              <span className="font-medium">{formatPrice(totalProductAmount)}</span>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">К оплате</p>
+                <p className="text-2xl font-semibold">
+                  {formatPrice(totalProductAmount)}
+                </p>
+              </div>
             </div>
-          )}
 
-          {hasAds && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-muted-foreground">
-                Объявления ({totalAdItems} шт.)
-              </span>
-              <span className="font-medium">{formatPrice(totalAdAmount)}</span>
+            <div className="flex items-center justify-between gap-4 text-sm">
+              <span className="text-muted-foreground">Доставка</span>
+              <span className="text-muted-foreground">Не подключена</span>
             </div>
-          )}
 
-          {hasProducts && hasAds && (
-            <div className="flex items-center justify-between gap-4 border-t border-border pt-3">
-              <span className="text-sm font-medium">Общая сумма</span>
-              <span className="text-2xl font-semibold">{formatPrice(grandTotal)}</span>
-            </div>
-          )}
+            <Button asChild size="lg" className="w-full">
+              <Link to="/checkout">Оформить заказ Маркета</Link>
+            </Button>
 
-          {!(hasProducts && hasAds) && (
-            <div className="flex items-center justify-between gap-4 border-t border-border pt-3">
-              <span className="text-sm text-muted-foreground">К оплате</span>
-              <span className="text-2xl font-semibold">{formatPrice(grandTotal)}</span>
+            <p className="text-xs leading-5 text-muted-foreground">
+              Заказ можно оформить без регистрации. Онлайн-оплата и доставка
+              пока находятся в разработке.
+            </p>
+          </section>
+        )}
+
+        {hasAds && (
+          <section className="flex flex-col gap-4 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <h2 className="font-semibold">Доска</h2>
+                <p className="text-sm text-muted-foreground">
+                  {formatItemCount(totalAdItems, [
+                    'объявление',
+                    'объявления',
+                    'объявлений',
+                  ])}
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">
+                  Указанная стоимость
+                </p>
+                <p className="text-xl font-semibold">
+                  {formatPrice(totalAdAmount)}
+                </p>
+              </div>
             </div>
-          )}
-        </div>
+
+            <p className="text-sm leading-6 text-muted-foreground">
+              Оплата и условия сделки обсуждаются с продавцами напрямую.
+            </p>
+          </section>
+        )}
       </div>
-
-      {hasProducts && (
-        <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-          <div className="space-y-1">
-            <h3 className="font-semibold">Товары маркета</h3>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-muted-foreground">Сумма</span>
-              <span className="font-medium">{formatPrice(totalProductAmount)}</span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-muted-foreground">Доставка</span>
-              <span className="text-sm text-muted-foreground">уточняется</span>
-            </div>
-          </div>
-
-          <Button asChild size="lg" className="w-full">
-            <Link to="/checkout">Оформить заказ</Link>
-          </Button>
-
-          <p className="text-xs text-muted-foreground">
-            Заказ можно оформить без регистрации.
-          </p>
-        </div>
-      )}
-
-      {hasAds && (
-        <div className="rounded-2xl border border-border bg-card p-5 space-y-2">
-          <h3 className="font-semibold">Объявления</h3>
-          <p className="text-sm text-muted-foreground">
-            Свяжитесь с продавцами напрямую по контактам в карточках.
-          </p>
-        </div>
-      )}
-
     </aside>
   );
 }

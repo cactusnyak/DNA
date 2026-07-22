@@ -13,7 +13,7 @@ export function ProfileSessionErrorState({
     <StateCard
       icon={CircleAlert}
       title="Сессия недоступна"
-      description="Не удалось получить данные пользователя. Возможно, токен устарел."
+      description="Сессия завершена. Войдите снова."
       action={{
         label: 'Выйти из профиля',
         onClick: onLogout,

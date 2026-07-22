@@ -11,8 +11,8 @@ export function MarketPage() {
     <div className="space-y-10">
       <section className="rounded-2xl border border-border bg-card p-6">
         <SectionHeader
-          title="Маркет"
-          description="Товары DNA и будущие предложения продавцов в одном разделе. Магазинная часть уже работает, продавцов подключим отдельной итерацией. Чудо дисциплины, почти пугает."
+          title="DNA Маркет"
+          description="Каталог товаров DNA. Онлайн-оплата, доставка и кабинет продавца пока находятся в разработке."
         />
 
         <div className="mt-5 flex flex-wrap gap-3">
@@ -21,15 +21,15 @@ export function MarketPage() {
           </Button>
 
           <Button asChild variant="outline">
-            <Link to="/market/seller">Перейти в аккаунт продавца</Link>
+            <Link to="/market/seller">Кабинет продавца — скоро</Link>
           </Button>
         </div>
       </section>
 
       <CategoryPreview
         section={PLATFORM_SECTION.MARKET}
-        title="Категории маркета"
-        emptyText="Категории маркета пока не добавлены."
+        title="Категории Маркета"
+        emptyText="Здесь пока нет категорий."
       />
 
       <section className="space-y-4">

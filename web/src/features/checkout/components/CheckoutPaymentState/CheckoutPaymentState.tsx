@@ -37,7 +37,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     mutationFn: () => initiatePayment(order.id, accessToken ?? undefined),
     onSuccess: (data) => {
       if (!data.confirmationToken) {
-        setErrorMessage('Не удалось получить токен оплаты от ЮKassa.');
+        setErrorMessage('Онлайн-оплата пока недоступна. Попробуйте позже.');
         setStage('error');
         return;
       }
@@ -45,7 +45,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       loadWidget(data.confirmationToken);
     },
     onError: () => {
-      setErrorMessage('Не удалось инициировать платёж. Попробуйте ещё раз.');
+      setErrorMessage('Онлайн-оплата пока недоступна. Попробуйте позже.');
       setStage('error');
     },
   });
@@ -60,7 +60,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         confirmation_token: confirmationToken,
         return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
         error_callback: () => {
-          setErrorMessage('Ошибка платёжного виджета. Попробуйте ещё раз.');
+          setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
           setStage('error');
         },
       });
@@ -80,7 +80,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     script.src = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
     script.onload = mountWidget;
     script.onerror = () => {
-      setErrorMessage('Не удалось загрузить платёжный виджет.');
+      setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
       setStage('error');
     };
     document.head.appendChild(script);
@@ -96,10 +96,10 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     <section className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-card p-8">
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">
-          Заказ оформлен
+          Заказ создан
         </p>
 
-        <h1 className="text-2xl font-semibold">Осталось оплатить заказ</h1>
+        <h1 className="text-2xl font-semibold">Заказ ожидает оплаты</h1>
 
         <p className="text-sm text-muted-foreground">
           Номер заказа: <span className="text-foreground">{order.id}</span>
@@ -133,8 +133,8 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
 
       {stage !== 'widget' && (
         <p className="text-sm text-muted-foreground">
-          После оплаты заказ будет передан в обработку. Если оплата не будет
-          совершена в течение 30 минут, заказ будет автоматически отменён.
+          Онлайн-оплата пока находится в разработке и может быть недоступна.
+          Сохраните номер заказа, чтобы уточнить его статус.
         </p>
       )}
 
@@ -145,8 +145,8 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
             disabled={initiateMutation.isPending || stage === 'loading'}
           >
             {initiateMutation.isPending || stage === 'loading'
-              ? 'Загрузка...'
-              : 'Оплатить заказ'}
+              ? 'Открываем оплату...'
+              : 'Проверить доступность оплаты'}
           </Button>
 
           <Button asChild variant="outline">

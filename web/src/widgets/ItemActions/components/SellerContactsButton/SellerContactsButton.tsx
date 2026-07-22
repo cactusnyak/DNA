@@ -64,7 +64,7 @@ export function SellerContactsButton({
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Контакты появятся позже.
+            Продавец пока не указал контакты.
           </p>
         )}
       </Modal>

@@ -8,7 +8,7 @@ export function FavoritesPage() {
     <section className="rounded-2xl border border-dashed border-border bg-card p-6">
       <SectionHeader
         title="Избранное"
-        description="Здесь позже будут собираться товары маркета и объявления доски с разделением по источнику. Пока это честная заготовка, а не кнопка в пустоту."
+        description="Сохранённые товары Маркета и объявления Доски."
       />
 
       <div className="mt-5 flex flex-wrap gap-3">

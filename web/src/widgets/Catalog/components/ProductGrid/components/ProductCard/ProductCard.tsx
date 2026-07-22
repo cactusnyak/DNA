@@ -51,7 +51,7 @@ export function ProductCard({
 
       {(showAddToCartButton || showBuyNowButton) && (
         <div
-          className="relative z-10 mt-auto p-4 pt-0"
+          className="relative z-10 mt-auto p-2"
           onClick={(e) => e.preventDefault()}
         >
           <ItemActions

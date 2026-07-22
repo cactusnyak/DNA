@@ -95,7 +95,7 @@ export function BalanceHero({
 
             {showReferralLink && (
               <BalanceHeroActionLink to="/referrals">
-                Зарабатывать
+                Реферальная программа
               </BalanceHeroActionLink>
             )}
           </div>

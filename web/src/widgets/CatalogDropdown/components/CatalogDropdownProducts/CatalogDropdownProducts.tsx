@@ -52,7 +52,7 @@ export function CatalogDropdownProducts({
 
       {isPending && (
         <p className="text-sm text-muted-foreground">
-          {isAdsSection ? 'Загрузка объявлений...' : 'Загрузка товаров...'}
+          {isAdsSection ? 'Загружаем объявления...' : 'Загружаем товары...'}
         </p>
       )}
 

@@ -51,7 +51,7 @@ export function Admin() {
   if (isUserPending) {
     return (
       <p className="text-sm text-muted-foreground">
-        Проверяем права доступа...
+        Проверяем сессию...
       </p>
     );
   }
@@ -60,7 +60,7 @@ export function Admin() {
     return (
       <StateCard
         title="Сессия недоступна"
-        description="Не удалось получить данные пользователя. Возможно, токен устарел."
+        description="Сессия завершена. Войдите снова."
         action={{
           label: 'Выйти из профиля',
           onClick: clearAccessToken,

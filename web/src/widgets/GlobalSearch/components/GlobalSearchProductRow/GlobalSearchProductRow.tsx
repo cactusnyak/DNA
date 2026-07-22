@@ -39,9 +39,14 @@ export function GlobalSearchProductRow({
       </div>
 
       <div className="min-w-0 p-1">
-        <p className="line-clamp-2 text-sm font-medium leading-5">
-          <MarkHighlight text={product.title} searchValue={searchValue} level={1} />
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <p className="line-clamp-2 text-sm font-medium leading-5">
+            <MarkHighlight text={product.title} searchValue={searchValue} level={1} />
+          </p>
+          <span className="shrink-0 rounded-md bg-muted px-1.5 py-1 text-[10px] font-medium leading-none text-muted-foreground">
+            Маркет
+          </span>
+        </div>
 
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="text-sm font-semibold">
