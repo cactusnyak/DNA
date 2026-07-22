@@ -28,19 +28,15 @@ export function FooterContacts({
 
       <div className="mt-4">
         <div className="space-y-2">
-          {contacts.map((link) => {
-            const Icon = link.icon;
-
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-2 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-              >
-                <span>{link.value}</span>
-              </a>
-            );
-          })}
+          {contacts.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="flex items-center gap-2 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            >
+              <span>{link.value}</span>
+            </a>
+          ))}
         </div>
       </div>
 
