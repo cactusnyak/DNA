@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { Modal } from '@/components/ui/Modal';
 import type { User } from '@/entities/user';
+import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 type AvatarEditModalProps = {
   user: User;
@@ -128,6 +129,8 @@ export function AvatarEditModal({
               снова.
             </p>
           )}
+
+          <LegalFormNotice />
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={onClose}>

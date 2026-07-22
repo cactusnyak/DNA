@@ -5,9 +5,6 @@ import { FooterMessengers } from '../FooterMessengers';
 type ContactLink = {
   value: string;
   href: string;
-  icon: React.ComponentType<{
-    className?: string;
-  }>;
 };
 
 type MessengerLink = {
@@ -30,10 +27,6 @@ export function FooterContacts({
       <SectionTitle>Контакты</SectionTitle>
 
       <div className="mt-4">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Почта и телефон
-        </p>
-
         <div className="space-y-2">
           {contacts.map((link) => {
             const Icon = link.icon;
@@ -44,7 +37,6 @@ export function FooterContacts({
                 href={link.href}
                 className="flex items-center gap-2 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
               >
-                <Icon className="size-4" />
                 <span>{link.value}</span>
               </a>
             );
@@ -52,9 +44,11 @@ export function FooterContacts({
         </div>
       </div>
 
-      <div className="mt-6">
-        <FooterMessengers links={messengers} />
-      </div>
+      {messengers.length > 0 && (
+        <div className="mt-6">
+          <FooterMessengers links={messengers} />
+        </div>
+      )}
     </section>
   );
 }

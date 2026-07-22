@@ -25,6 +25,7 @@ import { ProductPage } from '@/pages/product/ProductPage';
 import { ProfilePage } from '@/pages/profile/ProfilePage';
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage';
 import { SellerPage } from '@/pages/seller/SellerPage';
+import { LegalDocumentPage } from '@/features/legal';
 import {
   PLATFORM_SECTION,
   platformSections,
@@ -64,6 +65,22 @@ function LegacyProductRedirect() {
     />
   );
 }
+
+const legalRoutes = [
+  { path: '/legal-details', label: 'Юридическая информация' },
+  { path: '/public-offer', label: 'Публичная оферта' },
+  { path: '/terms', label: 'Пользовательское соглашение' },
+  { path: '/privacy-policy', label: 'Политика обработки персональных данных' },
+  { path: '/personal-data-consent', label: 'Согласие на обработку персональных данных' },
+  { path: '/personal-data-publication-consent', label: 'Согласие на распространение персональных данных' },
+  { path: '/returns', label: 'Правила возврата и отмены заказа' },
+  { path: '/referral-program-rules', label: 'Правила партнёрской программы' },
+  { path: '/ad-posting-rules', label: 'Правила размещения объявлений' },
+  { path: '/cookie-policy', label: 'Политика использования cookie и локального хранения' },
+  { path: '/payment-and-delivery', label: 'Оплата и доставка' },
+  { path: '/contacts', label: 'Контакты' },
+  { path: '/about', label: 'О платформе DNA' },
+] as const;
 
 export const router = createBrowserRouter([
   {
@@ -329,6 +346,16 @@ export const router = createBrowserRouter([
           },
         } satisfies BreadcrumbHandle,
       },
+      ...legalRoutes.map((route) => ({
+        path: route.path,
+        element: <LegalDocumentPage />,
+        handle: {
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: route.label,
+          },
+        } satisfies BreadcrumbHandle,
+      })),
     ],
   },
 ]);

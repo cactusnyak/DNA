@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/widgets/Breadcrumbs';
 import { Footer } from '@/widgets/Footer/Footer';
 import { Header } from '@/widgets/Header/Header';
 import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
+import { CookieNotice } from '@/widgets/CookieNotice';
 
 export function MainLayout() {
   return (
@@ -23,6 +24,8 @@ export function MainLayout() {
       <Footer />
 
       <MainNavigation placement="mobileBottom" />
+
+      <CookieNotice />
 
       <div
         id="app-modal-root"

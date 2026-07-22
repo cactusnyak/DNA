@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import type { Ad, CreateAdPayload } from '@/entities/ad';
 import { getCurrentUser } from '@/entities/auth';
 import { getAdCategories } from '@/entities/ad-category';
+import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 type AdFormProps = {
   initialAd?: Ad;
@@ -63,6 +64,11 @@ export function AdForm({
   const [contactOther, setContactOther] = useState(
     initialAd?.contactOther ?? '',
   );
+  const [showPhone, setShowPhone] = useState(Boolean(initialAd?.contactPhone));
+  const [showTelegram, setShowTelegram] = useState(Boolean(initialAd?.contactTelegram));
+  const [showEmail, setShowEmail] = useState(Boolean(initialAd?.contactEmail));
+  const [showOther, setShowOther] = useState(Boolean(initialAd?.contactOther));
+  const [publicationConsent, setPublicationConsent] = useState(false);
 
   useEffect(() => {
     if (!initialAd && currentUser) {
@@ -101,13 +107,18 @@ export function AdForm({
     }
 
     const hasContact =
-      contactPhone.trim() ||
-      contactTelegram.trim() ||
-      contactEmail.trim() ||
-      contactOther.trim();
+      (showPhone && contactPhone.trim()) ||
+      (showTelegram && contactTelegram.trim()) ||
+      (showEmail && contactEmail.trim()) ||
+      (showOther && contactOther.trim());
 
     if (!hasContact) {
       setError('Укажите хотя бы один способ связи.');
+      return;
+    }
+
+    if (!publicationConsent) {
+      setError('Подтвердите согласие на публикацию выбранных контактов.');
       return;
     }
 
@@ -124,10 +135,10 @@ export function AdForm({
         categoryId,
         price: Number(price) || 0,
         imageUrls: [...existingImageUrls, ...uploadedImageUrls],
-        contactPhone: contactPhone.trim() || undefined,
-        contactTelegram: contactTelegram.trim() || undefined,
-        contactEmail: contactEmail.trim() || undefined,
-        contactOther: contactOther.trim() || undefined,
+        contactPhone: showPhone ? contactPhone.trim() || undefined : undefined,
+        contactTelegram: showTelegram ? contactTelegram.trim() || undefined : undefined,
+        contactEmail: showEmail ? contactEmail.trim() || undefined : undefined,
+        contactOther: showOther ? contactOther.trim() || undefined : undefined,
       });
     } catch (submitError) {
       setError(
@@ -193,6 +204,7 @@ export function AdForm({
             value={contactPhone}
             onChange={(event) => setContactPhone(event.target.value)}
           />
+          <ContactVisibility checked={showPhone} disabled={!contactPhone.trim()} label="Показывать телефон" onChange={setShowPhone} />
 
           <FormInputField
             label="Telegram"
@@ -200,6 +212,7 @@ export function AdForm({
             value={contactTelegram}
             onChange={(event) => setContactTelegram(event.target.value)}
           />
+          <ContactVisibility checked={showTelegram} disabled={!contactTelegram.trim()} label="Показывать Telegram" onChange={setShowTelegram} />
 
           <FormInputField
             label="Email"
@@ -207,6 +220,7 @@ export function AdForm({
             value={contactEmail}
             onChange={(event) => setContactEmail(event.target.value)}
           />
+          <ContactVisibility checked={showEmail} disabled={!contactEmail.trim()} label="Показывать email" onChange={setShowEmail} />
 
           <FormInputField
             label="Другой способ связи"
@@ -214,12 +228,26 @@ export function AdForm({
             value={contactOther}
             onChange={(event) => setContactOther(event.target.value)}
           />
+          <ContactVisibility checked={showOther} disabled={!contactOther.trim()} label="Показывать другой способ связи" onChange={setShowOther} />
         </div>
 
         <p className="mt-1 ml-0.5 text-xs leading-5 text-muted-foreground">
           Укажите хотя бы один способ связи. Незаполненные поля не будут показаны покупателям.
         </p>
       </div>
+
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 text-sm leading-6">
+        <input
+          required
+          type="checkbox"
+          checked={publicationConsent}
+          className="mt-1 size-4"
+          onChange={(event) => setPublicationConsent(event.target.checked)}
+        />
+        <LegalFormNotice kind="publication" />
+      </label>
+
+      <LegalFormNotice />
 
       {error && (
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
@@ -244,5 +272,14 @@ export function AdForm({
         )}
       </div>
     </form>
+  );
+}
+
+function ContactVisibility({ checked, disabled, label, onChange }: { checked: boolean; disabled: boolean; label: string; onChange: (value: boolean) => void }) {
+  return (
+    <label className="-mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
+      {label}
+    </label>
   );
 }

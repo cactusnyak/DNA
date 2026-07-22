@@ -1,0 +1,2 @@
+export { CookieNotice } from './CookieNotice';
+
