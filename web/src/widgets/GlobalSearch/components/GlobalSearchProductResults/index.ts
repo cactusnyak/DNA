@@ -1,1 +1,0 @@
-export { GlobalSearchProductResults } from './GlobalSearchProductResults';

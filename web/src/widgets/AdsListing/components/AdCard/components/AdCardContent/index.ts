@@ -1,0 +1,1 @@
+export { AdCardContent } from './AdCardContent';

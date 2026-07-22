@@ -7,7 +7,7 @@ export function CartEmptyState() {
     <StateCard
       icon={ShoppingCart}
       title="Корзина пуста"
-      description="Добавьте товары из каталога, а потом возвращайтесь сюда. Корзина без товаров, конечно, концептуальна, но бизнесу от этого грустно."
+      description="Добавьте товары из каталога Маркета или сохраните объявления Доски."
       action={{
         label: 'Перейти в каталог',
         to: '/market/catalog',

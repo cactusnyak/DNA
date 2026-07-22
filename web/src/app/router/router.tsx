@@ -99,7 +99,7 @@ export const router = createBrowserRouter([
             handle: {
               breadcrumb: {
                 type: BREADCRUMB_TYPE.CATALOG,
-                label: 'Каталог',
+                label: 'Каталог Доски',
                 href: platformSections.ads.catalogHref,
               },
             } satisfies BreadcrumbHandle,
@@ -182,7 +182,7 @@ export const router = createBrowserRouter([
             handle: {
               breadcrumb: {
                 type: BREADCRUMB_TYPE.CATALOG,
-                label: 'Каталог',
+                label: 'Каталог Маркета',
                 href: platformSections.market.catalogHref,
               },
             } satisfies BreadcrumbHandle,
@@ -332,4 +332,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-

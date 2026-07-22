@@ -1,15 +1,12 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import type { Ad } from '@/entities/ad';
 import { FavouriteButton } from '@/entities/favourite';
-import {
-  getPlatformCategoryHref,
-  PLATFORM_SECTION,
-} from '@/shared/platform';
-import { formatPrice } from '@/shared/utils/format-price';
 
 import { ItemGallery } from '@/widgets/ItemGallery';
 import { ItemActions } from '@/widgets/ItemActions';
+
+import { AdCardContent } from './components/AdCardContent';
 
 type AdCardProps = {
   ad: Ad;
@@ -17,17 +14,6 @@ type AdCardProps = {
 };
 
 export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
-  const navigate = useNavigate();
-  const categoryHref = ad.category
-    ? getPlatformCategoryHref(
-        PLATFORM_SECTION.ADS,
-        ad.category.path ?? ad.category.slug,
-      )
-    : null;
-  const shouldShowCategoryLink =
-    !!ad.category &&
-    !!categoryHref &&
-    (!currentCategorySlug || currentCategorySlug !== ad.category.slug);
   return (
     <Link
       to={`/ads/ad/${ad.slug}`}
@@ -44,26 +30,10 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <p className="text-xl font-bold">{formatPrice(ad.price)}</p>
-
-        <div className="mt-2">
-          <h3 className="line-clamp-2 font-semibold">{ad.title}</h3>
-
-          {shouldShowCategoryLink && (
-            <span
-              role="link"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(categoryHref!); }}
-              className="mt-0.5 block cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground"
-            >
-              В категорию «{ad.category!.name}»
-            </span>
-          )}
-        </div>
-      </div>
+      <AdCardContent ad={ad} currentCategorySlug={currentCategorySlug} />
 
       <div
-        className="relative z-10 mt-auto p-4 pt-0"
+        className="relative z-10 mt-auto p-2"
         onClick={(e) => e.preventDefault()}
       >
         <ItemActions

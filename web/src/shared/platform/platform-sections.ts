@@ -31,9 +31,9 @@ export const platformSections: Record<
     catalogHref: '/ads/catalog',
     apiScope: 'ADS',
     searchPlaceholder: 'Поиск по доске',
-    catalogLabel: 'Каталог доски',
-    categoryPreviewTitle: 'Категории доски',
-    catalogDescription: 'Категории для будущих объявлений пользователей.',
+    catalogLabel: 'Каталог Доски',
+    categoryPreviewTitle: 'Категории Доски',
+    catalogDescription: 'Категории объявлений пользователей.',
   },
   [PLATFORM_SECTION.MARKET]: {
     id: PLATFORM_SECTION.MARKET,
@@ -42,8 +42,8 @@ export const platformSections: Record<
     catalogHref: '/market/catalog',
     apiScope: 'MARKET',
     searchPlaceholder: 'Поиск по маркету',
-    catalogLabel: 'Каталог маркета',
-    categoryPreviewTitle: 'Категории маркета',
+    catalogLabel: 'Каталог Маркета',
+    categoryPreviewTitle: 'Категории Маркета',
     catalogDescription: 'Полное дерево категорий маркета с товарами DNA.',
   },
 };

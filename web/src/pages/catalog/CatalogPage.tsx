@@ -24,7 +24,7 @@ export function CatalogPage({ section }: CatalogPageProps) {
   });
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загрузка категорий...</p>;
+    return <p className="text-muted-foreground">Загружаем категории...</p>;
   }
 
   if (error) {
@@ -37,8 +37,7 @@ export function CatalogPage({ section }: CatalogPageProps) {
       section={section}
       title={sectionConfig.catalogLabel}
       description={sectionConfig.catalogDescription}
-      emptyText="Категории пока не добавлены. Пустой каталог, зато честный."
+      emptyText="Здесь пока нет категорий."
     />
   );
 }
-

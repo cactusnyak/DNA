@@ -1,13 +1,13 @@
-import type { UIEvent } from 'react';
+import type { CSSProperties, UIEvent } from 'react';
 
 import type { Ad } from '@/entities/ad';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { Product } from '@/entities/product';
-import { PLATFORM_SECTION } from '@/shared/platform';
+import { headerHeightVar } from '@/shared/header';
+import { mobileNavigationHeightVar } from '@/shared/main-navigation';
 
-import { GlobalSearchAdResults } from '../GlobalSearchAdResults';
 import { GlobalSearchCategoryResults } from '../GlobalSearchCategoryResults';
-import { GlobalSearchProductResults } from '../GlobalSearchProductResults';
+import { GlobalSearchItemResults } from '../GlobalSearchItemResults';
 import { GlobalSearchSectionResults } from '../GlobalSearchSectionResults';
 import type { GlobalSearchSection } from '../../types/global-search';
 
@@ -76,66 +76,52 @@ export function GlobalSearchDropdown({
   onAdResultsScroll,
   onNavigate,
 }: GlobalSearchDropdownProps) {
-  const globalSearchDescription =
-    'Начните вводить запрос. Поиск по всем разделам: маркет, доска объявлений и их категории.';
+  const globalSearchDescription = 'Найдите нужное в DNA.';
+  const dropdownStyle = {
+    '--global-search-mobile-height': `calc(100dvh - ${headerHeightVar()} - ${mobileNavigationHeightVar()} - 0.5rem)`,
+  } as CSSProperties;
 
   return (
     <div className="absolute top-full right-0 left-0 z-[70] min-w-[320px] pt-2">
-      <div className="overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl">
+      <div
+        className="max-h-[var(--global-search-mobile-height)] overflow-y-auto rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl md:max-h-[calc(100dvh-var(--header-height,112px)-0.5rem)]"
+        style={dropdownStyle}
+      >
         {!isSearchReady ? (
           <p className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground leading-[1.5]">
             {globalSearchDescription}
           </p>
         ) : (
           <div className="flex flex-col divide-y divide-border">
-            <div className="pb-3">
-              <GlobalSearchSectionResults
-                sections={sections}
-                onNavigate={onNavigate}
-              />
-            </div>
-
-            <GlobalSearchCategoryResults
-              section={PLATFORM_SECTION.MARKET}
-              title="Категории маркета"
-              categories={marketCategoryResults}
-              allCategories={marketCategories}
-              searchValue={searchValue}
-              isPending={isMarketCategoriesPending}
-              isError={isMarketCategoriesError}
-              onNavigate={onNavigate}
-            />
-
-            <GlobalSearchCategoryResults
-              section={PLATFORM_SECTION.ADS}
-              title="Категории доски"
-              categories={adsCategoryResults}
-              allCategories={adsCategories}
-              searchValue={searchValue}
-              isPending={isAdsCategoriesPending}
-              isError={isAdsCategoriesError}
-              onNavigate={onNavigate}
-            />
-
-            <GlobalSearchProductResults
+            <GlobalSearchItemResults
               products={products}
               totalProducts={totalProducts}
-              searchValue={searchValue}
-              isPending={isProductsPending}
-              isError={isProductsError}
-              hasMoreProducts={hasMoreProducts}
-              onScroll={onProductResultsScroll}
-              onNavigate={onNavigate}
-            />
-
-            <GlobalSearchAdResults
               ads={ads}
               totalAds={totalAds}
               searchValue={searchValue}
-              isPending={isAdsPending}
-              isError={isAdsError}
-              hasMoreAds={hasMoreAds}
-              onScroll={onAdResultsScroll}
+              isPending={isProductsPending || isAdsPending}
+              isError={isProductsError || isAdsError}
+              hasMore={hasMoreProducts || hasMoreAds}
+              onScroll={(event) => {
+                onProductResultsScroll(event);
+                onAdResultsScroll(event);
+              }}
+              onNavigate={onNavigate}
+            />
+
+            <GlobalSearchCategoryResults
+              marketCategories={marketCategories}
+              adsCategories={adsCategories}
+              marketCategoryResults={marketCategoryResults}
+              adsCategoryResults={adsCategoryResults}
+              searchValue={searchValue}
+              isPending={isMarketCategoriesPending || isAdsCategoriesPending}
+              isError={isMarketCategoriesError || isAdsCategoriesError}
+              onNavigate={onNavigate}
+            />
+
+            <GlobalSearchSectionResults
+              sections={sections}
               onNavigate={onNavigate}
             />
           </div>
@@ -144,4 +130,3 @@ export function GlobalSearchDropdown({
     </div>
   );
 }
-

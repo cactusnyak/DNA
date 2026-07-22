@@ -18,18 +18,18 @@ export function ReferralGuestLanding() {
         <div className="space-y-7">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground">
             <Sparkles className="size-3.5" />
-            Раздел заработка DNA
+            Реферальная программа DNA
           </div>
 
           <div className="space-y-4">
             <h1 className="max-w-3xl text-3xl font-semibold leading-tight sm:text-5xl">
-              Приглашайте людей. Получайте бонусы. Не продавайте душу баннерной рекламе.
+              Приглашайте пользователей по персональной ссылке
             </h1>
 
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-              После регистрации вы получите реферальный код, ссылку для
-              приглашений, баланс и будущую историю начислений. Покупать в DNA
-              можно и без аккаунта, но заработок открывается только в профиле.
+              После регистрации доступны реферальный код, ссылка и дерево
+              приглашений. Начисления и условия программы пока разрабатываются.
+              Заказ в Маркете можно оформить без регистрации.
             </p>
           </div>
 
@@ -54,7 +54,7 @@ export function ReferralGuestLanding() {
                 <Users className="size-5 text-muted-foreground" />
                 <p className="mt-4 text-2xl font-semibold">∞</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Потенциальная сеть
+                  Дерево приглашений
                 </p>
               </div>
 
@@ -62,7 +62,7 @@ export function ReferralGuestLanding() {
                 <CircleDollarSign className="size-5 text-muted-foreground" />
                 <p className="mt-4 text-2xl font-semibold">₽</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Будущие начисления
+                  Программа в разработке
                 </p>
               </div>
             </div>
@@ -71,8 +71,8 @@ export function ReferralGuestLanding() {
               <Network className="size-5 opacity-80" />
 
               <p className="mt-4 text-sm font-medium">
-                Реферальная структура будет расти деревом: ваши приглашённые,
-                их приглашённые и следующие уровни до заданного порога.
+                В профиле можно посмотреть пользователей, зарегистрированных
+                по вашей ссылке. Условия начислений появятся перед запуском.
               </p>
             </div>
           </div>

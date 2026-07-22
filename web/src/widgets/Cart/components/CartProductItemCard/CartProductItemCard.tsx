@@ -31,10 +31,7 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
       price={<p className="text-base font-semibold sm:text-lg">{formatPrice(itemTotal)}</p>}
       priceMeta={`${quantity} × ${formatPrice(product.price)}`}
       actions={
-        <div
-          className="w-36 sm:w-40"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="w-36 sm:w-40">
           <ProductQuantityCounter productId={product.id} variant="details" />
         </div>
       }

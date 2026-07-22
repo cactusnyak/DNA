@@ -49,23 +49,25 @@ export function StateCard({
         className,
       )}
     >
-      <div className="mx-auto max-w-md">
+      <div className="flex flex-col gap-6">
         {Icon && (
-          <span className="mx-auto mb-5 flex size-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-            <Icon className="size-6" strokeWidth={1.5} />
+          <span className="mx-auto flex items-center justify-center">
+            <Icon className="size-8" strokeWidth={1.5} />
           </span>
         )}
 
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          {title}
-        </h1>
+        <div className="flex flex-col gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            {title}
+          </h1>
 
-        <p className="mt-4 text-sm leading-6 text-muted-foreground">
-          {description}
-        </p>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {description}
+          </p>
+        </div>
 
         {action && (
-          <div className="mt-5 flex justify-center">
+          <div className="flex justify-center">
             {action.to ? (
               <Button asChild variant={action.variant}>
                 <Link to={action.to}>{action.label}</Link>

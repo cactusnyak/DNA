@@ -16,7 +16,7 @@ type InfoBlock = {
 };
 
 function getInfoBlocks(activeCategory: (typeof referralEarningCategories)[number]): InfoBlock[] {
-  return [
+  const blocks: InfoBlock[] = [
     {
       title: 'Описание',
       items: activeCategory.details.paragraphs,
@@ -28,6 +28,8 @@ function getInfoBlocks(activeCategory: (typeof referralEarningCategories)[number
       type: 'examples',
     },
   ];
+
+  return blocks.filter((block) => block.items.length > 0);
 }
 
 function ReferralEarningDescriptionItem({

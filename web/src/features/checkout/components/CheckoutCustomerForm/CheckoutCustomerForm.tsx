@@ -51,7 +51,8 @@ export function CheckoutCustomerForm({
           <h2 className="text-lg font-semibold">Контактные данные</h2>
 
           <p className="text-sm leading-6 text-muted-foreground">
-            Аккаунт создавать не нужно. Оставьте данные для связи и доставки.
+            Аккаунт создавать не нужно. Оставьте контакты и адрес, чтобы мы
+            могли уточнить дальнейшее оформление. Доставка пока не подключена.
           </p>
         </header>
 

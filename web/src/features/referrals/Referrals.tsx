@@ -40,17 +40,16 @@ export function Referrals() {
   }
 
   if (isUserPending) {
-    return <p className="text-muted-foreground">Загрузка раздела заработка...</p>;
+    return <p className="text-muted-foreground">Загружаем данные...</p>;
   }
 
   if (isUserError || !user) {
     return (
       <section className="rounded-3xl border border-border bg-card p-6">
-        <h1 className="text-2xl font-semibold">Сессия устала жить</h1>
+        <h1 className="text-2xl font-semibold">Сессия завершена</h1>
 
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Не удалось загрузить пользователя. Выйдите и войдите снова, чтобы
-          раздел заработка снова вспомнил, кто вы такой.
+          Не удалось загрузить данные профиля. Выйдите и войдите снова.
         </p>
 
         <Button
@@ -69,7 +68,7 @@ export function Referrals() {
     <div className="space-y-8">
       <SectionHeader
         title="Заработок"
-        description="Реферальная ссылка, баланс и дерево приглашённых пользователей."
+        description="Реферальный код и дерево приглашений доступны. Начисления и условия программы пока разрабатываются."
       />
 
       <ReferralDashboard

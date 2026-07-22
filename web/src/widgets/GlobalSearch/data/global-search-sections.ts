@@ -6,14 +6,14 @@ export const globalSearchSections: GlobalSearchSection[] = [
   {
     id: 'home',
     title: 'Главная',
-    description: 'Баланс, категории маркета, товары и будущие объявления.',
+    description: 'Товары, объявления и категории.',
     href: '/',
     keywords: ['главная', 'домой', 'home', 'баланс', 'популярные товары'],
   },
   {
     id: 'ads',
     title: platformSections.ads.label,
-    description: 'Категории и будущие объявления пользователей.',
+    description: 'Категории и объявления пользователей.',
     href: platformSections.ads.href,
     keywords: ['доска', 'объявления', 'б/у', 'бу', 'classifieds', 'ads'],
   },
@@ -27,7 +27,7 @@ export const globalSearchSections: GlobalSearchSection[] = [
   {
     id: 'market',
     title: platformSections.market.label,
-    description: 'Товары DNA и будущие предложения продавцов.',
+    description: 'Каталог товаров DNA.',
     href: platformSections.market.href,
     keywords: ['маркет', 'магазин', 'товары', 'market', 'продавцы'],
   },
@@ -48,14 +48,14 @@ export const globalSearchSections: GlobalSearchSection[] = [
   {
     id: 'cart',
     title: 'Корзина',
-    description: 'Товары и будущие объявления, которые вы добавили.',
+    description: 'Добавленные товары и объявления.',
     href: '/cart',
     keywords: ['корзина', 'cart', 'покупка', 'товары в корзине'],
   },
   {
     id: 'checkout',
     title: 'Оформление заказа',
-    description: 'Контакты, доставка и подтверждение покупки из маркета.',
+    description: 'Контактные данные и создание заказа в Маркете.',
     href: '/checkout',
     keywords: ['оформление', 'заказ', 'доставка', 'купить', 'checkout'],
   },
@@ -69,7 +69,7 @@ export const globalSearchSections: GlobalSearchSection[] = [
   {
     id: 'referrals',
     title: 'Заработок',
-    description: 'Реферальная ссылка, код, дерево приглашённых и начисления.',
+    description: 'Реферальная ссылка, код и дерево приглашённых. Начисления пока разрабатываются.',
     href: '/referrals',
     keywords: [
       'заработок',

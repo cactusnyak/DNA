@@ -33,7 +33,7 @@ export function CategoryPage({ section }: CategoryPageProps) {
   }, [categories, categorySlug]);
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загрузка категории...</p>;
+    return <p className="text-muted-foreground">Загружаем категорию...</p>;
   }
 
   if (error || !currentCategory) {
@@ -51,4 +51,3 @@ export function CategoryPage({ section }: CategoryPageProps) {
     />
   );
 }
-

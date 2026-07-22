@@ -3,8 +3,8 @@ import { PLATFORM_SECTION } from '@/shared/platform';
 import { useGridColumns } from '@/shared/hooks/use-grid-columns';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
+import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard';
 
-import { ProductCard } from './components/ProductCard';
 
 type ProductsListingProps = {
   categorySlug?: string;
@@ -62,7 +62,11 @@ export function ProductsListing({
     <div className="space-y-4">
       <div className={getItemGridClasses()}>
         {items.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            section={PLATFORM_SECTION.MARKET}
+            product={product}
+          />
         ))}
       </div>
       
