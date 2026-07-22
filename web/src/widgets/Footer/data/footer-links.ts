@@ -68,11 +68,5 @@ export const contactLinks = [
   {
     value: 'dna.platform.shop@gmail.com',
     href: 'mailto:dna.platform.shop@gmail.com',
-    icon: Mail,
-  },
-  {
-    value: '+7 977 883-40-48',
-    href: 'tel:+79778834048',
-    icon: Phone,
-  },
+  }
 ];

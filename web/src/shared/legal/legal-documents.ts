@@ -3,7 +3,7 @@ import type { LegalDocument, LegalSection } from './types';
 
 const revisionDate = '22 июля 2026 года';
 const owner = legalOwner.fullName;
-const contact = `${legalOwner.email}, ${legalOwner.phone}`;
+const contact = `${legalOwner.email}`;
 
 const section = (id: string, title: string, paragraphs?: string[], items?: string[]): LegalSection => ({ id, title, paragraphs, items });
 
@@ -19,7 +19,7 @@ export const legalDocuments: LegalDocument[] = [
         `ОГРНИП: ${legalOwner.ogrnip}`,
         `Регистрирующий орган: ${legalOwner.registrationAuthority}`,
       ]),
-      section('contacts', 'Контакты', [`Email для обращений, претензий, вопросов о персональных данных и отзыва согласий: ${legalOwner.email}.`, `Телефон: ${legalOwner.phone}. Электронные обращения через сайт принимаются ${legalOwner.electronicRequestsHours}.`]),
+      section('contacts', 'Контакты', [`Email для обращений, претензий, вопросов о персональных данных и отзыва согласий: ${legalOwner.email}.`, `Электронные обращения через сайт принимаются ${legalOwner.electronicRequestsHours}.`]),
       section('role', 'Роль DNA', ['DNA объединяет Маркет и Доску объявлений и действует как агрегатор и информационный посредник. Оплату заказов Маркета принимает ИП Филатов Денис Романович, который также отвечает за организацию доставки, возвраты и претензии по таким заказам. На Доске DNA не является стороной сделок между пользователями, если прямо не указано иное.']),
     ],
   },
@@ -33,7 +33,7 @@ export const legalDocuments: LegalDocument[] = [
   },
   {
     path: '/contacts', title: 'Контакты', description: 'Способы связи с платформой DNA.', revisionDate,
-    sections: [section('requests', 'Обращения', [`Email: ${legalOwner.email}.`, `Телефон: ${legalOwner.phone}.`, 'Электронные обращения через сайт принимаются круглосуточно. Укажите имя, контакт для ответа, предмет обращения и связанные с ним номер заказа или объявления, если они есть.'])],
+    sections: [section('requests', 'Обращения', [`Email: ${legalOwner.email}.`, 'Электронные обращения через сайт принимаются круглосуточно. Укажите имя, контакт для ответа, предмет обращения и связанные с ним номер заказа или объявления, если они есть.'])],
   },
   {
     path: '/public-offer', title: 'Публичная оферта', description: 'Условия приобретения товаров в Маркете DNA.', revisionDate,

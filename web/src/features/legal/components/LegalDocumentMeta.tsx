@@ -3,9 +3,14 @@ import { useEffect } from 'react';
 type LegalDocumentMetaProps = {
   title: string;
   description: string;
+  revisionDate: string;
 };
 
-export function LegalDocumentMeta({ title, description }: LegalDocumentMetaProps) {
+export function LegalDocumentMeta({
+  title,
+  description,
+  revisionDate,
+}: LegalDocumentMetaProps) {
   useEffect(() => {
     const previousTitle = document.title;
     const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
@@ -20,6 +25,10 @@ export function LegalDocumentMeta({ title, description }: LegalDocumentMetaProps
     };
   }, [description, title]);
 
-  return null;
+  return (
+    <p className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-muted/60 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+      <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+      Редакция от {revisionDate}
+    </p>
+  );
 }
-

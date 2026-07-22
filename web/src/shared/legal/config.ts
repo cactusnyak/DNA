@@ -9,7 +9,6 @@ export const legalOwner = {
   registrationAuthority: 'Межрайонная инспекция Федеральной налоговой службы № 46 по г. Москве',
   legalAddress: null,
   email: 'dna.platform.shop@gmail.com',
-  phone: '+7 977 883-40-48',
   phoneHref: '+79778834048',
   electronicRequestsHours: 'круглосуточно',
   domain: 'dna-platform.shop',
