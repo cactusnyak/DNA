@@ -29,7 +29,6 @@ export function CategoryPreview({
   const {
     data: categories,
     isLoading,
-    error,
   } = useQuery({
     queryKey: ['categories', section],
     queryFn: () => getCatalogCategories({ section }),
@@ -44,10 +43,6 @@ export function CategoryPreview({
         <p className="text-sm text-muted-foreground">Загрузка категорий...</p>
       </section>
     );
-  }
-
-  if (error) {
-    return null;
   }
 
   const previewCategories = getPreviewCategories(categories ?? [], limit);

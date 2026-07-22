@@ -5,7 +5,7 @@ DNA Platform is a unified web platform combining an online marketplace, a classi
 ## Environments
 
 - Test: [https://dna-demo.netlify.app/](https://dna-demo.netlify.app/)
-- Production: [https://dna-platform.shop/ads](https://dna-platform.shop/ads)
+- Production: [https://dna-platform.shop](https://dna-platform.shop)
 
 ## Core Features
 
