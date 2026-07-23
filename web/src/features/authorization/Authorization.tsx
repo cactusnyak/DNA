@@ -1,9 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import {
   getCurrentUser,
@@ -37,6 +34,13 @@ type AuthorizationStep = 'login' | 'otp';
 
 export function Authorization() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const processedOAuthTokenRef = useRef<string | null>(null);
+
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const { guestItems, clearGuestItems } = useFavouriteStore();
 
   const referralCodeFromUrl =
     getAuthorizationReferralCodeFromSearchParams(searchParams);
@@ -44,9 +48,13 @@ export function Authorization() {
   const initialReferralCode =
     referralCodeFromUrl || getStoredAuthorizationReferralCode();
 
+  const oauthAccessToken = searchParams.get('oauth_access_token');
+  const oauthError = searchParams.get('oauth_error');
+
   const [mode, setMode] = useState<AuthorizationMode>(
     initialReferralCode ? 'register' : 'login',
   );
+
   const [step, setStep] = useState<AuthorizationStep>('login');
 
   const [formValue, setFormValue] = useState<AuthorizationFormValue>(() =>
@@ -54,14 +62,6 @@ export function Authorization() {
       inviterReferralCode: initialReferralCode,
     }),
   );
-
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
-  const { guestItems, clearGuestItems } = useFavouriteStore();
-
-  const oauthAccessToken = searchParams.get('oauth_access_token');
-  const oauthError = searchParams.get('oauth_error');
 
   const { data: availableOAuthProviders } = useQuery({
     queryKey: ['oauth-providers'],
@@ -78,38 +78,26 @@ export function Authorization() {
 
       queryClient.setQueryData(['current-user'], user);
 
-      if (oauthAccessToken) {
-        setAccessToken(oauthAccessToken);
-
-        if (guestItems.length > 0) {
-          syncFavourites(guestItems, oauthAccessToken).then(() => {
-            clearGuestItems();
-          });
-        }
-
-        navigate('/profile');
+      if (guestItems.length > 0 && oauthAccessToken) {
+        void syncFavourites(guestItems, oauthAccessToken).then(() => {
+          clearGuestItems();
+        });
       }
+
+      navigate('/profile', { replace: true });
     },
   });
 
   useEffect(() => {
-    if (!oauthAccessToken) {
+    if (
+      !oauthAccessToken ||
+      processedOAuthTokenRef.current === oauthAccessToken
+    ) {
       return;
     }
 
+    processedOAuthTokenRef.current = oauthAccessToken;
     setAccessToken(oauthAccessToken);
-
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete('oauth_access_token');
-
-    navigate(
-      {
-        pathname: '/authorization',
-        search: nextSearchParams.toString(),
-      },
-      { replace: true },
-    );
-
     oauthMutation.mutate();
   }, [oauthAccessToken]);
 
@@ -144,12 +132,12 @@ export function Authorization() {
       queryClient.setQueryData(['current-user'], response.user);
 
       if (guestItems.length > 0) {
-        syncFavourites(guestItems, response.accessToken).then(() => {
+        void syncFavourites(guestItems, response.accessToken).then(() => {
           clearGuestItems();
         });
       }
 
-      navigate('/profile');
+      navigate('/profile', { replace: true });
     },
   });
 
@@ -178,6 +166,7 @@ export function Authorization() {
   function handleModeChange(nextMode: AuthorizationMode) {
     setMode(nextMode);
     setStep('login');
+
     setFormValue((currentValue) => ({
       ...currentValue,
       otpCode: '',
@@ -193,7 +182,9 @@ export function Authorization() {
   }
 
   const errorMessage =
-    sendOtpMutation.error || verifyOtpMutation.error
+    sendOtpMutation.error ||
+      verifyOtpMutation.error ||
+      oauthMutation.error
       ? 'Не удалось выполнить действие. Проверьте данные и попробуйте ещё раз.'
       : oauthError ?? undefined;
 
