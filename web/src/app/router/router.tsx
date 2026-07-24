@@ -25,6 +25,7 @@ import { ProductPage } from '@/pages/product/ProductPage';
 import { ProfilePage } from '@/pages/profile/ProfilePage';
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage';
 import { SellerPage } from '@/pages/seller/SellerPage';
+import { SearchPage } from '@/pages/search/SearchPage';
 import { LegalDocumentPage } from '@/features/legal';
 import {
   PLATFORM_SECTION,
@@ -266,6 +267,17 @@ export const router = createBrowserRouter([
           breadcrumb: {
             type: BREADCRUMB_TYPE.STATIC,
             label: 'Избранное',
+          },
+        } satisfies BreadcrumbHandle,
+      },
+
+      {
+        path: '/search',
+        element: <SearchPage />,
+        handle: {
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.SEARCH,
+            fallbackLabel: 'Поиск',
           },
         } satisfies BreadcrumbHandle,
       },

@@ -17,6 +17,7 @@ export function GlobalSearch({
   inputClassName,
   onOpen,
 }: GlobalSearchProps) {
+  const navigate = useNavigate();
   const {
     containerRef,
     searchValue,
@@ -54,50 +55,73 @@ export function GlobalSearch({
   } = useGlobalSearch();
 
   function handleFocus() {
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      return;
+    }
+
     openSearch();
     onOpen?.();
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const query = searchValue.trim();
+
+    if (!query) {
+      return;
+    }
+
+    handleResultClick();
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  }
+
   return (
     <div ref={containerRef} className={cn('relative w-full', className)}>
-      <SearchInput
-        name="globalSearch"
-        value={searchValue}
-        placeholder={placeholder}
-        autoComplete="off"
-        className={inputClassName}
-        onFocus={handleFocus}
-        onChange={(event) => setSearchValue(event.target.value)}
-      />
+      <form role="search" onSubmit={handleSubmit}>
+        <SearchInput
+          name="globalSearch"
+          value={searchValue}
+          placeholder={placeholder}
+          autoComplete="off"
+          enterKeyHint="search"
+          className={inputClassName}
+          onFocus={handleFocus}
+          onChange={(event) => setSearchValue(event.target.value)}
+        />
+      </form>
 
       {isOpen && (
-        <GlobalSearchDropdown
-          isSearchReady={isSearchReady}
-          sections={sectionResults}
-          marketCategories={marketCategories}
-          adsCategories={adsCategories}
-          marketCategoryResults={marketCategoryResults}
-          adsCategoryResults={adsCategoryResults}
-          isMarketCategoriesPending={isMarketCategoriesPending}
-          isAdsCategoriesPending={isAdsCategoriesPending}
-          isMarketCategoriesError={isMarketCategoriesError}
-          isAdsCategoriesError={isAdsCategoriesError}
-          products={visibleProducts}
-          totalProducts={productResults.length}
-          isProductsPending={isProductsPending}
-          isProductsError={isProductsError}
-          hasMoreProducts={hasMoreProducts}
-          ads={visibleAds}
-          totalAds={adResults.length}
-          isAdsPending={isAdsPending}
-          isAdsError={isAdsError}
-          hasMoreAds={hasMoreAds}
-          searchValue={searchValue}
-          onProductResultsScroll={handleProductResultsScroll}
-          onAdResultsScroll={handleAdResultsScroll}
-          onNavigate={handleResultClick}
-        />
+        <div className="hidden md:block">
+          <GlobalSearchDropdown
+            isSearchReady={isSearchReady}
+            sections={sectionResults}
+            marketCategories={marketCategories}
+            adsCategories={adsCategories}
+            marketCategoryResults={marketCategoryResults}
+            adsCategoryResults={adsCategoryResults}
+            isMarketCategoriesPending={isMarketCategoriesPending}
+            isAdsCategoriesPending={isAdsCategoriesPending}
+            isMarketCategoriesError={isMarketCategoriesError}
+            isAdsCategoriesError={isAdsCategoriesError}
+            products={visibleProducts}
+            totalProducts={productResults.length}
+            isProductsPending={isProductsPending}
+            isProductsError={isProductsError}
+            hasMoreProducts={hasMoreProducts}
+            ads={visibleAds}
+            totalAds={adResults.length}
+            isAdsPending={isAdsPending}
+            isAdsError={isAdsError}
+            hasMoreAds={hasMoreAds}
+            searchValue={searchValue}
+            onProductResultsScroll={handleProductResultsScroll}
+            onAdResultsScroll={handleAdResultsScroll}
+            onNavigate={handleResultClick}
+          />
+        </div>
       )}
     </div>
   );
 }
+import { type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';

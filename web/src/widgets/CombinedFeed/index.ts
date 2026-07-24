@@ -1,1 +1,1 @@
-export { CombinedFeed } from './CombinedFeed';
+export { CombinedFeed, CombinedItemsGrid } from './CombinedFeed';

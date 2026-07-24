@@ -5,6 +5,7 @@ export const BREADCRUMB_TYPE = {
   PRODUCT: 'product',
   AD: 'ad',
   STATIC: 'static',
+  SEARCH: 'search',
 } as const;
 
 export type BreadcrumbType =
@@ -36,6 +37,10 @@ export type BreadcrumbDescriptor =
     type: typeof BREADCRUMB_TYPE.STATIC;
     label: string;
     href?: string;
+  }
+  | {
+    type: typeof BREADCRUMB_TYPE.SEARCH;
+    fallbackLabel: string;
   };
 
 export type BreadcrumbHandle = {

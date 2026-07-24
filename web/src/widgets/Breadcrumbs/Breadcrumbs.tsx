@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMatches } from 'react-router-dom';
+import { useMatches, useSearchParams } from 'react-router-dom';
 
 import { getAd } from '@/entities/ad';
 import { getCatalogCategories } from '@/shared/catalog';
@@ -34,6 +34,7 @@ function getActiveBreadcrumbSection(matches: BreadcrumbMatch[]) {
 
 export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
   const matches = useMatches() as BreadcrumbMatch[];
+  const [searchParams] = useSearchParams();
 
   const activeSection = getActiveBreadcrumbSection(matches);
   const categorySlug = getCurrentCategorySlug(matches);
@@ -68,6 +69,7 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
     productSlug,
     ad,
     adSlug,
+    searchQuery: searchParams.get('q')?.trim() ?? '',
   });
 
   if (breadcrumbItems.length <= 1) {
@@ -76,4 +78,3 @@ export function Breadcrumbs({ root = defaultRoot }: BreadcrumbsProps) {
 
   return <BreadcrumbsList items={breadcrumbItems} />;
 }
-

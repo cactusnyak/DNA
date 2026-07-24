@@ -26,6 +26,7 @@ type BuildBreadcrumbItemsParams = {
   productSlug?: string;
   ad?: Ad;
   adSlug?: string;
+  searchQuery?: string;
 };
 
 function getCatalogBreadcrumbItem(
@@ -165,6 +166,7 @@ export function buildBreadcrumbItems({
   productSlug,
   ad,
   adSlug,
+  searchQuery = '',
 }: BuildBreadcrumbItemsParams) {
   const isHomePage = matches.some(
     (match) =>
@@ -186,6 +188,19 @@ export function buildBreadcrumbItems({
     switch (breadcrumb.type) {
       case BREADCRUMB_TYPE.HOME:
         return [];
+
+      case BREADCRUMB_TYPE.SEARCH:
+        return [
+          {
+            id: 'search',
+            href: searchQuery
+              ? `/search?q=${encodeURIComponent(searchQuery)}`
+              : '/search',
+            label: searchQuery
+              ? `Поиск по запросу «${searchQuery}»`
+              : breadcrumb.fallbackLabel,
+          },
+        ];
 
       case BREADCRUMB_TYPE.CATALOG: {
         const catalogHref = activeSection
@@ -248,4 +263,3 @@ export function buildBreadcrumbItems({
 
   return removeDuplicateBreadcrumbs([root, ...routeBreadcrumbItems]);
 }
-
