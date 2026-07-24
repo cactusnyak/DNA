@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
+import { FormBooleanField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/shared/utils/cn';
 
@@ -160,13 +161,10 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
       >
         {hasBulkActions && (
           <td className="w-10 border-r border-border px-3 py-3">
-            <input
-              name={`selectedRecords.${key}`}
-              type="checkbox"
-              aria-label="Выбрать запись"
+            <FormBooleanField
+              ariaLabel="Выбрать запись"
               checked={isSelected}
-              onChange={() => toggleSelect(key)}
-              className="size-4 cursor-pointer rounded border-border accent-primary"
+              onCheckedChange={() => toggleSelect(key)}
             />
           </td>
         )}
@@ -430,16 +428,11 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
             <tr>
               {hasBulkActions && (
                 <th className="sticky top-0 z-10 w-10 bg-muted/80 px-3 py-3 border-r border-border">
-                  <input
-                    name="selectAllRecords"
-                    type="checkbox"
-                    aria-label="Выбрать все"
+                  <FormBooleanField
+                    ariaLabel="Выбрать все"
                     checked={allSelected}
-                    ref={(element) => {
-                      if (element) element.indeterminate = someSelected && !allSelected;
-                    }}
-                    onChange={toggleSelectAll}
-                    className="size-4 cursor-pointer rounded border-border accent-primary"
+                    indeterminate={someSelected && !allSelected}
+                    onCheckedChange={toggleSelectAll}
                   />
                 </th>
               )}
