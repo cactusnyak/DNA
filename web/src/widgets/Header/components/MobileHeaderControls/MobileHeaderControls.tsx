@@ -33,7 +33,7 @@ export function MobileHeaderControls({ section }: MobileHeaderControlsProps) {
   const sectionConfig = getPlatformSection(section);
 
   return (
-    <div className="border-t border-border/50 px-4 py-3 md:hidden">
+    <div className="border-t border-border/50 px-2 py-2 sm:px-3 md:hidden">
       <div className="mx-auto flex flex-col justify-start items-start gap-2 max-w-7xl sm:flex-row">
         {sectionConfig ? (
           <MobileCatalogButton

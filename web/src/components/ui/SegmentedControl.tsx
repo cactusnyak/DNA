@@ -24,7 +24,7 @@ export function SegmentedControl<T extends string>({
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1 rounded-xl border border-border bg-muted/50 p-1',
+        'inline-flex items-center gap-1 rounded-full border border-border bg-muted/50 p-[2px] sm:rounded-xl sm:p-1',
         className,
       )}
     >
@@ -32,7 +32,7 @@ export function SegmentedControl<T extends string>({
         const isActive = option.value === value;
 
         const itemClass = cn(
-          'inline-flex h-9 flex-1 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-colors whitespace-nowrap',
+          'inline-flex h-6 flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full px-3 text-xs font-medium text-muted-foreground transition-colors sm:h-9 sm:rounded-lg sm:px-4 sm:text-sm',
           'hover:bg-background hover:text-foreground',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           isActive && 'bg-background text-foreground ring-1 ring-border',
