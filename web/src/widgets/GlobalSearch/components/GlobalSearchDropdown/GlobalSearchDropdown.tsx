@@ -77,6 +77,20 @@ export function GlobalSearchDropdown({
   onNavigate,
 }: GlobalSearchDropdownProps) {
   const globalSearchDescription = 'Найдите нужное в DNA.';
+  const showItemResults =
+    totalProducts > 0 ||
+    totalAds > 0 ||
+    isProductsPending ||
+    isAdsPending ||
+    isProductsError ||
+    isAdsError;
+  const showCategoryResults =
+    marketCategoryResults.length > 0 ||
+    adsCategoryResults.length > 0 ||
+    isMarketCategoriesPending ||
+    isAdsCategoriesPending ||
+    isMarketCategoriesError ||
+    isAdsCategoriesError;
   const dropdownStyle = {
     '--global-search-mobile-height': `calc(100dvh - ${headerHeightVar()} - ${mobileNavigationHeightVar()} - 0.5rem)`,
   } as CSSProperties;
@@ -93,37 +107,45 @@ export function GlobalSearchDropdown({
           </p>
         ) : (
           <div className="flex flex-col divide-y divide-border">
-            <GlobalSearchItemResults
-              products={products}
-              totalProducts={totalProducts}
-              ads={ads}
-              totalAds={totalAds}
-              searchValue={searchValue}
-              isPending={isProductsPending || isAdsPending}
-              isError={isProductsError || isAdsError}
-              hasMore={hasMoreProducts || hasMoreAds}
-              onScroll={(event) => {
-                onProductResultsScroll(event);
-                onAdResultsScroll(event);
-              }}
-              onNavigate={onNavigate}
-            />
+            {showItemResults && (
+              <GlobalSearchItemResults
+                products={products}
+                totalProducts={totalProducts}
+                ads={ads}
+                totalAds={totalAds}
+                searchValue={searchValue}
+                isPending={isProductsPending || isAdsPending}
+                isError={isProductsError || isAdsError}
+                hasMore={hasMoreProducts || hasMoreAds}
+                onScroll={(event) => {
+                  onProductResultsScroll(event);
+                  onAdResultsScroll(event);
+                }}
+                onNavigate={onNavigate}
+              />
+            )}
 
-            <GlobalSearchCategoryResults
-              marketCategories={marketCategories}
-              adsCategories={adsCategories}
-              marketCategoryResults={marketCategoryResults}
-              adsCategoryResults={adsCategoryResults}
-              searchValue={searchValue}
-              isPending={isMarketCategoriesPending || isAdsCategoriesPending}
-              isError={isMarketCategoriesError || isAdsCategoriesError}
-              onNavigate={onNavigate}
-            />
+            {showCategoryResults && (
+              <GlobalSearchCategoryResults
+                marketCategories={marketCategories}
+                adsCategories={adsCategories}
+                marketCategoryResults={marketCategoryResults}
+                adsCategoryResults={adsCategoryResults}
+                searchValue={searchValue}
+                isPending={
+                  isMarketCategoriesPending || isAdsCategoriesPending
+                }
+                isError={isMarketCategoriesError || isAdsCategoriesError}
+                onNavigate={onNavigate}
+              />
+            )}
 
-            <GlobalSearchSectionResults
-              sections={sections}
-              onNavigate={onNavigate}
-            />
+            {sections.length > 0 && (
+              <GlobalSearchSectionResults
+                sections={sections}
+                onNavigate={onNavigate}
+              />
+            )}
           </div>
         )}
       </div>
