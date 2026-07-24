@@ -5,7 +5,7 @@ import { LegalTableOfContents } from './LegalTableOfContents';
 
 export function LegalDocumentLayout({ document }: { document: LegalDocument }) {
   return (
-    <article className="flex flex-col gap-9 rounded-2xl bg-white m-5 p-15 shadow-[0_0_90px_-10px_rgba(15,23,42,0.10)]">
+    <article className="flex flex-col gap-9 rounded-xl bg-white p-6 shadow-[0_0_90px_-10px_rgba(15,23,42,0.10)] sm:m-1 sm:rounded-lg sm:p-8 md:m-2 md:rounded-xl md:p-10 lg:m-3 lg:p-12 xl:m-5 xl:rounded-2xl xl:p-15">
       <LegalDocumentMeta
         title={document.title}
         description={document.description}

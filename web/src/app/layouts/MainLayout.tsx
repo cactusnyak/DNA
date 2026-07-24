@@ -1,6 +1,8 @@
+import type { CSSProperties } from 'react';
 import { Outlet, ScrollRestoration } from 'react-router-dom';
 
 import { headerHeightVar } from '@/shared/header';
+import { mobileNavigationHeightVar } from '@/shared/main-navigation';
 
 import { Breadcrumbs } from '@/widgets/Breadcrumbs';
 import { Footer } from '@/widgets/Footer/Footer';
@@ -10,7 +12,14 @@ import { CookieNotice } from '@/widgets/CookieNotice';
 
 export function MainLayout() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div
+      className="min-h-screen overflow-x-hidden bg-background pb-[var(--main-layout-mobile-bottom-padding)] text-foreground md:pb-0"
+      style={
+        {
+          '--main-layout-mobile-bottom-padding': mobileNavigationHeightVar(),
+        } as CSSProperties
+      }
+    >
       <Header />
 
       <div style={{ marginTop: headerHeightVar() }}>

@@ -395,6 +395,8 @@ export class UsersService {
           patronymic: null,
           phone: null,
           passwordHash: null,
+          oauthProvider: null,
+          oauthProviderId: null,
           avatarId: null,
           role: UserRole.DEFAULT,
           deletedAt: new Date(),
