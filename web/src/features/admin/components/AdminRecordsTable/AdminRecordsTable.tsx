@@ -219,16 +219,18 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               <button
                 type="button"
                 onClick={() => setIsFiltersOpen((prev) => !prev)}
-                className="group inline-flex items-center gap-1.5 text-left"
+                className="group inline-flex items-center gap-1.5 text-left cursor-pointer"
               >
                 <p className="text-sm font-medium">Фильтры таблицы</p>
-                <ChevronRight
-                  className={cn(
-                    'size-4 text-muted-foreground transition-transform',
-                    isFiltersOpen && 'rotate-90',
-                  )}
-                  strokeWidth={1.5}
-                />
+                <div>
+                  <ChevronRight
+                    className={cn(
+                      'size-4 text-muted-foreground transition-transform',
+                      isFiltersOpen && 'rotate-90',
+                    )}
+                    strokeWidth={1.5}
+                  />
+                </div>
               </button>
 
               {hasActiveFilters && (
@@ -250,127 +252,127 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
             )}
 
             {isFiltersOpen && (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {filterableColumns.map((column) => {
-                const filterConfig = getAdminTableFilterConfig(column);
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {filterableColumns.map((column) => {
+                  const filterConfig = getAdminTableFilterConfig(column);
 
-                if (!filterConfig) {
-                  return null;
-                }
+                  if (!filterConfig) {
+                    return null;
+                  }
 
-                const label = filterConfig.label ?? column.title;
-                const filterValue = filterValues[column.key];
+                  const label = filterConfig.label ?? column.title;
+                  const filterValue = filterValues[column.key];
 
-                if (filterConfig.type === 'select') {
+                  if (filterConfig.type === 'select') {
+                    return (
+                      <div key={column.key} className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground">
+                          {label}
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5">
+                          <button
+                            type="button"
+                            className={cn(
+                              'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                              !filterValue
+                                ? 'border-foreground bg-foreground text-background'
+                                : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
+                            )}
+                            onClick={() => updateFilterValue(column.key, '')}
+                          >
+                            Все
+                          </button>
+
+                          {filterConfig.options?.map((option) => {
+                            const isActive = filterValue === option.value;
+
+                            return (
+                              <button
+                                key={option.value}
+                                type="button"
+                                className={cn(
+                                  'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                                  isActive
+                                    ? 'border-foreground bg-foreground text-background'
+                                    : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
+                                )}
+                                onClick={() =>
+                                  updateFilterValue(column.key, option.value)
+                                }
+                              >
+                                {option.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (filterConfig.type === 'numberRange') {
+                    const rangeValue = getAdminTableRangeFilterValue(filterValue);
+
+                    return (
+                      <div key={column.key} className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground">
+                          {label}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            name={`${String(column.key)}From`}
+                            type="number"
+                            value={rangeValue.from ?? ''}
+                            placeholder="От"
+                            className="h-9"
+                            onChange={(event) =>
+                              updateRangeFilterValue(
+                                column.key,
+                                'from',
+                                event.target.value,
+                              )
+                            }
+                          />
+
+                          <Input
+                            name={`${String(column.key)}To`}
+                            type="number"
+                            value={rangeValue.to ?? ''}
+                            placeholder="До"
+                            className="h-9"
+                            onChange={(event) =>
+                              updateRangeFilterValue(
+                                column.key,
+                                'to',
+                                event.target.value,
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={column.key} className="space-y-2">
                       <div className="text-xs font-medium text-muted-foreground">
                         {label}
                       </div>
 
-                      <div className="flex flex-wrap gap-1.5">
-                        <button
-                          type="button"
-                          className={cn(
-                            'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
-                            !filterValue
-                              ? 'border-foreground bg-foreground text-background'
-                              : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
-                          )}
-                          onClick={() => updateFilterValue(column.key, '')}
-                        >
-                          Все
-                        </button>
-
-                        {filterConfig.options?.map((option) => {
-                          const isActive = filterValue === option.value;
-
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              className={cn(
-                                'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
-                                isActive
-                                  ? 'border-foreground bg-foreground text-background'
-                                  : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
-                              )}
-                              onClick={() =>
-                                updateFilterValue(column.key, option.value)
-                              }
-                            >
-                              {option.label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <Input
+                        name={String(column.key)}
+                        value={typeof filterValue === 'string' ? filterValue : ''}
+                        placeholder={filterConfig.placeholder ?? 'Поиск'}
+                        className="h-9"
+                        onChange={(event) =>
+                          updateFilterValue(column.key, event.target.value)
+                        }
+                      />
                     </div>
                   );
-                }
-
-                if (filterConfig.type === 'numberRange') {
-                  const rangeValue = getAdminTableRangeFilterValue(filterValue);
-
-                  return (
-                    <div key={column.key} className="space-y-2">
-                      <div className="text-xs font-medium text-muted-foreground">
-                        {label}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          name={`${String(column.key)}From`}
-                          type="number"
-                          value={rangeValue.from ?? ''}
-                          placeholder="От"
-                          className="h-9"
-                          onChange={(event) =>
-                            updateRangeFilterValue(
-                              column.key,
-                              'from',
-                              event.target.value,
-                            )
-                          }
-                        />
-
-                        <Input
-                          name={`${String(column.key)}To`}
-                          type="number"
-                          value={rangeValue.to ?? ''}
-                          placeholder="До"
-                          className="h-9"
-                          onChange={(event) =>
-                            updateRangeFilterValue(
-                              column.key,
-                              'to',
-                              event.target.value,
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={column.key} className="space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground">
-                      {label}
-                    </div>
-
-                    <Input
-                      name={String(column.key)}
-                      value={typeof filterValue === 'string' ? filterValue : ''}
-                      placeholder={filterConfig.placeholder ?? 'Поиск'}
-                      className="h-9"
-                      onChange={(event) =>
-                        updateFilterValue(column.key, event.target.value)
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </div>
+                })}
+              </div>
             )}
           </div>
         </div>
@@ -427,7 +429,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
           <thead className="text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
-                <th className="sticky top-0 z-10 w-10 bg-muted/80 px-3 py-3 border-r border-border">
+                <th className="sticky top-0 z-10 w-10 border-r border-border bg-muted/80 px-3 py-3 backdrop-blur-md">
                   <FormBooleanField
                     ariaLabel="Выбрать все"
                     checked={allSelected}
@@ -437,7 +439,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 </th>
               )}
 
-              {hasSubRows && <th className="sticky top-0 z-10 w-8 bg-muted/80 px-2 py-3 border-r border-border" />}
+              {hasSubRows && <th className="sticky top-0 z-10 w-8 border-r border-border bg-muted/80 px-2 py-3 backdrop-blur-md" />}
 
               {columns.map((column) => {
                 const width =
@@ -448,7 +450,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                   <th
                     key={column.key}
                     className={cn(
-                      'group relative sticky top-0 z-10 bg-muted/80 px-4 py-3 font-medium',
+                      'group relative sticky top-0 z-10 bg-muted/80 px-4 py-3 font-medium backdrop-blur-md',
                       getAdminTableAlignClassName(column.align),
                     )}
                     style={{ width: `${width}px` }}
@@ -489,7 +491,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               })}
 
               {renderActions && (
-                <th className="sticky top-0 z-10 w-[180px] bg-muted/80 px-4 py-3 text-right font-medium">
+                <th className="sticky top-0 z-10 w-[180px] bg-muted/80 px-4 py-3 text-right font-medium backdrop-blur-md">
                   Действия
                 </th>
               )}
