@@ -87,7 +87,7 @@ export function BalanceHero({
             className={cn(
               'grid w-full gap-4',
               showReferralLink
-                ? 'lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]'
+                ? 'lg:grid-cols-[minmax(min-content,3fr)_minmax(0,7fr)]'
                 : 'lg:grid-cols-1',
             )}
           >

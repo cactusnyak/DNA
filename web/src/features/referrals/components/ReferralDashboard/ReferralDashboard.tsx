@@ -30,7 +30,7 @@ export function ReferralDashboard({
 
   return (
     <div className="space-y-10">
-      <div className="grid gap-4 md:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] md:items-stretch">
+      <div className="grid gap-4 md:grid-cols-[minmax(min-content,3fr)_minmax(0,7fr)] md:items-stretch">
         <div className="grid gap-4">
           <BalanceCard balance={user.balance} />
 

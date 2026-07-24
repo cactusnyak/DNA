@@ -22,7 +22,7 @@ export function BalanceCard({
   return (
     <section
       className={cn(
-        'relative isolate w-full overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-[#050816] via-[#050816] to-[#0B1433] p-5 text-white shadow-[0_10px_100px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-500 sm:p-6',
+        'relative isolate w-full min-w-min shrink-0 overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-[#050816] via-[#050816] to-[#0B1433] p-5 text-white shadow-[0_10px_100px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-500 sm:p-6',
         className,
       )}
     >
