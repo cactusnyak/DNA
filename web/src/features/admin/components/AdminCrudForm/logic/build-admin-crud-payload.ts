@@ -1,6 +1,7 @@
 import type { AdStatus } from '@/entities/ad';
 import type { OrderStatus } from '@/entities/order';
 import type { UserRole } from '@/entities/user';
+import type { ProductAddition } from '@/entities/product';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
@@ -16,7 +17,7 @@ type BuildAdminCrudPayloadParams = {
   uploadImage: AdminImageUploader;
 };
 
-function isFile(value: AdminCrudFormValue): value is File {
+function isFile(value: unknown): value is File {
   return typeof File !== 'undefined' && value instanceof File;
 }
 
@@ -82,6 +83,9 @@ export async function buildAdminCrudPayload({
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
       imageUrls: [...existingImageUrls, ...uploadedImageUrls],
+      additions: Array.isArray(values.additions)
+        ? (values.additions as ProductAddition[])
+        : [],
       isActive: Boolean(values.isActive),
     };
   }

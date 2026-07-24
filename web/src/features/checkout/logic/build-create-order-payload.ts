@@ -30,6 +30,7 @@ export function buildCreateOrderPayload({
     items: items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
+      selectedAdditions: item.selectedAdditions ?? [],
     })),
   };
 }

@@ -2,7 +2,7 @@ import type { AdStatus } from '@/entities/ad';
 import type { AdCategory } from '@/entities/ad-category';
 import type { MarketCategory } from '@/entities/market-category';
 import type { Order } from '@/entities/order';
-import type { Product } from '@/entities/product';
+import type { Product, ProductAddition } from '@/entities/product';
 import type { UserRole } from '@/entities/user';
 import type { Image } from '@/shared/types/image';
 
@@ -135,7 +135,13 @@ export type AdminProductPayload = {
   categoryId: string;
   price: number;
   imageUrls: string[];
+  additions: ProductAddition[];
   isActive: boolean;
+};
+
+export type AdminProductAdditionType = {
+  key: 'boolean' | 'quantity';
+  name: string;
 };
 
 export type AdminAdCategoryPayload = {

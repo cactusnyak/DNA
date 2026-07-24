@@ -13,6 +13,7 @@ import type {
   AdminMarketCategory,
   AdminMarketCategoryPayload,
   AdminProduct,
+  AdminProductAdditionType,
   AdminProductPayload,
   AdminUploadImageResponse,
   AdminUser,
@@ -29,6 +30,13 @@ export function getAdminCatalogData(accessToken: string) {
   return httpClient<AdminCatalogData>('/admin/catalog', {
     headers: getAdminHeaders(accessToken),
   });
+}
+
+export function getAdminProductAdditionTypes(accessToken: string) {
+  return httpClient<AdminProductAdditionType[]>(
+    '/admin/market/products/addition-types',
+    { headers: getAdminHeaders(accessToken) },
+  );
 }
 
 export async function uploadAdminImage(accessToken: string, file: File) {

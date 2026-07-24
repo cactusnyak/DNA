@@ -114,6 +114,7 @@ export class FeedService {
             slug: product.slug,
             description: product.description,
             price: product.price,
+            additions: product.additions,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
             images: product.images,

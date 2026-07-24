@@ -18,6 +18,7 @@ type ProductCardProps = {
   currentCategorySlug?: string;
   showAddToCartButton?: boolean;
   showBuyNowButton?: boolean;
+  showAdditionsSummary?: boolean;
 };
 
 export function ProductCard({
@@ -26,6 +27,7 @@ export function ProductCard({
   currentCategorySlug,
   showAddToCartButton = true,
   showBuyNowButton = true,
+  showAdditionsSummary = false,
 }: ProductCardProps) {
   return (
     <Link
@@ -47,6 +49,7 @@ export function ProductCard({
         section={section}
         product={product}
         currentCategorySlug={currentCategorySlug}
+        showAdditionsSummary={showAdditionsSummary}
       />
 
       {(showAddToCartButton || showBuyNowButton) && (

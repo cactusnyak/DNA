@@ -566,8 +566,8 @@ async function main() {
       totalAmount: products[1].price + products[9].price,
       items: {
         create: [
-          { productId: products[1].id, quantity: 1, unitPrice: products[1].price },
-          { productId: products[9].id, quantity: 1, unitPrice: products[9].price },
+          { productId: products[1].id, quantity: 1, baseUnitPrice: products[1].price, unitPrice: products[1].price },
+          { productId: products[9].id, quantity: 1, baseUnitPrice: products[9].price, unitPrice: products[9].price },
         ],
       },
     },
@@ -584,7 +584,7 @@ async function main() {
       totalAmount: products[4].price,
       items: {
         create: [
-          { productId: products[4].id, quantity: 1, unitPrice: products[4].price },
+          { productId: products[4].id, quantity: 1, baseUnitPrice: products[4].price, unitPrice: products[4].price },
         ],
       },
     },
@@ -601,8 +601,8 @@ async function main() {
       totalAmount: products[18].price + products[19].price,
       items: {
         create: [
-          { productId: products[18].id, quantity: 1, unitPrice: products[18].price },
-          { productId: products[19].id, quantity: 1, unitPrice: products[19].price },
+          { productId: products[18].id, quantity: 1, baseUnitPrice: products[18].price, unitPrice: products[18].price },
+          { productId: products[19].id, quantity: 1, baseUnitPrice: products[19].price, unitPrice: products[19].price },
         ],
       },
     },
@@ -619,7 +619,7 @@ async function main() {
       totalAmount: products[10].price,
       items: {
         create: [
-          { productId: products[10].id, quantity: 1, unitPrice: products[10].price },
+          { productId: products[10].id, quantity: 1, baseUnitPrice: products[10].price, unitPrice: products[10].price },
         ],
       },
     },
@@ -635,8 +635,8 @@ async function main() {
       totalAmount: products[23].price + products[24].price,
       items: {
         create: [
-          { productId: products[23].id, quantity: 1, unitPrice: products[23].price },
-          { productId: products[24].id, quantity: 2, unitPrice: products[24].price },
+          { productId: products[23].id, quantity: 1, baseUnitPrice: products[23].price, unitPrice: products[23].price },
+          { productId: products[24].id, quantity: 2, baseUnitPrice: products[24].price, unitPrice: products[24].price },
         ],
       },
     },
@@ -652,7 +652,7 @@ async function main() {
       totalAmount: products[33].price,
       items: {
         create: [
-          { productId: products[33].id, quantity: 1, unitPrice: products[33].price },
+          { productId: products[33].id, quantity: 1, baseUnitPrice: products[33].price, unitPrice: products[33].price },
         ],
       },
     },

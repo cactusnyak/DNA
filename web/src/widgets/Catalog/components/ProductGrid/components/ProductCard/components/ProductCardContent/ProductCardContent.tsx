@@ -11,12 +11,14 @@ type ProductCardContentProps = {
   section: PlatformSectionId;
   product: Product;
   currentCategorySlug?: string;
+  showAdditionsSummary?: boolean;
 };
 
 export function ProductCardContent({
   section,
   product,
   currentCategorySlug,
+  showAdditionsSummary = false,
 }: ProductCardContentProps) {
   const navigate = useNavigate();
   const categoryHref = product.category
@@ -35,6 +37,19 @@ export function ProductCardContent({
 
       <div className="mt-2">
         <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
+
+        {showAdditionsSummary && (product.additions?.length ?? 0) > 0 && (
+          <div className="mt-2 text-xs text-muted-foreground">
+            <p>Есть дополнения: {product.additions.length}</p>
+            {product.additions.slice(0, 2).map((addition) => (
+              <p key={addition.id} className="truncate">
+                {addition.title}: {addition.type === 'quantity'
+                  ? `${formatPrice(addition.price)}/${addition.unitLabel}`
+                  : `+${formatPrice(addition.price)}`}
+              </p>
+            ))}
+          </div>
+        )}
 
         {shouldShowCategoryLink && categoryHref && (
           <span

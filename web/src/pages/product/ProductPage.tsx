@@ -29,5 +29,5 @@ export function ProductPage() {
     return <p className="text-destructive">Не удалось загрузить товар</p>;
   }
 
-  return <ProductDetails product={product} />;
+  return <ProductDetails key={product.id} product={product} />;
 }

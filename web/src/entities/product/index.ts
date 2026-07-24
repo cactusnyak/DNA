@@ -1,1 +1,7 @@
-export type { Product } from './types/product';
+export type {
+  Product,
+  ProductAddition,
+  BooleanProductAddition,
+  QuantityProductAddition,
+  SelectedProductAddition,
+} from './types/product';

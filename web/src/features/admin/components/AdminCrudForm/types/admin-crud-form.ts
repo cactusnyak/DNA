@@ -13,6 +13,7 @@ import type {
   AdminUserRolePayload,
 } from '@/entities/admin';
 import type { Order, OrderStatus } from '@/entities/order';
+import type { ProductAddition } from '@/entities/product';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 
@@ -40,6 +41,7 @@ export type AdminCrudFormValue =
   | File
   | File[]
   | string[]
+  | ProductAddition[]
   | null;
 
 export type AdminCrudFormValues = Record<string, AdminCrudFormValue>;

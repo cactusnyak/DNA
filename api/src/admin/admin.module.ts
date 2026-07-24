@@ -17,6 +17,7 @@ import { AdminOrdersController } from './admin-orders.controller';
 import { AdminOrdersService } from './admin-orders.service';
 import { AdminOverviewController } from './admin-overview.controller';
 import { AdminProductsController } from './admin-products.controller';
+import { AdminProductAdditionsController } from './admin-product-additions.controller';
 import { AdminService } from './admin.service';
 import { AdminUploadsController } from './admin-uploads.controller';
 import { AdminUploadsService } from './admin-uploads.service';
@@ -30,6 +31,7 @@ import { AdminUsersService } from './admin-users.service';
     AdminUploadsController,
     AdminMarketCategoriesController,
     AdminProductsController,
+    AdminProductAdditionsController,
     AdminCatalogCollectionsController,
     AdminOrdersController,
     AdminAdCategoriesController,

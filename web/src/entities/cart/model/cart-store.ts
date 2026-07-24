@@ -2,11 +2,18 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import type { Ad } from '@/entities/ad';
-import type { Product } from '@/entities/product';
+import type { Product, SelectedProductAddition } from '@/entities/product';
+import {
+  calculateProductAdditionsTotal,
+  createCartConfigurationKey,
+} from '@/entities/product/lib/product-additions';
 
 export type CartStoreItem = {
   product: Product;
   quantity: number;
+  selectedAdditions: SelectedProductAddition[];
+  configurationKey: string;
+  configuredUnitPrice: number;
 };
 
 export type CartAdItem = {
@@ -16,11 +23,11 @@ export type CartAdItem = {
 type CartStore = {
   items: CartStoreItem[];
   adItems: CartAdItem[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  increaseItem: (productId: string) => void;
-  decreaseItem: (productId: string) => void;
-  setItemQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, selectedAdditions?: SelectedProductAddition[]) => void;
+  removeItem: (configurationKey: string) => void;
+  increaseItem: (configurationKey: string) => void;
+  decreaseItem: (configurationKey: string) => void;
+  setItemQuantity: (configurationKey: string, quantity: number) => void;
   clearCart: () => void;
   clearAdItems: () => void;
   getItemQuantity: (productId: string) => number;
@@ -54,13 +61,17 @@ export const useCartStore = create<CartStore>()(
         return get().adItems.some((i) => i.ad.id === adId);
       },
 
-      addItem: (product) => {
+      addItem: (product, selectedAdditions = []) => {
+        const configurationKey = createCartConfigurationKey(
+          product.id,
+          selectedAdditions,
+        );
         const currentItem = get().items.find(
-          (item) => item.product.id === product.id,
+          (item) => item.configurationKey === configurationKey,
         );
 
         if (currentItem) {
-          get().increaseItem(product.id);
+          get().increaseItem(configurationKey);
           return;
         }
 
@@ -70,30 +81,43 @@ export const useCartStore = create<CartStore>()(
             {
               product,
               quantity: 1,
+              selectedAdditions,
+              configurationKey,
+              configuredUnitPrice:
+                product.price +
+                calculateProductAdditionsTotal(
+                  product.additions ?? [],
+                  selectedAdditions,
+                ),
             },
           ],
         }));
       },
 
-      removeItem: (productId) => {
+      removeItem: (configurationKey) => {
         set((state) => ({
-          items: state.items.filter((item) => item.product.id !== productId),
+          items: state.items.filter(
+            (item) => item.configurationKey !== configurationKey,
+          ),
         }));
       },
 
-      increaseItem: (productId) => {
+      increaseItem: (configurationKey) => {
         set((state) => ({
           items: state.items.map((item) =>
-            item.product.id === productId
+            (item.configurationKey ?? item.product.id) === configurationKey ||
+            item.product.id === configurationKey
               ? { ...item, quantity: item.quantity + 1 }
               : item,
           ),
         }));
       },
 
-      decreaseItem: (productId) => {
+      decreaseItem: (configurationKey) => {
         const currentItem = get().items.find(
-          (item) => item.product.id === productId,
+          (item) =>
+            (item.configurationKey ?? item.product.id) === configurationKey ||
+            item.product.id === configurationKey,
         );
 
         if (!currentItem) {
@@ -101,28 +125,30 @@ export const useCartStore = create<CartStore>()(
         }
 
         if (currentItem.quantity <= 1) {
-          get().removeItem(productId);
+          get().removeItem(configurationKey);
           return;
         }
 
         set((state) => ({
           items: state.items.map((item) =>
-            item.product.id === productId
+            (item.configurationKey ?? item.product.id) === configurationKey ||
+            item.product.id === configurationKey
               ? { ...item, quantity: item.quantity - 1 }
               : item,
           ),
         }));
       },
 
-      setItemQuantity: (productId, quantity) => {
+      setItemQuantity: (configurationKey, quantity) => {
         if (quantity <= 0) {
-          get().removeItem(productId);
+          get().removeItem(configurationKey);
           return;
         }
 
         set((state) => ({
           items: state.items.map((item) =>
-            item.product.id === productId
+            (item.configurationKey ?? item.product.id) === configurationKey ||
+            item.product.id === configurationKey
               ? { ...item, quantity }
               : item,
           ),
@@ -154,7 +180,9 @@ export const useCartStore = create<CartStore>()(
 
       getTotalAmount: () => {
         return get().items.reduce(
-          (sum, item) => sum + item.product.price * item.quantity,
+          (sum, item) =>
+            sum +
+            (item.configuredUnitPrice ?? item.product.price) * item.quantity,
           0,
         );
       },

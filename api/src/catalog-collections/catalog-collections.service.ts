@@ -5,6 +5,7 @@ import {
 import { CatalogCollectionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { normalizeProductAdditions } from '../products/product-additions';
 
 const ACTIVE_CATALOG_ITEM_WHERE = {
   isActive: true,
@@ -155,6 +156,7 @@ export class CatalogCollectionsService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      additions: normalizeProductAdditions(product.additions),
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images

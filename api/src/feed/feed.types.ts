@@ -1,3 +1,5 @@
+import type { ProductAddition } from '../products/product-additions';
+
 export type FeedScope = 'MARKET' | 'ADS';
 
 export type FeedConfig = {
@@ -33,6 +35,7 @@ export type FeedProductItem = {
     slug: string;
     description: string;
     price: number;
+    additions: ProductAddition[];
     createdAt: Date;
     updatedAt: Date;
     images: {

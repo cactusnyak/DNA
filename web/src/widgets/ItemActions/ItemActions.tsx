@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import type { Ad } from '@/entities/ad';
 import { useCartStore } from '@/entities/cart';
 import { FavouriteButton } from '@/entities/favourite';
-import type { Product } from '@/entities/product';
+import type { Product, SelectedProductAddition } from '@/entities/product';
 import { cn } from '@/shared/utils/cn';
 import {
   getProductActionHeightClass,
@@ -20,6 +20,9 @@ type ItemActionsProps = {
   showBuyNowButton?: boolean;
   showFavouriteButton?: boolean;
   showSellerContactsButton?: boolean;
+  selectedAdditions?: SelectedProductAddition[];
+  isProductConfigurationValid?: boolean;
+  onInvalidProductConfiguration?: () => void;
 } & (
     | { itemType: 'product'; item: Product }
     | { itemType: 'ad'; item: Ad }
@@ -33,13 +36,20 @@ export function ItemActions({
   showBuyNowButton = true,
   showFavouriteButton = false,
   showSellerContactsButton = false,
+  selectedAdditions = [],
+  isProductConfigurationValid = true,
+  onInvalidProductConfiguration,
 }: ItemActionsProps) {
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
 
   function handleBuyNow() {
     if (itemType === 'product') {
-      addItem(item);
+      if (!isProductConfigurationValid) {
+        onInvalidProductConfiguration?.();
+        return;
+      }
+      addItem(item, selectedAdditions);
       navigate('/checkout');
     }
   }
@@ -70,6 +80,9 @@ export function ItemActions({
                   itemType="product"
                   item={item as Product}
                   variant={variant}
+                  selectedAdditions={selectedAdditions}
+                  isConfigurationValid={isProductConfigurationValid}
+                  onInvalidConfiguration={onInvalidProductConfiguration}
                 />
               ) : (
                 <AddToCartButton
