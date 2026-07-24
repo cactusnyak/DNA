@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { normalizeProductAdditions } from '../products/product-additions';
 
 type AddFavouriteParams = {
   userId: string;
@@ -52,6 +53,7 @@ export class FavouritesService {
       product: fav.product
         ? {
             ...fav.product,
+            additions: normalizeProductAdditions(fav.product.additions),
             images: fav.product.images.map((pi: any) => pi.image),
           }
         : null,

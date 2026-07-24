@@ -7,12 +7,17 @@ import {
 import { OrderStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  resolveSelectedProductAdditions,
+  type SelectedProductAddition,
+} from '../products/product-additions';
 
 import type { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 
 type NormalizedOrderItem = {
   productId: string;
   quantity: number;
+  selectedAdditions: SelectedProductAddition[];
 };
 
 @Injectable()
@@ -40,7 +45,9 @@ export class OrdersService {
     const guestSessionId = this.getOptionalString(createOrderDto.guestSessionId);
 
     const normalizedItems = this.getNormalizedItems(createOrderDto.items);
-    const productIds = normalizedItems.map((item) => item.productId);
+    const productIds = Array.from(
+      new Set(normalizedItems.map((item) => item.productId)),
+    );
 
     const products = await this.prismaService.product.findMany({
       where: {
@@ -51,6 +58,7 @@ export class OrdersService {
       select: {
         id: true,
         price: true,
+        additions: true,
       },
     });
 
@@ -77,10 +85,16 @@ export class OrdersService {
         throw new BadRequestException(`Product not found: ${item.productId}`);
       }
 
+      const resolved = resolveSelectedProductAdditions(
+        product.additions,
+        item.selectedAdditions,
+      );
       return {
         productId: item.productId,
         quantity: item.quantity,
-        unitPrice: product.price,
+        baseUnitPrice: product.price,
+        unitPrice: product.price + resolved.additionsTotal,
+        selectedAdditions: resolved.snapshot,
       };
     });
 
@@ -108,7 +122,9 @@ export class OrdersService {
               },
             },
             quantity: item.quantity,
+            baseUnitPrice: item.baseUnitPrice,
             unitPrice: item.unitPrice,
+            selectedAdditions: item.selectedAdditions,
           })),
         },
       },
@@ -193,7 +209,7 @@ export class OrdersService {
       throw new BadRequestException('items are required');
     }
 
-    const quantityByProductId = new Map<string, number>();
+    const itemByConfiguration = new Map<string, NormalizedOrderItem>();
 
     items.forEach((item) => {
       if (!item?.productId) {
@@ -206,18 +222,22 @@ export class OrdersService {
         throw new BadRequestException('quantity must be a positive integer');
       }
 
-      quantityByProductId.set(
-        item.productId,
-        (quantityByProductId.get(item.productId) ?? 0) + quantity,
+      const selectedAdditions = Array.isArray(item.selectedAdditions)
+        ? item.selectedAdditions
+        : [];
+      const canonicalSelection = [...selectedAdditions].sort((first, second) =>
+        first.additionId.localeCompare(second.additionId),
       );
+      const key = `${item.productId}:${JSON.stringify(canonicalSelection)}`;
+      const current = itemByConfiguration.get(key);
+      itemByConfiguration.set(key, {
+        productId: item.productId,
+        quantity: (current?.quantity ?? 0) + quantity,
+        selectedAdditions: canonicalSelection,
+      });
     });
 
-    return Array.from(quantityByProductId.entries()).map<NormalizedOrderItem>(
-      ([productId, quantity]) => ({
-        productId,
-        quantity,
-      }),
-    );
+    return Array.from(itemByConfiguration.values());
   }
 
   private mapOrder(order: any) {
@@ -238,7 +258,9 @@ export class OrdersService {
         id: item.id,
         productId: item.productId,
         quantity: item.quantity,
+        baseUnitPrice: item.baseUnitPrice,
         unitPrice: item.unitPrice,
+        selectedAdditions: item.selectedAdditions ?? [],
         product: item.product ? this.mapOrderProduct(item.product) : undefined,
       })),
     };
@@ -262,6 +284,7 @@ export class OrdersService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      additions: product.additions ?? [],
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images

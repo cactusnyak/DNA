@@ -45,6 +45,7 @@ export function getAdminCrudInitialValues(
       price: String(product?.price ?? 0),
       imageUrls: product?.images.map((image) => image.url) ?? [],
       imageFiles: [],
+      additions: product?.additions ?? [],
       isActive: product?.isActive ?? true,
     };
   }

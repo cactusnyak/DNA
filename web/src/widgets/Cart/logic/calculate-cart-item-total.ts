@@ -1,5 +1,5 @@
 import type { CartStoreItem } from '@/entities/cart';
 
 export function calculateCartItemTotal(item: CartStoreItem) {
-  return item.product.price * item.quantity;
+  return (item.configuredUnitPrice ?? item.product.price) * item.quantity;
 }

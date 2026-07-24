@@ -159,6 +159,7 @@ model Product {
   slug        String
   description String
   price       Int
+  additions   Json? @db.JsonB
 
   isActive  Boolean   @default(true)
   deletedAt DateTime?
@@ -294,7 +295,9 @@ model OrderItem {
   orderId   String
   productId String
   quantity  Int
+  baseUnitPrice Int
   unitPrice Int
+  selectedAdditions Json? @db.JsonB
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])

@@ -140,6 +140,17 @@ export function AdminProductRecordsView({
           render: (product) => formatPrice(product.price),
         },
         {
+          key: 'additions',
+          title: 'Дополнения',
+          width: 180,
+          sortable: true,
+          getValue: (product) => product.additions?.length ?? 0,
+          render: (product) =>
+            product.additions?.length
+              ? `${product.additions.length} дополнений`
+              : 'Нет',
+        },
+        {
           key: 'status',
           title: 'Статус',
           width: 160,

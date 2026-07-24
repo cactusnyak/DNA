@@ -1,6 +1,9 @@
+import type { SelectedProductAddition } from '../../products/product-additions';
+
 export type CreateOrderItemDto = {
   productId: string;
   quantity: number;
+  selectedAdditions?: SelectedProductAddition[];
 };
 
 export type CreateOrderDto = {

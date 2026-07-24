@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { normalizeProductAdditions } from '../products/product-additions';
 
 @Injectable()
 export class AdminService {
@@ -237,6 +238,7 @@ export class AdminService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      additions: normalizeProductAdditions(product.additions),
       isActive: product.isActive,
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,
@@ -293,7 +295,9 @@ export class AdminService {
         id: item.id,
         productId: item.productId,
         quantity: item.quantity,
+        baseUnitPrice: item.baseUnitPrice,
         unitPrice: item.unitPrice,
+        selectedAdditions: item.selectedAdditions ?? [],
         product: item.product
           ? {
               id: item.product.id,

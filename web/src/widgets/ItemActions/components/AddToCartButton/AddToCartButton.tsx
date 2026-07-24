@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/Button';
 import type { Ad } from '@/entities/ad';
 import { useCartStore } from '@/entities/cart';
-import type { Product } from '@/entities/product';
+import type { Product, SelectedProductAddition } from '@/entities/product';
+import { createCartConfigurationKey } from '@/entities/product/lib/product-additions';
 import { cn } from '@/shared/utils/cn';
 import {
   ProductQuantityCounter,
@@ -11,6 +12,9 @@ import {
 
 type AddToCartButtonProps = {
   variant?: ProductQuantityCounterVariant;
+  selectedAdditions?: SelectedProductAddition[];
+  isConfigurationValid?: boolean;
+  onInvalidConfiguration?: () => void;
 } & (
     | { itemType: 'product'; item: Product }
     | { itemType: 'ad'; item: Ad }
@@ -20,8 +24,19 @@ export function AddToCartButton({
   variant = 'card',
   itemType,
   item,
+  selectedAdditions = [],
+  isConfigurationValid = true,
+  onInvalidConfiguration,
 }: AddToCartButtonProps) {
-  const quantity = useCartStore((state) => state.getItemQuantity(item.id));
+  const configurationKey =
+    itemType === 'product'
+      ? createCartConfigurationKey(item.id, selectedAdditions)
+      : item.id;
+  const quantity = useCartStore((state) =>
+    state.items.find((cartItem) =>
+      (cartItem.configurationKey ?? cartItem.product.id) === configurationKey,
+    )?.quantity ?? 0,
+  );
   const addItem = useCartStore((state) => state.addItem);
   const adItems = useCartStore((state) => state.adItems);
   const addAdItem = useCartStore((state) => state.addAdItem);
@@ -46,7 +61,7 @@ export function AddToCartButton({
   if (quantity > 0) {
     return (
       <ProductQuantityCounter
-        productId={item.id}
+        productId={configurationKey}
         variant={variant}
       />
     );
@@ -58,7 +73,13 @@ export function AddToCartButton({
       variant="outline"
       size={variant === 'details' ? 'lg' : 'default'}
       className={cn('w-full', getProductActionHeightClass(variant))}
-      onClick={() => addItem(item)}
+      onClick={() => {
+        if (!isConfigurationValid) {
+          onInvalidConfiguration?.();
+          return;
+        }
+        addItem(item, selectedAdditions);
+      }}
     >
       В корзину
     </Button>

@@ -107,6 +107,7 @@ export function FavouritesPage() {
                   key={fav.id}
                   section={PLATFORM_SECTION.MARKET}
                   product={fav.product!}
+                  showAdditionsSummary
                 />
               ))}
             </div>

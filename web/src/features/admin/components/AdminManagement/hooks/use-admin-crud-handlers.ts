@@ -258,6 +258,7 @@ export function useAdminCrudHandlers({
       categoryId: data.marketCategories[0].id,
       price: 0,
       imageUrls: [],
+      additions: [],
       isActive: true,
     });
 

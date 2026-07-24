@@ -41,6 +41,9 @@ type FormInputFieldProps = FormFieldBaseProps & {
   inputMode?: ComponentProps<'input'>['inputMode'];
   disabled?: boolean;
   minLength?: number;
+  min?: number;
+  max?: number;
+  step?: number;
   autoComplete?: ComponentProps<'input'>['autoComplete'];
   inputClassName?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -75,6 +78,19 @@ type FormSelectFieldProps = FormFieldBaseProps & {
 type FormToggleFieldProps = FormFieldBaseProps & {
   checked: boolean;
   disabled?: boolean;
+  onCheckedChange: (checked: boolean) => void;
+};
+
+type FormBooleanFieldProps = {
+  label?: ReactNode;
+  ariaLabel?: string;
+  caption?: ReactNode;
+  required?: boolean;
+  checked: boolean;
+  disabled?: boolean;
+  indeterminate?: boolean;
+  variant?: 'checkbox' | 'toggle';
+  className?: string;
   onCheckedChange: (checked: boolean) => void;
 };
 
@@ -156,6 +172,9 @@ export function FormInputField({
   inputMode,
   disabled = false,
   minLength,
+  min,
+  max,
+  step,
   autoComplete = 'off',
   className,
   inputClassName,
@@ -176,6 +195,9 @@ export function FormInputField({
         inputMode={inputMode}
         value={value}
         minLength={minLength}
+        min={min}
+        max={max}
+        step={step}
         autoComplete={autoComplete}
         placeholder={placeholder}
         className={inputClassName}
@@ -238,6 +260,7 @@ export function FormSelectField({
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedOption = options.find((option) => option.value === value);
+  const dropdownOptions = options.filter((option) => option.value !== '');
 
   useEffect(() => {
     if (!isOpen) {
@@ -274,7 +297,9 @@ export function FormSelectField({
       return;
     }
 
-    onValueChange(option.value);
+    const shouldClearSelection = option.value === value && value !== '';
+
+    onValueChange(shouldClearSelection ? '' : option.value);
     setIsOpen(false);
   }
 
@@ -320,11 +345,11 @@ export function FormSelectField({
             id={listboxId}
             role="listbox"
             className={cn(
-              'absolute left-0 right-0 top-full z-30 mt-2 max-h-64 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg',
+              'absolute left-0 right-0 top-full z-30 mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg',
               dropdownClassName,
             )}
           >
-            {options.map((option) => {
+            {dropdownOptions.map((option) => {
               const isSelected = option.value === value;
 
               return (
@@ -367,43 +392,95 @@ export function FormToggleField({
   onCheckedChange,
 }: FormToggleFieldProps) {
   return (
+    <FormBooleanField
+      label={label}
+      caption={caption}
+      required={required}
+      checked={checked}
+      disabled={disabled}
+      variant="toggle"
+      className={className}
+      onCheckedChange={onCheckedChange}
+    />
+  );
+}
+
+export function FormBooleanField({
+  label,
+  ariaLabel,
+  caption,
+  required = false,
+  checked,
+  disabled = false,
+  indeterminate = false,
+  variant = 'checkbox',
+  className,
+  onCheckedChange,
+}: FormBooleanFieldProps) {
+  const control = (
+    <button
+      type="button"
+      role={variant === 'toggle' ? 'switch' : 'checkbox'}
+      aria-label={ariaLabel}
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-required={required}
+      disabled={disabled}
+      className={cn(
+        variant === 'toggle'
+          ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm transition-colors hover:border-ring'
+          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors',
+        variant === 'checkbox' && (checked || indeterminate) && 'border-primary bg-primary',
+        'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        !label && className,
+      )}
+      onClick={() => onCheckedChange(!checked)}
+    >
+      {variant === 'toggle' ? (
+        <>
+          <span className="text-muted-foreground">
+            {checked ? 'Включено' : 'Выключено'}
+          </span>
+
+          <span
+            className={cn(
+              'flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors',
+              checked ? 'bg-primary' : 'bg-muted',
+            )}
+          >
+            <span
+              className={cn(
+                'size-5 rounded-full bg-background shadow-sm transition-transform',
+                checked && 'translate-x-5',
+              )}
+            />
+          </span>
+        </>
+      ) : (
+        indeterminate ? (
+          <span
+            aria-hidden="true"
+            className="block h-0.5 w-2 bg-current"
+          />
+        ) : (
+          checked && <Check aria-hidden="true" className="size-3" strokeWidth={3} />
+        )
+      )}
+    </button>
+  );
+
+  if (!label) {
+    return control;
+  }
+
+  return (
     <FormFieldRoot
       label={label}
       caption={caption}
       required={required}
       className={className}
     >
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        disabled={disabled}
-        className={cn(
-          'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm transition-colors',
-          'hover:border-ring',
-          'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-        )}
-        onClick={() => onCheckedChange(!checked)}
-      >
-        <span className="text-muted-foreground">
-          {checked ? 'Включено' : 'Выключено'}
-        </span>
-
-        <span
-          className={cn(
-            'flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors',
-            checked ? 'bg-primary' : 'bg-muted',
-          )}
-        >
-          <span
-            className={cn(
-              'size-5 rounded-full bg-background shadow-sm transition-transform',
-              checked && 'translate-x-5',
-            )}
-          />
-        </span>
-      </button>
+      {control}
     </FormFieldRoot>
   );
 }

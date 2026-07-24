@@ -6,6 +6,10 @@ import {
 import { CatalogCollectionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  normalizeProductAdditions,
+  productAdditionsToJson,
+} from '../products/product-additions';
 
 import { AdminInputService } from './admin-input.service';
 
@@ -111,6 +115,9 @@ export class AdminMarketCatalogService {
         categoryId,
         description: this.adminInputService.getOptionalString(payload.description) ?? '',
         price: this.adminInputService.getNumber(payload.price, 0),
+        additions: productAdditionsToJson(
+          normalizeProductAdditions(payload.additions),
+        ),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
       },
     });
@@ -151,6 +158,9 @@ export class AdminMarketCatalogService {
         categoryId,
         description: this.adminInputService.getOptionalString(payload.description) ?? '',
         price: this.adminInputService.getNumber(payload.price, 0),
+        additions: productAdditionsToJson(
+          normalizeProductAdditions(payload.additions),
+        ),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
       },
     });
@@ -699,6 +709,7 @@ export class AdminMarketCatalogService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      additions: normalizeProductAdditions(product.additions),
       isActive: product.isActive,
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,

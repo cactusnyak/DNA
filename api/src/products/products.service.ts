@@ -5,6 +5,7 @@ import {
 import type { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { normalizeProductAdditions } from './product-additions';
 
 type FindAllProductsParams = {
   categorySlug?: string;
@@ -316,6 +317,7 @@ export class ProductsService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      additions: normalizeProductAdditions(product.additions),
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images
