@@ -17,6 +17,7 @@ export function CollectionQuickCreate({
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
       <Input
+        name="quickCreateTitle"
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}

@@ -59,6 +59,7 @@ export function CheckoutCustomerForm({
 
         <div className="mt-6 grid gap-4">
           <FormInputField
+            name="customerName"
             required
             label="Имя"
             value={value.customerName}
@@ -67,6 +68,7 @@ export function CheckoutCustomerForm({
           />
 
           <FormInputField
+            name="customerPhone"
             required
             type="tel"
             label="Телефон"
@@ -76,6 +78,7 @@ export function CheckoutCustomerForm({
           />
 
           <FormInputField
+            name="customerEmail"
             type="email"
             label="Email"
             value={value.customerEmail}
@@ -84,6 +87,7 @@ export function CheckoutCustomerForm({
           />
 
           <FormInputField
+            name="deliveryAddress"
             required
             label="Адрес доставки"
             value={value.deliveryAddress}
@@ -92,6 +96,7 @@ export function CheckoutCustomerForm({
           />
 
           <FormTextareaField
+            name="comment"
             label="Комментарий"
             value={value.comment}
             placeholder="Необязательно"

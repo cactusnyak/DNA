@@ -34,6 +34,7 @@ type FormFieldRootProps = FormFieldBaseProps & {
 };
 
 type FormInputFieldProps = FormFieldBaseProps & {
+  name: string;
   value: string;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
@@ -46,6 +47,7 @@ type FormInputFieldProps = FormFieldBaseProps & {
 };
 
 type FormTextareaFieldProps = FormFieldBaseProps & {
+  name: string;
   value: string;
   placeholder?: string;
   rows?: number;
@@ -77,6 +79,7 @@ type FormToggleFieldProps = FormFieldBaseProps & {
 };
 
 type FormImageFileFieldProps = FormFieldBaseProps & {
+  name: string;
   file?: File | null;
   previewUrl?: string;
   accept?: string;
@@ -86,6 +89,7 @@ type FormImageFileFieldProps = FormFieldBaseProps & {
 };
 
 type FormImageFilesFieldProps = FormFieldBaseProps & {
+  name: string;
   files: File[];
   existingImageUrls?: string[];
   accept?: string;
@@ -142,6 +146,7 @@ function formatFileSize(size: number) {
 }
 
 export function FormInputField({
+  name,
   label,
   caption,
   required = false,
@@ -164,6 +169,7 @@ export function FormInputField({
       className={className}
     >
       <Input
+        name={name}
         required={required}
         disabled={disabled}
         type={type}
@@ -180,6 +186,7 @@ export function FormInputField({
 }
 
 export function FormTextareaField({
+  name,
   label,
   caption,
   required = false,
@@ -199,6 +206,7 @@ export function FormTextareaField({
       className={className}
     >
       <textarea
+        name={name}
         required={required}
         value={value}
         rows={rows}
@@ -401,6 +409,7 @@ export function FormToggleField({
 }
 
 export function FormImageFileField({
+  name,
   label,
   caption,
   required = false,
@@ -499,6 +508,7 @@ export function FormImageFileField({
         >
           <input
             id={inputId}
+            name={name}
             type="file"
             accept={accept}
             disabled={disabled}
@@ -528,6 +538,7 @@ export function FormImageFileField({
 }
 
 export function FormImageFilesField({
+  name,
   label,
   caption,
   required = false,
@@ -655,6 +666,7 @@ export function FormImageFilesField({
         >
           <input
             id={inputId}
+            name={name}
             type="file"
             accept={accept}
             multiple

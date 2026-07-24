@@ -6,7 +6,7 @@ export function SearchInput({
   className,
   type = 'search',
   ...props
-}: React.ComponentProps<'input'>) {
+}: Omit<React.ComponentProps<'input'>, 'name'> & { name: string }) {
   return (
     <input
       type={type}

@@ -87,6 +87,7 @@ export function AvatarEditModal({
             <div className="flex flex-wrap items-center justify-center gap-1">
               <label className="cursor-pointer">
                 <input
+                  name="avatar"
                   type="file"
                   accept="image/*"
                   className="sr-only"

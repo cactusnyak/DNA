@@ -6,7 +6,7 @@ export function Input({
   className,
   type = 'text',
   ...props
-}: React.ComponentProps<'input'>) {
+}: Omit<React.ComponentProps<'input'>, 'name'> & { name: string }) {
   return (
     <input
       type={type}

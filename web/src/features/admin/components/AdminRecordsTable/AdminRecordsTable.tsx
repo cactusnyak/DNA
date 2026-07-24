@@ -161,6 +161,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         {hasBulkActions && (
           <td className="w-10 border-r border-border px-3 py-3">
             <input
+              name={`selectedRecords.${key}`}
               type="checkbox"
               aria-label="Выбрать запись"
               checked={isSelected}
@@ -320,6 +321,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
 
                       <div className="grid grid-cols-2 gap-2">
                         <Input
+                          name={`${String(column.key)}From`}
                           type="number"
                           value={rangeValue.from ?? ''}
                           placeholder="От"
@@ -334,6 +336,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                         />
 
                         <Input
+                          name={`${String(column.key)}To`}
                           type="number"
                           value={rangeValue.to ?? ''}
                           placeholder="До"
@@ -358,6 +361,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                     </div>
 
                     <Input
+                      name={String(column.key)}
                       value={typeof filterValue === 'string' ? filterValue : ''}
                       placeholder={filterConfig.placeholder ?? 'Поиск'}
                       className="h-9"
@@ -427,6 +431,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               {hasBulkActions && (
                 <th className="sticky top-0 z-10 w-10 bg-muted/80 px-3 py-3 border-r border-border">
                   <input
+                    name="selectAllRecords"
                     type="checkbox"
                     aria-label="Выбрать все"
                     checked={allSelected}

@@ -36,6 +36,7 @@ export function AdminToolbar({
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <SearchInput
+        name="adminSearch"
         value={searchValue}
         placeholder="Поиск по разделу..."
         className="w-full lg:max-w-sm"

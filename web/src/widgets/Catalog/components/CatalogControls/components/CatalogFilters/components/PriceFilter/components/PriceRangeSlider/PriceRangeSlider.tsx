@@ -44,6 +44,7 @@ export function PriceRangeSlider({
       />
 
       <input
+        name="priceFrom"
         type="range"
         min={min}
         max={max}
@@ -57,6 +58,7 @@ export function PriceRangeSlider({
       />
 
       <input
+        name="priceTo"
         type="range"
         min={min}
         max={max}

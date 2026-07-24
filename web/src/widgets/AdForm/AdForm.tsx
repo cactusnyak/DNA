@@ -156,6 +156,7 @@ export function AdForm({
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <FormInputField
+        name="title"
         required
         label="Заголовок"
         value={title}
@@ -171,6 +172,7 @@ export function AdForm({
       />
 
       <FormInputField
+        name="price"
         required
         type="number"
         label="Цена, ₽"
@@ -179,12 +181,14 @@ export function AdForm({
       />
 
       <FormTextareaField
+        name="description"
         label="Описание"
         value={description}
         onChange={(event) => setDescription(event.target.value)}
       />
 
       <FormImageFilesField
+        name="images"
         label="Изображения"
         caption="Можно выбрать несколько файлов. Новые файлы будут загружены при сохранении."
         files={imageFiles}
@@ -199,6 +203,7 @@ export function AdForm({
 
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
           <FormInputField
+            name="contactPhone"
             label="Телефон"
             type="tel"
             value={contactPhone}
@@ -207,6 +212,7 @@ export function AdForm({
           <ContactVisibility checked={showPhone} disabled={!contactPhone.trim()} label="Показывать телефон" onChange={setShowPhone} />
 
           <FormInputField
+            name="contactTelegram"
             label="Telegram"
             placeholder="@username"
             value={contactTelegram}
@@ -215,6 +221,7 @@ export function AdForm({
           <ContactVisibility checked={showTelegram} disabled={!contactTelegram.trim()} label="Показывать Telegram" onChange={setShowTelegram} />
 
           <FormInputField
+            name="contactEmail"
             label="Email"
             type="email"
             value={contactEmail}
@@ -223,6 +230,7 @@ export function AdForm({
           <ContactVisibility checked={showEmail} disabled={!contactEmail.trim()} label="Показывать email" onChange={setShowEmail} />
 
           <FormInputField
+            name="contactOther"
             label="Другой способ связи"
             placeholder="WhatsApp, ВКонтакте и т.д."
             value={contactOther}
@@ -238,6 +246,7 @@ export function AdForm({
 
       <label className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 text-sm leading-6">
         <input
+          name="publicationConsent"
           required
           type="checkbox"
           checked={publicationConsent}
@@ -278,7 +287,7 @@ export function AdForm({
 function ContactVisibility({ checked, disabled, label, onChange }: { checked: boolean; disabled: boolean; label: string; onChange: (value: boolean) => void }) {
   return (
     <label className="-mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-      <input type="checkbox" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
+      <input name="contactVisibility" type="checkbox" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
       {label}
     </label>
   );

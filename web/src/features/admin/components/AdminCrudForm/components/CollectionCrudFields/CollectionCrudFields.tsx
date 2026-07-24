@@ -24,6 +24,7 @@ export function CollectionCrudFields({
   return (
     <div className="flex flex-col gap-5">
       <FormInputField
+        name="title"
         required
         label="Название"
         value={String(values.title ?? '')}
@@ -31,6 +32,7 @@ export function CollectionCrudFields({
       />
 
       <FormInputField
+        name="slug"
         label="Slug"
         caption="Например: popular-products."
         value={String(values.slug ?? '')}
@@ -45,6 +47,7 @@ export function CollectionCrudFields({
       />
 
       <FormTextareaField
+        name="description"
         label="Описание"
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}

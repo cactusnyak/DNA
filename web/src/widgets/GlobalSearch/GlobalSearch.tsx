@@ -61,6 +61,7 @@ export function GlobalSearch({
   return (
     <div ref={containerRef} className={cn('relative w-full', className)}>
       <SearchInput
+        name="globalSearch"
         value={searchValue}
         placeholder={placeholder}
         autoComplete="off"
