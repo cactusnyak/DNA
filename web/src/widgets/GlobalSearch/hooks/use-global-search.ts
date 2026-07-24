@@ -11,6 +11,7 @@ import { getCatalogCategories } from '@/shared/catalog';
 import { getAds } from '@/entities/ad/api/get-ads';
 import { getProducts } from '@/entities/product/api/get-products';
 import { PLATFORM_SECTION } from '@/shared/platform';
+import { useHeaderStore } from '@/shared/header';
 
 import { filterGlobalSearchAds } from '../logic/filter-global-search-ads';
 import { filterGlobalSearchCategories } from '../logic/filter-global-search-categories';
@@ -23,6 +24,7 @@ const PRODUCT_RESULTS_STEP = 8;
 
 export function useGlobalSearch() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const setIsSearchActive = useHeaderStore((state) => state.setIsSearchActive);
 
   const [searchValue, setSearchValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -172,6 +174,36 @@ export function useGlobalSearch() {
   }, [normalizedSearchValue]);
 
   useEffect(() => {
+    setIsSearchActive(isOpen);
+
+    return () => {
+      setIsSearchActive(false);
+    };
+  }, [isOpen, setIsSearchActive]);
+
+  useEffect(() => {
+    if (!isOpen || !window.matchMedia('(max-width: 767px)').matches) {
+      return;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousDocumentOverflow = document.documentElement.style.overflow;
+    const previousOverscrollBehavior =
+      document.documentElement.style.overscrollBehavior;
+
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousDocumentOverflow;
+      document.documentElement.style.overscrollBehavior =
+        previousOverscrollBehavior;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
       const target = event.target as Node;
 
@@ -234,4 +266,3 @@ export function useGlobalSearch() {
     handleAdResultsScroll,
   };
 }
-

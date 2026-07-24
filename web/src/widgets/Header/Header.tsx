@@ -28,10 +28,15 @@ export function Header() {
   useEffect(() => {
     const element = dropdownContainerRef.current;
     if (!element) return;
-    const observer = new ResizeObserver(() => {
+
+    const updateHeaderHeight = () => {
       setHeaderHeight(element.offsetHeight);
-    });
+    };
+    const observer = new ResizeObserver(updateHeaderHeight);
+
+    updateHeaderHeight();
     observer.observe(element);
+
     return () => observer.disconnect();
   }, [dropdownContainerRef]);
 
@@ -46,7 +51,7 @@ export function Header() {
       onMouseLeave={closeCatalogDropdown}
     >
       <div className="w-full border-b border-border/50">
-        <div className="mx-auto flex max-w-7xl min-h-16 w-full items-center gap-4 p-4 lg:gap-8">
+        <div className="mx-auto flex min-h-12 w-full max-w-7xl items-center gap-3 p-3 sm:min-h-14 sm:p-3 md:min-h-16 md:gap-4 md:p-4 lg:gap-8">
           <HeaderLogo onClick={closeCatalogDropdown} />
 
           <PlatformSectionSwitcher activeSectionId={activeSectionId} />

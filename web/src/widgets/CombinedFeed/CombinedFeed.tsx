@@ -20,6 +20,34 @@ function CardSkeleton() {
   );
 }
 
+type CombinedItemsGridProps = {
+  items: FeedItem[];
+  compact?: boolean;
+};
+
+export function CombinedItemsGrid({
+  items,
+  compact = false,
+}: CombinedItemsGridProps) {
+  return (
+    <div className={getItemGridClasses(compact ? 'compact' : 'default')}>
+      {items.map((item) =>
+        item.type === 'PRODUCT' ? (
+          <ProductCard
+            key={`product-${item.product.id}`}
+            section={PLATFORM_SECTION.MARKET}
+            product={item.product}
+            showAddToCartButton
+            showBuyNowButton
+          />
+        ) : (
+          <AdCard key={`ad-${item.ad.id}`} ad={item.ad} />
+        ),
+      )}
+    </div>
+  );
+}
+
 export function CombinedFeed() {
   const { initialChunkSize, chunkSize } = useFeedChunkSize('default');
 
@@ -57,21 +85,7 @@ export function CombinedFeed() {
 
   return (
     <div className="space-y-4">
-      <div className={getItemGridClasses()}>
-        {items.map((item) =>
-          item.type === 'PRODUCT' ? (
-            <ProductCard
-              key={`product-${item.product.id}`}
-              section={PLATFORM_SECTION.MARKET}
-              product={item.product}
-              showAddToCartButton
-              showBuyNowButton
-            />
-          ) : (
-            <AdCard key={`ad-${item.ad.id}`} ad={item.ad} />
-          ),
-        )}
-      </div>
+      <CombinedItemsGrid items={items} />
 
       {isLoading && items.length > 0 && (
         <div className={getItemGridClasses()}>

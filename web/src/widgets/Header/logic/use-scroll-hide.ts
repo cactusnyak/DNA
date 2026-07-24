@@ -26,6 +26,7 @@ function getBreakpoint(): ScrollHideBreakpoint {
 export function useScrollHide() {
   const setIsHidden = useHeaderStore((s) => s.setIsHidden);
   const isHidden = useHeaderStore((s) => s.isHidden);
+  const isSearchActive = useHeaderStore((s) => s.isSearchActive);
 
   const lastScrollY = useRef(window.scrollY);
   const breakpointRef = useRef(getBreakpoint());
@@ -36,6 +37,11 @@ export function useScrollHide() {
     };
 
     const handleScroll = () => {
+      if (isSearchActive) {
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+
       const { topOffset, hideThreshold, showThreshold } = breakpointRef.current;
       const currentScrollY = window.scrollY;
       const diff = currentScrollY - lastScrollY.current;
@@ -58,7 +64,7 @@ export function useScrollHide() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', onResize);
     };
-  }, [setIsHidden]);
+  }, [isSearchActive, setIsHidden]);
 
   return { isHidden };
 }

@@ -33,6 +33,7 @@ export function AdCategoryCrudFields({
   return (
     <div className="flex flex-col gap-5">
       <FormInputField
+        name="name"
         required
         label="Название"
         value={String(values.name ?? '')}
@@ -40,6 +41,7 @@ export function AdCategoryCrudFields({
       />
 
       <FormInputField
+        name="slug"
         label="Slug"
         caption="Можно оставить пустым, система создаст сама."
         value={String(values.slug ?? '')}
@@ -54,6 +56,7 @@ export function AdCategoryCrudFields({
       />
 
       <FormInputField
+        name="sortOrder"
         type="number"
         label="Порядок сортировки"
         value={String(values.sortOrder ?? '')}
@@ -61,6 +64,7 @@ export function AdCategoryCrudFields({
       />
 
       <FormImageFileField
+        name="image"
         label="Изображение"
         caption="Файл будет загружен на сервер, а в категорию сохранится полученный URL."
         file={imageFile}
@@ -70,12 +74,14 @@ export function AdCategoryCrudFields({
       />
 
       <FormInputField
+        name="imageAlt"
         label="Alt изображения"
         value={String(values.imageAlt ?? '')}
         onChange={(event) => onValueChange('imageAlt', event.target.value)}
       />
 
       <FormTextareaField
+        name="description"
         label="Описание"
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}

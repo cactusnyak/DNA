@@ -128,6 +128,7 @@ export function AuthorizationForm({
           {isOtpStep ? (
             <>
               <FormInputField
+                name="otpCode"
                 required
                 type="text"
                 inputMode="numeric"
@@ -142,6 +143,7 @@ export function AuthorizationForm({
             <>
               {isRegisterMode && (
                 <FormInputField
+                  name="nickname"
                   required
                   label="Имя аккаунта"
                   value={value.nickname}
@@ -152,6 +154,7 @@ export function AuthorizationForm({
               )}
 
               <FormInputField
+                name="login"
                 required
                 type="text"
                 inputMode="email"

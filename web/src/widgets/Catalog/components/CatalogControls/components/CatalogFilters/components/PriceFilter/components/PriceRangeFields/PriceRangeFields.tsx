@@ -25,6 +25,7 @@ export function PriceRangeFields({
         <span className="text-xs text-muted-foreground">От</span>
 
         <Input
+          name="priceFrom"
           type="number"
           value={from}
           min={min}
@@ -39,6 +40,7 @@ export function PriceRangeFields({
         <span className="text-xs text-muted-foreground">До</span>
 
         <Input
+          name="priceTo"
           type="number"
           value={to}
           min={min}

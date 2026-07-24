@@ -107,6 +107,7 @@ export function CatalogCategoryTree({
       />
 
       <SearchInput
+        name="categorySearch"
         value={searchValue}
         placeholder="Поиск категории"
         className="h-10"
@@ -137,4 +138,3 @@ export function CatalogCategoryTree({
     </div>
   );
 }
-

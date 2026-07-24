@@ -53,6 +53,7 @@ export function ReferralLinkCard({ user }: ReferralLinkCardProps) {
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
         <Input
+          name="referralLink"
           readOnly
           value={referralLink || 'Реферальная ссылка пока недоступна'}
         />

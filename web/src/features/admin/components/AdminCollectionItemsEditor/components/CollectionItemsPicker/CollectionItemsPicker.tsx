@@ -35,6 +35,7 @@ export function CollectionItemsPicker({
           >
             <span className="flex items-start gap-3">
               <input
+                name={`selectedItems.${item.id}`}
                 type="checkbox"
                 checked={Boolean(state?.selected)}
                 onChange={() => onItemToggle(item.id)}
@@ -52,6 +53,7 @@ export function CollectionItemsPicker({
             </span>
 
             <Input
+              name={`sortOrder.${item.id}`}
               type="number"
               value={String(state?.sortOrder ?? index)}
               onChange={(event) =>
@@ -64,4 +66,3 @@ export function CollectionItemsPicker({
     </div>
   );
 }
-

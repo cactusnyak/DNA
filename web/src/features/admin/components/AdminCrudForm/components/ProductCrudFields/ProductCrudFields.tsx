@@ -42,6 +42,7 @@ export function ProductCrudFields({
   return (
     <div className="flex flex-col gap-5">
       <FormInputField
+        name="title"
         required
         label="Название"
         value={String(values.title ?? '')}
@@ -49,6 +50,7 @@ export function ProductCrudFields({
       />
 
       <FormInputField
+        name="slug"
         label="Slug"
         caption="Можно оставить пустым, система создаст сама."
         value={String(values.slug ?? '')}
@@ -64,6 +66,7 @@ export function ProductCrudFields({
       />
 
       <FormInputField
+        name="price"
         required
         type="number"
         label="Цена"
@@ -72,12 +75,14 @@ export function ProductCrudFields({
       />
 
       <FormTextareaField
+        name="description"
         label="Описание"
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}
       />
 
       <FormImageFilesField
+        name="images"
         label="Изображения"
         caption="Новые файлы будут загружены на сервер, а в товар сохранятся полученные URL."
         files={imageFiles}

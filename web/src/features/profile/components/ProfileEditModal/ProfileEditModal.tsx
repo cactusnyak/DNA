@@ -80,6 +80,7 @@ export function ProfileEditModal({
       >
         <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
           <FormInputField
+            name="nickname"
             required
             label="Имя аккаунта"
             value={nickname}
@@ -87,24 +88,28 @@ export function ProfileEditModal({
           />
 
           <FormInputField
+            name="lastName"
             label="Фамилия"
             value={lastName}
             onChange={getInputChangeHandler(setLastName)}
           />
 
           <FormInputField
+            name="firstName"
             label="Имя"
             value={firstName}
             onChange={getInputChangeHandler(setFirstName)}
           />
 
           <FormInputField
+            name="patronymic"
             label="Отчество"
             value={patronymic}
             onChange={getInputChangeHandler(setPatronymic)}
           />
 
           <FormInputField
+            name="phone"
             type="tel"
             label="Телефон"
             value={phone}

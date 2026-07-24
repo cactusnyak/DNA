@@ -1,10 +1,12 @@
 import type { CSSProperties, UIEvent } from 'react';
+import { Link } from 'react-router-dom';
 
 import type { Ad } from '@/entities/ad';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import type { Product } from '@/entities/product';
 import { headerHeightVar } from '@/shared/header';
 import { mobileNavigationHeightVar } from '@/shared/main-navigation';
+import { Button } from '@/components/ui/Button';
 
 import { GlobalSearchCategoryResults } from '../GlobalSearchCategoryResults';
 import { GlobalSearchItemResults } from '../GlobalSearchItemResults';
@@ -92,14 +94,17 @@ export function GlobalSearchDropdown({
     isMarketCategoriesError ||
     isAdsCategoriesError;
   const dropdownStyle = {
+    '--global-search-mobile-top': headerHeightVar(),
     '--global-search-mobile-height': `calc(100dvh - ${headerHeightVar()} - ${mobileNavigationHeightVar()} - 0.5rem)`,
   } as CSSProperties;
 
   return (
-    <div className="absolute top-full right-0 left-0 z-[70] min-w-[320px] pt-2">
+    <div
+      className="fixed top-[var(--global-search-mobile-top)] right-0 left-0 z-[70] px-4 pt-2 md:absolute md:top-full md:px-0"
+      style={dropdownStyle}
+    >
       <div
-        className="max-h-[var(--global-search-mobile-height)] overflow-y-auto rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl md:max-h-[calc(100dvh-var(--header-height,112px)-0.5rem)]"
-        style={dropdownStyle}
+        className="max-h-[var(--global-search-mobile-height)] touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl md:max-h-[calc(100dvh-var(--header-height,112px)-0.5rem)]"
       >
         {!isSearchReady ? (
           <p className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground leading-[1.5]">
@@ -146,6 +151,17 @@ export function GlobalSearchDropdown({
                 onNavigate={onNavigate}
               />
             )}
+
+            <div className="p-4">
+              <Button className="w-full" asChild>
+                <Link
+                  to={`/search?q=${encodeURIComponent(searchValue.trim())}`}
+                  onClick={onNavigate}
+                >
+                  Посмотреть все результаты
+                </Link>
+              </Button>
+            </div>
           </div>
         )}
       </div>

@@ -31,6 +31,7 @@ export function SubcategoryFilter({
           >
             <span className="flex items-center gap-2 text-sm">
               <input
+                name={`category.${option.id}`}
                 type="checkbox"
                 checked={isSelected}
                 className="cursor-pointer"

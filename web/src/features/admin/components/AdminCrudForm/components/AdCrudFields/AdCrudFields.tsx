@@ -50,6 +50,7 @@ export function AdCrudFields({
   return (
     <div className="flex flex-col gap-5">
       <FormInputField
+        name="title"
         required
         label="Заголовок"
         value={String(values.title ?? '')}
@@ -57,6 +58,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
+        name="slug"
         label="Slug"
         caption="Можно оставить пустым, система создаст сама."
         value={String(values.slug ?? '')}
@@ -79,6 +81,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
+        name="price"
         required
         type="number"
         label="Цена"
@@ -87,12 +90,14 @@ export function AdCrudFields({
       />
 
       <FormTextareaField
+        name="description"
         label="Описание"
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}
       />
 
       <FormImageFilesField
+        name="images"
         label="Изображения"
         caption="Новые файлы будут загружены на сервер, а в объявление сохранятся полученные URL."
         files={imageFiles}
@@ -104,6 +109,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
+        name="contactPhone"
         label="Телефон (для объявления)"
         type="tel"
         value={String(values.contactPhone ?? '')}
@@ -111,6 +117,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
+        name="contactTelegram"
         label="Telegram"
         placeholder="@username"
         value={String(values.contactTelegram ?? '')}
@@ -118,6 +125,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
+        name="contactEmail"
         label="Email (для объявления)"
         type="email"
         value={String(values.contactEmail ?? '')}
@@ -125,6 +133,7 @@ export function AdCrudFields({
       />
 
       <FormInputField
+        name="contactOther"
         label="Другой контакт"
         value={String(values.contactOther ?? '')}
         onChange={(event) => onValueChange('contactOther', event.target.value)}
