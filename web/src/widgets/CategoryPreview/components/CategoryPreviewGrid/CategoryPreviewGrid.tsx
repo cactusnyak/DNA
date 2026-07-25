@@ -20,7 +20,7 @@ function getGridCols(count: number) {
   
   const baseCols = Math.max(minCols, Math.min(count, maxCols));
   const smCols = Math.max(minCols, Math.ceil(baseCols / smDivider));
-  
+
   return {
     base: minCols,
     sm: smCols,
@@ -58,9 +58,9 @@ export function CategoryPreviewGrid({
   previewCategories,
 }: CategoryPreviewGridProps) {
   const cols = getGridCols(previewCategories.length);
-  
+
   const gridClassName = [
-    'grid gap-3',
+    'grid justify-items-start gap-3',
     gridColsClasses[cols.base],
     smGridColsClasses[cols.sm],
     lgGridColsClasses[cols.lg],
@@ -69,14 +69,14 @@ export function CategoryPreviewGrid({
   return (
     <div className={gridClassName}>
       {previewCategories.map((category) => (
-        <CategoryPreviewCard
-          key={category.id}
-          section={section}
-          category={category}
-          categories={categories}
-        />
+        <div key={category.id} className="w-full max-w-48">
+          <CategoryPreviewCard
+            section={section}
+            category={category}
+            categories={categories}
+          />
+        </div>
       ))}
     </div>
   );
 }
-

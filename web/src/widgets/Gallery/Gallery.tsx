@@ -30,16 +30,16 @@ export function Gallery({ images, title }: GalleryProps) {
 
   if (!activeImage) {
     return (
-      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+      <div className="flex aspect-[4/3] w-full max-w-2xl items-center justify-center rounded-2xl bg-muted text-muted-foreground">
         Нет изображения
       </div>
     );
   }
 
   return (
-    <div className="flex gap-4">
+    <div className="flex w-full max-w-3xl flex-col gap-3 sm:flex-row sm:gap-4">
       {images.length > 1 && (
-        <div className="flex w-16 shrink-0 flex-col gap-2">
+        <div className="order-2 flex w-full gap-2 overflow-x-auto pb-1 sm:order-1 sm:max-h-[32rem] sm:w-16 sm:shrink-0 sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0">
           {images.map((image, index) => {
             const isActive = index === activeImageIndex;
 
@@ -48,7 +48,7 @@ export function Gallery({ images, title }: GalleryProps) {
                 key={image.id}
                 type="button"
                 className={cn(
-                  'size-16 overflow-hidden rounded-xl border transition-colors cursor-pointer',
+                  'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted transition-colors sm:size-16 sm:rounded-xl',
                   isActive
                     ? 'border-foreground'
                     : 'border-border hover:border-foreground/40',
@@ -67,17 +67,24 @@ export function Gallery({ images, title }: GalleryProps) {
       )}
 
       <div
-        className="aspect-[4/3] flex-1 overflow-hidden rounded-2xl border border-border bg-muted cursor-zoom-in"
+        className="relative order-1 aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-muted sm:order-2 sm:max-h-[32rem] sm:rounded-2xl sm:cursor-zoom-in"
         onMouseEnter={() => setIsZoomed(true)}
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}
       >
         <img
+          aria-hidden="true"
+          src={activeImage.url}
+          alt=""
+          className="absolute inset-0 size-full scale-110 object-cover opacity-50 blur-xl"
+        />
+
+        <img
           src={activeImage.url}
           alt={activeImage.alt ?? title}
-          className="size-full object-cover transition-transform duration-200"
+          className="relative size-full object-contain transition-transform duration-200"
           style={{
-            transform: isZoomed ? 'scale(1.65)' : 'scale(1)',
+            transform: isZoomed ? 'scale(1.4)' : 'scale(1)',
             transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
           }}
         />
