@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { AdminAd } from '@/entities/admin';
 import { formatAdStatus } from '@/entities/ad';
 import { formatPrice } from '@/shared/utils/format-price';
+import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -52,7 +53,7 @@ export function AdminAdRecordsView({
           renderHighlightedText(ad.description || 'Без описания', searchValue)
         }
         getMeta={(ad) =>
-          `${getSellerName(ad)} · ${formatPrice(ad.price)} · ${formatAdStatus(ad.status)}`
+          `${getSellerName(ad)} · ${formatPrice(ad.price)} · ${ad.location?.name ?? 'Без геопозиции'} · ${formatAdStatus(ad.status)}`
         }
         renderActions={renderActions}
         emptyText="Объявления не найдены."
@@ -180,6 +181,28 @@ export function AdminAdRecordsView({
             ) : (
               <span className="text-muted-foreground">—</span>
             ),
+        },
+        {
+          key: 'locationName',
+          title: 'Геопозиция',
+          width: 180,
+          sortable: true,
+          filter: { type: 'text', placeholder: 'Название точки' },
+          getValue: (ad) => ad.location?.name ?? '',
+          render: (ad) =>
+            ad.location?.name ? (
+              renderHighlightedText(ad.location.name, searchValue)
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            ),
+        },
+        {
+          key: 'locationCoordinates',
+          title: 'Координаты',
+          width: 200,
+          sortable: false,
+          getValue: (ad) => formatLocationCoordinates(ad.location),
+          render: (ad) => formatLocationCoordinates(ad.location),
         },
         {
           key: 'price',

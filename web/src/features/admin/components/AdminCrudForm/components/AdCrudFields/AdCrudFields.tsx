@@ -7,6 +7,7 @@ import {
 import { AD_STATUS_LABELS } from '@/entities/ad';
 
 import type { AdminCrudFieldsProps } from '../../types/admin-crud-form';
+import { LocationCrudFields } from '../LocationCrudFields';
 
 function getStringArray(value: unknown) {
   return Array.isArray(value)
@@ -96,6 +97,8 @@ export function AdCrudFields({
         onChange={(event) => onValueChange('description', event.target.value)}
       />
 
+      <LocationCrudFields values={values} onValueChange={onValueChange} />
+
       <FormImageFilesField
         name="images"
         label="Изображения"
@@ -121,7 +124,9 @@ export function AdCrudFields({
         label="Telegram"
         placeholder="@username"
         value={String(values.contactTelegram ?? '')}
-        onChange={(event) => onValueChange('contactTelegram', event.target.value)}
+        onChange={(event) =>
+          onValueChange('contactTelegram', event.target.value)
+        }
       />
 
       <FormInputField

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { AdminProduct } from '@/entities/admin';
 import { formatPrice } from '@/shared/utils/format-price';
+import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -73,7 +74,7 @@ export function AdminProductRecordsView({
           )
         }
         getMeta={(product) =>
-          `${product.category?.name ?? 'Без категории'} · ${formatPrice(product.price)} · ${getAdminRecordStatusLabel(product)}`
+          `${product.category?.name ?? 'Без категории'} · ${formatPrice(product.price)} · ${product.location?.name ?? 'Без геопозиции'} · ${getAdminRecordStatusLabel(product)}`
         }
         renderActions={renderActions}
         emptyText="Продукты не найдены."
@@ -138,6 +139,28 @@ export function AdminProductRecordsView({
           },
           getValue: (product) => product.price,
           render: (product) => formatPrice(product.price),
+        },
+        {
+          key: 'locationName',
+          title: 'Геопозиция',
+          width: 180,
+          sortable: true,
+          filter: { type: 'text', placeholder: 'Название точки' },
+          getValue: (product) => product.location?.name ?? '',
+          render: (product) =>
+            product.location?.name ? (
+              renderHighlightedText(product.location.name, searchValue)
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            ),
+        },
+        {
+          key: 'locationCoordinates',
+          title: 'Координаты',
+          width: 200,
+          sortable: false,
+          getValue: (product) => formatLocationCoordinates(product.location),
+          render: (product) => formatLocationCoordinates(product.location),
         },
         {
           key: 'additions',
