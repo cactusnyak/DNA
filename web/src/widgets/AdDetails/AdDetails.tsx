@@ -16,8 +16,10 @@ export function AdDetails({ ad }: AdDetailsProps) {
 
       <div className="space-y-8">
         <AdDetailsInfo ad={ad} />
-        <AdDetailsActions ad={ad} />
-        <AdDetailsContacts ad={ad} />
+        <div className="space-y-8">
+          <AdDetailsActions ad={ad} />
+          <AdDetailsContacts ad={ad} />
+        </div>
       </div>
     </div>
   );

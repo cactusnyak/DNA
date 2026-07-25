@@ -8,6 +8,7 @@ import {
 import type { AdminCrudFieldsProps } from '../../types/admin-crud-form';
 import type { ProductAddition } from '@/entities/product';
 import { ProductAdditionsFields } from '../ProductAdditionsFields';
+import { LocationCrudFields } from '../LocationCrudFields';
 
 function getStringArray(value: unknown) {
   return Array.isArray(value)
@@ -79,9 +80,13 @@ export function ProductCrudFields({
       <FormTextareaField
         name="description"
         label="Описание"
+        caption="Каждая строка — отдельный блок. Начните строку с «# », чтобы создать заголовок."
+        rows={8}
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}
       />
+
+      <LocationCrudFields values={values} onValueChange={onValueChange} />
 
       <FormImageFilesField
         name="images"
@@ -96,7 +101,11 @@ export function ProductCrudFields({
       />
 
       <ProductAdditionsFields
-        value={Array.isArray(values.additions) ? values.additions as ProductAddition[] : []}
+        value={
+          Array.isArray(values.additions)
+            ? (values.additions as ProductAddition[])
+            : []
+        }
         onChange={(additions) => onValueChange('additions', additions)}
       />
     </div>

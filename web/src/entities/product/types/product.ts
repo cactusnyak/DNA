@@ -1,5 +1,7 @@
 import type { MarketCategory } from '@/entities/market-category';
 import type { Image } from '@/shared/types/image';
+import type { Location } from '@/shared/types/location';
+import type { ContentDescription } from '@/shared/types/content-description';
 
 export type BooleanProductAddition = {
   id: string;
@@ -22,9 +24,7 @@ export type QuantityProductAddition = {
   unitLabel: string;
 };
 
-export type ProductAddition =
-  | BooleanProductAddition
-  | QuantityProductAddition;
+export type ProductAddition = BooleanProductAddition | QuantityProductAddition;
 
 export type SelectedProductAddition =
   | { additionId: string; type: 'boolean'; value: boolean }
@@ -35,8 +35,9 @@ export type Product = {
   category: MarketCategory;
   title: string;
   slug: string;
-  description: string;
+  description: ContentDescription;
   price: number;
+  location?: Location | null;
   additions: ProductAddition[];
   createdAt: string;
   updatedAt: string;

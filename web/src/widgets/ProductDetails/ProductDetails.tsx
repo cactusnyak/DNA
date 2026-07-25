@@ -35,16 +35,18 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       <div className="space-y-6">
         <ProductDetailsInfo product={product} />
-        <ProductAdditionsSelector
-          additions={product.additions ?? []}
-          selected={selectedAdditions}
-          errors={showErrors ? errors : {}}
-          onChange={setSelectedAdditions}
-        />
         {(product.additions?.length ?? 0) > 0 && (
-          <p className="text-xl font-semibold">
-            Итого за единицу: {formatPrice(configuredUnitPrice)}
-          </p>
+          <div className="space-y-6">
+            <ProductAdditionsSelector
+              additions={product.additions ?? []}
+              selected={selectedAdditions}
+              errors={showErrors ? errors : {}}
+              onChange={setSelectedAdditions}
+            />
+            <p className="text-xl font-semibold">
+              Итого за единицу: {formatPrice(configuredUnitPrice)}
+            </p>
+          </div>
         )}
         <ProductDetailsActions
           product={product}

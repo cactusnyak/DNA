@@ -1,4 +1,6 @@
 import type { ProductAddition } from '../products/product-additions';
+import type { Location } from '../common/location';
+import type { ContentDescription } from '../common/content-description';
 
 export type FeedScope = 'MARKET' | 'ADS';
 
@@ -33,8 +35,9 @@ export type FeedProductItem = {
     };
     title: string;
     slug: string;
-    description: string;
+    description: ContentDescription;
     price: number;
+    location: Location | null;
     additions: ProductAddition[];
     createdAt: Date;
     updatedAt: Date;
@@ -74,8 +77,9 @@ export type FeedAdItem = {
     };
     title: string;
     slug: string;
-    description: string;
+    description: ContentDescription;
     price: number;
+    location: Location | null;
     status: string;
     moderatedAt?: Date | null;
     createdAt: Date;

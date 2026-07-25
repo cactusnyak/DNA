@@ -1,0 +1,1 @@
+export { LocationCrudFields } from './LocationCrudFields';

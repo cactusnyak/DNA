@@ -22,8 +22,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "seed": "tsx prisma/seed.ts",
-    "seed:images": "tsx prisma/seed-images.ts"
+    "seed": "tsx prisma/seeds/default/seed.ts",
+    "seed:images": "tsx prisma/seeds/default/seed-images.ts",
+    "seed:production": "tsx prisma/seeds/production/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1090.0",

@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -35,10 +32,7 @@ const SORT_FIELD_WHITELIST = new Set<CatalogSortField>([
   'price',
 ]);
 
-const SORT_DIRECTION_WHITELIST = new Set<CatalogSortDirection>([
-  'asc',
-  'desc',
-]);
+const SORT_DIRECTION_WHITELIST = new Set<CatalogSortDirection>(['asc', 'desc']);
 
 @Injectable()
 export class ProductsService {
@@ -103,9 +97,10 @@ export class ProductsService {
       activeCategories.map((category) => [category.id, category]),
     );
 
-    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      productIdOrSlug,
-    );
+    const isId =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        productIdOrSlug,
+      );
 
     const product = await this.prismaService.product.findFirst({
       where: {
@@ -149,7 +144,9 @@ export class ProductsService {
   private async getFilteredCategoryIds(params: {
     categorySlug?: string;
     categoryIds?: string[];
-    activeCategories: Awaited<ReturnType<ProductsService['getActiveCategories']>>;
+    activeCategories: Awaited<
+      ReturnType<ProductsService['getActiveCategories']>
+    >;
   }) {
     const requestedCategoryIds = params.categoryIds?.filter(Boolean) ?? [];
 
@@ -317,6 +314,7 @@ export class ProductsService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      location: product.location,
       additions: normalizeProductAdditions(product.additions),
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,

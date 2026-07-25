@@ -7,6 +7,11 @@ import {
 import { AdStatus, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { locationToJson } from '../common/location';
+import {
+  contentDescriptionToJson,
+  contentDescriptionToPlainText,
+} from '../common/content-description';
 
 import { AdsModerationService } from './ads-moderation.service';
 import type { CreateAdDto } from './dto/create-ad.dto';
@@ -24,10 +29,39 @@ type AdSortField = 'title' | 'category' | 'createdAt' | 'price';
 type AdSortDirection = 'asc' | 'desc';
 
 const CYRILLIC_MAP: Record<string, string> = {
-  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh',
-  з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o',
-  п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'c',
-  ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+  а: 'a',
+  б: 'b',
+  в: 'v',
+  г: 'g',
+  д: 'd',
+  е: 'e',
+  ё: 'e',
+  ж: 'zh',
+  з: 'z',
+  и: 'i',
+  й: 'y',
+  к: 'k',
+  л: 'l',
+  м: 'm',
+  н: 'n',
+  о: 'o',
+  п: 'p',
+  р: 'r',
+  с: 's',
+  т: 't',
+  у: 'u',
+  ф: 'f',
+  х: 'h',
+  ц: 'c',
+  ч: 'ch',
+  ш: 'sh',
+  щ: 'sch',
+  ъ: '',
+  ы: 'y',
+  ь: '',
+  э: 'e',
+  ю: 'yu',
+  я: 'ya',
 };
 
 const ACTIVE_AD_CATEGORY_WHERE = {
@@ -105,9 +139,10 @@ export class AdsService {
       activeCategories.map((category) => [category.id, category]),
     );
 
-    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      adIdOrSlug,
-    );
+    const isId =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        adIdOrSlug,
+      );
 
     const ad = await this.prismaService.ad.findFirst({
       where: {
@@ -161,7 +196,7 @@ export class AdsService {
 
     const decision = this.adsModerationService.moderateOnCreate({
       title,
-      description: this.getOptionalString(dto.description) ?? '',
+      description: contentDescriptionToPlainText(dto.description),
       price: this.getNumber(dto.price, 0),
     });
 
@@ -171,8 +206,9 @@ export class AdsService {
         slug,
         categoryId,
         sellerId,
-        description: this.getOptionalString(dto.description) ?? '',
+        description: contentDescriptionToJson(dto.description),
         price: this.getNumber(dto.price, 0),
+        location: locationToJson(dto.location),
         status: decision.status,
         moderatedAt: decision.moderatedAt,
         contactPhone: this.getOptionalString(dto.contactPhone),
@@ -206,7 +242,7 @@ export class AdsService {
 
     const decision = this.adsModerationService.moderateOnUpdate({
       title,
-      description: this.getOptionalString(dto.description) ?? '',
+      description: contentDescriptionToPlainText(dto.description),
       price: this.getNumber(dto.price, ad.price),
     });
 
@@ -218,8 +254,9 @@ export class AdsService {
         title,
         slug,
         categoryId,
-        description: this.getOptionalString(dto.description) ?? '',
+        description: contentDescriptionToJson(dto.description),
         price: this.getNumber(dto.price, ad.price),
+        location: locationToJson(dto.location),
         status: decision.status,
         moderatedAt: decision.moderatedAt,
         contactPhone: this.getOptionalString(dto.contactPhone),
@@ -546,6 +583,7 @@ export class AdsService {
       slug: ad.slug,
       description: ad.description,
       price: ad.price,
+      location: ad.location,
       status: ad.status,
       moderatedAt: ad.moderatedAt,
       createdAt: ad.createdAt,

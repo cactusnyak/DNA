@@ -1,5 +1,6 @@
 import type { Ad } from '@/entities/ad';
 import { formatPrice } from '@/shared/utils/format-price';
+import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
 
 import { getSearchTokens, normalizeSearchValue } from './normalize-search-value';
 
@@ -16,7 +17,9 @@ function getAdSearchScore(
 ) {
   const normalizedSearch = normalizeSearchValue(searchValue);
   const normalizedTitle = normalizeSearchValue(ad.title);
-  const normalizedDescription = normalizeSearchValue(ad.description ?? '');
+  const normalizedDescription = normalizeSearchValue(
+    contentDescriptionToPlainText(ad.description),
+  );
   const normalizedCategory = normalizeSearchValue(ad.category?.name ?? '');
   const adPrice = String(Math.round(ad.price));
 
@@ -41,7 +44,7 @@ export function filterGlobalSearchAds(ads: Ad[], searchValue: string) {
     normalizeSearchValue(
       [
         ad.title,
-        ad.description ?? '',
+        contentDescriptionToPlainText(ad.description),
         ad.category?.name ?? '',
         String(ad.price),
         formatPrice(ad.price),

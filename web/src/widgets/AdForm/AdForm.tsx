@@ -12,6 +12,10 @@ import type { Ad, CreateAdPayload } from '@/entities/ad';
 import { getCurrentUser } from '@/entities/auth';
 import { getAdCategories } from '@/entities/ad-category';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
+import {
+  contentDescriptionToMarkdown,
+  markdownToContentDescription,
+} from '@/shared/utils/content-description';
 
 type AdFormProps = {
   initialAd?: Ad;
@@ -44,7 +48,18 @@ export function AdForm({
   const [title, setTitle] = useState(initialAd?.title ?? '');
   const [categoryId, setCategoryId] = useState(initialAd?.categoryId ?? '');
   const [price, setPrice] = useState(String(initialAd?.price ?? ''));
-  const [description, setDescription] = useState(initialAd?.description ?? '');
+  const [description, setDescription] = useState(
+    contentDescriptionToMarkdown(initialAd?.description),
+  );
+  const [locationName, setLocationName] = useState(
+    initialAd?.location?.name ?? '',
+  );
+  const [locationLatitude, setLocationLatitude] = useState(
+    String(initialAd?.location?.coordinates.latitude ?? ''),
+  );
+  const [locationLongitude, setLocationLongitude] = useState(
+    String(initialAd?.location?.coordinates.longitude ?? ''),
+  );
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>(
     initialAd?.images.map((image) => image.url) ?? [],
   );
@@ -65,7 +80,9 @@ export function AdForm({
     initialAd?.contactOther ?? '',
   );
   const [showPhone, setShowPhone] = useState(Boolean(initialAd?.contactPhone));
-  const [showTelegram, setShowTelegram] = useState(Boolean(initialAd?.contactTelegram));
+  const [showTelegram, setShowTelegram] = useState(
+    Boolean(initialAd?.contactTelegram),
+  );
   const [showEmail, setShowEmail] = useState(Boolean(initialAd?.contactEmail));
   const [showOther, setShowOther] = useState(Boolean(initialAd?.contactOther));
   const [publicationConsent, setPublicationConsent] = useState(false);
@@ -122,6 +139,40 @@ export function AdForm({
       return;
     }
 
+    const hasAnyLocationValue =
+      locationName.trim() ||
+      locationLatitude.trim() ||
+      locationLongitude.trim();
+
+    if (
+      hasAnyLocationValue &&
+      (!locationName.trim() ||
+        !locationLatitude.trim() ||
+        !locationLongitude.trim())
+    ) {
+      setError('Для геопозиции заполните название точки и обе координаты.');
+      return;
+    }
+
+    const latitude = Number(locationLatitude);
+    const longitude = Number(locationLongitude);
+
+    if (
+      hasAnyLocationValue &&
+      (!Number.isFinite(latitude) || latitude < -90 || latitude > 90)
+    ) {
+      setError('Широта должна быть числом от −90 до 90.');
+      return;
+    }
+
+    if (
+      hasAnyLocationValue &&
+      (!Number.isFinite(longitude) || longitude < -180 || longitude > 180)
+    ) {
+      setError('Долгота должна быть числом от −180 до 180.');
+      return;
+    }
+
     setIsUploadingImages(true);
 
     try {
@@ -131,12 +182,20 @@ export function AdForm({
 
       await onSubmit({
         title: title.trim(),
-        description: description.trim(),
+        description: markdownToContentDescription(description),
         categoryId,
         price: Number(price) || 0,
+        location: hasAnyLocationValue
+          ? {
+              name: locationName.trim(),
+              coordinates: { latitude, longitude },
+            }
+          : undefined,
         imageUrls: [...existingImageUrls, ...uploadedImageUrls],
         contactPhone: showPhone ? contactPhone.trim() || undefined : undefined,
-        contactTelegram: showTelegram ? contactTelegram.trim() || undefined : undefined,
+        contactTelegram: showTelegram
+          ? contactTelegram.trim() || undefined
+          : undefined,
         contactEmail: showEmail ? contactEmail.trim() || undefined : undefined,
         contactOther: showOther ? contactOther.trim() || undefined : undefined,
       });
@@ -183,9 +242,52 @@ export function AdForm({
       <FormTextareaField
         name="description"
         label="Описание"
+        caption="Каждая строка — отдельный блок. Начните строку с «# », чтобы создать заголовок."
+        rows={8}
         value={description}
         onChange={(event) => setDescription(event.target.value)}
       />
+
+      <fieldset className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+        <legend className="px-1 text-sm font-medium">Геопозиция</legend>
+
+        <FormInputField
+          name="locationName"
+          label="Название точки"
+          caption="Оставьте весь блок пустым, если геопозиция не нужна."
+          placeholder="Например, Талдом"
+          value={locationName}
+          onChange={(event) => setLocationName(event.target.value)}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormInputField
+            name="locationLatitude"
+            type="number"
+            inputMode="decimal"
+            min={-90}
+            max={90}
+            step={0.000001}
+            label="Широта"
+            placeholder="56.7308"
+            value={locationLatitude}
+            onChange={(event) => setLocationLatitude(event.target.value)}
+          />
+
+          <FormInputField
+            name="locationLongitude"
+            type="number"
+            inputMode="decimal"
+            min={-180}
+            max={180}
+            step={0.000001}
+            label="Долгота"
+            placeholder="37.5276"
+            value={locationLongitude}
+            onChange={(event) => setLocationLongitude(event.target.value)}
+          />
+        </div>
+      </fieldset>
 
       <FormImageFilesField
         name="images"
@@ -209,7 +311,12 @@ export function AdForm({
             value={contactPhone}
             onChange={(event) => setContactPhone(event.target.value)}
           />
-          <ContactVisibility checked={showPhone} disabled={!contactPhone.trim()} label="Показывать телефон" onChange={setShowPhone} />
+          <ContactVisibility
+            checked={showPhone}
+            disabled={!contactPhone.trim()}
+            label="Показывать телефон"
+            onChange={setShowPhone}
+          />
 
           <FormInputField
             name="contactTelegram"
@@ -218,7 +325,12 @@ export function AdForm({
             value={contactTelegram}
             onChange={(event) => setContactTelegram(event.target.value)}
           />
-          <ContactVisibility checked={showTelegram} disabled={!contactTelegram.trim()} label="Показывать Telegram" onChange={setShowTelegram} />
+          <ContactVisibility
+            checked={showTelegram}
+            disabled={!contactTelegram.trim()}
+            label="Показывать Telegram"
+            onChange={setShowTelegram}
+          />
 
           <FormInputField
             name="contactEmail"
@@ -227,7 +339,12 @@ export function AdForm({
             value={contactEmail}
             onChange={(event) => setContactEmail(event.target.value)}
           />
-          <ContactVisibility checked={showEmail} disabled={!contactEmail.trim()} label="Показывать email" onChange={setShowEmail} />
+          <ContactVisibility
+            checked={showEmail}
+            disabled={!contactEmail.trim()}
+            label="Показывать email"
+            onChange={setShowEmail}
+          />
 
           <FormInputField
             name="contactOther"
@@ -236,11 +353,17 @@ export function AdForm({
             value={contactOther}
             onChange={(event) => setContactOther(event.target.value)}
           />
-          <ContactVisibility checked={showOther} disabled={!contactOther.trim()} label="Показывать другой способ связи" onChange={setShowOther} />
+          <ContactVisibility
+            checked={showOther}
+            disabled={!contactOther.trim()}
+            label="Показывать другой способ связи"
+            onChange={setShowOther}
+          />
         </div>
 
         <p className="mt-1 ml-0.5 text-xs leading-5 text-muted-foreground">
-          Укажите хотя бы один способ связи. Незаполненные поля не будут показаны покупателям.
+          Укажите хотя бы один способ связи. Незаполненные поля не будут
+          показаны покупателям.
         </p>
       </div>
 
@@ -266,7 +389,11 @@ export function AdForm({
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isFormPending}>
-          {isUploadingImages ? 'Загружаем изображения...' : isPending ? 'Сохраняем...' : submitLabel}
+          {isUploadingImages
+            ? 'Загружаем изображения...'
+            : isPending
+              ? 'Сохраняем...'
+              : submitLabel}
         </Button>
 
         {onCancel && (
@@ -284,10 +411,26 @@ export function AdForm({
   );
 }
 
-function ContactVisibility({ checked, disabled, label, onChange }: { checked: boolean; disabled: boolean; label: string; onChange: (value: boolean) => void }) {
+function ContactVisibility({
+  checked,
+  disabled,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  disabled: boolean;
+  label: string;
+  onChange: (value: boolean) => void;
+}) {
   return (
     <label className="-mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-      <input name="contactVisibility" type="checkbox" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
+      <input
+        name="contactVisibility"
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.checked)}
+      />
       {label}
     </label>
   );

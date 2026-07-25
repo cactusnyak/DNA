@@ -6,6 +6,8 @@ import {
 import { CatalogCollectionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { locationToJson } from '../common/location';
+import { contentDescriptionToJson } from '../common/content-description';
 import {
   normalizeProductAdditions,
   productAdditionsToJson,
@@ -39,7 +41,9 @@ export class AdminMarketCatalogService {
       data: {
         name,
         slug,
-        description: this.adminInputService.getOptionalString(payload.description),
+        description: this.adminInputService.getOptionalString(
+          payload.description,
+        ),
         parentId,
         imageId: await this.createImageFromPayload(payload),
         sortOrder: this.adminInputService.getNumber(payload.sortOrder, 0),
@@ -73,9 +77,14 @@ export class AdminMarketCatalogService {
       data: {
         name,
         slug,
-        description: this.adminInputService.getOptionalString(payload.description),
+        description: this.adminInputService.getOptionalString(
+          payload.description,
+        ),
         parentId,
-        imageId: await this.resolveImageFromPayload(payload, currentCategory.imageId),
+        imageId: await this.resolveImageFromPayload(
+          payload,
+          currentCategory.imageId,
+        ),
         sortOrder: this.adminInputService.getNumber(payload.sortOrder, 0),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
       },
@@ -113,8 +122,9 @@ export class AdminMarketCatalogService {
           fallback: title,
         }),
         categoryId,
-        description: this.adminInputService.getOptionalString(payload.description) ?? '',
+        description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
+        location: locationToJson(payload.location),
         additions: productAdditionsToJson(
           normalizeProductAdditions(payload.additions),
         ),
@@ -156,8 +166,9 @@ export class AdminMarketCatalogService {
           exceptId: id,
         }),
         categoryId,
-        description: this.adminInputService.getOptionalString(payload.description) ?? '',
+        description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
+        location: locationToJson(payload.location),
         additions: productAdditionsToJson(
           normalizeProductAdditions(payload.additions),
         ),
@@ -306,7 +317,9 @@ export class AdminMarketCatalogService {
           fallback: title,
         }),
         type: this.adminInputService.getCollectionType(payload.type),
-        description: this.adminInputService.getOptionalString(payload.description),
+        description: this.adminInputService.getOptionalString(
+          payload.description,
+        ),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
       },
     });
@@ -332,7 +345,9 @@ export class AdminMarketCatalogService {
           exceptId: id,
         }),
         type: this.adminInputService.getCollectionType(payload.type),
-        description: this.adminInputService.getOptionalString(payload.description),
+        description: this.adminInputService.getOptionalString(
+          payload.description,
+        ),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
       },
     });
@@ -556,7 +571,8 @@ export class AdminMarketCatalogService {
     const blockers: string[] = [];
 
     if (orderItemsCount > 0) blockers.push('продукт есть в заказах');
-    if (cartItemsCount > 0) blockers.push('продукт есть в корзинах пользователей');
+    if (cartItemsCount > 0)
+      blockers.push('продукт есть в корзинах пользователей');
     if (collectionProductsCount > 0)
       blockers.push('продукт используется в подборках');
 
@@ -616,10 +632,12 @@ export class AdminMarketCatalogService {
       }
 
       visitedCategoryIds.add(currentParentId);
-      const parentCategory = await this.prismaService.marketCategory.findUnique({
-        where: { id: currentParentId },
-        select: { id: true, parentId: true },
-      });
+      const parentCategory = await this.prismaService.marketCategory.findUnique(
+        {
+          where: { id: currentParentId },
+          select: { id: true, parentId: true },
+        },
+      );
 
       if (!parentCategory) {
         throw new NotFoundException('Parent category not found');
@@ -709,6 +727,7 @@ export class AdminMarketCatalogService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      location: product.location,
       additions: normalizeProductAdditions(product.additions),
       isActive: product.isActive,
       deletedAt: product.deletedAt,

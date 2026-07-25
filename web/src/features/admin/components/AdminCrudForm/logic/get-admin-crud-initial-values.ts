@@ -7,6 +7,7 @@ import type {
   AdminUser,
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
+import { contentDescriptionToMarkdown } from '@/shared/utils/content-description';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
@@ -40,9 +41,12 @@ export function getAdminCrudInitialValues(
     return {
       title: product?.title ?? '',
       slug: product?.slug ?? '',
-      description: product?.description ?? '',
+      description: contentDescriptionToMarkdown(product?.description),
       categoryId: product?.categoryId ?? '',
       price: String(product?.price ?? 0),
+      locationName: product?.location?.name ?? '',
+      locationLatitude: String(product?.location?.coordinates.latitude ?? ''),
+      locationLongitude: String(product?.location?.coordinates.longitude ?? ''),
       imageUrls: product?.images.map((image) => image.url) ?? [],
       imageFiles: [],
       additions: product?.additions ?? [],
@@ -84,9 +88,12 @@ export function getAdminCrudInitialValues(
     return {
       title: ad?.title ?? '',
       slug: ad?.slug ?? '',
-      description: ad?.description ?? '',
+      description: contentDescriptionToMarkdown(ad?.description),
       categoryId: ad?.categoryId ?? '',
       price: String(ad?.price ?? 0),
+      locationName: ad?.location?.name ?? '',
+      locationLatitude: String(ad?.location?.coordinates.latitude ?? ''),
+      locationLongitude: String(ad?.location?.coordinates.longitude ?? ''),
       status: ad?.status ?? 'PUBLISHED',
       imageUrls: ad?.images.map((image) => image.url) ?? [],
       imageFiles: [],

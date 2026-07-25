@@ -2,6 +2,7 @@ import type { AdStatus } from '@/entities/ad';
 import type { OrderStatus } from '@/entities/order';
 import type { UserRole } from '@/entities/user';
 import type { ProductAddition } from '@/entities/product';
+import { markdownToContentDescription } from '@/shared/utils/content-description';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
@@ -48,6 +49,33 @@ function getImageUrls(value: AdminCrudFormValue) {
     .filter(Boolean);
 }
 
+function getLocation(values: AdminCrudFormValues) {
+  const name = String(values.locationName ?? '').trim();
+  const latitudeValue = String(values.locationLatitude ?? '').trim();
+  const longitudeValue = String(values.locationLongitude ?? '').trim();
+
+  if (!name && !latitudeValue && !longitudeValue) return undefined;
+
+  if (!name || !latitudeValue || !longitudeValue) {
+    throw new Error(
+      'Для геопозиции заполните название точки, широту и долготу.',
+    );
+  }
+
+  const latitude = Number(latitudeValue);
+  const longitude = Number(longitudeValue);
+
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
+    throw new Error('Широта должна быть числом от −90 до 90.');
+  }
+
+  if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    throw new Error('Долгота должна быть числом от −180 до 180.');
+  }
+
+  return { name, coordinates: { latitude, longitude } };
+}
+
 export async function buildAdminCrudPayload({
   tabId,
   values,
@@ -79,9 +107,12 @@ export async function buildAdminCrudPayload({
     return {
       title: String(values.title ?? ''),
       slug: String(values.slug ?? ''),
-      description: String(values.description ?? ''),
+      description: markdownToContentDescription(
+        String(values.description ?? ''),
+      ),
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
+      location: getLocation(values),
       imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       additions: Array.isArray(values.additions)
         ? (values.additions as ProductAddition[])
@@ -108,9 +139,12 @@ export async function buildAdminCrudPayload({
     return {
       title: String(values.title ?? ''),
       slug: String(values.slug ?? ''),
-      description: String(values.description ?? ''),
+      description: markdownToContentDescription(
+        String(values.description ?? ''),
+      ),
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
+      location: getLocation(values),
       status: (values.status as AdStatus) ?? 'PUBLISHED',
       imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       isActive: Boolean(values.isActive),

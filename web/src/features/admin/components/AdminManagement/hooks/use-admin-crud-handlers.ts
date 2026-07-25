@@ -254,7 +254,7 @@ export function useAdminCrudHandlers({
     const product = await mutations.createProductMutation.mutateAsync({
       title,
       slug: '',
-      description: '',
+      description: { blocks: [] },
       categoryId: data.marketCategories[0].id,
       price: 0,
       imageUrls: [],

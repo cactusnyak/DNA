@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { USER_ROLE_LABELS } from '@/entities/user';
+import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
 
 import { filterAdminRecords } from '../../../logic/filter-admin-records';
 import type {
@@ -32,7 +33,7 @@ export function useFilteredAdminRecords(
       filterAdminRecords(data?.products ?? [], searchValue, (product) => [
         product.title,
         product.slug,
-        product.description,
+        contentDescriptionToPlainText(product.description),
         product.price,
         product.category?.name,
       ]),
@@ -80,7 +81,7 @@ export function useFilteredAdminRecords(
       filterAdminRecords(data?.ads ?? [], searchValue, (ad) => [
         ad.title,
         ad.slug,
-        ad.description,
+        contentDescriptionToPlainText(ad.description),
         ad.price,
         ad.category?.name,
         ad.seller?.nickname,

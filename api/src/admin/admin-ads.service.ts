@@ -6,6 +6,8 @@ import {
 import { AdStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { locationToJson } from '../common/location';
+import { contentDescriptionToJson } from '../common/content-description';
 
 import { AdminInputService } from './admin-input.service';
 
@@ -34,7 +36,9 @@ export class AdminAdsService {
           value: payload.slug,
           fallback: name,
         }),
-        description: this.adminInputService.getOptionalString(payload.description),
+        description: this.adminInputService.getOptionalString(
+          payload.description,
+        ),
         parentId,
         imageId: await this.createImageFromPayload(payload),
         sortOrder: this.adminInputService.getNumber(payload.sortOrder, 0),
@@ -43,7 +47,10 @@ export class AdminAdsService {
       include: this.categoryInclude,
     });
 
-    return this.mapAdCategory(adCategory, new Map([[adCategory.id, adCategory]]));
+    return this.mapAdCategory(
+      adCategory,
+      new Map([[adCategory.id, adCategory]]),
+    );
   }
 
   async updateAdCategory(id: string, body: unknown) {
@@ -67,7 +74,9 @@ export class AdminAdsService {
           fallback: name,
           exceptId: id,
         }),
-        description: this.adminInputService.getOptionalString(payload.description),
+        description: this.adminInputService.getOptionalString(
+          payload.description,
+        ),
         parentId,
         imageId: await this.resolveImageFromPayload(
           payload,
@@ -168,20 +177,32 @@ export class AdminAdsService {
           exceptId: id,
         }),
         categoryId,
-        description: this.adminInputService.getOptionalString(payload.description) ?? '',
+        description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
+        location: locationToJson(payload.location),
         status: this.getAdStatus(payload.status),
         moderatedAt: new Date(),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
-        contactPhone: this.adminInputService.getOptionalString(payload.contactPhone),
-        contactTelegram: this.adminInputService.getOptionalString(payload.contactTelegram),
-        contactEmail: this.adminInputService.getOptionalString(payload.contactEmail),
-        contactOther: this.adminInputService.getOptionalString(payload.contactOther),
+        contactPhone: this.adminInputService.getOptionalString(
+          payload.contactPhone,
+        ),
+        contactTelegram: this.adminInputService.getOptionalString(
+          payload.contactTelegram,
+        ),
+        contactEmail: this.adminInputService.getOptionalString(
+          payload.contactEmail,
+        ),
+        contactOther: this.adminInputService.getOptionalString(
+          payload.contactOther,
+        ),
       },
     });
 
     if ('imageUrls' in payload) {
-      await this.replaceAdImages(id, this.adminInputService.getImageUrls(payload));
+      await this.replaceAdImages(
+        id,
+        this.adminInputService.getImageUrls(payload),
+      );
     }
 
     return this.getAdminAdById(id);
@@ -228,7 +249,11 @@ export class AdminAdsService {
     const ids = this.adminInputService.getIdsFromBody(body);
     await this.prismaService.ad.updateMany({
       where: { id: { in: ids } },
-      data: { isActive: false, status: AdStatus.ARCHIVED, deletedAt: new Date() },
+      data: {
+        isActive: false,
+        status: AdStatus.ARCHIVED,
+        deletedAt: new Date(),
+      },
     });
 
     return { deleted: ids.length };
@@ -320,7 +345,9 @@ export class AdminAdsService {
 
     while (currentParentId) {
       if (visitedCategoryIds.has(currentParentId)) {
-        throw new BadRequestException('Ad category parent tree contains a cycle');
+        throw new BadRequestException(
+          'Ad category parent tree contains a cycle',
+        );
       }
 
       visitedCategoryIds.add(currentParentId);
@@ -360,7 +387,8 @@ export class AdminAdsService {
   }
 
   private getAdStatus(value: unknown): AdStatus {
-    return typeof value === 'string' && Object.values(AdStatus).includes(value as AdStatus)
+    return typeof value === 'string' &&
+      Object.values(AdStatus).includes(value as AdStatus)
       ? (value as AdStatus)
       : AdStatus.PUBLISHED;
   }
@@ -442,6 +470,7 @@ export class AdminAdsService {
       slug: ad.slug,
       description: ad.description,
       price: ad.price,
+      location: ad.location,
       status: ad.status,
       moderatedAt: ad.moderatedAt,
       isActive: ad.isActive,

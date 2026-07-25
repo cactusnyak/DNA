@@ -1,0 +1,2 @@
+ALTER TABLE "Product" ADD COLUMN "location" JSONB;
+ALTER TABLE "Ad" ADD COLUMN "location" JSONB;

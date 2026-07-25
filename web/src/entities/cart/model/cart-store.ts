@@ -30,7 +30,7 @@ type CartStore = {
   setItemQuantity: (configurationKey: string, quantity: number) => void;
   clearCart: () => void;
   clearAdItems: () => void;
-  getItemQuantity: (productId: string) => number;
+  getItemQuantity: (configurationKey: string) => number;
   getTotalItems: () => number;
   getTotalAmount: () => number;
   getTotalAdItems: () => number;
@@ -167,10 +167,13 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      getItemQuantity: (productId) => {
+      getItemQuantity: (configurationKey) => {
         return (
-          get().items.find((item) => item.product.id === productId)?.quantity ??
-          0
+          get().items.find(
+            (item) =>
+              (item.configurationKey ?? item.product.id) === configurationKey ||
+              item.product.id === configurationKey,
+          )?.quantity ?? 0
         );
       },
 
