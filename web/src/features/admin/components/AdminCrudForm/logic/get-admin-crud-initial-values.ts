@@ -7,6 +7,7 @@ import type {
   AdminUser,
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
+import { contentDescriptionToMarkdown } from '@/shared/utils/content-description';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
@@ -40,7 +41,7 @@ export function getAdminCrudInitialValues(
     return {
       title: product?.title ?? '',
       slug: product?.slug ?? '',
-      description: product?.description ?? '',
+      description: contentDescriptionToMarkdown(product?.description),
       categoryId: product?.categoryId ?? '',
       price: String(product?.price ?? 0),
       locationName: product?.location?.name ?? '',
@@ -87,7 +88,7 @@ export function getAdminCrudInitialValues(
     return {
       title: ad?.title ?? '',
       slug: ad?.slug ?? '',
-      description: ad?.description ?? '',
+      description: contentDescriptionToMarkdown(ad?.description),
       categoryId: ad?.categoryId ?? '',
       price: String(ad?.price ?? 0),
       locationName: ad?.location?.name ?? '',

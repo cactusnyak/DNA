@@ -157,7 +157,7 @@ model Product {
   categoryId  String
   title       String
   slug        String
-  description String
+  description Json   @db.JsonB
   price       Int
   additions   Json?  @db.JsonB
   location    Json?  @db.JsonB
@@ -204,7 +204,7 @@ model Ad {
   sellerId    String
   title       String
   slug        String
-  description String
+  description Json     @db.JsonB
   price       Int
   location    Json?    @db.JsonB
   status      AdStatus @default(PENDING_MODERATION)

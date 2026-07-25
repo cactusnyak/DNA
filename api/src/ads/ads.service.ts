@@ -8,6 +8,10 @@ import { AdStatus, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { locationToJson } from '../common/location';
+import {
+  contentDescriptionToJson,
+  contentDescriptionToPlainText,
+} from '../common/content-description';
 
 import { AdsModerationService } from './ads-moderation.service';
 import type { CreateAdDto } from './dto/create-ad.dto';
@@ -192,7 +196,7 @@ export class AdsService {
 
     const decision = this.adsModerationService.moderateOnCreate({
       title,
-      description: this.getOptionalString(dto.description) ?? '',
+      description: contentDescriptionToPlainText(dto.description),
       price: this.getNumber(dto.price, 0),
     });
 
@@ -202,7 +206,7 @@ export class AdsService {
         slug,
         categoryId,
         sellerId,
-        description: this.getOptionalString(dto.description) ?? '',
+        description: contentDescriptionToJson(dto.description),
         price: this.getNumber(dto.price, 0),
         location: locationToJson(dto.location),
         status: decision.status,
@@ -238,7 +242,7 @@ export class AdsService {
 
     const decision = this.adsModerationService.moderateOnUpdate({
       title,
-      description: this.getOptionalString(dto.description) ?? '',
+      description: contentDescriptionToPlainText(dto.description),
       price: this.getNumber(dto.price, ad.price),
     });
 
@@ -250,7 +254,7 @@ export class AdsService {
         title,
         slug,
         categoryId,
-        description: this.getOptionalString(dto.description) ?? '',
+        description: contentDescriptionToJson(dto.description),
         price: this.getNumber(dto.price, ad.price),
         location: locationToJson(dto.location),
         status: decision.status,

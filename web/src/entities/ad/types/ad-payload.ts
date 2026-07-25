@@ -1,9 +1,10 @@
 import type { Location } from '@/shared/types/location';
+import type { ContentDescription } from '@/shared/types/content-description';
 
 export type CreateAdPayload = {
   title: string;
   slug?: string;
-  description: string;
+  description: ContentDescription;
   categoryId: string;
   price: number;
   location?: Location;

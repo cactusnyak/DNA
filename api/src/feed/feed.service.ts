@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { normalizeLocation } from '../common/location';
+import { normalizeContentDescription } from '../common/content-description';
 
 import { AdCategoriesService } from '../ad-categories/ad-categories.service';
 import { AdsService } from '../ads/ads.service';
@@ -110,7 +111,7 @@ export class FeedService {
             category: product.category,
             title: product.title,
             slug: product.slug,
-            description: product.description,
+            description: normalizeContentDescription(product.description),
             price: product.price,
             location: normalizeLocation(product.location),
             additions: product.additions,
@@ -132,7 +133,7 @@ export class FeedService {
             seller: ad.seller,
             title: ad.title,
             slug: ad.slug,
-            description: ad.description,
+            description: normalizeContentDescription(ad.description),
             price: ad.price,
             location: normalizeLocation(ad.location),
             status: ad.status,

@@ -1,6 +1,7 @@
 import type { AdCategory } from '@/entities/ad-category';
 import type { Image } from '@/shared/types/image';
 import type { Location } from '@/shared/types/location';
+import type { ContentDescription } from '@/shared/types/content-description';
 
 import type { AdSeller } from './ad-seller';
 import type { AdStatus } from './ad-status';
@@ -12,7 +13,7 @@ export type Ad = {
   seller?: AdSeller;
   title: string;
   slug: string;
-  description: string;
+  description: ContentDescription;
   price: number;
   location?: Location | null;
   status: AdStatus;

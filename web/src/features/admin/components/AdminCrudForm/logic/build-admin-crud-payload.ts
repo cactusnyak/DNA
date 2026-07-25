@@ -2,6 +2,7 @@ import type { AdStatus } from '@/entities/ad';
 import type { OrderStatus } from '@/entities/order';
 import type { UserRole } from '@/entities/user';
 import type { ProductAddition } from '@/entities/product';
+import { markdownToContentDescription } from '@/shared/utils/content-description';
 
 import type { AdminManagementTabId } from '../../../types/admin-management';
 import type {
@@ -106,7 +107,9 @@ export async function buildAdminCrudPayload({
     return {
       title: String(values.title ?? ''),
       slug: String(values.slug ?? ''),
-      description: String(values.description ?? ''),
+      description: markdownToContentDescription(
+        String(values.description ?? ''),
+      ),
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
       location: getLocation(values),
@@ -136,7 +139,9 @@ export async function buildAdminCrudPayload({
     return {
       title: String(values.title ?? ''),
       slug: String(values.slug ?? ''),
-      description: String(values.description ?? ''),
+      description: markdownToContentDescription(
+        String(values.description ?? ''),
+      ),
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
       location: getLocation(values),

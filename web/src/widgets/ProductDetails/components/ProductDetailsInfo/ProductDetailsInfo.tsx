@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Product } from '@/entities/product';
 import { getPlatformCategoryHref } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
-import { LinkifyText } from '@/shared/utils/linkify';
+import { ContentDescription } from '@/components/ui/ContentDescription';
 
 type ProductDetailsInfoProps = {
   product: Product;
@@ -28,11 +28,7 @@ export function ProductDetailsInfo({ product }: ProductDetailsInfoProps) {
       <h1 className="text-2xl font-semibold">{product.title}</h1>
       <p className="text-3xl font-semibold">{formatPrice(product.price)}</p>
 
-      {product.description && (
-        <p className="whitespace-pre-line pt-2 text-sm leading-relaxed text-muted-foreground">
-          <LinkifyText text={product.description} />
-        </p>
-      )}
+      <ContentDescription description={product.description} />
     </div>
   );
 }

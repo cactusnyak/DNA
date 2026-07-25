@@ -93,6 +93,8 @@ export function AdCrudFields({
       <FormTextareaField
         name="description"
         label="Описание"
+        caption="Каждая строка — отдельный блок. Начните строку с «# », чтобы создать заголовок."
+        rows={8}
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}
       />

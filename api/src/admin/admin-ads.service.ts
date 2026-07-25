@@ -7,6 +7,7 @@ import { AdStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { locationToJson } from '../common/location';
+import { contentDescriptionToJson } from '../common/content-description';
 
 import { AdminInputService } from './admin-input.service';
 
@@ -176,8 +177,7 @@ export class AdminAdsService {
           exceptId: id,
         }),
         categoryId,
-        description:
-          this.adminInputService.getOptionalString(payload.description) ?? '',
+        description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
         location: locationToJson(payload.location),
         status: this.getAdStatus(payload.status),

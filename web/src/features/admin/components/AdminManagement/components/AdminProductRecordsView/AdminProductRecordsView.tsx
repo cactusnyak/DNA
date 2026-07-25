@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { AdminProduct } from '@/entities/admin';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
+import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -69,7 +70,7 @@ export function AdminProductRecordsView({
         }
         getDescription={(product) =>
           renderHighlightedText(
-            product.description || 'Без описания',
+            contentDescriptionToPlainText(product.description) || 'Без описания',
             searchValue,
           )
         }

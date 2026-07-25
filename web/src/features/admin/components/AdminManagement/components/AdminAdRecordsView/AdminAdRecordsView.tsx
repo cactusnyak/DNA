@@ -4,6 +4,7 @@ import type { AdminAd } from '@/entities/admin';
 import { formatAdStatus } from '@/entities/ad';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
+import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -50,7 +51,10 @@ export function AdminAdRecordsView({
         getRecordKey={(ad) => ad.id}
         getTitle={(ad) => renderHighlightedText(ad.title, searchValue)}
         getDescription={(ad) =>
-          renderHighlightedText(ad.description || 'Без описания', searchValue)
+          renderHighlightedText(
+            contentDescriptionToPlainText(ad.description) || 'Без описания',
+            searchValue,
+          )
         }
         getMeta={(ad) =>
           `${getSellerName(ad)} · ${formatPrice(ad.price)} · ${ad.location?.name ?? 'Без геопозиции'} · ${formatAdStatus(ad.status)}`

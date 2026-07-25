@@ -6,6 +6,7 @@ import type { Product, ProductAddition } from '@/entities/product';
 import type { UserRole } from '@/entities/user';
 import type { Image } from '@/shared/types/image';
 import type { Location } from '@/shared/types/location';
+import type { ContentDescription } from '@/shared/types/content-description';
 
 export type AdminCatalogCollectionType = 'CATEGORY' | 'PRODUCT';
 
@@ -44,7 +45,7 @@ export type AdminAd = {
   seller?: AdminAdSeller;
   title: string;
   slug: string;
-  description: string;
+  description: ContentDescription;
   price: number;
   location?: Location | null;
   status: AdStatus;
@@ -133,7 +134,7 @@ export type AdminMarketCategoryPayload = {
 export type AdminProductPayload = {
   title: string;
   slug?: string;
-  description: string;
+  description: ContentDescription;
   categoryId: string;
   price: number;
   imageUrls: string[];
@@ -161,7 +162,7 @@ export type AdminAdCategoryPayload = {
 export type AdminAdPayload = {
   title: string;
   slug?: string;
-  description: string;
+  description: ContentDescription;
   categoryId: string;
   price: number;
   location?: Location;

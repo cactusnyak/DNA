@@ -7,6 +7,7 @@ import { CatalogCollectionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { locationToJson } from '../common/location';
+import { contentDescriptionToJson } from '../common/content-description';
 import {
   normalizeProductAdditions,
   productAdditionsToJson,
@@ -121,8 +122,7 @@ export class AdminMarketCatalogService {
           fallback: title,
         }),
         categoryId,
-        description:
-          this.adminInputService.getOptionalString(payload.description) ?? '',
+        description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
         location: locationToJson(payload.location),
         additions: productAdditionsToJson(
@@ -166,8 +166,7 @@ export class AdminMarketCatalogService {
           exceptId: id,
         }),
         categoryId,
-        description:
-          this.adminInputService.getOptionalString(payload.description) ?? '',
+        description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
         location: locationToJson(payload.location),
         additions: productAdditionsToJson(

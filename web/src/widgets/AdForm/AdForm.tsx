@@ -12,6 +12,10 @@ import type { Ad, CreateAdPayload } from '@/entities/ad';
 import { getCurrentUser } from '@/entities/auth';
 import { getAdCategories } from '@/entities/ad-category';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
+import {
+  contentDescriptionToMarkdown,
+  markdownToContentDescription,
+} from '@/shared/utils/content-description';
 
 type AdFormProps = {
   initialAd?: Ad;
@@ -44,7 +48,9 @@ export function AdForm({
   const [title, setTitle] = useState(initialAd?.title ?? '');
   const [categoryId, setCategoryId] = useState(initialAd?.categoryId ?? '');
   const [price, setPrice] = useState(String(initialAd?.price ?? ''));
-  const [description, setDescription] = useState(initialAd?.description ?? '');
+  const [description, setDescription] = useState(
+    contentDescriptionToMarkdown(initialAd?.description),
+  );
   const [locationName, setLocationName] = useState(
     initialAd?.location?.name ?? '',
   );
@@ -176,7 +182,7 @@ export function AdForm({
 
       await onSubmit({
         title: title.trim(),
-        description: description.trim(),
+        description: markdownToContentDescription(description),
         categoryId,
         price: Number(price) || 0,
         location: hasAnyLocationValue
@@ -236,6 +242,8 @@ export function AdForm({
       <FormTextareaField
         name="description"
         label="Описание"
+        caption="Каждая строка — отдельный блок. Начните строку с «# », чтобы создать заголовок."
+        rows={8}
         value={description}
         onChange={(event) => setDescription(event.target.value)}
       />

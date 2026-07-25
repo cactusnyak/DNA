@@ -1,5 +1,6 @@
 import type { Product } from '@/entities/product';
 import { formatPrice } from '@/shared/utils/format-price';
+import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
 
 import { getSearchTokens, normalizeSearchValue } from './normalize-search-value';
 
@@ -13,7 +14,7 @@ function getProductSearchableValue(product: Product) {
   return normalizeSearchValue(
     [
       product.title,
-      product.description,
+      contentDescriptionToPlainText(product.description),
       product.category.name,
       product.category.slug,
       product.category.path,
@@ -31,7 +32,9 @@ function getProductSearchScore(
 ) {
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const normalizedTitle = normalizeSearchValue(product.title);
-  const normalizedDescription = normalizeSearchValue(product.description);
+  const normalizedDescription = normalizeSearchValue(
+    contentDescriptionToPlainText(product.description),
+  );
   const normalizedCategory = normalizeSearchValue(product.category.name);
   const productPrice = String(Math.round(product.price));
 
