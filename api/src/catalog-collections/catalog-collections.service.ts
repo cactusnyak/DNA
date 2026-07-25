@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CatalogCollectionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -156,6 +153,7 @@ export class CatalogCollectionsService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      location: product.location,
       additions: normalizeProductAdditions(product.additions),
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,

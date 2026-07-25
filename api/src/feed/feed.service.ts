@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { normalizeLocation } from '../common/location';
 
 import { AdCategoriesService } from '../ad-categories/ad-categories.service';
 import { AdsService } from '../ads/ads.service';
@@ -26,13 +27,10 @@ export class FeedService {
     private readonly adCategoriesService: AdCategoriesService,
   ) {}
 
-  async buildFeed(config: FeedConfig = DEFAULT_FEED_CONFIG): Promise<FeedItem[]> {
-    const [
-      marketCategories,
-      adCategories,
-      products,
-      ads,
-    ] = await Promise.all([
+  async buildFeed(
+    config: FeedConfig = DEFAULT_FEED_CONFIG,
+  ): Promise<FeedItem[]> {
+    const [marketCategories, adCategories, products, ads] = await Promise.all([
       this.marketCategoriesService.findAll(),
       this.adCategoriesService.findAll(),
       this.productsService.findAll({ sort: 'createdAt:desc' }),
@@ -114,6 +112,7 @@ export class FeedService {
             slug: product.slug,
             description: product.description,
             price: product.price,
+            location: normalizeLocation(product.location),
             additions: product.additions,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
@@ -135,6 +134,7 @@ export class FeedService {
             slug: ad.slug,
             description: ad.description,
             price: ad.price,
+            location: normalizeLocation(ad.location),
             status: ad.status,
             moderatedAt: ad.moderatedAt,
             createdAt: ad.createdAt,

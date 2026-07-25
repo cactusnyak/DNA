@@ -4,6 +4,7 @@ export type UpdateAdDto = {
   description?: unknown;
   categoryId?: unknown;
   price?: unknown;
+  location?: unknown;
   imageUrls?: unknown;
   contactPhone?: unknown;
   contactTelegram?: unknown;
