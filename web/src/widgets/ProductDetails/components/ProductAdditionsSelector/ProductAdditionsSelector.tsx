@@ -29,79 +29,81 @@ export function ProductAdditionsSelector({
   if (!additions.length) return null;
 
   return (
-    <section className="space-y-2.5 rounded-xl w-full lg:w-fit">
-      <h2 className="text-sm font-medium">Дополнения</h2>
-      {additions.map((addition) => {
-        const selection = selectedById.get(addition.id);
-        return (
-          <div
-            key={addition.id}
-            className="space-y-2 border-t border-border pt-2.5 first:border-0 first:pt-0"
-          >
-            <div className="flex items-center justify-between gap-5 text-sm">
-              <span>
-                {addition.title}
-                {addition.required ? ' *' : ''}
-              </span>
-              <span className="shrink-0 text-xs text-muted-foreground">
-                {addition.type === 'boolean'
-                  ? `+${formatPrice(addition.price)}`
-                  : `${formatPrice(addition.price)}/${addition.unitLabel}`}
-              </span>
-            </div>
-            {addition.type === 'boolean' ? (
-              <div className="flex gap-1.5">
-                {[true, false].map((value) => (
-                  <button
-                    key={String(value)}
-                    type="button"
-                    className={`h-6 cursor-pointer rounded-md border px-3 text-xs font-medium transition-colors ${selection?.type === 'boolean' && selection.value === value
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background hover:bg-muted'
-                      }`}
-                    onClick={() =>
-                      setSelection({
-                        additionId: addition.id,
-                        type: 'boolean',
-                        value,
-                      })
-                    }
-                  >
-                    {value ? 'Да' : 'Нет'}
-                  </button>
-                ))}
+    <section className="space-y-3 rounded-xl w-full lg:w-fit">
+      <h2 className="text-lg font-medium">Дополнения</h2>
+      <div className="space-y-2.5 rounded-xl w-full lg:w-fit">
+        {additions.map((addition) => {
+          const selection = selectedById.get(addition.id);
+          return (
+            <div
+              key={addition.id}
+              className="space-y-2 border-t border-border pt-2.5 first:border-0 first:pt-0"
+            >
+              <div className="flex items-center justify-between gap-5 text-sm">
+                <span>
+                  {addition.title}
+                  {addition.required ? ' *' : ''}
+                </span>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {addition.type === 'boolean'
+                    ? `+${formatPrice(addition.price)}`
+                    : `${formatPrice(addition.price)}/${addition.unitLabel}`}
+                </span>
               </div>
-            ) : (
-              <input
-                type="number"
-                step={1}
-                min={addition.min}
-                max={addition.max ?? undefined}
-                className="h-7 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
-                value={selection?.type === 'quantity' ? selection.value : ''}
-                onChange={(event) => {
-                  if (event.target.value === '') {
-                    onChange(
-                      selected.filter(
-                        (item) => item.additionId !== addition.id,
-                      ),
-                    );
-                    return;
-                  }
-                  setSelection({
-                    additionId: addition.id,
-                    type: 'quantity',
-                    value: Number(event.target.value),
-                  });
-                }}
-              />
-            )}
-            {errors[addition.id] && (
-              <p className="text-xs text-destructive">{errors[addition.id]}</p>
-            )}
-          </div>
-        );
-      })}
+              {addition.type === 'boolean' ? (
+                <div className="flex gap-1.5">
+                  {[true, false].map((value) => (
+                    <button
+                      key={String(value)}
+                      type="button"
+                      className={`h-6 cursor-pointer rounded-md border px-3 text-xs font-medium transition-colors ${selection?.type === 'boolean' && selection.value === value
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:bg-muted'
+                        }`}
+                      onClick={() =>
+                        setSelection({
+                          additionId: addition.id,
+                          type: 'boolean',
+                          value,
+                        })
+                      }
+                    >
+                      {value ? 'Да' : 'Нет'}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <input
+                  type="number"
+                  step={1}
+                  min={addition.min}
+                  max={addition.max ?? undefined}
+                  className="h-7 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
+                  value={selection?.type === 'quantity' ? selection.value : ''}
+                  onChange={(event) => {
+                    if (event.target.value === '') {
+                      onChange(
+                        selected.filter(
+                          (item) => item.additionId !== addition.id,
+                        ),
+                      );
+                      return;
+                    }
+                    setSelection({
+                      additionId: addition.id,
+                      type: 'quantity',
+                      value: Number(event.target.value),
+                    });
+                  }}
+                />
+              )}
+              {errors[addition.id] && (
+                <p className="text-xs text-destructive">{errors[addition.id]}</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
