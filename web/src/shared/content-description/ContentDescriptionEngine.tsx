@@ -28,10 +28,37 @@ type ContentDescriptionEngineProps = {
   description: ContentDescription;
 };
 
+type DescriptionBlockGroup = {
+  blocks: ContentDescriptionBlock[];
+};
+
+function groupDescriptionBlocks(
+  blocks: ContentDescriptionBlock[],
+): DescriptionBlockGroup[] {
+  return blocks.reduce<DescriptionBlockGroup[]>((groups, block) => {
+    if (block.type === 'heading' || groups.length === 0) {
+      groups.push({ blocks: [block] });
+    } else {
+      groups.at(-1)?.blocks.push(block);
+    }
+
+    return groups;
+  }, []);
+}
+
 export function ContentDescriptionEngine({
   description,
 }: ContentDescriptionEngineProps) {
-  return description.blocks.map((block, index) =>
-    blockRenderers[block.type](block, `${block.type}-${index}`),
-  );
+  const groups = groupDescriptionBlocks(description.blocks);
+
+  return groups.map((group, groupIndex) => (
+    <div key={`description-group-${groupIndex}`} className="space-y-3">
+      {group.blocks.map((block, blockIndex) =>
+        blockRenderers[block.type](
+          block,
+          `${block.type}-${groupIndex}-${blockIndex}`,
+        ),
+      )}
+    </div>
+  ));
 }

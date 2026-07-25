@@ -15,22 +15,26 @@ const categoryBadgeClass =
 export function AdDetailsInfo({ ad }: AdDetailsInfoProps) {
   return (
     <div className="space-y-2">
-      {ad.category && (
-        <Link
-          to={getPlatformCategoryHref(
-            'ads',
-            ad.category.path ?? ad.category.slug,
-          )}
-          className={categoryBadgeClass}
-        >
-          {ad.category.name}
-        </Link>
-      )}
+      <header className="space-y-2">
+        {ad.category && (
+          <Link
+            to={getPlatformCategoryHref(
+              'ads',
+              ad.category.path ?? ad.category.slug,
+            )}
+            className={categoryBadgeClass}
+          >
+            {ad.category.name}
+          </Link>
+        )}
 
-      <h1 className="text-2xl font-semibold">{ad.title}</h1>
-      <p className="text-3xl font-semibold">{formatPrice(ad.price)}</p>
+        <h1 className="text-2xl font-semibold">{ad.title}</h1>
+      </header>
 
-      <ContentDescription description={ad.description} />
+      <div className="space-y-2">
+        <p className="text-3xl font-semibold">{formatPrice(ad.price)}</p>
+        <ContentDescription description={ad.description} />
+      </div>
     </div>
   );
 }

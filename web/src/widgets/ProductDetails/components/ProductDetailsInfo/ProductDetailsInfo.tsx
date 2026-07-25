@@ -15,20 +15,24 @@ const categoryBadgeClass =
 export function ProductDetailsInfo({ product }: ProductDetailsInfoProps) {
   return (
     <div className="space-y-2">
-      <Link
-        to={getPlatformCategoryHref(
-          'market',
-          product.category.path ?? product.category.slug,
-        )}
-        className={categoryBadgeClass}
-      >
-        {product.category.name}
-      </Link>
+      <header className="space-y-2">
+        <Link
+          to={getPlatformCategoryHref(
+            'market',
+            product.category.path ?? product.category.slug,
+          )}
+          className={categoryBadgeClass}
+        >
+          {product.category.name}
+        </Link>
 
-      <h1 className="text-2xl font-semibold">{product.title}</h1>
-      <p className="text-3xl font-semibold">{formatPrice(product.price)}</p>
+        <h1 className="text-2xl font-semibold">{product.title}</h1>
+      </header>
 
-      <ContentDescription description={product.description} />
+      <div className="space-y-2">
+        <p className="text-3xl font-semibold">{formatPrice(product.price)}</p>
+        <ContentDescription description={product.description} />
+      </div>
     </div>
   );
 }
