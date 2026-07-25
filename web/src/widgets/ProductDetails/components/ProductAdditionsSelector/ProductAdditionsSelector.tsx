@@ -29,7 +29,7 @@ export function ProductAdditionsSelector({
   if (!additions.length) return null;
 
   return (
-    <section className="space-y-2.5 rounded-xl w-fit">
+    <section className="space-y-2.5 rounded-xl w-full lg:w-fit">
       <h2 className="text-sm font-medium">Дополнения</h2>
       {additions.map((addition) => {
         const selection = selectedById.get(addition.id);

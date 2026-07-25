@@ -33,7 +33,7 @@ export function ProductQuantityCounter({
     >
       <button
         type="button"
-        className="flex h-full items-center justify-center transition-colors hover:bg-muted"
+        className="flex h-full cursor-pointer items-center justify-center transition-colors hover:bg-muted"
         onClick={() => decreaseItem(productId)}
       >
         <Minus className="size-4" />
@@ -45,7 +45,7 @@ export function ProductQuantityCounter({
 
       <button
         type="button"
-        className="flex h-full items-center justify-center transition-colors hover:bg-muted"
+        className="flex h-full cursor-pointer items-center justify-center transition-colors hover:bg-muted"
         onClick={() => increaseItem(productId)}
       >
         <Plus className="size-4" />
