@@ -29,46 +29,63 @@ export function ProductAdditionsSelector({
   if (!additions.length) return null;
 
   return (
-    <section className="space-y-3 rounded-xl border border-border p-4">
-      <h2 className="font-medium">Дополнения</h2>
+    <section className="space-y-2.5 rounded-xl w-fit">
+      <h2 className="text-sm font-medium">Дополнения</h2>
       {additions.map((addition) => {
         const selection = selectedById.get(addition.id);
         return (
-          <div key={addition.id} className="space-y-2 border-t border-border pt-3 first:border-0 first:pt-0">
-            <div className="flex justify-between gap-3 text-sm">
-              <span>{addition.title}{addition.required ? ' *' : ''}</span>
-              <span className="text-muted-foreground">
+          <div
+            key={addition.id}
+            className="space-y-2 border-t border-border pt-2.5 first:border-0 first:pt-0"
+          >
+            <div className="flex items-center justify-between gap-5 text-sm">
+              <span>
+                {addition.title}
+                {addition.required ? ' *' : ''}
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground">
                 {addition.type === 'boolean'
                   ? `+${formatPrice(addition.price)}`
                   : `${formatPrice(addition.price)}/${addition.unitLabel}`}
               </span>
             </div>
             {addition.type === 'boolean' ? (
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 {[true, false].map((value) => (
-                  <button key={String(value)} type="button"
-                    className={`rounded-md border px-4 py-2 text-sm ${
-                      selection?.type === 'boolean' && selection.value === value
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border'
-                    }`}
-                    onClick={() => setSelection({
-                      additionId: addition.id,
-                      type: 'boolean',
-                      value,
-                    })}>
+                  <button
+                    key={String(value)}
+                    type="button"
+                    className={`h-6 cursor-pointer rounded-md border px-3 text-xs font-medium transition-colors ${selection?.type === 'boolean' && selection.value === value
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background hover:bg-muted'
+                      }`}
+                    onClick={() =>
+                      setSelection({
+                        additionId: addition.id,
+                        type: 'boolean',
+                        value,
+                      })
+                    }
+                  >
                     {value ? 'Да' : 'Нет'}
                   </button>
                 ))}
               </div>
             ) : (
-              <input type="number" step={1} min={addition.min}
+              <input
+                type="number"
+                step={1}
+                min={addition.min}
                 max={addition.max ?? undefined}
-                className="w-32 rounded-md border border-input bg-background px-3 py-2"
+                className="h-7 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
                 value={selection?.type === 'quantity' ? selection.value : ''}
                 onChange={(event) => {
                   if (event.target.value === '') {
-                    onChange(selected.filter((item) => item.additionId !== addition.id));
+                    onChange(
+                      selected.filter(
+                        (item) => item.additionId !== addition.id,
+                      ),
+                    );
                     return;
                   }
                   setSelection({
@@ -76,7 +93,8 @@ export function ProductAdditionsSelector({
                     type: 'quantity',
                     value: Number(event.target.value),
                   });
-                }} />
+                }}
+              />
             )}
             {errors[addition.id] && (
               <p className="text-xs text-destructive">{errors[addition.id]}</p>
