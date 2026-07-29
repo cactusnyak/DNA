@@ -1,0 +1,1 @@
+export { AdminTableImage } from './AdminTableImage';

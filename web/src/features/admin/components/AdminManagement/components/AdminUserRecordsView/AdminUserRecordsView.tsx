@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 
 import type { AdminUser } from '@/entities/admin';
 import { USER_ROLE_LABELS } from '@/entities/user';
-import { Avatar } from '@/components/ui/Avatar';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import { AdminTableAvatar } from '../../../AdminTableAvatar';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
@@ -76,15 +76,14 @@ export function AdminUserRecordsView({
       columns={[
         {
           key: 'avatar',
-          title: 'Фото',
+          title: 'Аватар',
           width: 72,
           sortable: false,
           getValue: (user) => (user.avatar ? user.avatar.url : ''),
           render: (user) => (
-            <Avatar
+            <AdminTableAvatar
               src={user.avatar?.url}
               name={getUserName(user)}
-              size="sm"
             />
           ),
         },
