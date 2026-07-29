@@ -19,7 +19,6 @@ const routeByPage = new Map([
   ['pages/seller/SellerPage.tsx', '/market/seller'],
   ['pages/product/ProductPage.tsx', '/market/product/:productSlug'],
   ['pages/favourites/FavouritesPage.tsx', '/favourites'],
-  ['pages/favorites/FavoritesPage.tsx', 'не подключена к роутеру (legacy-файл)'],
   ['pages/cart/CartPage.tsx', '/cart'],
   ['pages/checkout/CheckoutPage.tsx', '/checkout'],
   ['pages/checkout/CheckoutResultPage.tsx', '/checkout/result'],
