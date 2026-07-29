@@ -45,30 +45,29 @@ export function CartSummary({
     <aside className="overflow-hidden rounded-2xl shadow-card-3xl lg:sticky lg:top-28 lg:self-start bg-white">
       <div className="divide-y divide-border">
         {hasProducts && (
-          <section className="flex flex-col gap-4 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <h2 className="font-semibold">Маркет</h2>
-                <p className="text-sm text-muted-foreground">
-                  {formatItemCount(totalProductItems, [
-                    'товар',
-                    'товара',
-                    'товаров',
-                  ])}
-                </p>
-              </div>
-
-              <div className="flex flex-col text-right gap-2">
-                <p className="text-xs text-muted-foreground">К оплате</p>
-                <p className="text-2xl font-semibold">
-                  {formatPrice(totalProductAmount)}
-                </p>
-              </div>
+          <section className="grid gap-4 p-5">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-2">
+              <h2 className="font-semibold">Маркет</h2>
+              <p className="text-right text-xs text-muted-foreground">
+                К оплате
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {formatItemCount(totalProductItems, [
+                  'товар',
+                  'товара',
+                  'товаров',
+                ])}
+              </p>
+              <p className="whitespace-nowrap text-right text-2xl font-semibold">
+                {formatPrice(totalProductAmount)}
+              </p>
             </div>
 
-            <div className="flex items-center justify-between gap-4 text-sm">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 text-sm">
               <span className="text-muted-foreground">Доставка</span>
-              <span className="text-muted-foreground">Не подключена</span>
+              <span className="text-right text-muted-foreground">
+                Не подключена
+              </span>
             </div>
 
             <Button asChild size="lg" className="w-full">
@@ -83,27 +82,22 @@ export function CartSummary({
         )}
 
         {hasAds && (
-          <section className="flex flex-col gap-4 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <h2 className="font-semibold">Доска</h2>
-                <p className="text-sm text-muted-foreground">
-                  {formatItemCount(totalAdItems, [
-                    'объявление',
-                    'объявления',
-                    'объявлений',
-                  ])}
-                </p>
-              </div>
-
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">
-                  Указанная стоимость
-                </p>
-                <p className="text-xl font-semibold">
-                  {formatPrice(totalAdAmount)}
-                </p>
-              </div>
+          <section className="grid gap-4 p-5">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-2">
+              <h2 className="font-semibold">Доска</h2>
+              <p className="text-right text-xs text-muted-foreground">
+                Указанная стоимость
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {formatItemCount(totalAdItems, [
+                  'объявление',
+                  'объявления',
+                  'объявлений',
+                ])}
+              </p>
+              <p className="whitespace-nowrap text-right text-xl font-semibold">
+                {formatPrice(totalAdAmount)}
+              </p>
             </div>
 
             <p className="text-sm leading-6 text-muted-foreground">
