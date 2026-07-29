@@ -37,12 +37,12 @@ export function CartItemCard({
     <Link to={href} className="block">
       <article
         className={cn(
-          'grid gap-0 rounded-2xl grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
+          'grid gap-0 rounded-2xl grid-cols-[72px_minmax(0,1fr)]',
           className,
         )}
       >
-        <div className="p-2 sm:p-3 h-fit shadow-card-lg rounded-l-lg bg-white">
-          <div className="aspect-square overflow-hidden rounded-md">
+        <div className="p-[5px] h-fit shadow-card-lg rounded-l-lg bg-white">
+          <div className="aspect-square overflow-hidden rounded-l-sm rounded-r-xs">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -57,7 +57,7 @@ export function CartItemCard({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-3 p-2.5 sm:space-y-4 sm:p-3 shadow-card-lg rounded-r-xl rounded-bl-xl border-r border-solid border-r-[#f6f5fc] bg-white">
+        <div className="min-w-0 space-y-3 p-2.5 sm:space-y-4 sm:p-3 shadow-card-xl rounded-r-xl rounded-bl-xl border-r border-solid border-r-[#f6f5fc] bg-white">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 space-y-0.5 sm:space-y-1">
               <h3 className="line-clamp-2 text-sm font-semibold sm:text-base">

@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { setMobileNavigationHeight } from '@/shared/main-navigation';
+import { cn } from '@/shared/utils/cn';
 
 import { CartItemsBadge } from '../CartItemsBadge';
 import { FavouritesBadge } from '../FavouritesBadge/FavouritesBadge';
@@ -48,17 +49,25 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
 
           return (
             <Button key={item.to} variant="ghost" asChild className="h-15">
-              <Link
+              <NavLink
                 to={item.to}
+                end={item.to === '/'}
                 className="relative flex items-center justify-center"
               >
-                <span className="relative">
-                  <Icon className="size-4" />
+                {({ isActive }) => (
+                  <span className="relative">
+                    <Icon
+                      className={cn(
+                        'size-4',
+                        isActive && 'text-mobile-navigation-active',
+                      )}
+                    />
 
-                  {isCartLink && <CartItemsBadge />}
-                  {isFavouritesLink && <FavouritesBadge />}
-                </span>
-              </Link>
+                    {isCartLink && <CartItemsBadge />}
+                    {isFavouritesLink && <FavouritesBadge />}
+                  </span>
+                )}
+              </NavLink>
             </Button>
           );
         })}
