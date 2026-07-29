@@ -14,7 +14,6 @@ import {
   uploadUserAvatar,
 } from '@/entities/user';
 
-import { AvatarEditModal } from './components/AvatarEditModal/AvatarEditModal';
 import { ProfileDangerZone } from './components/ProfileDangerZone';
 import { ProfileDetailsCard } from './components/ProfileDetailsCard';
 import { ProfileEditModal } from './components/ProfileEditModal/ProfileEditModal';
@@ -28,7 +27,6 @@ export function Profile() {
   const queryClient = useQueryClient();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
   const {
     data: user,
@@ -91,7 +89,6 @@ export function Profile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
-      setIsAvatarModalOpen(false);
     },
   });
 
@@ -135,8 +132,11 @@ export function Profile() {
 
       <ProfileDetailsCard
         user={user}
+        isAvatarPending={updateAvatarMutation.isPending}
         onEdit={() => setIsEditModalOpen(true)}
-        onEditAvatar={() => setIsAvatarModalOpen(true)}
+        onAvatarChange={(avatarFile) =>
+          updateAvatarMutation.mutate({ avatarFile, remove: false })
+        }
         onRemoveAvatar={() =>
           updateAvatarMutation.mutate({ remove: true })
         }
@@ -155,15 +155,6 @@ export function Profile() {
         error={updateProfileMutation.error}
         onClose={() => setIsEditModalOpen(false)}
         onSubmit={(value) => updateProfileMutation.mutate(value)}
-      />
-
-      <AvatarEditModal
-        user={user}
-        isOpen={isAvatarModalOpen}
-        isPending={updateAvatarMutation.isPending}
-        error={updateAvatarMutation.error}
-        onClose={() => setIsAvatarModalOpen(false)}
-        onSubmit={(value) => updateAvatarMutation.mutate(value)}
       />
 
       {updateProfileMutation.isError && (

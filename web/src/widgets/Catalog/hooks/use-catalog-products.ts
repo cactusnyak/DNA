@@ -5,6 +5,7 @@ import { getProducts } from '@/entities/product/api/get-products';
 import type { PlatformSectionId } from '@/shared/platform';
 
 import type { CatalogPriceFilterValue } from '../components/CatalogControls/components/CatalogFilters/types/catalog-filters';
+import { getSubcategoryOptions } from '../components/CatalogControls/components/CatalogFilters/logic/get-subcategory-options';
 import type { CatalogSortRule } from '../components/CatalogControls/components/CatalogSorting/types/catalog-sorting';
 import { getPriceFilterValue } from '../logic/get-price-filter-value';
 
@@ -36,6 +37,17 @@ export function useCatalogProducts({
   const priceBounds = useMemo(
     () => getPriceFilterValue(baseProducts),
     [baseProducts],
+  );
+  const subcategoryOptions = useMemo(
+    () =>
+      getSubcategoryOptions(
+        categorySlug
+          ? baseProducts.filter(
+              (product) => product.category.slug !== categorySlug,
+            )
+          : baseProducts,
+      ),
+    [baseProducts, categorySlug],
   );
 
   const [priceFilter, setPriceFilter] = useState<CatalogPriceFilterValue>({
@@ -84,6 +96,7 @@ export function useCatalogProducts({
   return {
     baseProducts,
     products: isFilteredQueryEnabled ? filteredProducts : baseProducts,
+    subcategoryOptions,
     priceFilter,
     selectedCategoryIds,
     sortRules,

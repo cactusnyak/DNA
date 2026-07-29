@@ -45,6 +45,7 @@ export function Catalog({
   const {
     baseProducts,
     products,
+    subcategoryOptions,
     priceFilter,
     selectedCategoryIds,
     sortRules,
@@ -174,6 +175,7 @@ export function Catalog({
             sortRules={sortRules}
             showFilters={showFilters}
             showSorting={showSorting}
+            subcategoryOptions={subcategoryOptions}
             containerRef={containerRef}
             onPriceFilterChange={setPriceFilter}
             onSelectedCategoryIdsChange={setSelectedCategoryIds}
