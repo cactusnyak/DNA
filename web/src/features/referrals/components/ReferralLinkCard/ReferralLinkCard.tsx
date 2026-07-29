@@ -60,6 +60,7 @@ export function ReferralLinkCard({ user }: ReferralLinkCardProps) {
 
         <Button
           type="button"
+          variant='secondary'
           disabled={!referralLink}
           onClick={handleCopy}
         >

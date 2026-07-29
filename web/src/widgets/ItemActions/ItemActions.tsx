@@ -101,7 +101,7 @@ export function ItemActions({
                   : { adId: item.id }
               }
               className={[
-                'shrink-0 rounded-lg border border-border',
+                'shrink-0 rounded-lg',
                 variant === 'details' ? 'size-9' : 'size-8',
               ].filter(Boolean).join(' ')}
             />

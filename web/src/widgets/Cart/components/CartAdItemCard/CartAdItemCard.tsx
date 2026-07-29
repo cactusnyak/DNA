@@ -44,7 +44,7 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
       favouriteButton={
         <FavouriteButton
           item={{ adId: ad.id }}
-          className="size-8 rounded-lg bg-muted hover:bg-muted/80"
+          className="size-8 rounded-lg"
         />
       }
       actions={

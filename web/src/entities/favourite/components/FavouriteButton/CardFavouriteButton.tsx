@@ -2,20 +2,16 @@ import type { FavouriteItem } from '../../types/favourite-item';
 
 import { FavouriteButtonBase } from './FavouriteButtonBase';
 
-type FavouriteButtonProps = {
+type CardFavouriteButtonProps = {
   item: FavouriteItem;
-  className?: string;
 };
 
-export function FavouriteButton({ item, className }: FavouriteButtonProps) {
+export function CardFavouriteButton({ item }: CardFavouriteButtonProps) {
   return (
     <FavouriteButtonBase
       item={item}
+      className="rounded-full bg-white/75 shadow-sm"
       inactiveIconClassName="stroke-primary"
-      className={[
-        'rounded-full bg-primary/5 hover:bg-primary/10',
-        className,
-      ].filter(Boolean).join(' ')}
     />
   );
 }

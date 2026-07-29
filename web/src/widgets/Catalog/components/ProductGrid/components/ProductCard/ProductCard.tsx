@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import { FavouriteButton } from '@/entities/favourite';
+import { CardFavouriteButton } from '@/entities/favourite';
 import type { Product } from '@/entities/product';
 import {
   getPlatformProductHref,
@@ -40,7 +40,7 @@ export function ProductCard({
           className="absolute right-2 top-2 z-10"
           onClick={(e) => e.preventDefault()}
         >
-          <FavouriteButton item={{ productId: product.id }} />
+          <CardFavouriteButton item={{ productId: product.id }} />
         </div>
       </div>
 
