@@ -21,12 +21,12 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   return (
     <div
-      className={`inline-flex items-center gap-1 rounded-full border border-primary/15 bg-primary/5 p-1 sm:rounded-xl ${className ?? ''}`}
+      className={`inline-flex items-center gap-1 rounded-xl border border-primary/15 bg-primary/5 p-1 sm:rounded-xl ${className ?? ''}`}
     >
       {options.map((option) => {
         const isActive = option.value === value;
 
-        const itemClass = `inline-flex h-8 flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full px-3.5 text-xs font-medium text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:h-9 sm:rounded-lg sm:px-4 sm:text-sm ${isActive ? 'bg-primary text-primary-foreground ring-1 ring-primary' : 'hover:bg-primary/10 hover:text-primary'}`;
+        const itemClass = `inline-flex h-8 flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3.5 text-xs font-medium text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:h-9 sm:rounded-lg sm:px-4 sm:text-sm ${isActive ? 'bg-primary text-primary-foreground ring-1 ring-primary' : 'hover:bg-primary/10 hover:text-primary'}`;
 
         if (option.href) {
           return (
