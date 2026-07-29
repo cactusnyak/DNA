@@ -1,4 +1,5 @@
 import { type AdminOverview } from '@/entities/admin';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 
 import { AdminManagement } from '../AdminManagement';
@@ -26,7 +27,7 @@ export function AdminDashboard({
   isOverviewError = false,
 }: AdminDashboardProps) {
   return (
-    <div className="space-y-10">
+    <ContentCard>
       <SectionHeader
         title="Админ-панель"
         description="Управление каталогом, подборками, заказами и базовыми сущностями сервиса."
@@ -87,7 +88,6 @@ export function AdminDashboard({
           />
         </div>
       </section>
-    </div>
+    </ContentCard>
   );
 }
-

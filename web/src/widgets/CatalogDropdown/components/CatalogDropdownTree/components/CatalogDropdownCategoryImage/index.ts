@@ -1,0 +1,1 @@
+export { CatalogDropdownCategoryImage } from './CatalogDropdownCategoryImage';

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 
 import { useParams } from 'react-router-dom';
 
+import { ContentCard } from '@/components/ui/ContentCard';
 import { getCategorySlugFromPath } from '@/shared/catalog';
 import {
   PLATFORM_SECTION,
@@ -103,7 +104,7 @@ export function Catalog({
 
   if (section === PLATFORM_SECTION.ADS) {
     return (
-      <section className="space-y-8">
+      <ContentCard as="section">
         {showHeader && (
           <CatalogHeader
             section={section}
@@ -139,7 +140,7 @@ export function Catalog({
             }
           />
         </div>
-      </section>
+      </ContentCard>
     );
   }
 
@@ -148,7 +149,7 @@ export function Catalog({
     : 'Здесь пока нет товаров.';
 
   return (
-    <section className="space-y-8">
+    <ContentCard as="section">
       {showHeader && (
         <CatalogHeader
           section={section}
@@ -193,6 +194,6 @@ export function Catalog({
           </div>
         )}
       </div>
-    </section>
+    </ContentCard>
   );
 }

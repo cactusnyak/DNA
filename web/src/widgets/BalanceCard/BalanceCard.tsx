@@ -22,12 +22,12 @@ export function BalanceCard({
   return (
     <section
       className={cn(
-        'relative isolate w-full min-w-min shrink-0 overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-[#050816] via-[#050816] to-[#0B1433] p-5 text-white shadow-[0_10px_100px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-500 sm:p-6',
+        'balance-card-surface relative isolate w-full min-w-min shrink-0 overflow-hidden rounded-3xl border border-white/15 p-5 text-white shadow-balance-card backdrop-blur-2xl transition-all duration-500 sm:p-6',
         className,
       )}
     >
-      <div className="pointer-events-none absolute -right-20 -top-20 z-0 size-48 rounded-full bg-[#5945E2]/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-16 z-0 size-52 rounded-full bg-[#94E1D1]/18 blur-3xl" />
+      <div className="balance-card-primary-glow pointer-events-none absolute -right-20 -top-20 z-0 size-48 rounded-full blur-3xl" />
+      <div className="balance-card-accent-glow pointer-events-none absolute -bottom-24 -left-16 z-0 size-52 rounded-full blur-3xl" />
 
       <div className="relative z-10">
         <div className="inline-flex items-center rounded-full bg-white/10 p-1 text-xs font-medium text-indigo-100/75">
@@ -37,7 +37,7 @@ export function BalanceCard({
           </div>
           <div className="flex gap-0.5">
             <Button
-              className="flex-1 h-fit border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white rounded-full rounded-r-[3px]"
+              className="h-fit flex-1 rounded-full rounded-r-[3px] border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
               onClick={() =>
                 window.alert('Функция пополнения баланса находится в разработке')
               }
@@ -46,7 +46,7 @@ export function BalanceCard({
             </Button>
 
             <Button
-              className="flex-1 h-fit border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white rounded-full rounded-l-[3px]"
+              className="h-fit flex-1 rounded-full rounded-l-[3px] border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
               onClick={() =>
                 window.alert('Функция вывода средств находится в разработке')
               }
@@ -56,7 +56,7 @@ export function BalanceCard({
           </div>
         </div>
 
-        <p className="mt-5 bg-gradient-to-r from-white via-indigo-100 to-cyan-100 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
+        <p className="balance-amount-gradient mt-5 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
           {formatPrice(balanceValue)}
         </p>
 

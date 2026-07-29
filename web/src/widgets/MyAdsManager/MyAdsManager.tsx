@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
+import { ContentCard } from '@/components/ui/ContentCard';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { deleteAd, formatAdStatus, getMyAds } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { formatPrice } from '@/shared/utils/format-price';
@@ -54,7 +56,7 @@ export function MyAdsManager() {
   }
 
   return (
-    <div className="space-y-5">
+    <ContentCard className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold">Мои объявления</h2>
 
@@ -76,9 +78,7 @@ export function MyAdsManager() {
       )}
 
       {!isPending && !isError && !ads.length && (
-        <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          У вас пока нет объявлений.
-        </div>
+        <EmptyPlaceholder>У вас пока нет объявлений.</EmptyPlaceholder>
       )}
 
       <ul className="space-y-3">
@@ -138,6 +138,6 @@ export function MyAdsManager() {
           );
         })}
       </ul>
-    </div>
+    </ContentCard>
   );
 }

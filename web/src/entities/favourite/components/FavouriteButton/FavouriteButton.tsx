@@ -24,7 +24,7 @@ export function FavouriteButton({ item, className }: FavouriteButtonProps) {
         toggle();
       }}
       className={cn(
-        'group/fav flex cursor-pointer items-center justify-center rounded-full p-1.5 transition-colors',
+        'group/fav flex cursor-pointer items-center justify-center rounded-full p-1 bg-black/20',
         'backdrop-blur-sm',
         'disabled:opacity-50',
         className,
@@ -32,10 +32,10 @@ export function FavouriteButton({ item, className }: FavouriteButtonProps) {
     >
       <Heart
         className={cn(
-          'size-4 transition-colors',
+          'size-4 fill-white',
           isFavourite
             ? 'fill-red-500 stroke-red-500'
-            : 'stroke-muted-foreground group-hover/fav:stroke-red-400',
+            : 'stroke-[#5c5c5c] group-hover/fav:stroke-red-400',
         )}
       />
     </button>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
+import { ContentCard } from '@/components/ui/ContentCard';
 import {
   getCurrentUser,
   useAuthStore,
@@ -126,7 +127,7 @@ export function Profile() {
   }
 
   return (
-    <div className="space-y-8">
+    <ContentCard>
       <SectionHeader
         title="Профиль"
         description="Личные данные, баланс и история заказов."
@@ -188,6 +189,6 @@ export function Profile() {
         onLogout={clearAccessToken}
         onDeleteAccount={handleDeleteAccount}
       />
-    </div>
+    </ContentCard>
   );
 }

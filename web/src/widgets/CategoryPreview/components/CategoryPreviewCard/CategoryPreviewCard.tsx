@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
-import { CategoryImage } from '@/widgets/CategoryImage';
+
+import {
+  CategoryPreviewImage,
+  categoryPreviewLabelClassName,
+} from '../CategoryPreviewImage';
 
 type CategoryPreviewCardProps = {
   section: PlatformSectionId;
@@ -19,25 +23,16 @@ export function CategoryPreviewCard({
   return (
     <Link
       to={getCategoryHref(categories, category.id, section)}
-      className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/10"
+      className="group relative block h-fit w-fit overflow-hidden rounded-xl shadow-card-lg transition-[box-shadow,border-color] duration-150 hover:border-primary/30 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      aria-label={category.name}
     >
-      {/* Full-width category image */}
-      <div className="aspect-square">
-        <CategoryImage 
-          category={category} 
-          size="full"
-          placeholderMode="full"
-          className="h-full w-full"
-        />
-      </div>
+      <CategoryPreviewImage category={category} />
 
-      {/* Hover overlay with category name */}
-      <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <span className="text-center text-white font-medium px-3">
-          {category.name}
-        </span>
+      <div
+        className={`${categoryPreviewLabelClassName} absolute inset-0 bg-primary/70 text-primary-foreground opacity-0 backdrop-blur-[2px] transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100`}
+      >
+        <span>{category.name}</span>
       </div>
     </Link>
   );
 }
-

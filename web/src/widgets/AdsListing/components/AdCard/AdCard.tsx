@@ -17,7 +17,7 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
   return (
     <Link
       to={`/ads/ad/${ad.slug}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl p-1"
     >
       <div className="relative">
         <ItemGallery images={ad.images} title={ad.title} />

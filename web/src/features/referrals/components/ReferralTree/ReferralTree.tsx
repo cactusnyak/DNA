@@ -26,7 +26,7 @@ export function ReferralTree({
 }: ReferralTreeProps) {
   if (isPending) {
     return (
-      <section className="rounded-3xl border border-border bg-card p-5">
+      <section className="rounded-3xl shadow-card-2xl bg-card p-5">
         <ReferralTreeBadge />
 
         <h2 className="mt-4 text-xl font-semibold">
@@ -42,7 +42,7 @@ export function ReferralTree({
 
   if (isError) {
     return (
-      <section className="rounded-3xl border border-border bg-card p-5">
+      <section className="rounded-3xl shadow-card-2xl bg-card p-5">
         <ReferralTreeBadge />
 
         <h2 className="mt-4 text-xl font-semibold">
@@ -57,7 +57,7 @@ export function ReferralTree({
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-card p-5">
+    <section className="rounded-3xl shadow-card-2xl bg-card p-5">
       <div>
         <ReferralTreeBadge />
 

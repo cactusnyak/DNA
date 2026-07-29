@@ -1,17 +1,15 @@
-import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import type { CatalogCategory } from '@/shared/types/catalog-category';
-import { getCategoryHref } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
   type PlatformSectionId,
 } from '@/shared/platform';
 import { cn } from '@/shared/utils/cn';
-import { CategoryImage } from '@/widgets/CategoryImage';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 import type { CategoryLevel } from '../../types/category-level';
+import { CatalogDropdownCategoryCard } from '../CatalogDropdownCategoryCard';
 
 type CategoryColumnProps = {
   section: PlatformSectionId;
@@ -64,24 +62,16 @@ export function CategoryColumn({
 
           return (
             <li key={category.id}>
-              <Link
-                to={getCategoryHref(categories, category.id, section)}
+              <CatalogDropdownCategoryCard
+                section={section}
+                category={category}
+                categories={categories}
+                isActive={isActive}
+                isInActivePath={isInPath}
+                hasChildren={hasChildren}
                 onClick={onCategoryClick}
                 onMouseEnter={() => onActiveCategoryChange(category.slug)}
-                className={cn(
-                  'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
-                  isActive || isInPath
-                    ? 'bg-muted text-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                )}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <CategoryImage category={category} size="md" />
-                  <span className="line-clamp-1">{category.name}</span>
-                </div>
-
-                {hasChildren && <ChevronRight className="size-4 shrink-0" />}
-              </Link>
+              />
             </li>
           );
         })}
@@ -89,4 +79,3 @@ export function CategoryColumn({
     </div>
   );
 }
-

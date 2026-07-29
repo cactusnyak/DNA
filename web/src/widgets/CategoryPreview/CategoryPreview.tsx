@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { getCatalogCategories } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
@@ -64,9 +65,7 @@ export function CategoryPreview({
           previewCategories={previewCategories}
         />
       ) : (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-5 text-sm text-muted-foreground">
-          {emptyText}
-        </div>
+        <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>
       )}
     </section>
   );

@@ -44,17 +44,14 @@ export async function uploadAdminImage(accessToken: string, file: File) {
 
   formData.append('file', file);
 
-  const response = await fetch('/api/admin/uploads/images', {
-    method: 'POST',
-    headers: getAdminHeaders(accessToken),
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Image upload failed with status ${response.status}`);
-  }
-
-  return response.json() as Promise<AdminUploadImageResponse>;
+  return httpClient<AdminUploadImageResponse, FormData>(
+    '/admin/uploads/images',
+    {
+      method: 'POST',
+      headers: getAdminHeaders(accessToken),
+      body: formData,
+    },
+  );
 }
 
 // ===== Market categories =====

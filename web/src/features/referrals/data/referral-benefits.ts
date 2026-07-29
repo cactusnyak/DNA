@@ -1,8 +1,8 @@
 import {
   BadgePercent,
+  CircleDollarSign,
   Network,
-  Share2,
-  WalletCards,
+  KeyRoundIcon,
 } from 'lucide-react';
 
 import type { ReferralBenefit } from '../types/referral-benefit';
@@ -11,17 +11,18 @@ export const referralBenefits: ReferralBenefit[] = [
   {
     title: 'Личный код',
     description: 'После регистрации доступны код и ссылка для приглашений.',
-    icon: Share2,
+    icon: KeyRoundIcon,
   },
   {
     title: 'Дерево приглашений',
-    description: 'В профиле можно посмотреть пользователей, зарегистрированных по вашей ссылке.',
+    description:
+      'В профиле можно посмотреть пользователей, зарегистрированных по вашей ссылке.',
     icon: Network,
   },
   {
     title: 'Начисления',
     description: 'Механика начислений и её условия пока разрабатываются.',
-    icon: WalletCards,
+    icon: CircleDollarSign,
   },
   {
     title: 'Кешбэк и бонусы',

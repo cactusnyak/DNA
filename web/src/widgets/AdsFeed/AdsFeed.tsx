@@ -1,5 +1,6 @@
 import { getAds } from '@/entities/ad';
 import type { Ad } from '@/entities/ad';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
@@ -15,11 +16,7 @@ type AdsFeedProps = {
 
 function AdGrid({ ads, emptyText, categorySlug, compact = false }: { ads: Ad[]; emptyText: string; categorySlug?: string; compact?: boolean }) {
   if (!ads.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
   return (
     <div className={getItemGridClasses(compact ? 'compact' : 'default')}>
@@ -58,11 +55,7 @@ function AdsFeedFetched({
   }
 
   if (!isLoading && !items.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
   return (

@@ -1,4 +1,5 @@
 import { getProducts } from '@/entities/product/api/get-products';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
@@ -44,11 +45,7 @@ export function ProductsFeed({
   }
 
   if (!isLoading && !items.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
   return (

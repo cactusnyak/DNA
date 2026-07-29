@@ -37,7 +37,7 @@ export function CartItemCard({
     <Link to={href} className="block">
       <article
         className={cn(
-          'grid gap-0 rounded-2xl border border-border bg-card grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
+          'grid gap-0 rounded-2xl shadow-card-lg bg-card grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
           className,
         )}
       >

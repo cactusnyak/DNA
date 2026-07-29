@@ -10,10 +10,10 @@ type AvatarProps = {
 };
 
 const sizeClassNames: Record<AvatarSize, string> = {
-  sm: 'size-8 text-xs',
-  md: 'size-12 text-sm',
-  lg: 'size-20 text-xl',
-  xl: 'size-28 text-3xl',
+  sm: 'size-10 text-sm',
+  md: 'size-15 text-2xl',
+  lg: 'size-25 text-3xl',
+  xl: 'size-40 text-4xl',
 };
 
 export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
@@ -36,7 +36,7 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground',
+        'flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground',
         sizeClassNames[size],
         className,
       )}

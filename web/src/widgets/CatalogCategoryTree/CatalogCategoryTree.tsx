@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { SearchInput } from '@/components/ui/SearchInput';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import {
@@ -100,7 +101,7 @@ export function CatalogCategoryTree({
   }
 
   return (
-    <div className="space-y-6">
+    <ContentCard>
       <SectionHeader
         title={title ?? sectionConfig.catalogLabel}
         description={description ?? sectionConfig.catalogDescription}
@@ -135,6 +136,6 @@ export function CatalogCategoryTree({
             : emptyText}
         </div>
       )}
-    </div>
+    </ContentCard>
   );
 }

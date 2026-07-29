@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { useAuthStore } from '@/entities/auth';
 import { useCartStore } from '@/entities/cart';
 import {
@@ -66,7 +67,7 @@ export function Checkout() {
   }
 
   return (
-    <div className="space-y-8">
+    <ContentCard>
       <SectionHeader
         title="Оформление заказа"
         description="Заказ в Маркете можно оформить без регистрации. Заказы, созданные после входа, сохраняются в истории профиля. Онлайн-оплата и доставка пока находятся в разработке."
@@ -88,6 +89,6 @@ export function Checkout() {
 
         <CheckoutOrderSummary items={items} totalAmount={totalAmount} />
       </div>
-    </div>
+    </ContentCard>
   );
 }

@@ -1,4 +1,5 @@
 import { getProducts } from '@/entities/product/api/get-products';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { useGridColumns } from '@/shared/hooks/use-grid-columns';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
@@ -51,11 +52,7 @@ export function ProductsListing({
   }
 
   if (!isLoading && !items.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
   return (

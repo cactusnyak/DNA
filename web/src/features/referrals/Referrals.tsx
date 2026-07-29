@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 import {
   getCurrentUser,
@@ -65,7 +66,7 @@ export function Referrals() {
   }
 
   return (
-    <div className="space-y-8">
+    <ContentCard>
       <SectionHeader
         title="Заработок"
         description="Реферальный код и дерево приглашений доступны. Начисления и условия программы пока разрабатываются."
@@ -77,6 +78,6 @@ export function Referrals() {
         isTreePending={isReferralTreePending}
         isTreeError={isReferralTreeError}
       />
-    </div>
+    </ContentCard>
   );
 }

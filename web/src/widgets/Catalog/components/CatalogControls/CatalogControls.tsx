@@ -3,7 +3,6 @@ import { type RefObject, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import type { CatalogSubcategoryFilterOption } from './components/CatalogFilters/types/catalog-filters';
-import { cn } from '@/shared/utils/cn';
 
 import { useStickyPanel } from './logic/use-sticky-panel';
 
@@ -62,21 +61,13 @@ export function CatalogControls({
             Фильтры и сортировка
 
             <ChevronDown
-              className={cn(
-                'size-4 transition-transform',
-                isOpen && 'rotate-180',
-              )}
+              className={`size-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
             />
           </Button>
         </div>
 
         <div
-          className={cn(
-            'space-y-6 p-4 pt-0',
-            isOpen && 'mt-3',
-            !isOpen && 'hidden',
-            'lg:mt-0 lg:block lg:pt-4',
-          )}
+          className={`space-y-6 rounded-2xl bg-white p-4 shadow-card-xl lg:mt-0 lg:block lg:pt-4 ${isOpen ? 'mt-3' : 'hidden'}`}
         >
           {showSorting && (
             <CatalogSorting value={sortRules} onChange={onSortRulesChange} />

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 
 import type { FeedItem } from '@/entities/feed';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { CombinedItemsGrid } from '@/widgets/CombinedFeed';
 import { CatalogControls } from '@/widgets/Catalog/components/CatalogControls';
 import type { CatalogPriceFilterValue } from '@/widgets/Catalog/components/CatalogControls/components/CatalogFilters/types/catalog-filters';
@@ -126,9 +127,9 @@ export function SearchListings({ items, query }: SearchListingsProps) {
         {visibleItems.length ? (
           <CombinedItemsGrid items={visibleItems} compact />
         ) : (
-          <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          <EmptyPlaceholder>
             По вашему запросу ничего не найдено.
-          </div>
+          </EmptyPlaceholder>
         )}
       </div>
     </section>

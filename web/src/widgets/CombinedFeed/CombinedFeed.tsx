@@ -1,5 +1,6 @@
 import { getFeed } from '@/entities/feed';
 import type { FeedItem } from '@/entities/feed';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { PLATFORM_SECTION } from '@/shared/platform';
@@ -76,11 +77,7 @@ export function CombinedFeed() {
   }
 
   if (!isLoading && items.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        Товаров и объявлений пока нет.
-      </div>
-    );
+    return <EmptyPlaceholder>Товаров и объявлений пока нет.</EmptyPlaceholder>;
   }
 
   return (

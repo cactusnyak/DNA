@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { CategoryPreview } from '@/widgets/CategoryPreview';
@@ -8,8 +9,8 @@ import { ProductsFeed } from '@/widgets/ProductsFeed';
 
 export function MarketPage() {
   return (
-    <div className="space-y-10">
-      <section className="rounded-2xl border border-border bg-card p-6">
+    <ContentCard>
+      <section className="">
         <SectionHeader
           title="DNA Маркет"
           description="Каталог товаров DNA. Онлайн-оплата, доставка и кабинет продавца пока находятся в разработке."
@@ -36,6 +37,6 @@ export function MarketPage() {
         <h2 className="text-xl font-semibold">Товары</h2>
         <ProductsFeed />
       </section>
-    </div>
+    </ContentCard>
   );
 }

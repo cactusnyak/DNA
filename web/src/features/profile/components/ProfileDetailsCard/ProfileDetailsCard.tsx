@@ -28,8 +28,8 @@ export function ProfileDetailsCard({
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold">Личные данные</h2>
 
-        <Button type="button" variant="outline" size="sm" onClick={onEdit}>
-          <Pencil className="mr-2 size-4" />
+        <Button className='gap-2' type="button" variant="outline" size="sm" onClick={onEdit}>
+          <Pencil className="size-3.5" strokeWidth={1.5} />
           Редактировать
         </Button>
       </div>
