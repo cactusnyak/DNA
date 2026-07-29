@@ -1,1 +1,0 @@
-export { CompactProductCard } from './CompactProductCard';

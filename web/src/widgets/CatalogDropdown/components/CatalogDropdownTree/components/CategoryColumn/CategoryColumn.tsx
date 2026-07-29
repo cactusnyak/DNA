@@ -5,7 +5,6 @@ import {
   getPlatformCatalogHref,
   type PlatformSectionId,
 } from '@/shared/platform';
-import { cn } from '@/shared/utils/cn';
 
 import { getChildrenCategories } from '../../logic/get-children-categories';
 import type { CategoryLevel } from '../../types/category-level';
@@ -41,12 +40,12 @@ export function CategoryColumn({
               to={getPlatformCatalogHref(section)}
               onClick={onCategoryClick}
               onMouseEnter={() => onActiveCategoryChange(undefined)}
-              className={cn(
+              className={[
                 'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
                 !activeCategorySlug
                   ? 'bg-muted text-foreground'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-              )}
+              ].filter(Boolean).join(' ')}
             >
               <span className="line-clamp-1">Все категории</span>
             </Link>

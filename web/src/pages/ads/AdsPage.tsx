@@ -21,11 +21,11 @@ export function AdsPage() {
             <Link to="/ads/new">Разместить объявление</Link>
           </Button>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="secondary">
             <Link to="/ads/my">Мои объявления</Link>
           </Button>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="secondary">
             <Link to="/ads/catalog">Категории доски</Link>
           </Button>
         </div>

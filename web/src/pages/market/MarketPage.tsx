@@ -21,7 +21,7 @@ export function MarketPage() {
             <Link to="/market/catalog">Перейти в каталог</Link>
           </Button>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="secondary">
             <Link to="/market/seller">Кабинет продавца — скоро</Link>
           </Button>
         </div>

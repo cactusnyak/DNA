@@ -1,4 +1,3 @@
-import { cn } from '@/shared/utils/cn';
 
 import type { AdminTabGroupId, AdminManagementTab } from '../../data/admin-management-tabs';
 import type { AdminManagementTabId } from '../../types/admin-management';
@@ -66,23 +65,23 @@ export function AdminTabs({
                     <button
                       key={tab.id}
                       type="button"
-                      className={cn(
+                      className={[
                         'flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-b-2 p-2 text-xs font-medium transition-colors sm:gap-2 sm:px-3 sm:text-sm',
                         isActive
                           ? 'border-foreground text-foreground'
                           : 'border-transparent text-muted-foreground hover:text-foreground',
-                      )}
+                      ].filter(Boolean).join(' ')}
                       onClick={() => onTabChange(tab.id)}
                     >
                       {tab.title}
 
                       <span
-                        className={cn(
+                        className={[
                           'rounded-full px-1.5 py-0.5 text-xs font-medium tabular-nums',
                           isActive
                             ? 'bg-foreground text-background'
                             : 'bg-muted text-muted-foreground',
-                        )}
+                        ].filter(Boolean).join(' ')}
                       >
                         {counts[tab.id]}
                       </span>
@@ -97,4 +96,3 @@ export function AdminTabs({
     </div>
   );
 }
-

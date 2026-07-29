@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/shared/utils/cn';
 
 type CartItemCardProps = {
   href: string;
@@ -36,13 +35,13 @@ export function CartItemCard({
   return (
     <Link to={href} className="block">
       <article
-        className={cn(
-          'grid gap-0 rounded-2xl shadow-card-lg bg-card grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
+        className={[
+          'grid gap-0 rounded-2xl grid-cols-[72px_minmax(0,1fr)]',
           className,
-        )}
+        ].filter(Boolean).join(' ')}
       >
-        <div className="border-r border-border p-2 sm:p-3">
-          <div className="aspect-square overflow-hidden rounded-sm bg-muted">
+        <div className="p-[5px] h-fit shadow-card-lg rounded-l-lg bg-white">
+          <div className="aspect-square overflow-hidden rounded-l-sm rounded-r-xs">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -57,7 +56,7 @@ export function CartItemCard({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-3 p-2 sm:space-y-4 sm:p-3">
+        <div className="min-w-0 space-y-3 p-2.5 sm:space-y-4 sm:p-3 shadow-card-xl rounded-r-xl rounded-bl-xl border-r border-solid border-r-[#f6f5fc] bg-white">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 space-y-0.5 sm:space-y-1">
               <h3 className="line-clamp-2 text-sm font-semibold sm:text-base">
@@ -67,7 +66,7 @@ export function CartItemCard({
               {category}
             </div>
 
-            <div className="shrink-0 text-right">
+            <div className="shrink-0 text-right gap-2">
               {price}
               {priceMeta && (
                 <p className="text-xs text-muted-foreground">{priceMeta}</p>

@@ -44,11 +44,11 @@ export function CartAdItemCard({ item, onRemove }: CartAdItemCardProps) {
       favouriteButton={
         <FavouriteButton
           item={{ adId: ad.id }}
-          className="size-8 rounded-lg bg-muted hover:bg-muted/80"
+          className="size-8 rounded-lg"
         />
       }
       actions={
-        <div className="flex flex-col gap-1 rounded-xl text-xs sm:gap-2 sm:text-sm">
+        <div className="flex flex-col gap-2 rounded-xl text-xs sm:gap-2 sm:text-sm">
           <span className="font-medium text-foreground">{sellerName}</span>
 
           {contactValues.length > 0 ? (

@@ -74,7 +74,7 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
       favouriteButton={
         <FavouriteButton
           item={{ productId: product.id }}
-          className="size-8 rounded-lg bg-muted hover:bg-muted/80"
+          className="size-8 rounded-lg"
         />
       }
       onRemove={() => onRemove(item.configurationKey ?? product.id)}

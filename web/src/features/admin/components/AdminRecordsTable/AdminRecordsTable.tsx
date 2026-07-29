@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/Button';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { FormBooleanField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/Input';
-import { cn } from '@/shared/utils/cn';
 
 import { getAdminTableAlignClassName } from './logic/get-admin-table-align-class-name';
 import { getAdminTableFilterConfig } from './logic/get-admin-table-filter-config';
@@ -149,12 +148,12 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
     return [
       <tr
         key={key}
-        className={cn(
+        className={[
           'align-top transition-colors',
           isDeleted && 'bg-muted/30 text-muted-foreground',
           isSelected && 'bg-primary/5',
           depthBg,
-        )}
+        ].filter(Boolean).join(' ')}
       >
         {hasBulkActions && (
           <td className="w-10 border-r border-border px-3 py-3">
@@ -185,11 +184,11 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         {columns.map((column) => (
           <td
             key={column.key}
-            className={cn(
+            className={[
               'px-4 py-3',
               getAdminTableAlignClassName(column.align),
               isDeleted && 'opacity-60',
-            )}
+            ].filter(Boolean).join(' ')}
           >
             {column.render(record)}
           </td>
@@ -221,10 +220,10 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 <p className="text-sm font-medium">Фильтры таблицы</p>
                 <div>
                   <ChevronRight
-                    className={cn(
+                    className={[
                       'size-4 text-muted-foreground transition-transform',
                       isFiltersOpen && 'rotate-90',
-                    )}
+                    ].filter(Boolean).join(' ')}
                     strokeWidth={1.5}
                   />
                 </div>
@@ -270,12 +269,12 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                         <div className="flex flex-wrap gap-1.5">
                           <button
                             type="button"
-                            className={cn(
+                            className={[
                               'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
                               !filterValue
                                 ? 'border-foreground bg-foreground text-background'
                                 : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
-                            )}
+                            ].filter(Boolean).join(' ')}
                             onClick={() => updateFilterValue(column.key, '')}
                           >
                             Все
@@ -288,12 +287,12 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                               <button
                                 key={option.value}
                                 type="button"
-                                className={cn(
+                                className={[
                                   'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
                                   isActive
                                     ? 'border-foreground bg-foreground text-background'
                                     : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
-                                )}
+                                ].filter(Boolean).join(' ')}
                                 onClick={() =>
                                   updateFilterValue(column.key, option.value)
                                 }
@@ -446,21 +445,21 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 return (
                   <th
                     key={column.key}
-                    className={cn(
+                    className={[
                       'group relative sticky top-0 z-10 bg-muted/80 px-4 py-3 font-medium backdrop-blur-md',
                       getAdminTableAlignClassName(column.align),
-                    )}
+                    ].filter(Boolean).join(' ')}
                     style={{ width: `${width}px` }}
                   >
                     <button
                       type="button"
                       disabled={!column.sortable}
-                      className={cn(
+                      className={[
                         'inline-flex max-w-full items-center gap-2 text-current',
                         column.sortable
                           ? 'cursor-pointer hover:text-foreground'
                           : 'cursor-default',
-                      )}
+                      ].filter(Boolean).join(' ')}
                       onClick={() => handleSortClick(column)}
                     >
                       <span className="truncate">{column.title}</span>
@@ -476,11 +475,11 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                       }
                     >
                       <span
-                        className={cn(
+                        className={[
                           'h-6 w-0.5 rounded-full bg-muted-foreground/45 opacity-0 transition-opacity',
                           'group-hover:opacity-100',
                           isResizing && 'opacity-100',
-                        )}
+                        ].filter(Boolean).join(' ')}
                       />
                     </span>
                   </th>

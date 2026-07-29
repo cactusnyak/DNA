@@ -10,12 +10,12 @@ type AdDetailsInfoProps = {
 };
 
 const categoryBadgeClass =
-  'inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground';
+  'inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground w-fit';
 
 export function AdDetailsInfo({ ad }: AdDetailsInfoProps) {
   return (
-    <div className="space-y-2">
-      <header className="space-y-2">
+    <div className="flex flex-col gap-2">
+      <header className="flex flex-col gap-2">
         {ad.category && (
           <Link
             to={getPlatformCategoryHref(
@@ -27,12 +27,13 @@ export function AdDetailsInfo({ ad }: AdDetailsInfoProps) {
             {ad.category.name}
           </Link>
         )}
-
-        <h1 className="text-2xl font-semibold">{ad.title}</h1>
       </header>
 
-      <div className="space-y-2">
-        <p className="text-3xl font-semibold">{formatPrice(ad.price)}</p>
+      <div className="flex flex-col gap-2 p-6">
+        <div>
+          <h1 className="text-2xl font-semibold">{ad.title}</h1>
+          <p className="text-3xl font-semibold">{formatPrice(ad.price)}</p>
+        </div>
         <ContentDescription description={ad.description} />
       </div>
     </div>

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import type { Ad } from '@/entities/ad';
 import { LinkifyText } from '@/shared/utils/linkify';
-import { cn } from '@/shared/utils/cn';
 import { Modal } from '@/components/ui/Modal';
 import {
   getProductActionHeightClass,
@@ -41,7 +40,7 @@ export function SellerContactsButton({
         type="button"
         variant="outline"
         size={variant === 'details' ? 'lg' : 'default'}
-        className={cn('w-full', getProductActionHeightClass(variant))}
+        className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
         onClick={() => setIsModalOpen(true)}
       >
         Контакты

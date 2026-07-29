@@ -53,9 +53,9 @@ export function Cart() {
 
               <Button
                 type="button"
-                variant="outline"
+                variant="destructive"
                 size="sm"
-                className="w-full sm:w-auto"
+                className="w-full p-4 rounded-lg"
                 onClick={clearCart}
               >
                 Очистить товары
@@ -80,7 +80,7 @@ export function Cart() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="w-full sm:w-auto"
+                className="w-full p-4 rounded-lg"
                 onClick={clearAdItems}
               >
                 Очистить объявления

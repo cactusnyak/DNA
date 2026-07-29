@@ -1,4 +1,3 @@
-import { cn } from '@/shared/utils/cn';
 
 type PriceRangeSliderProps = {
   from: number;
@@ -13,11 +12,11 @@ type PriceRangeSliderProps = {
   onCommit: () => void;
 };
 
-const rangeInputClassName = cn(
+const rangeInputClassName = [
   'pointer-events-none absolute inset-x-0 top-0 h-6 w-full appearance-none bg-transparent',
   '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground',
   '[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-foreground',
-);
+].filter(Boolean).join(' ');
 
 export function PriceRangeSlider({
   from,

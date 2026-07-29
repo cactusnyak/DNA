@@ -3,7 +3,6 @@ import type { Ad } from '@/entities/ad';
 import { useCartStore } from '@/entities/cart';
 import type { Product, SelectedProductAddition } from '@/entities/product';
 import { createCartConfigurationKey } from '@/entities/product/lib/product-additions';
-import { cn } from '@/shared/utils/cn';
 import {
   ProductQuantityCounter,
   getProductActionHeightClass,
@@ -48,9 +47,9 @@ export function AddToCartButton({
     return (
       <Button
         type="button"
-        variant={isInCart ? 'outline' : 'default'}
+        variant={isInCart ? 'outline' : 'accent'}
         size={variant === 'details' ? 'lg' : 'default'}
-        className={cn('w-full', getProductActionHeightClass(variant))}
+        className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
         onClick={() => (isInCart ? removeAdItem(item.id) : addAdItem(item))}
       >
         {isInCart ? 'Убрать из корзины' : 'В корзину'}
@@ -70,9 +69,9 @@ export function AddToCartButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="accent"
       size={variant === 'details' ? 'lg' : 'default'}
-      className={cn('w-full', getProductActionHeightClass(variant))}
+      className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
       onClick={() => {
         if (!isConfigurationValid) {
           onInvalidConfiguration?.();

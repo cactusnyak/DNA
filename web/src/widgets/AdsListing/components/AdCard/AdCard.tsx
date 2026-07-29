@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import type { Ad } from '@/entities/ad';
-import { FavouriteButton } from '@/entities/favourite';
+import { CardFavouriteButton } from '@/entities/favourite';
 
 import { ItemGallery } from '@/widgets/ItemGallery';
 import { ItemActions } from '@/widgets/ItemActions';
@@ -26,7 +26,7 @@ export function AdCard({ ad, currentCategorySlug }: AdCardProps) {
           className="absolute right-2 top-2 z-10"
           onClick={(e) => e.preventDefault()}
         >
-          <FavouriteButton item={{ adId: ad.id }} />
+          <CardFavouriteButton item={{ adId: ad.id }} />
         </div>
       </div>
 

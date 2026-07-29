@@ -8,7 +8,6 @@ import {
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-import { cn } from '@/shared/utils/cn';
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -101,11 +100,11 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={cn(
+        className={[
           'flex h-[calc(100dvh-10rem)] max-h-[calc(100dvh-2rem)] min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl',
           modalSizeClassNames[size],
           className,
-        )}
+        ].filter(Boolean).join(' ')}
         onMouseDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}
       >
@@ -127,10 +126,10 @@ export function Modal({
         </header>
 
         <div
-          className={cn(
+          className={[
             'flex min-h-0 flex-1 flex-col overflow-hidden',
             bodyClassName,
-          )}
+          ].filter(Boolean).join(' ')}
         >
           {children}
         </div>

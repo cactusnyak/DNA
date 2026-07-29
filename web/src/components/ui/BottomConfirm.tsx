@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/shared/utils/cn';
 
 type BottomConfirmProps = {
   children: ReactNode;
@@ -20,10 +19,10 @@ export function BottomConfirm({
 }: BottomConfirmProps) {
   return (
     <aside
-      className={cn(
+      className={[
         'fixed inset-x-3 bottom-20 z-50 mx-auto max-w-3xl rounded-2xl border border-border bg-card p-4 shadow-xl md:bottom-4',
         className,
-      )}
+      ].filter(Boolean).join(' ')}
       aria-label={ariaLabel}
     >
       <div className="flex flex-col gap-4 justify-between">

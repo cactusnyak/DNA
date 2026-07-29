@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import type { Image } from '@/shared/types/image';
-import { cn } from '@/shared/utils/cn';
 
 type GalleryProps = {
   images: Image[];
@@ -37,7 +36,7 @@ export function Gallery({ images, title }: GalleryProps) {
   }
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-3 sm:flex-row sm:gap-4">
+    <div className="flex w-full max-w-3xl flex-col gap-2 sm:flex-row h-fit md:rounded-3xl md:bg-white md:p-2 md:shadow-card-2xl">
       {images.length > 1 && (
         <div className="order-2 flex w-full gap-2 overflow-x-auto pb-1 sm:order-1 sm:max-h-[32rem] sm:w-16 sm:shrink-0 sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0">
           {images.map((image, index) => {
@@ -47,12 +46,12 @@ export function Gallery({ images, title }: GalleryProps) {
               <button
                 key={image.id}
                 type="button"
-                className={cn(
+                className={[
                   'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted transition-colors sm:size-16 sm:rounded-xl',
                   isActive
                     ? 'border-foreground'
                     : 'border-border hover:border-foreground/40',
-                )}
+                ].filter(Boolean).join(' ')}
                 onClick={() => setActiveImageIndex(index)}
               >
                 <img
