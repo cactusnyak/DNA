@@ -30,30 +30,32 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     product.price +
     calculateProductAdditionsTotal(product.additions ?? [], selectedAdditions);
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <Gallery images={product.images} title={product.title} />
 
-      <div className="space-y-6">
+      <div className="flex flex-col gap-5 md:rounded-3xl md:bg-white md:shadow-card-2xl">
         <ProductDetailsInfo product={product} />
         {(product.additions?.length ?? 0) > 0 && (
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             <ProductAdditionsSelector
               additions={product.additions ?? []}
               selected={selectedAdditions}
               errors={showErrors ? errors : {}}
               onChange={setSelectedAdditions}
             />
-            <p className="text-xl font-semibold">
+            <p className="text-xl font-semibold px-5">
               Итого за единицу: {formatPrice(configuredUnitPrice)}
             </p>
           </div>
         )}
-        <ProductDetailsActions
-          product={product}
-          selectedAdditions={selectedAdditions}
-          isConfigurationValid={Object.keys(errors).length === 0}
-          onInvalidConfiguration={() => setShowErrors(true)}
-        />
+        <div className="p-5">
+          <ProductDetailsActions
+            product={product}
+            selectedAdditions={selectedAdditions}
+            isConfigurationValid={Object.keys(errors).length === 0}
+            onInvalidConfiguration={() => setShowErrors(true)}
+          />
+        </div>
       </div>
     </div>
   );

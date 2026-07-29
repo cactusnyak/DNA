@@ -47,7 +47,7 @@ export function AddToCartButton({
     return (
       <Button
         type="button"
-        variant={isInCart ? 'outline' : 'default'}
+        variant={isInCart ? 'outline' : 'accent'}
         size={variant === 'details' ? 'lg' : 'default'}
         className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
         onClick={() => (isInCart ? removeAdItem(item.id) : addAdItem(item))}
@@ -69,7 +69,7 @@ export function AddToCartButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="accent"
       size={variant === 'details' ? 'lg' : 'default'}
       className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
       onClick={() => {

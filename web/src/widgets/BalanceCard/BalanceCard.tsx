@@ -36,7 +36,7 @@ export function BalanceCard({
           </div>
           <div className="flex gap-0.5">
             <Button
-              className="h-fit flex-1 rounded-full rounded-r-[3px] border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
+              className="h-fit flex-1 rounded-l-full rounded-r-[3px] border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
               onClick={() =>
                 window.alert('Функция пополнения баланса находится в разработке')
               }
@@ -45,7 +45,7 @@ export function BalanceCard({
             </Button>
 
             <Button
-              className="h-fit flex-1 rounded-full rounded-l-[3px] border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
+              className="h-fit flex-1 rounded-l-[3px] rounded-r-full border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
               onClick={() =>
                 window.alert('Функция вывода средств находится в разработке')
               }

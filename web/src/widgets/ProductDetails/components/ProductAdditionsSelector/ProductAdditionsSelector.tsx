@@ -29,15 +29,15 @@ export function ProductAdditionsSelector({
   if (!additions.length) return null;
 
   return (
-    <section className="space-y-3 rounded-xl w-full lg:w-fit">
+    <section className="flex w-full flex-col gap-3 rounded-xl px-5 py-2">
       <h2 className="text-lg font-medium">Дополнения</h2>
-      <div className="space-y-2.5 rounded-xl w-full lg:w-fit">
+      <div className="flex w-full flex-col gap-2.5 rounded-xl">
         {additions.map((addition) => {
           const selection = selectedById.get(addition.id);
           return (
             <div
               key={addition.id}
-              className="space-y-2 border-t border-border pt-2.5 first:border-0 first:pt-0"
+              className="flex flex-col gap-2 border-t border-border pt-2.5 first:border-0 first:pt-0"
             >
               <div className="flex items-center justify-between gap-5 text-sm">
                 <span>
