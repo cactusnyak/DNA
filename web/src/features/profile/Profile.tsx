@@ -14,6 +14,7 @@ import {
   uploadUserAvatar,
 } from '@/entities/user';
 
+import { AvatarCropModal } from './components/AvatarCropModal';
 import { ProfileDangerZone } from './components/ProfileDangerZone';
 import { ProfileDetailsCard } from './components/ProfileDetailsCard';
 import { ProfileEditModal } from './components/ProfileEditModal/ProfileEditModal';
@@ -27,6 +28,7 @@ export function Profile() {
   const queryClient = useQueryClient();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [avatarFileToCrop, setAvatarFileToCrop] = useState<File>();
 
   const {
     data: user,
@@ -134,9 +136,7 @@ export function Profile() {
         user={user}
         isAvatarPending={updateAvatarMutation.isPending}
         onEdit={() => setIsEditModalOpen(true)}
-        onAvatarChange={(avatarFile) =>
-          updateAvatarMutation.mutate({ avatarFile, remove: false })
-        }
+        onAvatarSelect={setAvatarFileToCrop}
         onRemoveAvatar={() =>
           updateAvatarMutation.mutate({ remove: true })
         }
@@ -156,6 +156,18 @@ export function Profile() {
         onClose={() => setIsEditModalOpen(false)}
         onSubmit={(value) => updateProfileMutation.mutate(value)}
       />
+
+      {avatarFileToCrop && (
+        <AvatarCropModal
+          key={`${avatarFileToCrop.name}-${avatarFileToCrop.lastModified}`}
+          file={avatarFileToCrop}
+          onClose={() => setAvatarFileToCrop(undefined)}
+          onConfirm={(avatarFile) => {
+            setAvatarFileToCrop(undefined);
+            updateAvatarMutation.mutate({ avatarFile, remove: false });
+          }}
+        />
+      )}
 
       {updateProfileMutation.isError && (
         <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">

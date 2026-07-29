@@ -423,7 +423,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
           className="w-full table-fixed text-left text-sm"
           style={{ minWidth: `${Math.max(tableMinWidth, 760)}px` }}
         >
-          <thead className="text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="text-xs tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
                 <th className="sticky top-0 z-10 w-10 border-r border-border bg-muted/80 px-3 py-3 backdrop-blur-md">

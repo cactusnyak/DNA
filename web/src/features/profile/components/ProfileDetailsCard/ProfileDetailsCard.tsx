@@ -11,7 +11,7 @@ type ProfileDetailsCardProps = {
   user: User;
   isAvatarPending?: boolean;
   onEdit: () => void;
-  onAvatarChange: (file: File) => void;
+  onAvatarSelect: (file: File) => void;
   onRemoveAvatar: () => void;
 };
 
@@ -19,7 +19,7 @@ export function ProfileDetailsCard({
   user,
   isAvatarPending = false,
   onEdit,
-  onAvatarChange,
+  onAvatarSelect,
   onRemoveAvatar,
 }: ProfileDetailsCardProps) {
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +52,7 @@ export function ProfileDetailsCard({
               event.target.value = '';
 
               if (file) {
-                onAvatarChange(file);
+                onAvatarSelect(file);
               }
             }}
           />
