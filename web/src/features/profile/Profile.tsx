@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
 import { ContentCard } from '@/components/ui/ContentCard';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import {
   getCurrentUser,
   useAuthStore,
@@ -118,7 +119,14 @@ export function Profile() {
   }
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загружаем профиль...</p>;
+    return (
+      <SkeletonLoader
+        layout="stack"
+        count={3}
+        itemClassName="min-h-40"
+        ariaLabel="Загружаем профиль"
+      />
+    );
   }
 
   if (error || !user) {

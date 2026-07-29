@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getAd } from '@/entities/ad';
 import { AdDetails } from '@/widgets/AdDetails';
 
@@ -25,7 +26,10 @@ export function AdDetailsPage() {
 
   if (isPending) {
     return (
-      <p className="text-sm text-muted-foreground">Загружаем объявление...</p>
+      <SkeletonLoader
+        itemClassName="min-h-[32rem]"
+        ariaLabel="Загружаем объявление"
+      />
     );
   }
 

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import {
   formatOrderStatus,
   type Order,
@@ -74,9 +75,13 @@ export function ProfileOrdersCard({
       <section>
         <h2 className="text-lg font-semibold">Мои заказы</h2>
 
-        <ProfileOrdersMessage>
-          Загружаем заказы...
-        </ProfileOrdersMessage>
+        <SkeletonLoader
+          layout="stack"
+          count={3}
+          className="mt-5"
+          itemClassName="min-h-20"
+          ariaLabel="Загружаем заказы"
+        />
       </section>
     );
   }

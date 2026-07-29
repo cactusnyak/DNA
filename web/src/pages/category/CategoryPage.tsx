@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCatalogCategories } from '@/shared/catalog';
 import { getCategorySlugFromPath } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
@@ -33,7 +34,12 @@ export function CategoryPage({ section }: CategoryPageProps) {
   }, [categories, categorySlug]);
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загружаем категорию...</p>;
+    return (
+      <SkeletonLoader
+        itemClassName="min-h-96"
+        ariaLabel="Загружаем категорию"
+      />
+    );
   }
 
   if (error || !currentCategory) {

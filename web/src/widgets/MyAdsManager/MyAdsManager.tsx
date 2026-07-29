@@ -12,6 +12,7 @@ import { deleteAd, formatAdStatus, getMyAds } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { formatPrice } from '@/shared/utils/format-price';
 import { StateCard } from '@/components/ui/StateCard';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 
 export function MyAdsManager() {
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -66,7 +67,12 @@ export function MyAdsManager() {
       </div>
 
       {isPending && (
-        <p className="text-sm text-muted-foreground">Загружаем объявления...</p>
+        <SkeletonLoader
+          layout="stack"
+          count={3}
+          itemClassName="min-h-24"
+          ariaLabel="Загружаем ваши объявления"
+        />
       )}
 
       {isError && (

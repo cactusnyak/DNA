@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 import {
@@ -41,7 +42,14 @@ export function Referrals() {
   }
 
   if (isUserPending) {
-    return <p className="text-muted-foreground">Загружаем данные...</p>;
+    return (
+      <SkeletonLoader
+        layout="stack"
+        count={3}
+        itemClassName="min-h-32"
+        ariaLabel="Загружаем реферальные данные"
+      />
+    );
   }
 
   if (isUserError || !user) {

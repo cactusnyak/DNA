@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCatalogCategories } from '@/shared/catalog';
 import {
   getPlatformSection,
@@ -24,7 +25,14 @@ export function CatalogPage({ section }: CatalogPageProps) {
   });
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загружаем категории...</p>;
+    return (
+      <SkeletonLoader
+        layout="stack"
+        count={5}
+        itemClassName="min-h-16"
+        ariaLabel="Загружаем категории"
+      />
+    );
   }
 
   if (error) {

@@ -1,6 +1,7 @@
 import { getAds } from '@/entities/ad';
 import type { Ad } from '@/entities/ad';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
@@ -58,6 +59,18 @@ function AdsFeedFetched({
     return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
+  if (isLoading && !items.length) {
+    return (
+      <SkeletonLoader
+        variant="card"
+        layout="grid"
+        count={initialChunkSize}
+        className={getItemGridClasses(compact ? 'compact' : 'default')}
+        ariaLabel="Загружаем объявления"
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className={getItemGridClasses(compact ? 'compact' : 'default')}>
@@ -67,13 +80,13 @@ function AdsFeedFetched({
       </div>
 
       {isLoading && items.length > 0 && (
-        <div className="flex justify-center py-8">
-          <div className="flex gap-2">
-            {Array.from({ length: Math.min(chunkSize, 4) }).map((_, i) => (
-              <div key={i} className="w-16 h-16 bg-muted rounded-lg animate-pulse" />
-            ))}
-          </div>
-        </div>
+        <SkeletonLoader
+          variant="card"
+          layout="grid"
+          count={chunkSize}
+          className={getItemGridClasses(compact ? 'compact' : 'default')}
+          ariaLabel="Загружаем ещё объявления"
+        />
       )}
 
       {!hasMore && items.length > 0 && (

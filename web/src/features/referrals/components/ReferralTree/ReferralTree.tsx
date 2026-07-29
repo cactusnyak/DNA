@@ -1,5 +1,6 @@
 import { Network } from 'lucide-react';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import type { ReferralTreeUser } from '@/entities/referral';
 
 import { ReferralTreeNode } from '../ReferralTreeNode';
@@ -33,9 +34,13 @@ export function ReferralTree({
           Приведённые пользователи
         </h2>
 
-        <p className="mt-4 text-sm text-muted-foreground">
-          Загружаем дерево приглашённых...
-        </p>
+        <SkeletonLoader
+          layout="stack"
+          count={4}
+          className="mt-5"
+          itemClassName="min-h-16"
+          ariaLabel="Загружаем дерево приглашённых"
+        />
       </section>
     );
   }

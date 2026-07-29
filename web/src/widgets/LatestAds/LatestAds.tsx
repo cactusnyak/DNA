@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import { getAds } from '@/entities/ad/api/get-ads';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { AdCard } from '@/widgets/AdsListing/components/AdCard/AdCard';
 import { HorizontalScrollSection } from '@/widgets/HorizontalScrollSection';
 import { useHorizontalScrollLazyLoading } from '@/shared/hooks/use-horizontal-scroll-lazy-loading';
@@ -66,22 +67,13 @@ export function LatestAds({
       className={className}
     >
       {isLoading && items.length === 0 ? (
-        // Loading skeleton
         Array.from({ length: initialChunkSize }).map((_, index) => (
-          <div
+          <SkeletonLoader
             key={`skeleton-${index}`}
-            className="flex flex-col bg-card border border-border rounded-xl overflow-hidden min-w-0 w-72 animate-pulse"
-          >
-            <div className="aspect-square bg-muted" />
-            <div className="p-4 space-y-2">
-              <div className="h-4 bg-muted rounded" />
-              <div className="h-4 bg-muted rounded w-3/4" />
-              <div className="flex justify-between items-center">
-                <div className="h-6 bg-muted rounded w-20" />
-                <div className="h-6 bg-muted rounded w-16" />
-              </div>
-            </div>
-          </div>
+            variant="card"
+            itemClassName="w-72 shrink-0"
+            ariaLabel="Загружаем объявление"
+          />
         ))
       ) : (
         <>
@@ -92,22 +84,13 @@ export function LatestAds({
           ))}
           
           {isLoading && hasMore && (
-            // Loading more indicator
             Array.from({ length: Math.min(chunkSize, 2) }).map((_, index) => (
-              <div
+              <SkeletonLoader
                 key={`loading-${index}`}
-                className="flex flex-col bg-card border border-border rounded-xl overflow-hidden min-w-0 w-72 animate-pulse"
-              >
-                <div className="aspect-square bg-muted" />
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded w-3/4" />
-                  <div className="flex justify-between items-center">
-                    <div className="h-6 bg-muted rounded w-20" />
-                    <div className="h-6 bg-muted rounded w-16" />
-                  </div>
-                </div>
-              </div>
+                variant="card"
+                itemClassName="w-72 shrink-0"
+                ariaLabel="Загружаем ещё объявление"
+              />
             ))
           )}
         </>

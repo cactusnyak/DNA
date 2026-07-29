@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ContentCard } from '@/components/ui/ContentCard';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCategorySlugFromPath } from '@/shared/catalog';
 import {
   PLATFORM_SECTION,
@@ -83,7 +84,10 @@ export function Catalog({
             showCatalogLink={showCatalogLink}
           />
         )}
-        <p className="text-muted-foreground">Загружаем данные...</p>
+        <SkeletonLoader
+          itemClassName="min-h-96"
+          ariaLabel="Загружаем каталог"
+        />
       </section>
     );
   }

@@ -184,6 +184,17 @@ body {
 }
 
 @layer components {
+  .skeleton-shimmer {
+    background-color: var(--muted);
+    background-image: linear-gradient(100deg,
+        transparent 20%,
+        color-mix(in srgb, var(--background) 72%, transparent) 50%,
+        transparent 80%);
+    background-position: 180% 0;
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+
   .balance-hero-surface {
     background-image: linear-gradient(135deg,
         color-mix(in srgb, var(--primary) 24%, #050816),
@@ -265,5 +276,17 @@ body {
         rgb(0 0 0 / 85%) 35%,
         transparent 100%);
     pointer-events: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    background-position: -80% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
   }
 }

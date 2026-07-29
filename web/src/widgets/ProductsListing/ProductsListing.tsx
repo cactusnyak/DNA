@@ -1,5 +1,6 @@
 import { getProducts } from '@/entities/product/api/get-products';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { useGridColumns } from '@/shared/hooks/use-grid-columns';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
@@ -55,6 +56,18 @@ export function ProductsListing({
     return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
+  if (isLoading && !items.length) {
+    return (
+      <SkeletonLoader
+        variant="card"
+        layout="grid"
+        count={initialChunkSize}
+        className={getItemGridClasses()}
+        ariaLabel="Загружаем товары"
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className={getItemGridClasses()}>
@@ -68,16 +81,13 @@ export function ProductsListing({
       </div>
       
       {isLoading && items.length > 0 && (
-        <div className="flex justify-center py-8">
-          <div className="flex gap-2">
-            {Array.from({ length: Math.min(chunkSize, 4) }).map((_, index) => (
-              <div
-                key={`loading-${index}`}
-                className="w-16 h-16 bg-muted rounded-lg animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
+        <SkeletonLoader
+          variant="card"
+          layout="grid"
+          count={chunkSize}
+          className={getItemGridClasses()}
+          ariaLabel="Загружаем ещё товары"
+        />
       )}
       
       {!hasMore && items.length > 0 && (

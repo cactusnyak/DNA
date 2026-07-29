@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getAds } from '@/entities/ad';
 import { getCatalogCategories } from '@/shared/catalog';
 import { getProducts } from '@/entities/product/api/get-products';
@@ -68,9 +69,12 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
           </p>
 
           {isCategoriesPending && (
-            <p className="text-sm text-muted-foreground">
-              Загружаем категории...
-            </p>
+            <SkeletonLoader
+              layout="stack"
+              count={6}
+              itemClassName="min-h-12 rounded-xl"
+              ariaLabel="Загружаем категории"
+            />
           )}
 
           {categoriesError && (

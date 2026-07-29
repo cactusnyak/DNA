@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import {
   getAd,
   updateAd,
@@ -50,7 +51,13 @@ export function AdEditPage() {
 
   if (isPending) {
     return (
-      <p className="text-sm text-muted-foreground">Загружаем объявление...</p>
+      <SkeletonLoader
+        layout="stack"
+        count={5}
+        className="mx-auto max-w-2xl"
+        itemClassName="min-h-16"
+        ariaLabel="Загружаем объявление"
+      />
     );
   }
 
