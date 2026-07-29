@@ -112,6 +112,7 @@ body {
   --muted-foreground: oklch(0.556 0 0);
   --accent: #eeecfc;
   --accent-foreground: #4331b9;
+  --background-content: #fafafe;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -278,6 +279,14 @@ body {
         rgb(0 0 0 / 85%) 35%,
         transparent 100%);
     pointer-events: none;
+  }
+
+  @media (max-width: 767px) {
+    .page-dot-background::before {
+      background-color: var(--background-content);
+      background-image: none;
+      mask-image: none;
+    }
   }
 }
 

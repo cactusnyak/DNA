@@ -47,7 +47,7 @@ export function CheckoutCustomerForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+      <section className="flex flex-col gap-6 rounded-2xl shadow-card-lg bg-card p-5 sm:p-6">
         <header className="space-y-1.5">
           <h2 className="text-lg font-semibold">Контактные данные</h2>
 
@@ -57,7 +57,7 @@ export function CheckoutCustomerForm({
           </p>
         </header>
 
-        <div className="mt-6 grid gap-4">
+        <div className="grid gap-4">
           <FormInputField
             name="customerName"
             required
@@ -103,24 +103,24 @@ export function CheckoutCustomerForm({
             onChange={getTextareaChangeHandler('comment')}
           />
         </div>
+
+        {errorMessage && (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {errorMessage}
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={isSubmitDisabled || isPending}
+        >
+          {isPending ? 'Оформляем заказ...' : 'Подтвердить заказ'}
+        </Button>
+
+        <LegalFormNotice />
       </section>
-
-      {errorMessage && (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {errorMessage}
-        </p>
-      )}
-
-      <Button
-        type="submit"
-        size="lg"
-        className="w-full"
-        disabled={isSubmitDisabled || isPending}
-      >
-        {isPending ? 'Оформляем заказ...' : 'Подтвердить заказ'}
-      </Button>
-
-      <LegalFormNotice />
     </form>
   );
 }

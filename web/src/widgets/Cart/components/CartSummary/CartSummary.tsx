@@ -42,12 +42,12 @@ export function CartSummary({
   const hasAds = totalAdItems > 0;
 
   return (
-    <aside className="overflow-hidden rounded-2xl shadow-card-3xl lg:sticky lg:top-28 lg:self-start">
+    <aside className="overflow-hidden rounded-2xl shadow-card-3xl lg:sticky lg:top-28 lg:self-start bg-white">
       <div className="divide-y divide-border">
         {hasProducts && (
           <section className="flex flex-col gap-4 p-5">
             <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2">
                 <h2 className="font-semibold">Маркет</h2>
                 <p className="text-sm text-muted-foreground">
                   {formatItemCount(totalProductItems, [
@@ -58,7 +58,7 @@ export function CartSummary({
                 </p>
               </div>
 
-              <div className="text-right">
+              <div className="flex flex-col text-right gap-2">
                 <p className="text-xs text-muted-foreground">К оплате</p>
                 <p className="text-2xl font-semibold">
                   {formatPrice(totalProductAmount)}
@@ -85,7 +85,7 @@ export function CartSummary({
         {hasAds && (
           <section className="flex flex-col gap-4 p-5">
             <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2">
                 <h2 className="font-semibold">Доска</h2>
                 <p className="text-sm text-muted-foreground">
                   {formatItemCount(totalAdItems, [

@@ -37,12 +37,12 @@ export function CartItemCard({
     <Link to={href} className="block">
       <article
         className={cn(
-          'grid gap-0 rounded-2xl shadow-card-lg bg-card grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
+          'grid gap-0 rounded-2xl grid-cols-[72px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)]',
           className,
         )}
       >
-        <div className="border-r border-border p-2 sm:p-3">
-          <div className="aspect-square overflow-hidden rounded-sm bg-muted">
+        <div className="p-2 sm:p-3 h-fit shadow-card-lg rounded-l-lg bg-white">
+          <div className="aspect-square overflow-hidden rounded-md">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -57,7 +57,7 @@ export function CartItemCard({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-3 p-2 sm:space-y-4 sm:p-3">
+        <div className="min-w-0 space-y-3 p-2.5 sm:space-y-4 sm:p-3 shadow-card-lg rounded-r-xl rounded-bl-xl border-r border-solid border-r-[#f6f5fc] bg-white">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 space-y-0.5 sm:space-y-1">
               <h3 className="line-clamp-2 text-sm font-semibold sm:text-base">
@@ -67,7 +67,7 @@ export function CartItemCard({
               {category}
             </div>
 
-            <div className="shrink-0 text-right">
+            <div className="shrink-0 text-right gap-2">
               {price}
               {priceMeta && (
                 <p className="text-xs text-muted-foreground">{priceMeta}</p>
