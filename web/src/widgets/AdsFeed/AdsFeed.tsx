@@ -1,6 +1,7 @@
 import { getAds } from '@/entities/ad';
 import type { Ad } from '@/entities/ad';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { ListEndMessage } from '@/components/ui/ListEndMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
@@ -90,9 +91,7 @@ function AdsFeedFetched({
       )}
 
       {!hasMore && items.length > 0 && (
-        <div className="text-center py-8 text-sm text-muted-foreground">
-          Показаны все объявления
-        </div>
+        <ListEndMessage>Показаны все объявления</ListEndMessage>
       )}
     </div>
   );

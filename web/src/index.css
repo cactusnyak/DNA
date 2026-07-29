@@ -54,6 +54,7 @@ body {
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-logo: var(--logo-color);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -92,6 +93,7 @@ body {
 
 :root {
   --page: #fcfcff;
+  --logo-color: color-mix(in srgb, var(--primary) 30%, #050816);
   --shadow-color: rgb(41 27 135 / 10%);
   --shadow-color-strong: rgb(27 18 88 / 24%);
   --shadow-brand-glow-color: rgb(41 27 135 / 18%);

@@ -1,6 +1,7 @@
 import { getFeed } from '@/entities/feed';
 import type { FeedItem } from '@/entities/feed';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { ListEndMessage } from '@/components/ui/ListEndMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
@@ -85,9 +86,7 @@ export function CombinedFeed() {
       )}
 
       {!hasMore && items.length > 0 && (
-        <div className="text-center py-8 text-sm text-muted-foreground">
-          Показаны все товары и объявления
-        </div>
+        <ListEndMessage>Показаны все товары и объявления</ListEndMessage>
       )}
     </div>
   );
