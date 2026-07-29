@@ -1,0 +1,1 @@
+export { CatalogDropdownCategoryCard } from './CatalogDropdownCategoryCard';

@@ -1,4 +1,7 @@
 import { getProducts } from '@/entities/product/api/get-products';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { ListEndMessage } from '@/components/ui/ListEndMessage';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { useGridColumns } from '@/shared/hooks/use-grid-columns';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
@@ -51,10 +54,18 @@ export function ProductsListing({
   }
 
   if (!isLoading && !items.length) {
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
+  }
+
+  if (isLoading && !items.length) {
     return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
+      <SkeletonLoader
+        variant="card"
+        layout="grid"
+        count={initialChunkSize}
+        className={getItemGridClasses()}
+        ariaLabel="Загружаем товары"
+      />
     );
   }
 
@@ -71,22 +82,17 @@ export function ProductsListing({
       </div>
       
       {isLoading && items.length > 0 && (
-        <div className="flex justify-center py-8">
-          <div className="flex gap-2">
-            {Array.from({ length: Math.min(chunkSize, 4) }).map((_, index) => (
-              <div
-                key={`loading-${index}`}
-                className="w-16 h-16 bg-muted rounded-lg animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
+        <SkeletonLoader
+          variant="card"
+          layout="grid"
+          count={chunkSize}
+          className={getItemGridClasses()}
+          ariaLabel="Загружаем ещё товары"
+        />
       )}
       
       {!hasMore && items.length > 0 && (
-        <div className="text-center py-8 text-sm text-muted-foreground">
-          Показаны все товары
-        </div>
+        <ListEndMessage>Показаны все товары</ListEndMessage>
       )}
     </div>
   );

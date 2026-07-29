@@ -7,6 +7,7 @@ import { contentDescriptionToPlainText } from '@/shared/utils/content-descriptio
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
@@ -91,6 +92,19 @@ export function AdminProductRecordsView({
       renderActions={renderActions}
       bulkActions={bulkActions}
       columns={[
+        {
+          key: 'image',
+          title: 'Фото',
+          width: 72,
+          sortable: false,
+          getValue: (product) => product.images[0]?.url ?? '',
+          render: (product) => (
+            <AdminTableImage
+              src={product.images[0]?.url}
+              alt={product.images[0]?.alt ?? product.title}
+            />
+          ),
+        },
         {
           key: 'id',
           title: 'ID',

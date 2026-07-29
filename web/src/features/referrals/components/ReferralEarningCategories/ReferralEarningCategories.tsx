@@ -23,7 +23,7 @@ export function ReferralEarningCategories({
               'flex flex-1 cursor-pointer items-center justify-center border p-3 text-center transition-colors duration-300 sm:rounded-2xl sm:p-4',
               'rounded-xl',
               isActive
-                ? 'border-foreground bg-foreground text-background'
+                ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border bg-background hover:border-foreground/30 hover:bg-muted/50',
             ].join(' ')}
             onClick={() => onActiveCategoryChange(category.id)}

@@ -1,0 +1,1 @@
+export { CatalogTreeCategoryImage } from './CatalogTreeCategoryImage';

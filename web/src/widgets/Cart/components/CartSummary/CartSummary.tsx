@@ -42,7 +42,7 @@ export function CartSummary({
   const hasAds = totalAdItems > 0;
 
   return (
-    <aside className="overflow-hidden rounded-2xl border border-border bg-card lg:sticky lg:top-28 lg:self-start">
+    <aside className="overflow-hidden rounded-2xl shadow-card-3xl lg:sticky lg:top-28 lg:self-start">
       <div className="divide-y divide-border">
         {hasProducts && (
           <section className="flex flex-col gap-4 p-5">

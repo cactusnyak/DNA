@@ -32,8 +32,7 @@ export function ProductCard({
   return (
     <Link
       to={getPlatformProductHref(product.slug)}
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-1 transition-colors hover:bg-muted/40"
-    >
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl p-1 hover:bg-primary/3">
       <div className="relative">
         <ItemGallery images={product.images} title={product.title} />
 

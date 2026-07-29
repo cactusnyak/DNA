@@ -6,6 +6,8 @@ import {
 } from '@/entities/auth';
 import { BalanceHero } from '@/widgets/BalanceHero';
 import { CombinedFeed } from '@/widgets/CombinedFeed';
+import { SectionHeader } from '@/components/ui/Section';
+import { ContentCard } from '@/components/ui/ContentCard';
 
 export function HomePage() {
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -17,7 +19,7 @@ export function HomePage() {
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <BalanceHero
         balance={user?.balance}
         isAuthenticated={Boolean(user)}
@@ -26,10 +28,13 @@ export function HomePage() {
         guestText="Заказ в Маркете можно оформить без регистрации. В профиле доступны история заказов, реферальный код и дерево приглашений. Финансовые функции пока разрабатываются."
       />
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Товары и объявления</h2>
+      <ContentCard as="section">
+        <SectionHeader
+          title="Товары и объявления"
+          description="Предложения из обоих разделов: товаров и объявлений."
+        />
         <CombinedFeed />
-      </section>
+      </ContentCard>
     </div>
   );
 }

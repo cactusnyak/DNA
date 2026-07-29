@@ -2,6 +2,8 @@ import { useRef } from 'react';
 
 import { useParams } from 'react-router-dom';
 
+import { ContentCard } from '@/components/ui/ContentCard';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCategorySlugFromPath } from '@/shared/catalog';
 import {
   PLATFORM_SECTION,
@@ -44,6 +46,7 @@ export function Catalog({
   const {
     baseProducts,
     products,
+    subcategoryOptions,
     priceFilter,
     selectedCategoryIds,
     sortRules,
@@ -81,7 +84,10 @@ export function Catalog({
             showCatalogLink={showCatalogLink}
           />
         )}
-        <p className="text-muted-foreground">Загружаем данные...</p>
+        <SkeletonLoader
+          itemClassName="min-h-96"
+          ariaLabel="Загружаем каталог"
+        />
       </section>
     );
   }
@@ -103,7 +109,7 @@ export function Catalog({
 
   if (section === PLATFORM_SECTION.ADS) {
     return (
-      <section className="space-y-8">
+      <ContentCard as="section">
         {showHeader && (
           <CatalogHeader
             section={section}
@@ -139,7 +145,7 @@ export function Catalog({
             }
           />
         </div>
-      </section>
+      </ContentCard>
     );
   }
 
@@ -148,7 +154,7 @@ export function Catalog({
     : 'Здесь пока нет товаров.';
 
   return (
-    <section className="space-y-8">
+    <ContentCard as="section">
       {showHeader && (
         <CatalogHeader
           section={section}
@@ -173,6 +179,7 @@ export function Catalog({
             sortRules={sortRules}
             showFilters={showFilters}
             showSorting={showSorting}
+            subcategoryOptions={subcategoryOptions}
             containerRef={containerRef}
             onPriceFilterChange={setPriceFilter}
             onSelectedCategoryIdsChange={setSelectedCategoryIds}
@@ -193,6 +200,6 @@ export function Catalog({
           </div>
         )}
       </div>
-    </section>
+    </ContentCard>
   );
 }

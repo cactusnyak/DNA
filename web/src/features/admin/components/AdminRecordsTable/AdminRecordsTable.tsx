@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { FormBooleanField } from '@/components/ui/FormField';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/shared/utils/cn';
@@ -121,11 +122,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   }
 
   if (!records.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
   const selectedCount = selectedIds.size;
@@ -426,7 +423,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
           className="w-full table-fixed text-left text-sm"
           style={{ minWidth: `${Math.max(tableMinWidth, 760)}px` }}
         >
-          <thead className="text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="text-xs tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
                 <th className="sticky top-0 z-10 w-10 border-r border-border bg-muted/80 px-3 py-3 backdrop-blur-md">

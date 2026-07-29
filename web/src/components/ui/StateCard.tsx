@@ -15,17 +15,17 @@ type StateCardIcon = ComponentType<{
 
 type StateCardAction =
   | {
-      label: ReactNode;
-      to: string;
-      onClick?: never;
-      variant?: ComponentProps<typeof Button>['variant'];
-    }
+    label: ReactNode;
+    to: string;
+    onClick?: never;
+    variant?: ComponentProps<typeof Button>['variant'];
+  }
   | {
-      label: ReactNode;
-      onClick: () => void;
-      to?: never;
-      variant?: ComponentProps<typeof Button>['variant'];
-    };
+    label: ReactNode;
+    onClick: () => void;
+    to?: never;
+    variant?: ComponentProps<typeof Button>['variant'];
+  };
 
 type StateCardProps = {
   icon?: StateCardIcon;
@@ -45,7 +45,7 @@ export function StateCard({
   return (
     <section
       className={cn(
-        'mx-auto max-w-xl rounded-3xl border border-border p-6 text-center sm:px-8 sm:py-10',
+        'mx-auto max-w-xl rounded-3xl p-6 text-center shadow-card-2xl bg-white sm:px-8 sm:py-10',
         className,
       )}
     >

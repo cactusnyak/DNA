@@ -36,7 +36,7 @@ function CatalogButton({
       type="button"
       asChild
       onMouseEnter={onMouseEnter}
-      className={cn(isActive && 'bg-white text-foreground border border-border hover:bg-white scale-95')}
+      className={cn(isActive && 'bg-white text-foreground border border-border hover:bg-white')}
     >
       <Link to={to} onClick={onClick}>
         {label}

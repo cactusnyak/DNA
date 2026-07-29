@@ -8,7 +8,9 @@ import { PLATFORM_SECTION } from '@/shared/platform';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 import { SectionHeader } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { AdCard } from '@/widgets/AdsListing/components/AdCard';
 import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard';
 
@@ -46,7 +48,7 @@ export function FavouritesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <ContentCard>
       <SectionHeader
         title="Избранное"
         description="Сохранённые товары маркета и объявления доски."
@@ -72,7 +74,13 @@ export function FavouritesPage() {
       )}
 
       {isLoading && (
-        <p className="text-sm text-muted-foreground">Загружаем избранное...</p>
+        <SkeletonLoader
+          variant="card"
+          layout="grid"
+          count={6}
+          className={getItemGridClasses()}
+          ariaLabel="Загружаем избранное"
+        />
       )}
 
       {tab === 'products' && !isLoading && (
@@ -149,7 +157,7 @@ export function FavouritesPage() {
           )}
         </>
       )}
-    </div>
+    </ContentCard>
   );
 }
 

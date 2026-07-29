@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 
+import { ContentCard } from '@/components/ui/ContentCard';
 import { getFeed } from '@/entities/feed';
 import { getCatalogCategories } from '@/shared/catalog';
 import { PLATFORM_SECTION } from '@/shared/platform';
@@ -44,7 +45,7 @@ export function SearchPage() {
   }
 
   return (
-    <div className="space-y-12">
+    <ContentCard>
       <header>
         <h1 className="text-2xl font-semibold">
           Поиск по запросу «{query}»
@@ -68,6 +69,6 @@ export function SearchPage() {
       ) : (
         <SearchListings key={query} items={feedItems} query={query} />
       )}
-    </div>
+    </ContentCard>
   );
 }

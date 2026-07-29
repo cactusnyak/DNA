@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { SectionHeader } from '@/components/ui/Section';
+import { ContentCard } from '@/components/ui/ContentCard';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import {
   getCurrentUser,
   useAuthStore,
@@ -13,7 +15,7 @@ import {
   uploadUserAvatar,
 } from '@/entities/user';
 
-import { AvatarEditModal } from './components/AvatarEditModal/AvatarEditModal';
+import { AvatarCropModal } from './components/AvatarCropModal';
 import { ProfileDangerZone } from './components/ProfileDangerZone';
 import { ProfileDetailsCard } from './components/ProfileDetailsCard';
 import { ProfileEditModal } from './components/ProfileEditModal/ProfileEditModal';
@@ -27,7 +29,7 @@ export function Profile() {
   const queryClient = useQueryClient();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarFileToCrop, setAvatarFileToCrop] = useState<File>();
 
   const {
     data: user,
@@ -90,7 +92,6 @@ export function Profile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
-      setIsAvatarModalOpen(false);
     },
   });
 
@@ -118,7 +119,14 @@ export function Profile() {
   }
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загружаем профиль...</p>;
+    return (
+      <SkeletonLoader
+        layout="stack"
+        count={3}
+        itemClassName="min-h-40"
+        ariaLabel="Загружаем профиль"
+      />
+    );
   }
 
   if (error || !user) {
@@ -126,7 +134,7 @@ export function Profile() {
   }
 
   return (
-    <div className="space-y-8">
+    <ContentCard>
       <SectionHeader
         title="Профиль"
         description="Личные данные, баланс и история заказов."
@@ -134,8 +142,9 @@ export function Profile() {
 
       <ProfileDetailsCard
         user={user}
+        isAvatarPending={updateAvatarMutation.isPending}
         onEdit={() => setIsEditModalOpen(true)}
-        onEditAvatar={() => setIsAvatarModalOpen(true)}
+        onAvatarSelect={setAvatarFileToCrop}
         onRemoveAvatar={() =>
           updateAvatarMutation.mutate({ remove: true })
         }
@@ -156,14 +165,17 @@ export function Profile() {
         onSubmit={(value) => updateProfileMutation.mutate(value)}
       />
 
-      <AvatarEditModal
-        user={user}
-        isOpen={isAvatarModalOpen}
-        isPending={updateAvatarMutation.isPending}
-        error={updateAvatarMutation.error}
-        onClose={() => setIsAvatarModalOpen(false)}
-        onSubmit={(value) => updateAvatarMutation.mutate(value)}
-      />
+      {avatarFileToCrop && (
+        <AvatarCropModal
+          key={`${avatarFileToCrop.name}-${avatarFileToCrop.lastModified}`}
+          file={avatarFileToCrop}
+          onClose={() => setAvatarFileToCrop(undefined)}
+          onConfirm={(avatarFile) => {
+            setAvatarFileToCrop(undefined);
+            updateAvatarMutation.mutate({ avatarFile, remove: false });
+          }}
+        />
+      )}
 
       {updateProfileMutation.isError && (
         <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -188,6 +200,6 @@ export function Profile() {
         onLogout={clearAccessToken}
         onDeleteAccount={handleDeleteAccount}
       />
-    </div>
+    </ContentCard>
   );
 }

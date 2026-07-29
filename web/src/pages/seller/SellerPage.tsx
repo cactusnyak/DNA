@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 
 export function SellerPage() {
   return (
-    <section className="rounded-2xl border border-dashed border-border bg-card p-6">
+    <ContentCard as="section">
       <SectionHeader
         title="Аккаунт продавца"
         description="Кабинет продавца пока находится в разработке."
       />
 
-      <Button asChild variant="outline" className="mt-5">
+      <Button asChild variant="outline">
         <Link to="/market/catalog">Посмотреть каталог Маркета</Link>
       </Button>
-    </section>
+    </ContentCard>
   );
 }

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getProduct } from '@/entities/product/api/get-product';
 import { ProductDetails } from '@/widgets/ProductDetails';
 
@@ -22,7 +23,12 @@ export function ProductPage() {
   }
 
   if (isPending) {
-    return <p className="text-muted-foreground">Загружаем товар...</p>;
+    return (
+      <SkeletonLoader
+        itemClassName="min-h-[32rem]"
+        ariaLabel="Загружаем товар"
+      />
+    );
   }
 
   if (error || !product) {

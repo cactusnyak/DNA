@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 import {
   getCurrentUser,
@@ -40,7 +42,14 @@ export function Referrals() {
   }
 
   if (isUserPending) {
-    return <p className="text-muted-foreground">Загружаем данные...</p>;
+    return (
+      <SkeletonLoader
+        layout="stack"
+        count={3}
+        itemClassName="min-h-32"
+        ariaLabel="Загружаем реферальные данные"
+      />
+    );
   }
 
   if (isUserError || !user) {
@@ -65,7 +74,7 @@ export function Referrals() {
   }
 
   return (
-    <div className="space-y-8">
+    <ContentCard>
       <SectionHeader
         title="Заработок"
         description="Реферальный код и дерево приглашений доступны. Начисления и условия программы пока разрабатываются."
@@ -77,6 +86,6 @@ export function Referrals() {
         isTreePending={isReferralTreePending}
         isTreeError={isReferralTreeError}
       />
-    </div>
+    </ContentCard>
   );
 }

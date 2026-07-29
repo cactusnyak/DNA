@@ -33,7 +33,7 @@ export function ReferralLinkCard({ user }: ReferralLinkCardProps) {
   }
 
   return (
-    <section className="flex h-full flex-col rounded-3xl border border-border bg-card p-5">
+    <section className="flex h-full flex-col rounded-3xl shadow-card-xl bg-card p-5">
       <div className="flex-1">
         <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
           <Share2 className="size-3.5" />

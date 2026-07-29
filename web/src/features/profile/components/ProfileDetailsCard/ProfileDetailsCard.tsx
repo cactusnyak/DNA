@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react';
+import { useRef } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
@@ -8,17 +9,20 @@ import { getProfileDetailItems } from './data';
 
 type ProfileDetailsCardProps = {
   user: User;
+  isAvatarPending?: boolean;
   onEdit: () => void;
-  onEditAvatar: () => void;
+  onAvatarSelect: (file: File) => void;
   onRemoveAvatar: () => void;
 };
 
 export function ProfileDetailsCard({
   user,
+  isAvatarPending = false,
   onEdit,
-  onEditAvatar,
+  onAvatarSelect,
   onRemoveAvatar,
 }: ProfileDetailsCardProps) {
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const profileDetails = getProfileDetailItems(user, {
     showRole: user.role === 'ADMIN',
   });
@@ -28,8 +32,8 @@ export function ProfileDetailsCard({
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold">Личные данные</h2>
 
-        <Button type="button" variant="outline" size="sm" onClick={onEdit}>
-          <Pencil className="mr-2 size-4" />
+        <Button className='gap-2' type="button" variant="outline" size="sm" onClick={onEdit}>
+          <Pencil className="size-3.5" strokeWidth={1.5} />
           Редактировать
         </Button>
       </div>
@@ -38,13 +42,29 @@ export function ProfileDetailsCard({
         <Avatar src={user.avatar?.url} name={user.nickname} size="lg" />
 
         <div className="flex flex-wrap gap-1">
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+
+              if (file) {
+                onAvatarSelect(file);
+              }
+            }}
+          />
+
           <Button
             type="button"
             variant="outline"
             size="icon-sm"
             title={user.avatar ? 'Изменить аватар' : 'Добавить аватар'}
             aria-label={user.avatar ? 'Изменить аватар' : 'Добавить аватар'}
-            onClick={onEditAvatar}
+            disabled={isAvatarPending}
+            onClick={() => avatarInputRef.current?.click()}
           >
             <Pencil className="size-3.5" strokeWidth={1.5} />
           </Button>
@@ -56,6 +76,7 @@ export function ProfileDetailsCard({
               size="icon-sm"
               title="Удалить аватар"
               aria-label="Удалить аватар"
+              disabled={isAvatarPending}
               onClick={onRemoveAvatar}
             >
               <Trash2 className="size-3.5" strokeWidth={1.5} />

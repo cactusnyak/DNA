@@ -54,12 +54,34 @@ body {
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-logo: var(--logo-color);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-page: var(--page);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --shadow-2xs: 0 1px var(--shadow-color);
+  --shadow-xs: 0 1px 2px 0 var(--shadow-color);
+  --shadow-sm: 0 1px 3px 0 var(--shadow-color), 0 1px 2px -1px var(--shadow-color);
+  --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+  --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+  --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+  --shadow-2xl: 0 25px 50px -12px var(--shadow-color-strong);
+  --shadow-card-xs: 0 0 8px var(--shadow-color);
+  --shadow-card-sm: 0 0 14px var(--shadow-color);
+  --shadow-card-md: 0 0 20px var(--shadow-color);
+  --shadow-card: 0 0 20px var(--shadow-color);
+  --shadow-card-lg: 0 0 28px var(--shadow-color);
+  --shadow-card-xl: 0 0 40px var(--shadow-color);
+  --shadow-card-2xl: 0 0 56px var(--shadow-color);
+  --shadow-card-3xl: 0 0 72px var(--shadow-color-strong);
+  --shadow-card-4xl: 0 0 96px var(--shadow-color-strong);
+  --shadow-document: 0 0 90px -10px var(--shadow-color-strong);
+  --shadow-balance-card: 0 10px 100px var(--shadow-color-strong);
+  --shadow-brand-glow: 0 20px 100px var(--shadow-brand-glow-color);
+  --shadow-accent-glow: 0 30px 140px var(--shadow-accent-glow-color), inset 0 1px 0 rgb(245 249 253 / 22%);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -70,24 +92,30 @@ body {
 }
 
 :root {
+  --page: #fcfcff;
+  --logo-color: color-mix(in srgb, var(--primary) 30%, #050816);
+  --shadow-color: rgb(41 27 135 / 10%);
+  --shadow-color-strong: rgb(27 18 88 / 24%);
+  --shadow-brand-glow-color: rgb(41 27 135 / 18%);
+  --shadow-accent-glow-color: rgb(148 225 209 / 18%);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #291b87;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: #eeecfc;
+  --accent-foreground: #4331b9;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #291b87;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -105,24 +133,29 @@ body {
 }
 
 .dark {
+  --page: #0c0b12;
+  --shadow-color: rgb(0 0 0 / 28%);
+  --shadow-color-strong: rgb(0 0 0 / 48%);
+  --shadow-brand-glow-color: rgb(139 124 240 / 24%);
+  --shadow-accent-glow-color: rgb(148 225 209 / 20%);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #8b7cf0;
+  --primary-foreground: #130d3d;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #292348;
+  --accent-foreground: #d8d2ff;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #8b7cf0;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -142,10 +175,120 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .skeleton-shimmer {
+    background-color: var(--muted);
+    background-image: linear-gradient(100deg,
+        transparent 20%,
+        color-mix(in srgb, var(--background) 72%, transparent) 50%,
+        transparent 80%);
+    background-position: 180% 0;
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+
+  .balance-hero-surface {
+    background-image: linear-gradient(135deg,
+        color-mix(in srgb, var(--primary) 24%, #050816),
+        color-mix(in srgb, var(--primary) 48%, #080b1d),
+        color-mix(in srgb, var(--primary) 32%, #050816));
+  }
+
+  .balance-card-surface {
+    background-image: linear-gradient(135deg,
+        color-mix(in srgb, var(--primary) 18%, #050816),
+        color-mix(in srgb, var(--primary) 30%, #050816),
+        color-mix(in srgb, var(--primary) 46%, #080b1d));
+  }
+
+  .balance-hero-action-surface {
+    background-color: rgb(255 255 255 / 5%);
+    background-image: radial-gradient(circle at 30% 20%,
+        color-mix(in srgb, var(--primary) 42%, transparent) 0%,
+        color-mix(in srgb, var(--primary) 30%, transparent) 30%,
+        color-mix(in srgb, var(--accent-foreground) 18%, transparent) 65%,
+        color-mix(in srgb, var(--primary) 30%, transparent) 100%);
+    background-position: 0% 0%;
+    background-size: 200% 200%;
+  }
+
+  .balance-hero-action-surface::before {
+    background-image: radial-gradient(circle at 25% 15%,
+        rgb(255 255 255 / 12%),
+        transparent 45%),
+      radial-gradient(circle at 80% 80%,
+        color-mix(in srgb, var(--primary) 18%, transparent),
+        transparent 50%),
+      radial-gradient(circle at 50% 50%,
+        color-mix(in srgb, var(--accent-foreground) 12%, transparent),
+        transparent 55%);
+  }
+
+  .balance-hero-action-surface::after {
+    background-color: rgb(255 255 255 / 5%);
+  }
+
+  .balance-hero-action-surface:hover {
+    background-color: rgb(0 0 0 / 15%);
+    background-position: 100% 100%;
+  }
+
+  .balance-card-primary-glow {
+    background-color: color-mix(in srgb, var(--primary) 38%, transparent);
+  }
+
+  .balance-card-accent-glow {
+    background-color: color-mix(in srgb, var(--accent-foreground) 22%, transparent);
+  }
+
+  .balance-amount-gradient {
+    background-image: linear-gradient(90deg,
+        #fff,
+        color-mix(in srgb, var(--primary) 18%, #fff),
+        color-mix(in srgb, var(--accent-foreground) 28%, #fff));
+  }
+
+  .page-dot-background {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .page-dot-background::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background-image: radial-gradient(circle,
+        color-mix(in oklch, var(--primary) 15%, transparent) 1.25px,
+        transparent 1.5px);
+    background-position: center top;
+    background-size: 20px 20px;
+    content: '';
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 38%,
+        black 0%,
+        rgb(0 0 0 / 85%) 35%,
+        transparent 100%);
+    pointer-events: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    background-position: -80% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
   }
 }

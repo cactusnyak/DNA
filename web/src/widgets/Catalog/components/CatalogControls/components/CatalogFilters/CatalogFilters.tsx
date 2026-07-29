@@ -67,13 +67,15 @@ export function CatalogFilters({
         />
       </FilterSection>
 
-      <FilterSection title="Подкатегории">
-        <SubcategoryFilter
-          options={subcategoryOptions}
-          selectedIds={selectedCategoryIds}
-          onToggle={handleToggleSubcategory}
-        />
-      </FilterSection>
+      {subcategoryOptions.length > 0 && (
+        <FilterSection title="Подкатегории">
+          <SubcategoryFilter
+            options={subcategoryOptions}
+            selectedIds={selectedCategoryIds}
+            onToggle={handleToggleSubcategory}
+          />
+        </FilterSection>
+      )}
     </aside>
   );
 }

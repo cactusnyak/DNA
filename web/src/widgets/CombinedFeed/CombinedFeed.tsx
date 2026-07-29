@@ -1,24 +1,14 @@
 import { getFeed } from '@/entities/feed';
 import type { FeedItem } from '@/entities/feed';
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { ListEndMessage } from '@/components/ui/ListEndMessage';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useFeedChunkSize } from '@/shared/hooks/use-feed-chunk-size';
 import { usePageScrollLazyLoading } from '@/shared/hooks/use-page-scroll-lazy-loading';
 import { PLATFORM_SECTION } from '@/shared/platform';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 import { AdCard } from '@/widgets/AdsListing/components/AdCard';
 import { ProductCard } from '@/widgets/Catalog/components/ProductGrid/components/ProductCard/ProductCard';
-
-function CardSkeleton() {
-  return (
-    <div className="flex flex-col bg-card border border-border rounded-xl overflow-hidden animate-pulse">
-      <div className="aspect-square bg-muted" />
-      <div className="p-4 space-y-2">
-        <div className="h-4 bg-muted rounded" />
-        <div className="h-4 bg-muted rounded w-3/4" />
-        <div className="h-6 bg-muted rounded w-20 mt-2" />
-      </div>
-    </div>
-  );
-}
 
 type CombinedItemsGridProps = {
   items: FeedItem[];
@@ -67,20 +57,18 @@ export function CombinedFeed() {
 
   if (isLoading && items.length === 0) {
     return (
-      <div className={getItemGridClasses()}>
-        {Array.from({ length: initialChunkSize }).map((_, i) => (
-          <CardSkeleton key={i} />
-        ))}
-      </div>
+      <SkeletonLoader
+        variant="card"
+        layout="grid"
+        count={initialChunkSize}
+        className={getItemGridClasses()}
+        ariaLabel="Загружаем товары и объявления"
+      />
     );
   }
 
   if (!isLoading && items.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        Товаров и объявлений пока нет.
-      </div>
-    );
+    return <EmptyPlaceholder>Товаров и объявлений пока нет.</EmptyPlaceholder>;
   }
 
   return (
@@ -88,17 +76,17 @@ export function CombinedFeed() {
       <CombinedItemsGrid items={items} />
 
       {isLoading && items.length > 0 && (
-        <div className={getItemGridClasses()}>
-          {Array.from({ length: chunkSize }).map((_, i) => (
-            <CardSkeleton key={i} />
-          ))}
-        </div>
+        <SkeletonLoader
+          variant="card"
+          layout="grid"
+          count={chunkSize}
+          className={getItemGridClasses()}
+          ariaLabel="Загружаем ещё элементы"
+        />
       )}
 
       {!hasMore && items.length > 0 && (
-        <div className="text-center py-8 text-sm text-muted-foreground">
-          Показаны все товары и объявления
-        </div>
+        <ListEndMessage>Показаны все товары и объявления</ListEndMessage>
       )}
     </div>
   );

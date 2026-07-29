@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+
 import { AdminCategoryTreeItem } from './components/AdminCategoryTreeItem';
 import { buildAdminCategoryTree } from './logic/build-admin-category-tree';
 import type { AdminCategoryTreeRecord } from './types/admin-category-tree';
@@ -22,11 +24,7 @@ export function AdminCategoryTreeView<T extends AdminCategoryTreeRecord>({
   const tree = buildAdminCategoryTree(categories);
 
   if (!tree.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
   return (

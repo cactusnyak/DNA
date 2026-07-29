@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCatalogCategories } from '@/shared/catalog';
 import {
   getPlatformCatalogHref,
@@ -40,7 +42,12 @@ export function CategoryPreview({
     return (
       <section className="space-y-4">
         <SectionTitle title={previewTitle} level={2} />
-        <p className="text-sm text-muted-foreground">Загружаем категории...</p>
+        <SkeletonLoader
+          layout="inline"
+          count={limit}
+          itemClassName="h-36 w-50 min-h-0"
+          ariaLabel="Загружаем категории"
+        />
       </section>
     );
   }
@@ -64,9 +71,7 @@ export function CategoryPreview({
           previewCategories={previewCategories}
         />
       ) : (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-5 text-sm text-muted-foreground">
-          {emptyText}
-        </div>
+        <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>
       )}
     </section>
   );

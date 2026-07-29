@@ -1,0 +1,1 @@
+export { CatalogTreeCategoryCard } from './CatalogTreeCategoryCard';

@@ -104,7 +104,7 @@ export function GlobalSearchDropdown({
       style={dropdownStyle}
     >
       <div
-        className="max-h-[var(--global-search-mobile-height)] touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl md:max-h-[calc(100dvh-var(--header-height,112px)-0.5rem)]"
+        className="max-h-[var(--global-search-mobile-height)] touch-pan-y overflow-y-auto overscroll-contain rounded-2xl shadow-card-3xl bg-popover text-popover-foreground shadow-xl md:max-h-[calc(100dvh-var(--header-height,112px)-0.5rem)]"
       >
         {!isSearchReady ? (
           <p className="rounded-xl bg-muted/40 px-4 py-4 text-sm text-muted-foreground leading-[1.5]">

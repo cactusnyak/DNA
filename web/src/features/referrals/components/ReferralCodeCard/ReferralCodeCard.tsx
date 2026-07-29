@@ -8,7 +8,7 @@ type ReferralCodeCardProps = {
 
 export function ReferralCodeCard({ user }: ReferralCodeCardProps) {
   return (
-    <section className="relative isolate overflow-hidden rounded-3xl border border-border bg-card p-5">
+    <section className="relative isolate overflow-hidden rounded-3xl shadow-card-xl bg-card p-5">
       <div className="pointer-events-none absolute -right-14 -top-14 z-0 size-36 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="relative z-10">

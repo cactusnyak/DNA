@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { useCartStore } from '@/entities/cart';
@@ -29,7 +30,7 @@ export function Cart() {
   }
 
   return (
-    <div className="space-y-6">
+    <ContentCard>
       <SectionHeader
         title="Корзина"
         description="Проверьте товары и объявления перед оформлением."
@@ -101,6 +102,6 @@ export function Cart() {
           totalAdAmount={totalAdAmount}
         />
       </div>
-    </div>
+    </ContentCard>
   );
 }

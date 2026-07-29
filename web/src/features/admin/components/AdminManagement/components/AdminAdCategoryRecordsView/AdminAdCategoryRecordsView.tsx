@@ -6,6 +6,7 @@ import { buildCategoryTree } from '../../../../logic/build-category-tree';
 import { AdminCategoryTreeView } from '../../../AdminCategoryTreeView';
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
+import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
@@ -81,6 +82,19 @@ export function AdminAdCategoryRecordsView({
       bulkActions={bulkActions}
       getSubRows={(category) => category.children ?? []}
       columns={[
+        {
+          key: 'image',
+          title: 'Фото',
+          width: 72,
+          sortable: false,
+          getValue: (category) => category.image?.url ?? '',
+          render: (category) => (
+            <AdminTableImage
+              src={category.image?.url}
+              alt={category.image?.alt ?? category.name}
+            />
+          ),
+        },
         {
           key: 'id',
           title: 'ID',

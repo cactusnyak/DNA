@@ -71,6 +71,7 @@ export function useAdsControls({ categorySlug }: UseAdsControlsParams = {}) {
     const map = new Map<string, { id: string; name: string; productsCount: number }>();
     baseAds.forEach((ad) => {
       if (!ad.category) return;
+      if (categorySlug && ad.category.slug === categorySlug) return;
       const cur = map.get(ad.categoryId);
       map.set(ad.categoryId, cur
         ? { ...cur, productsCount: cur.productsCount + 1 }
@@ -78,7 +79,7 @@ export function useAdsControls({ categorySlug }: UseAdsControlsParams = {}) {
       );
     });
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, 'ru'));
-  }, [baseAds]);
+  }, [baseAds, categorySlug]);
 
   return {
     baseAds,

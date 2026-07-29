@@ -8,6 +8,7 @@ import {
   getAdminReferrals,
   uploadAdminImage,
 } from '@/entities/admin';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 
 import { AdminTabs } from '../AdminTabs';
 import { AdminToolbar } from '../AdminToolbar';
@@ -170,7 +171,14 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
   }
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Загружаем админку...</p>;
+    return (
+      <SkeletonLoader
+        layout="stack"
+        count={5}
+        itemClassName="min-h-14"
+        ariaLabel="Загружаем данные админ-панели"
+      />
+    );
   }
 
   if (isError || !data) {
@@ -235,5 +243,4 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     </section>
   );
 }
-
 

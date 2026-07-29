@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+
 type AdminRecordsListProps<TRecord> = {
   records: TRecord[];
   getRecordKey: (record: TRecord) => string;
@@ -20,11 +22,7 @@ export function AdminRecordsList<TRecord>({
   emptyText,
 }: AdminRecordsListProps<TRecord>) {
   if (!records.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        {emptyText}
-      </div>
-    );
+    return <EmptyPlaceholder>{emptyText}</EmptyPlaceholder>;
   }
 
   return (

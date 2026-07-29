@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import type { Ad } from '@/entities/ad';
 import type { Product } from '@/entities/product';
 import {
@@ -51,9 +52,15 @@ export function CatalogDropdownProducts({
       </p>
 
       {isPending && (
-        <p className="text-sm text-muted-foreground">
-          {isAdsSection ? 'Загружаем объявления...' : 'Загружаем товары...'}
-        </p>
+        <SkeletonLoader
+          variant="card"
+          layout="grid"
+          count={8}
+          className="grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4"
+          ariaLabel={
+            isAdsSection ? 'Загружаем объявления' : 'Загружаем товары'
+          }
+        />
       )}
 
       {!isPending && !items.length && (
