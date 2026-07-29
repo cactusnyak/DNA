@@ -34,7 +34,10 @@ export function ReferralGuestLanding() {
             <Button asChild size="lg">
               <Link to="/authorization">
                 Войти или зарегистрироваться
-                <ArrowRight className="size-4" />
+                <ArrowRight
+                  className="size-4 transition-transform group-hover/button:translate-x-1"
+                  aria-hidden="true"
+                />
               </Link>
             </Button>
           </div>
