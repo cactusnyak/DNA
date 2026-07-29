@@ -1,4 +1,3 @@
-import { cn } from '@/shared/utils/cn';
 
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -24,22 +23,22 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
       <img
         src={src}
         alt={name}
-        className={cn(
+        className={[
           'rounded-full object-cover',
           sizeClassNames[size],
           className,
-        )}
+        ].filter(Boolean).join(' ')}
       />
     );
   }
 
   return (
     <div
-      className={cn(
+      className={[
         'flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground',
         sizeClassNames[size],
         className,
-      )}
+      ].filter(Boolean).join(' ')}
       aria-label={name}
     >
       {initial}

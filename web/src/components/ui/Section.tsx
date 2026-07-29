@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { cn } from '@/shared/utils/cn';
 
 type SectionHeaderProps = {
   title: ReactNode;
@@ -14,7 +13,7 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={['space-y-2', className].filter(Boolean).join(' ')}>
       <h1 className="text-2xl font-semibold">{title}</h1>
 
       {description && (
@@ -30,5 +29,5 @@ type SectionTitleProps = {
 };
 
 export function SectionTitle({ children, className }: SectionTitleProps) {
-  return <h2 className={cn('text-sm font-semibold', className)}>{children}</h2>;
+  return <h2 className={['text-sm font-semibold', className].filter(Boolean).join(' ')}>{children}</h2>;
 }

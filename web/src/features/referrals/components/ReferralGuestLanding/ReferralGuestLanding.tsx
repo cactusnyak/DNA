@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/shared/utils/cn';
 
 import { referralBenefits } from '../../data/referral-benefits';
 
@@ -50,14 +49,14 @@ export function ReferralGuestLanding() {
             return (
               <article
                 key={benefit.title}
-                className={cn(
+                className={[
                   'flex min-h-40 flex-col bg-background/80 p-5',
                   '[&:not(:last-child)]:border-b',
                   'sm:[&:not(:last-child)]:border-b-0',
                   'sm:[&:nth-child(-n+2)]:border-b',
                   'sm:[&:nth-child(odd)]:border-r',
                   dividerClass,
-                )}
+                ].filter(Boolean).join(' ')}
               >
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
                   <Icon className="size-5 text-primary" />

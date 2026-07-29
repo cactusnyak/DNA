@@ -18,7 +18,6 @@ import {
   X,
 } from 'lucide-react';
 
-import { cn } from '@/shared/utils/cn';
 
 import { Input } from './Input';
 
@@ -131,13 +130,13 @@ function FormFieldRoot({
   children,
 }: FormFieldRootProps) {
   return (
-    <div className={cn('flex flex-col', className)}>
+    <div className={['flex flex-col', className].filter(Boolean).join(' ')}>
       <span
-        className={cn(
+        className={[
           'mb-2 ml-0.5 text-sm font-medium',
           required &&
           "after:ml-1 after:text-destructive after:content-['*']",
-        )}
+        ].filter(Boolean).join(' ')}
       >
         {label}
       </span>
@@ -235,7 +234,7 @@ export function FormTextareaField({
         disabled={disabled}
         placeholder={placeholder}
         autoComplete="off"
-        className={cn(TEXTAREA_CLASS_NAME, textareaClassName)}
+        className={[TEXTAREA_CLASS_NAME, textareaClassName].filter(Boolean).join(' ')}
         onChange={onChange}
       />
     </FormFieldRoot>
@@ -318,24 +317,24 @@ export function FormSelectField({
           aria-expanded={isOpen}
           aria-controls={listboxId}
           aria-required={required}
-          className={cn(SELECT_TRIGGER_CLASS_NAME, selectClassName)}
+          className={[SELECT_TRIGGER_CLASS_NAME, selectClassName].filter(Boolean).join(' ')}
           onClick={() => setIsOpen((currentValue) => !currentValue)}
           onKeyDown={handleTriggerKeyDown}
         >
           <span
-            className={cn(
+            className={[
               'truncate',
               !selectedOption && 'text-muted-foreground',
-            )}
+            ].filter(Boolean).join(' ')}
           >
             {selectedOption?.label ?? placeholder}
           </span>
 
           <ChevronDown
-            className={cn(
+            className={[
               'size-4 shrink-0 text-muted-foreground transition-transform',
               isOpen && 'rotate-180',
-            )}
+            ].filter(Boolean).join(' ')}
             strokeWidth={1.5}
           />
         </button>
@@ -344,10 +343,10 @@ export function FormSelectField({
           <div
             id={listboxId}
             role="listbox"
-            className={cn(
+            className={[
               'absolute left-0 right-0 top-full z-30 mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg',
               dropdownClassName,
-            )}
+            ].filter(Boolean).join(' ')}
           >
             {dropdownOptions.map((option) => {
               const isSelected = option.value === value;
@@ -359,12 +358,12 @@ export function FormSelectField({
                   role="option"
                   aria-selected={isSelected}
                   disabled={option.disabled}
-                  className={cn(
+                  className={[
                     'flex w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-left transition-colors',
                     'hover:bg-muted hover:text-foreground',
                     'disabled:cursor-not-allowed disabled:opacity-50',
                     isSelected && 'bg-muted text-foreground',
-                  )}
+                  ].filter(Boolean).join(' ')}
                   onClick={() => handleOptionClick(option)}
                 >
                   <span className="truncate">{option.label}</span>
@@ -425,7 +424,7 @@ export function FormBooleanField({
       aria-checked={indeterminate ? 'mixed' : checked}
       aria-required={required}
       disabled={disabled}
-      className={cn(
+      className={[
         variant === 'toggle'
           ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm transition-colors hover:border-ring'
           : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors',
@@ -433,7 +432,7 @@ export function FormBooleanField({
         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
         !label && className,
-      )}
+      ].filter(Boolean).join(' ')}
       onClick={() => onCheckedChange(!checked)}
     >
       {variant === 'toggle' ? (
@@ -443,16 +442,16 @@ export function FormBooleanField({
           </span>
 
           <span
-            className={cn(
+            className={[
               'flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors',
               checked ? 'bg-primary' : 'bg-muted',
-            )}
+            ].filter(Boolean).join(' ')}
           >
             <span
-              className={cn(
+              className={[
                 'size-5 rounded-full bg-background shadow-sm transition-transform',
                 checked && 'translate-x-5',
-              )}
+              ].filter(Boolean).join(' ')}
             />
           </span>
         </>
@@ -578,10 +577,10 @@ export function FormImageFileField({
 
         <label
           htmlFor={inputId}
-          className={cn(
+          className={[
             FILE_DROPZONE_CLASS_NAME,
             disabled && 'pointer-events-none cursor-not-allowed opacity-50',
-          )}
+          ].filter(Boolean).join(' ')}
         >
           <input
             id={inputId}
@@ -736,10 +735,10 @@ export function FormImageFilesField({
 
         <label
           htmlFor={inputId}
-          className={cn(
+          className={[
             FILE_DROPZONE_CLASS_NAME,
             disabled && 'pointer-events-none cursor-not-allowed opacity-50',
-          )}
+          ].filter(Boolean).join(' ')}
         >
           <input
             id={inputId}

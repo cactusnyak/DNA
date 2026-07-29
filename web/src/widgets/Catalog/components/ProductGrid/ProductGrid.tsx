@@ -1,6 +1,5 @@
 import type { Product } from '@/entities/product';
 import type { PlatformSectionId } from '@/shared/platform';
-import { cn } from '@/shared/utils/cn';
 import { getItemGridClasses } from '@/shared/utils/get-item-grid-classes';
 
 import { ProductCard } from './components/ProductCard';
@@ -20,10 +19,10 @@ export function ProductGrid({
 }: ProductGridProps) {
   return (
     <div
-      className={cn(
+      className={[
         'auto-rows-fr items-stretch',
         getItemGridClasses(compact ? 'compact' : 'default'),
-      )}
+      ].filter(Boolean).join(' ')}
     >
       {products.map((product) => (
         <ProductCard

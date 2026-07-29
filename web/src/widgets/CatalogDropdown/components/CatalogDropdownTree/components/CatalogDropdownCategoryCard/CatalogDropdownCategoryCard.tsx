@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
-import { cn } from '@/shared/utils/cn';
 
 import { CatalogDropdownCategoryImage } from '../CatalogDropdownCategoryImage';
 
@@ -34,12 +33,12 @@ export function CatalogDropdownCategoryCard({
       to={getCategoryHref(categories, category.id, section)}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
-      className={cn(
+      className={[
         'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm transition-colors',
         isActive || isInActivePath
           ? 'text-foreground'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-      )}
+      ].filter(Boolean).join(' ')}
     >
       <div className="flex min-w-0 items-center gap-2">
         <CatalogDropdownCategoryImage category={category} />

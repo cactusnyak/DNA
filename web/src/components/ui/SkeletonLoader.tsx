@@ -1,4 +1,3 @@
-import { cn } from '@/shared/utils/cn';
 
 export type SkeletonVariant = 'block' | 'text' | 'card';
 export type SkeletonLayout = 'single' | 'grid' | 'stack' | 'inline';
@@ -22,10 +21,10 @@ function SkeletonItem({
   if (variant === 'card') {
     return (
       <div
-        className={cn(
+        className={[
           'flex h-full flex-col overflow-hidden rounded-xl p-1',
           className,
-        )}
+        ].filter(Boolean).join(' ')}
       >
         <div className="skeleton-shimmer aspect-square rounded-lg" />
         <div className="space-y-3 p-2">
@@ -40,7 +39,7 @@ function SkeletonItem({
 
   if (variant === 'text') {
     return (
-      <div className={cn('space-y-2', className)}>
+      <div className={['space-y-2', className].filter(Boolean).join(' ')}>
         <div className="skeleton-shimmer h-4 w-full rounded-md" />
         <div className="skeleton-shimmer h-4 w-5/6 rounded-md" />
         <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
@@ -50,7 +49,7 @@ function SkeletonItem({
 
   return (
     <div
-      className={cn('skeleton-shimmer min-h-32 rounded-2xl', className)}
+      className={['skeleton-shimmer min-h-32 rounded-2xl', className].filter(Boolean).join(' ')}
     />
   );
 }
@@ -76,13 +75,13 @@ export function SkeletonLoader({
     <div
       role="status"
       aria-label={ariaLabel}
-      className={cn(
+      className={[
         layout === 'grid' &&
           'grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4',
         layout === 'stack' && 'flex flex-col gap-4',
         layout === 'inline' && 'flex flex-wrap gap-3',
         className,
-      )}
+      ].filter(Boolean).join(' ')}
     >
       {content}
       <span className="sr-only">{ariaLabel}</span>

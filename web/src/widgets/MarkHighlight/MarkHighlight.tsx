@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { cn } from '@/shared/utils/cn';
 
 export type MarkLevel = 1 | 2 | 3;
 
@@ -39,11 +38,11 @@ export function MarkHighlight({
       return isHighlight ? (
         <mark 
           key={index} 
-          className={cn(
+          className={[
             'rounded-[4px] px-0.5',
             levelStyles[level],
             className
-          )}
+          ].filter(Boolean).join(' ')}
         >
           {part}
         </mark>

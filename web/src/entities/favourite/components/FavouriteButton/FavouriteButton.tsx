@@ -1,6 +1,5 @@
 import { Heart } from 'lucide-react';
 
-import { cn } from '@/shared/utils/cn';
 
 import { useFavourite } from '../../hooks/use-favourite';
 import type { FavouriteItem } from '../../types/favourite-item';
@@ -23,20 +22,20 @@ export function FavouriteButton({ item, className }: FavouriteButtonProps) {
         e.stopPropagation();
         toggle();
       }}
-      className={cn(
+      className={[
         'group/fav flex cursor-pointer items-center justify-center rounded-full p-1 bg-black/20',
         'backdrop-blur-sm',
         'disabled:opacity-50',
         className,
-      )}
+      ].filter(Boolean).join(' ')}
     >
       <Heart
-        className={cn(
+        className={[
           'size-4 fill-white',
           isFavourite
             ? 'fill-red-500 stroke-red-500'
             : 'stroke-[#5c5c5c] group-hover/fav:stroke-red-400',
-        )}
+        ].filter(Boolean).join(' ')}
       />
     </button>
   );

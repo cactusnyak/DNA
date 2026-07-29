@@ -3,7 +3,6 @@ import { WalletCards } from 'lucide-react';
 
 import type { Balance } from '@/entities/balance';
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/shared/utils/cn';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type BalanceCardProps = {
@@ -21,10 +20,10 @@ export function BalanceCard({
 
   return (
     <section
-      className={cn(
+      className={[
         'balance-card-surface relative isolate w-full min-w-min shrink-0 overflow-hidden rounded-3xl border border-white/15 p-5 text-white shadow-balance-card backdrop-blur-2xl transition-all duration-500 sm:p-6',
         className,
-      )}
+      ].filter(Boolean).join(' ')}
     >
       <div className="balance-card-primary-glow pointer-events-none absolute -right-20 -top-20 z-0 size-48 rounded-full blur-3xl" />
       <div className="balance-card-accent-glow pointer-events-none absolute -bottom-24 -left-16 z-0 size-52 rounded-full blur-3xl" />

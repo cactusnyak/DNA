@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import type { Image } from '@/shared/types/image';
-import { cn } from '@/shared/utils/cn';
 
 type GalleryProps = {
   images: Image[];
@@ -47,12 +46,12 @@ export function Gallery({ images, title }: GalleryProps) {
               <button
                 key={image.id}
                 type="button"
-                className={cn(
+                className={[
                   'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted transition-colors sm:size-16 sm:rounded-xl',
                   isActive
                     ? 'border-foreground'
                     : 'border-border hover:border-foreground/40',
-                )}
+                ].filter(Boolean).join(' ')}
                 onClick={() => setActiveImageIndex(index)}
               >
                 <img

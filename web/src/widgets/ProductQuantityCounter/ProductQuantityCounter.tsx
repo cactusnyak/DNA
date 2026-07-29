@@ -1,7 +1,6 @@
 import { Minus, Plus } from 'lucide-react';
 
 import { useCartStore } from '@/entities/cart';
-import { cn } from '@/shared/utils/cn';
 
 export type ProductQuantityCounterVariant = 'card' | 'details';
 
@@ -26,10 +25,10 @@ export function ProductQuantityCounter({
 
   return (
     <div
-      className={cn(
+      className={[
         'grid grid-cols-[2.25rem_1fr_2.25rem] overflow-hidden rounded-lg border border-border bg-background',
         getProductActionHeightClass(variant),
-      )}
+      ].filter(Boolean).join(' ')}
     >
       <button
         type="button"

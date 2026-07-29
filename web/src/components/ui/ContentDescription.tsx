@@ -1,6 +1,5 @@
 import { ContentDescriptionEngine } from '@/shared/content-description';
 import type { ContentDescription as ContentDescriptionValue } from '@/shared/types/content-description';
-import { cn } from '@/shared/utils/cn';
 
 type ContentDescriptionProps = {
   description: ContentDescriptionValue;
@@ -14,7 +13,7 @@ export function ContentDescription({
   if (!description.blocks.length) return null;
 
   return (
-    <section className={cn('space-y-3 pt-2', className)}>
+    <section className={['space-y-3 pt-2', className].filter(Boolean).join(' ')}>
       <ContentDescriptionEngine description={description} />
     </section>
   );

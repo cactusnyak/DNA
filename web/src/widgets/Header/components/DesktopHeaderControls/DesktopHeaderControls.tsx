@@ -7,7 +7,6 @@ import {
   platformSections,
   type PlatformSectionId,
 } from '@/shared/platform';
-import { cn } from '@/shared/utils/cn';
 import { GlobalSearch } from '@/widgets/GlobalSearch';
 
 type DesktopHeaderControlsProps = {
@@ -36,7 +35,7 @@ function CatalogButton({
       type="button"
       asChild
       onMouseEnter={onMouseEnter}
-      className={cn(isActive && 'bg-white text-foreground border border-border hover:bg-white')}
+      className={[isActive && 'bg-white text-foreground border border-border hover:bg-white'].filter(Boolean).join(' ')}
     >
       <Link to={to} onClick={onClick}>
         {label}

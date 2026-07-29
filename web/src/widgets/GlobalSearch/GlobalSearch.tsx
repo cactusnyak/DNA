@@ -1,5 +1,4 @@
 import { SearchInput } from '@/components/ui/SearchInput';
-import { cn } from '@/shared/utils/cn';
 
 import { GlobalSearchDropdown } from './components/GlobalSearchDropdown';
 import { useGlobalSearch } from './hooks/use-global-search';
@@ -76,7 +75,7 @@ export function GlobalSearch({
   }
 
   return (
-    <div ref={containerRef} className={cn('relative w-full', className)}>
+    <div ref={containerRef} className={['relative w-full', className].filter(Boolean).join(' ')}>
       <form role="search" onSubmit={handleSubmit}>
         <SearchInput
           name="globalSearch"

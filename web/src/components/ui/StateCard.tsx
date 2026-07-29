@@ -6,7 +6,6 @@ import type {
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/shared/utils/cn';
 
 type StateCardIcon = ComponentType<{
   className?: string;
@@ -44,10 +43,10 @@ export function StateCard({
 }: StateCardProps) {
   return (
     <section
-      className={cn(
+      className={[
         'mx-auto max-w-xl rounded-3xl p-6 text-center shadow-card-2xl bg-white sm:px-8 sm:py-10',
         className,
-      )}
+      ].filter(Boolean).join(' ')}
     >
       <div className="flex flex-col gap-6">
         {Icon && (

@@ -2,7 +2,6 @@ import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ArrowRight } from 'lucide-react';
-import { cn } from '@/shared/utils/cn';
 
 type SectionTitleProps = {
   title: string;
@@ -23,15 +22,15 @@ export const SectionTitle = forwardRef<
   ) => {
     const baseClasses =
       'group flex items-center gap-2 font-semibold hover:text-primary transition-colors cursor-pointer';
-    const titleClasses = cn(
+    const titleClasses = [
       baseClasses,
       level === 2 ? 'text-lg' : 'text-base',
       className,
-    );
-    const arrowClasses = cn(
+    ].filter(Boolean).join(' ');
+    const arrowClasses = [
       'size-4 transition-transform group-hover:translate-x-1',
       arrowClassName,
-    );
+    ].filter(Boolean).join(' ');
 
     const HeadingTag = level === 2 ? 'h2' : 'h3';
 

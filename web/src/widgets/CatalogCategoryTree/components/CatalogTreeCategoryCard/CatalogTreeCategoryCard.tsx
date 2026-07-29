@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { getCategoryHref } from '@/shared/catalog';
 import type { PlatformSectionId } from '@/shared/platform';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
-import { cn } from '@/shared/utils/cn';
 import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 import { CatalogTreeCategoryImage } from '../CatalogTreeCategoryImage';
@@ -32,22 +31,22 @@ export function CatalogTreeCategoryCard({
 }: CatalogTreeCategoryCardProps) {
   return (
     <div
-      className={cn(
+      className={[
         'flex items-center gap-2 rounded-lg px-3 py-2',
         isMatched &&
           'outline outline-1 outline-dashed outline-muted-foreground/30',
-      )}
+      ].filter(Boolean).join(' ')}
     >
       <button
         type="button"
         disabled={!hasChildren}
         onClick={onToggle}
-        className={cn(
+        className={[
           'flex size-7 items-center justify-center rounded-md',
           hasChildren
             ? 'cursor-pointer hover:bg-muted'
             : 'cursor-default opacity-30',
-        )}
+        ].filter(Boolean).join(' ')}
       >
         {isExpanded ? (
           <ChevronDown className="size-4" />

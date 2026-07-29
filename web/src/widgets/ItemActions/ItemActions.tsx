@@ -5,7 +5,6 @@ import type { Ad } from '@/entities/ad';
 import { useCartStore } from '@/entities/cart';
 import { FavouriteButton } from '@/entities/favourite';
 import type { Product, SelectedProductAddition } from '@/entities/product';
-import { cn } from '@/shared/utils/cn';
 import {
   getProductActionHeightClass,
   type ProductQuantityCounterVariant,
@@ -101,10 +100,10 @@ export function ItemActions({
                   ? { productId: item.id }
                   : { adId: item.id }
               }
-              className={cn(
+              className={[
                 'shrink-0 rounded-lg border border-border',
                 variant === 'details' ? 'size-9' : 'size-8',
-              )}
+              ].filter(Boolean).join(' ')}
             />
           )}
         </div>
@@ -116,7 +115,7 @@ export function ItemActions({
         <Button
           type="button"
           size={variant === 'details' ? 'lg' : 'default'}
-          className={cn('w-full', getProductActionHeightClass(variant))}
+          className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
           onClick={handleBuyNow}
         >
           Купить в 1 клик

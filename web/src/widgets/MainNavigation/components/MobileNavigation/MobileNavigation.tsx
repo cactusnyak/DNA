@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { setMobileNavigationHeight } from '@/shared/main-navigation';
-import { cn } from '@/shared/utils/cn';
 
 import { CartItemsBadge } from '../CartItemsBadge';
 import { FavouritesBadge } from '../FavouritesBadge/FavouritesBadge';
@@ -57,10 +56,10 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
                 {({ isActive }) => (
                   <span className="relative">
                     <Icon
-                      className={cn(
+                      className={[
                         'size-4',
                         isActive && 'text-mobile-navigation-active',
-                      )}
+                      ].filter(Boolean).join(' ')}
                     />
 
                     {isCartLink && <CartItemsBadge />}

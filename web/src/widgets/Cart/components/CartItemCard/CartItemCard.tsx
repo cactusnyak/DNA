@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/shared/utils/cn';
 
 type CartItemCardProps = {
   href: string;
@@ -36,10 +35,10 @@ export function CartItemCard({
   return (
     <Link to={href} className="block">
       <article
-        className={cn(
+        className={[
           'grid gap-0 rounded-2xl grid-cols-[72px_minmax(0,1fr)]',
           className,
-        )}
+        ].filter(Boolean).join(' ')}
       >
         <div className="p-[5px] h-fit shadow-card-lg rounded-l-lg bg-white">
           <div className="aspect-square overflow-hidden rounded-l-sm rounded-r-xs">
