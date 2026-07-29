@@ -61,7 +61,7 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
   });
 
   return (
-    <div className="mt-2 h-[70vh] w-full overflow-hidden rounded-lg border border-border bg-background shadow-lg">
+    <div className="mt-2 h-[70vh] w-full overflow-hidden rounded-lg bg-background shadow-card-3xl">
       <div className="grid h-full min-w-0 grid-cols-[minmax(360px,auto)_minmax(220px,1fr)] overflow-hidden">
         <div className="min-w-0 overflow-hidden border-r border-border p-4">
           <p className="mb-3 text-sm font-semibold">
