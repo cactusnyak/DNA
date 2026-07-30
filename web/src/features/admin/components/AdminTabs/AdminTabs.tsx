@@ -66,7 +66,7 @@ export function AdminTabs({
                       key={tab.id}
                       type="button"
                       className={[
-                        'flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-b-2 p-2 text-xs font-medium transition-colors sm:gap-2 sm:px-3 sm:text-sm',
+                        'flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-b-2 p-2 text-xs font-medium sm:gap-2 sm:px-3 sm:text-sm',
                         isActive
                           ? 'border-foreground text-foreground'
                           : 'border-transparent text-muted-foreground hover:text-foreground',

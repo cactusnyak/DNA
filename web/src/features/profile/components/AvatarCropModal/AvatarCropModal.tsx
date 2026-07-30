@@ -101,7 +101,7 @@ export function AvatarCropModal({
           <div className="flex justify-end gap-3">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               disabled={isProcessing}
               onClick={onClose}
             >

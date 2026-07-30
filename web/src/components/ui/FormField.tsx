@@ -114,13 +114,13 @@ type FormImageFilesFieldProps = FormFieldBaseProps & {
 };
 
 const TEXTAREA_CLASS_NAME =
-  'w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm leading-5 outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
+  'w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm leading-5 outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 const SELECT_TRIGGER_CLASS_NAME =
-  'flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm outline-none transition-colors hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
+  'flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm outline-none hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 const FILE_DROPZONE_CLASS_NAME =
-  'flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center transition-colors hover:border-ring hover:bg-muted/50';
+  'flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center hover:border-ring hover:bg-muted/50';
 
 function FormFieldRoot({
   label,
@@ -332,7 +332,7 @@ export function FormSelectField({
 
           <ChevronDown
             className={[
-              'size-4 shrink-0 text-muted-foreground transition-transform',
+              'size-4 shrink-0 text-muted-foreground',
               isOpen && 'rotate-180',
             ].filter(Boolean).join(' ')}
             strokeWidth={1.5}
@@ -359,7 +359,7 @@ export function FormSelectField({
                   aria-selected={isSelected}
                   disabled={option.disabled}
                   className={[
-                    'flex w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-left transition-colors',
+                    'flex w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-left',
                     'hover:bg-muted hover:text-foreground',
                     'disabled:cursor-not-allowed disabled:opacity-50',
                     isSelected && 'bg-muted text-foreground',
@@ -426,8 +426,8 @@ export function FormBooleanField({
       disabled={disabled}
       className={[
         variant === 'toggle'
-          ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm transition-colors hover:border-ring'
-          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors',
+          ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm hover:border-ring'
+          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground',
         variant === 'checkbox' && (checked || indeterminate) && 'border-primary bg-primary',
         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
@@ -443,13 +443,13 @@ export function FormBooleanField({
 
           <span
             className={[
-              'flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors',
+              'flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 ',
               checked ? 'bg-primary' : 'bg-muted',
             ].filter(Boolean).join(' ')}
           >
             <span
               className={[
-                'size-5 rounded-full bg-background shadow-sm transition-transform',
+                'size-5 rounded-full bg-background shadow-sm ',
                 checked && 'translate-x-5',
               ].filter(Boolean).join(' ')}
             />
@@ -565,7 +565,7 @@ export function FormImageFileField({
               <button
                 type="button"
                 disabled={disabled}
-                className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleClear}
               >
                 <Trash2 className="size-3.5" strokeWidth={1.5} />
@@ -686,7 +686,7 @@ export function FormImageFilesField({
                     type="button"
                     disabled={disabled}
                     aria-label="Удалить изображение"
-                    className="absolute right-2 top-2 inline-flex size-7 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground shadow-sm transition-colors hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+                    className="absolute right-2 top-2 inline-flex size-7 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground shadow-sm hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => removeExistingImage(index)}
                   >
                     <X className="size-4" strokeWidth={1.5} />
@@ -715,7 +715,7 @@ export function FormImageFilesField({
                     type="button"
                     disabled={disabled}
                     aria-label="Удалить изображение"
-                    className="absolute right-2 top-2 inline-flex size-7 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground shadow-sm transition-colors hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+                    className="absolute right-2 top-2 inline-flex size-7 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground shadow-sm hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => removeFile(index)}
                   >
                     <X className="size-4" strokeWidth={1.5} />

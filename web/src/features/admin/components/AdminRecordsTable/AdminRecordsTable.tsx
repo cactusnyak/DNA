@@ -149,7 +149,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
       <tr
         key={key}
         className={[
-          'align-top transition-colors',
+          'align-top ',
           isDeleted && 'bg-muted/30 text-muted-foreground',
           isSelected && 'bg-primary/5',
           depthBg,
@@ -221,7 +221,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 <div>
                   <ChevronRight
                     className={[
-                      'size-4 text-muted-foreground transition-transform',
+                      'size-4 text-muted-foreground ',
                       isFiltersOpen && 'rotate-90',
                     ].filter(Boolean).join(' ')}
                     strokeWidth={1.5}
@@ -232,7 +232,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               {hasActiveFilters && (
                 <button
                   type="button"
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-background hover:text-foreground"
                   onClick={resetFilters}
                 >
                   <RotateCcw className="size-3.5" strokeWidth={1.5} />
@@ -270,7 +270,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                           <button
                             type="button"
                             className={[
-                              'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                              'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium ',
                               !filterValue
                                 ? 'border-foreground bg-foreground text-background'
                                 : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
@@ -288,7 +288,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                                 key={option.value}
                                 type="button"
                                 className={[
-                                  'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                                  'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium ',
                                   isActive
                                     ? 'border-foreground bg-foreground text-background'
                                     : 'border-border text-muted-foreground hover:bg-background hover:text-foreground',
@@ -476,7 +476,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                     >
                       <span
                         className={[
-                          'h-6 w-0.5 rounded-full bg-muted-foreground/45 opacity-0 transition-opacity',
+                          'h-6 w-0.5 rounded-full bg-muted-foreground/45 opacity-0 ',
                           'group-hover:opacity-100',
                           isResizing && 'opacity-100',
                         ].filter(Boolean).join(' ')}

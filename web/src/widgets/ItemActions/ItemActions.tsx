@@ -30,7 +30,7 @@ type ItemActionsProps = {
 export function ItemActions({
   itemType,
   item,
-  variant = 'card',
+  variant = 'secondary',
   showAddToCartButton = true,
   showBuyNowButton = true,
   showFavouriteButton = false,

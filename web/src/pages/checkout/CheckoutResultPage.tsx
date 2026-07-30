@@ -89,7 +89,7 @@ export function CheckoutResultPage() {
             </Button>
           )}
 
-          <Button asChild variant="outline">
+          <Button asChild variant="secondary">
             <Link to="/">На главную</Link>
           </Button>
         </div>

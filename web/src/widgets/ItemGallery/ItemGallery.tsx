@@ -72,7 +72,7 @@ export function ItemGallery({ images, title }: ItemGalleryProps) {
           src={image.url}
           alt={image.alt ?? title}
           className={[
-            'absolute inset-0 size-full object-cover transition-opacity duration-150',
+            'absolute inset-0 size-full object-cover ',
             index === activeIndex ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         />
@@ -84,7 +84,7 @@ export function ItemGallery({ images, title }: ItemGalleryProps) {
             <span
               key={index}
               className={[
-                'w-3 h-0.5 flex-1 rounded-full transition-colors',
+                'w-3 h-0.5 flex-1 rounded-full ',
                 index === activeIndex ? 'bg-foreground' : 'bg-background/70',
               ].join(' ')}
             />

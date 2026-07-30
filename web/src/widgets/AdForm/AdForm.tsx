@@ -399,7 +399,7 @@ export function AdForm({
         {onCancel && (
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             disabled={isFormPending}
             onClick={onCancel}
           >

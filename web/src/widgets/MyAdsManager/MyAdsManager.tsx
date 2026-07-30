@@ -126,7 +126,7 @@ export function MyAdsManager() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="secondary" size="sm">
                 <Link to={`/ads/my/${ad.id}/edit`}>Редактировать</Link>
               </Button>
 

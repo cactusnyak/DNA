@@ -28,13 +28,13 @@ export function FavouriteButtonBase({
         toggle();
       }}
       className={[
-        'group/fav flex cursor-pointer items-center justify-center p-1 backdrop-blur-sm transition-colors disabled:opacity-50',
+        'group/fav flex cursor-pointer items-center justify-center p-1 backdrop-blur-sm disabled:opacity-50',
         className,
       ].filter(Boolean).join(' ')}
     >
       <Heart
         className={[
-          'size-4 transition-colors',
+          'size-4 ',
           isFavourite
             ? 'fill-red-500 stroke-red-500'
             : `fill-transparent ${inactiveIconClassName} group-hover/fav:stroke-red-400`,

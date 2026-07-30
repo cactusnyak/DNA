@@ -20,7 +20,7 @@ export function ReferralEarningCategories({
             key={category.id}
             type="button"
             className={[
-              'flex flex-1 cursor-pointer items-center justify-center border p-3 text-center transition-colors duration-300 sm:rounded-2xl sm:p-4',
+              'flex flex-1 cursor-pointer items-center justify-center border p-3 text-center sm:rounded-2xl sm:p-4',
               'rounded-xl',
               isActive
                 ? 'border-primary bg-primary text-primary-foreground'

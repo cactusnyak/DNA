@@ -239,7 +239,7 @@ export function AuthorizationForm({
                       <Button
                         key={item.id}
                         type="button"
-                        variant="outline"
+                        variant="secondary"
                         className="w-full"
                         onClick={() =>
                           window.location.assign(

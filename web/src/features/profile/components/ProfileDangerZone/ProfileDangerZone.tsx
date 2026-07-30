@@ -34,7 +34,7 @@ export function ProfileDangerZone({
 
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             className="mt-4 w-full sm:w-auto"
             onClick={onLogout}
           >

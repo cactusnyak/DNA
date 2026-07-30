@@ -183,7 +183,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
               : 'Проверить доступность оплаты'}
           </Button>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="secondary">
             <Link to="/market/catalog">Вернуться в каталог</Link>
           </Button>
         </div>

@@ -12,7 +12,7 @@ export function SellerPage() {
         description="Кабинет продавца пока находится в разработке."
       />
 
-      <Button asChild variant="outline">
+      <Button asChild variant="secondary">
         <Link to="/market/catalog">Посмотреть каталог Маркета</Link>
       </Button>
     </ContentCard>

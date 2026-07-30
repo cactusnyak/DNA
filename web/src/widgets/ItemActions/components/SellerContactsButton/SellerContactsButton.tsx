@@ -38,7 +38,7 @@ export function SellerContactsButton({
     <>
       <Button
         type="button"
-        variant="outline"
+        variant="secondary"
         size={variant === 'details' ? 'lg' : 'default'}
         className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
         onClick={() => setIsModalOpen(true)}

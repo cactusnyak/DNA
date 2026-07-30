@@ -76,14 +76,14 @@ export function CatalogDropdownProducts({
               key={item.id}
               to={item.to}
               onClick={onProductClick}
-              className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/30"
+              className="group overflow-hidden rounded-lg border border-border bg-card hover:border-foreground/30"
             >
               <div className="aspect-square overflow-hidden bg-muted">
                 {item.image && (
                   <img
                     src={item.image.url}
                     alt={item.image.alt ?? item.title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="h-full w-full object-cover group-hover:scale-105"
                   />
                 )}
               </div>

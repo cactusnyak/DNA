@@ -56,7 +56,7 @@ export function ProductAdditionsSelector({
                     <button
                       key={String(value)}
                       type="button"
-                      className={`h-6 cursor-pointer rounded-md border px-3 text-xs font-medium transition-colors ${selection?.type === 'boolean' && selection.value === value
+                      className={`h-6 cursor-pointer rounded-md border px-3 text-xs font-medium ${selection?.type === 'boolean' && selection.value === value
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border bg-background hover:bg-muted'
                         }`}
@@ -78,7 +78,7 @@ export function ProductAdditionsSelector({
                   step={1}
                   min={addition.min}
                   max={addition.max ?? undefined}
-                  className="h-7 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
+                  className="h-7 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
                   value={selection?.type === 'quantity' ? selection.value : ''}
                   onChange={(event) => {
                     if (event.target.value === '') {

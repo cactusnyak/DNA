@@ -34,7 +34,7 @@ export function ReferralGuestLanding() {
               <Link to="/authorization">
                 Войти или зарегистрироваться
                 <ArrowRight
-                  className="size-4 transition-transform group-hover/button:translate-x-1"
+                  className="size-4 group-hover/button:translate-x-1"
                   aria-hidden="true"
                 />
               </Link>

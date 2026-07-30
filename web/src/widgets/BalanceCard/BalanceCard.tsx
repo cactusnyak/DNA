@@ -21,7 +21,7 @@ export function BalanceCard({
   return (
     <section
       className={[
-        'balance-card-surface relative isolate w-full min-w-min shrink-0 overflow-hidden rounded-3xl border border-white/15 p-5 text-white shadow-balance-card backdrop-blur-2xl transition-all duration-500 sm:p-6',
+        'balance-card-surface relative isolate w-full min-w-min shrink-0 overflow-hidden rounded-3xl border border-white/15 p-5 text-white shadow-balance-card backdrop-blur-2xl sm:p-6',
         className,
       ].filter(Boolean).join(' ')}
     >
