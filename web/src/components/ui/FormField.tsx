@@ -40,6 +40,8 @@ type FormInputFieldProps = FormFieldBaseProps & {
   inputMode?: ComponentProps<'input'>['inputMode'];
   disabled?: boolean;
   minLength?: number;
+  maxLength?: number;
+  pattern?: string;
   min?: number;
   max?: number;
   step?: number;
@@ -171,6 +173,8 @@ export function FormInputField({
   inputMode,
   disabled = false,
   minLength,
+  maxLength,
+  pattern,
   min,
   max,
   step,
@@ -194,6 +198,8 @@ export function FormInputField({
         inputMode={inputMode}
         value={value}
         minLength={minLength}
+        maxLength={maxLength}
+        pattern={pattern}
         min={min}
         max={max}
         step={step}

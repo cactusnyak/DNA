@@ -10,9 +10,9 @@ type ScrollHideBreakpoint = {
 };
 
 const SCROLL_HIDE_BREAKPOINTS: ScrollHideBreakpoint[] = [
-  { minWidth: 1024, topOffset: 80, hideThreshold: 4,  showThreshold: 2  },
-  { minWidth: 768,  topOffset: 60, hideThreshold: 8,  showThreshold: 6  },
-  { minWidth: 0,    topOffset: 40, hideThreshold: 16, showThreshold: 12 },
+  { minWidth: 1024, topOffset: 80, hideThreshold: 15, showThreshold: 10 },
+  { minWidth: 768, topOffset: 40, hideThreshold: 15, showThreshold: 30 },
+  { minWidth: 0, topOffset: 20, hideThreshold: 10, showThreshold: 40 },
 ];
 
 function getBreakpoint(): ScrollHideBreakpoint {

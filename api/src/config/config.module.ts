@@ -63,6 +63,67 @@ import * as Joi from 'joi';
         SMTP_PASS: Joi.string().allow('').optional(),
         SMTP_FROM: Joi.string().email().default('noreply@dna.ru'),
         OTP_LOG_CODES: Joi.boolean().default(false),
+        OTP_DELIVERY_PROVIDER: Joi.string()
+          .valid('console', 'sms_ru')
+          .default('console'),
+        OTP_CODE_TTL_SECONDS: Joi.number()
+          .integer()
+          .min(60)
+          .max(86400)
+          .default(300),
+        OTP_RESEND_COOLDOWN_SECONDS: Joi.number()
+          .integer()
+          .min(1)
+          .max(3600)
+          .default(60),
+        OTP_MAX_VERIFY_ATTEMPTS: Joi.number()
+          .integer()
+          .min(1)
+          .max(20)
+          .default(5),
+        OTP_MAX_SENDS_PER_PHONE_PER_HOUR: Joi.number()
+          .integer()
+          .min(1)
+          .max(100)
+          .default(5),
+        OTP_MAX_SENDS_PER_IP_PER_HOUR: Joi.number()
+          .integer()
+          .min(1)
+          .max(1000)
+          .default(15),
+        OTP_HASH_SECRET: Joi.string().min(32).required(),
+        SMS_RU_API_ID: Joi.string().when('OTP_DELIVERY_PROVIDER', {
+          is: 'sms_ru',
+          then: Joi.required(),
+          otherwise: Joi.string().allow('').optional(),
+        }),
+        SMS_RU_BASE_URL: Joi.string()
+          .uri({ scheme: ['https'] })
+          .default('https://sms.ru'),
+        SMS_RU_SENDER_NAME: Joi.string().when('OTP_DELIVERY_PROVIDER', {
+          is: 'sms_ru',
+          then: Joi.required(),
+          otherwise: Joi.string().allow('').optional(),
+        }),
+        SMS_RU_OTP_MESSAGE_TEMPLATE: Joi.string()
+          .custom((value: string, helpers) => {
+            return value.split('{code}').length === 2
+              ? value
+              : helpers.error('string.otpTemplate');
+          })
+          .default('Код для входа в DNA: {code}'),
+        SMS_RU_TEST_MODE: Joi.boolean().default(true),
+        SMS_RU_REQUEST_TIMEOUT_MS: Joi.number()
+          .integer()
+          .min(100)
+          .max(30000)
+          .default(10000),
+        SMS_RU_WEBHOOK_TOKEN: Joi.string().allow('').optional(),
+        SMS_RU_WEBHOOK_URL: Joi.string()
+          .uri({ scheme: ['https'] })
+          .allow('')
+          .optional(),
+        TRUST_PROXY: Joi.boolean().default(false),
         HARD_DELETE_ORDERS_ENABLED: Joi.boolean().default(false),
       }),
       validationOptions: {

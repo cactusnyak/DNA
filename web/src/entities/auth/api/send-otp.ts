@@ -8,7 +8,7 @@ export type SendOtpPayload = {
 };
 
 export function sendOtp(payload: SendOtpPayload) {
-  return httpClient<{ expiresInSeconds: number }>('/auth/otp/send', {
+  return httpClient<{ expiresInSeconds: number; resendAfterSeconds: number }>('/auth/otp/send', {
     method: 'POST',
     body: payload,
   });

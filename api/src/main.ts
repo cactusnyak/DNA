@@ -15,6 +15,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const webAppUrl = configService.getOrThrow<string>('WEB_APP_URL');
 
+  if (configService.get<boolean>('TRUST_PROXY')) {
+    app.set('trust proxy', 1);
+  }
+
   app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 
 import { MainNavigation } from '@/widgets/MainNavigation/MainNavigation';
-import { setHeaderHeight } from '@/shared/header';
+import {
+  HEADER_ANIMATION_DURATION_MS,
+  HEADER_ANIMATION_EASING,
+  setHeaderHeight,
+} from '@/shared/header';
 import { useActivePlatformSection } from '@/shared/platform';
 
 import { DesktopHeaderControls } from './components/DesktopHeaderControls';
@@ -46,6 +50,8 @@ export function Header() {
       className="fixed top-0 left-0 right-0 z-40 border-b border-border/50 bg-background/90 backdrop-blur-xl w-full"
       style={{
         transform: isHidden ? 'translateY(-100%)' : 'translateY(0)',
+        transition: `transform ${HEADER_ANIMATION_DURATION_MS}ms ${HEADER_ANIMATION_EASING}`,
+        willChange: 'transform',
       }}
       onMouseLeave={closeCatalogDropdown}
     >

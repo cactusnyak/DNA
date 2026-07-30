@@ -11,6 +11,12 @@ function getActiveGalleryImage(images: Image[], activeIndex: number) {
   return images[activeIndex] ?? images[0];
 }
 
+function canZoomGallery() {
+  return window.matchMedia(
+    '(min-width: 640px) and (hover: hover) and (pointer: fine)',
+  ).matches;
+}
+
 export function Gallery({ images, title }: GalleryProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
@@ -19,6 +25,11 @@ export function Gallery({ images, title }: GalleryProps) {
   const activeImage = getActiveGalleryImage(images, activeImageIndex);
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
+    if (!canZoomGallery()) {
+      setIsZoomed(false);
+      return;
+    }
+
     const rect = event.currentTarget.getBoundingClientRect();
 
     setZoomPosition({
@@ -67,7 +78,7 @@ export function Gallery({ images, title }: GalleryProps) {
 
       <div
         className="relative order-1 aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-muted sm:order-2 sm:max-h-[32rem] sm:rounded-2xl sm:cursor-zoom-in"
-        onMouseEnter={() => setIsZoomed(true)}
+        onMouseEnter={() => setIsZoomed(canZoomGallery())}
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}
       >

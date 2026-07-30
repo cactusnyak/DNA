@@ -79,16 +79,31 @@ model User {
 }
 
 model OtpCode {
-  id        String   @id @default(uuid())
-  login     String
-  type      String
-  code      String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id                  String   @id @default(uuid())
+  login               String
+  type                String
+  purpose             String   @default("login")
+  codeHash             String?
+  expiresAt            DateTime
+  verifyAttempts       Int      @default(0)
+  consumedAt           DateTime?
+  provider             String?
+  providerMessageId    String?  @unique
+  providerStatusCode   Int?
+  deliveryStatus       String?
+  providerErrorCode    String?
+  sentAt               DateTime?
+  deliveredAt          DateTime?
+  failedAt             DateTime?
+  clientIpHash         String?
+  createdAt            DateTime @default(now())
+
+  // Kept nullable for a rolling migration; new code never writes plaintext OTP.
+  code String?
 
   @@index([login])
-  @@index([code])
-  @@index([login, code])
+  @@index([login, createdAt])
+  @@index([clientIpHash, createdAt])
 }
 
 model Favourite {

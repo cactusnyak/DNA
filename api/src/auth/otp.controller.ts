@@ -1,4 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
+import type { Request } from 'express';
+import { isIP } from 'node:net';
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 
@@ -13,8 +15,9 @@ export class OtpController {
 
   @Post('send')
   @Throttle({ default: { limit: 3, ttl: 60_000 } })
-  send(@Body() sendOtpDto: SendOtpDto) {
-    return this.otpService.sendOtp(sendOtpDto);
+  send(@Body() sendOtpDto: SendOtpDto, @Req() request: Request) {
+    const clientIp = request.ip && isIP(request.ip) ? request.ip : undefined;
+    return this.otpService.sendOtp(sendOtpDto, clientIp);
   }
 
   @Post('verify')
