@@ -9,27 +9,22 @@ type ProductDetailsInfoProps = {
   product: Product;
 };
 
-const categoryBadgeClass =
-  'inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground w-fit';
-
 export function ProductDetailsInfo({ product }: ProductDetailsInfoProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <header className="flex flex-col gap-2">
-        <div className='px-3 py-2.5 bg-primary/10 w-fit rounded-tl-3xl rounded-br-3xl'>
-          <Link
-            to={getPlatformCategoryHref(
-              'market',
-              product.category.path ?? product.category.slug,
-            )}
-            className={categoryBadgeClass}
-          >
-            {product.category.name}
-          </Link>
-        </div>
+        <Link
+          to={getPlatformCategoryHref(
+            'market',
+            product.category.path ?? product.category.slug,
+          )}
+          className='w-fit underline-offset-4 hover:underline text-muted-foreground hover:text-foreground text-sm'
+        >
+          {product.category.name}
+        </Link>
       </header>
 
-      <div className="flex flex-col gap-2 px-5 py-2">
+      <div className="flex flex-col gap-2">
         <div>
           <h1 className="text-2xl font-semibold">{product.title}</h1>
           <p className="text-3xl font-semibold">
