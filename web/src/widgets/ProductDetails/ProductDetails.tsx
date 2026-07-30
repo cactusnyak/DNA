@@ -33,7 +33,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <Gallery images={product.images} title={product.title} />
 
-      <div className="flex flex-col gap-5 md:rounded-3xl md:bg-white md:shadow-card-2xl">
+      <div className="flex flex-col gap-5 md:rounded-3xl md:bg-white md:shadow-card-2xl p-5">
         <ProductDetailsInfo product={product} />
         {(product.additions?.length ?? 0) > 0 && (
           <div className="flex flex-col gap-6">
@@ -43,12 +43,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               errors={showErrors ? errors : {}}
               onChange={setSelectedAdditions}
             />
-            <p className="text-xl font-semibold px-5">
+            <p className="text-xl font-semibold">
               Итого за единицу: {formatPrice(configuredUnitPrice)}
             </p>
           </div>
         )}
-        <div className="p-5">
+        <div className="">
           <ProductDetailsActions
             product={product}
             selectedAdditions={selectedAdditions}

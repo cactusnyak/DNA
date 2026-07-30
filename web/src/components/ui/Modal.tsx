@@ -117,7 +117,7 @@ export function Modal({
             role="button"
             tabIndex={0}
             aria-label="Закрыть модальное окно"
-            className="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={onClose}
             onKeyDown={handleCloseKeyDown}
           >

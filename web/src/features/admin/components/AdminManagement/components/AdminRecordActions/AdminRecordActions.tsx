@@ -59,7 +59,7 @@ export function AdminRecordActions({
     <div className="flex flex-wrap justify-end gap-2">
       <Button
         type="button"
-        variant="outline"
+        variant="secondary"
         size="icon-sm"
         aria-label={editLabel}
         title={editLabel}
@@ -71,7 +71,7 @@ export function AdminRecordActions({
       {activeTabId !== 'orders' && !isUsersTab && canRestore && (
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           size="icon-sm"
           aria-label="Восстановить запись"
           title="Восстановить запись"

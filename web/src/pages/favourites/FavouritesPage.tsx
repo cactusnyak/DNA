@@ -173,7 +173,7 @@ function EmptyState({
   return (
     <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-4">
       <p className="text-sm text-muted-foreground">{text}</p>
-      <Button asChild variant="outline">
+      <Button asChild variant="secondary">
         <Link to={to}>{linkLabel}</Link>
       </Button>
     </div>

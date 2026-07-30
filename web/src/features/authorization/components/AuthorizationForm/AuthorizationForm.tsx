@@ -178,6 +178,7 @@ export function AuthorizationForm({
           <div className="flex flex-col gap-3">
             <Button
               type="submit"
+              variant="accent"
               size="lg"
               className="w-full"
               disabled={isPending}
@@ -209,6 +210,7 @@ export function AuthorizationForm({
           <>
             <Button
               type="submit"
+              variant="accent"
               size="lg"
               className="w-full"
               disabled={isPending}
@@ -239,7 +241,7 @@ export function AuthorizationForm({
                       <Button
                         key={item.id}
                         type="button"
-                        variant="outline"
+                        variant="secondary"
                         className="w-full"
                         onClick={() =>
                           window.location.assign(

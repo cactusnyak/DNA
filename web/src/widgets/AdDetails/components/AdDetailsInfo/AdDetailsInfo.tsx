@@ -10,7 +10,7 @@ type AdDetailsInfoProps = {
 };
 
 const categoryBadgeClass =
-  'inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground w-fit';
+  'inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground w-fit';
 
 export function AdDetailsInfo({ ad }: AdDetailsInfoProps) {
   return (

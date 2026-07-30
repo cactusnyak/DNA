@@ -78,7 +78,7 @@ export function Cart() {
 
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 className="w-full p-4 rounded-lg"
                 onClick={clearAdItems}

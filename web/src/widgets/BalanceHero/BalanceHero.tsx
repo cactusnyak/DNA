@@ -55,7 +55,7 @@ export function BalanceHero({
           src={balanceIllustration}
           alt=""
           loading="lazy"
-          className="pointer-events-none absolute z-10 hidden max-w-none select-none object-contain drop-shadow-[0_36px_45px_rgba(99,102,241,0.45)] transition-all duration-700 ease-out lg:-right-[1%] lg:top-[50%] lg:block lg:w-[75%] lg:max-w-none lg:scale-[1] lg:-translate-y-1/2 xl:scale-[1] xl:-translate-y-1/2"
+          className="pointer-events-none absolute z-10 hidden max-w-none select-none object-contain drop-shadow-[0_36px_45px_rgba(99,102,241,0.45)] lg:-right-[1%] lg:top-[50%] lg:block lg:w-[75%] lg:max-w-none lg:scale-[1] lg:-translate-y-1/2 xl:scale-[1] xl:-translate-y-1/2"
         />
       )}
 

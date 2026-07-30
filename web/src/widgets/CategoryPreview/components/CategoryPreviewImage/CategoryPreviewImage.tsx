@@ -17,7 +17,7 @@ export function CategoryPreviewImage({
       <img
         src={category.image.url}
         alt={category.image.alt ?? category.name}
-        className={`${categoryPreviewSizeClassName} object-cover transition-transform duration-300 group-hover:scale-105`}
+        className={`${categoryPreviewSizeClassName} object-cover group-hover:scale-105`}
       />
     );
   }

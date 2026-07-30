@@ -70,7 +70,7 @@ export function CartSummary({
               </span>
             </div>
 
-            <Button asChild size="lg" className="w-full">
+            <Button asChild variant="accent" size="lg" className="w-full">
               <Link to="/checkout">Оформить заказ Маркета</Link>
             </Button>
 

@@ -39,7 +39,7 @@ export function CollapsedAncestors({
             to={getPlatformCatalogHref(section)}
             onClick={onCategoryClick}
             onMouseEnter={() => onActiveCategoryChange(undefined)}
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             <MoreHorizontal className="size-4 shrink-0" />
             <span className="line-clamp-1">Все категории</span>
@@ -52,7 +52,7 @@ export function CollapsedAncestors({
               to={getCategoryHref(categories, category.id, section)}
               onClick={onCategoryClick}
               onMouseEnter={() => onActiveCategoryChange(category.slug)}
-              className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <span className="line-clamp-1">{category.name}</span>
               <ChevronRight className="size-4 shrink-0" />
@@ -63,4 +63,3 @@ export function CollapsedAncestors({
     </div>
   );
 }
-

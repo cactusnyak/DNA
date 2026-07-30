@@ -17,7 +17,7 @@ export function MarketPage() {
         />
 
         <div className="mt-5 flex flex-wrap gap-3">
-          <Button asChild>
+          <Button asChild variant="accent">
             <Link to="/market/catalog">Перейти в каталог</Link>
           </Button>
 

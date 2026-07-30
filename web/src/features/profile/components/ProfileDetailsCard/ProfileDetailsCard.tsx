@@ -32,7 +32,7 @@ export function ProfileDetailsCard({
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold">Личные данные</h2>
 
-        <Button className='gap-2' type="button" variant="outline" size="sm" onClick={onEdit}>
+        <Button className='gap-2' type="button" variant="secondary" size="sm" onClick={onEdit}>
           <Pencil className="size-3.5" strokeWidth={1.5} />
           Редактировать
         </Button>
@@ -59,7 +59,7 @@ export function ProfileDetailsCard({
 
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="icon-sm"
             title={user.avatar ? 'Изменить аватар' : 'Добавить аватар'}
             aria-label={user.avatar ? 'Изменить аватар' : 'Добавить аватар'}

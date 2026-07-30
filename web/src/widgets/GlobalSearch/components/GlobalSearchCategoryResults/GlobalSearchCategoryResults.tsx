@@ -79,7 +79,7 @@ export function GlobalSearchCategoryResults({
               key={`${section}-${category.id}`}
               to={getCategoryHref(allCategories, category.id, section)}
               onClick={onNavigate}
-              className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-xl p-2 transition-colors hover:bg-muted"
+              className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-xl p-2 hover:bg-muted"
             >
               <div className="size-14 overflow-hidden rounded-md bg-muted">
                 {category.image ? (

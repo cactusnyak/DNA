@@ -114,6 +114,7 @@ export function ItemActions({
       {isProduct && showBuyNowButton && (
         <Button
           type="button"
+          variant='accent'
           size={variant === 'details' ? 'lg' : 'default'}
           className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
           onClick={handleBuyNow}

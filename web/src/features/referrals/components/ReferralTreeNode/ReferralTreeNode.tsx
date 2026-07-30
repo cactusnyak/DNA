@@ -24,7 +24,7 @@ export function ReferralTreeNode({ user, isLast: _isLast = false }: ReferralTree
       </div>
 
       <div className="w-fit">
-        <article className="w-fit rounded-xl bg-muted/50 px-4 py-3 transition-colors hover:bg-muted/80">
+        <article className="w-fit rounded-xl bg-muted/50 px-4 py-3 hover:bg-muted/80">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
               <p className="text-sm">{displayName}</p>

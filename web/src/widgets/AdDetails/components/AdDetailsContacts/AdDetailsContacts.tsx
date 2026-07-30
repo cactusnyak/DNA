@@ -6,7 +6,7 @@ type AdDetailsContactsProps = {
 };
 
 const contactBadgeClass =
-  'inline items-center rounded-md bg-muted/60 px-3 py-1.5 text-sm font-medium text-foreground transition-colors';
+  'inline items-center rounded-md bg-muted/60 px-3 py-1.5 text-sm font-medium text-foreground ';
 
 function getContactValues(ad: Ad): string[] {
   return [

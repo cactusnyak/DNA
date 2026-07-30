@@ -76,20 +76,20 @@ export function CheckoutResultPage() {
 
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           {status === 'failed' ? (
-            <Button asChild>
+            <Button asChild variant="accent">
               <Link to="/checkout">Вернуться к оформлению</Link>
             </Button>
           ) : accessToken ? (
-            <Button asChild>
+            <Button asChild variant="accent">
               <Link to="/profile">Мои заказы</Link>
             </Button>
           ) : (
-            <Button asChild>
+            <Button asChild variant="accent">
               <Link to="/market/catalog">Вернуться в каталог</Link>
             </Button>
           )}
 
-          <Button asChild variant="outline">
+          <Button asChild variant="secondary">
             <Link to="/">На главную</Link>
           </Button>
         </div>

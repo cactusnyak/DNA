@@ -11,7 +11,7 @@ type CartAdItemCardProps = {
 };
 
 const contactBadgeClass =
-  'inline items-center rounded-md bg-muted/60 px-2 py-1 text-xs font-medium text-foreground transition-colors sm:px-3 sm:py-1.5 sm:text-sm';
+  'inline items-center rounded-md bg-muted/60 px-2 py-1 text-xs font-medium text-foreground sm:px-3 sm:py-1.5 sm:text-sm';
 
 function getContactValues(ad: CartAdItem['ad']): string[] {
   return [

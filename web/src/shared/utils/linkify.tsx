@@ -15,7 +15,7 @@ function ResourceLink({ href, children }: ResourceLinkProps) {
       href={href}
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
-      className="text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+      className="text-blue-600 hover:text-blue-800 hover:underline"
     >
       {children}
     </a>
@@ -106,7 +106,7 @@ function getContactLink(value: string, renderAsLink = true): ReactNode | null {
     return (
       <span
         role="link"
-        className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+        className="text-blue-600 hover:text-blue-800 hover:underline "
       >
         {value}
       </span>

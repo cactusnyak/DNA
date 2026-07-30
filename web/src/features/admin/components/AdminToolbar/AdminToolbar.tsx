@@ -54,6 +54,7 @@ export function AdminToolbar({
         {canCreate && (
           <Button
             type="button"
+            variant="accent"
             className="h-auto w-full cursor-pointer rounded-xl px-4 py-2 lg:w-auto"
             onClick={onCreateClick}
           >

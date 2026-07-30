@@ -63,7 +63,7 @@ export function Referrals() {
 
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           className="mt-5"
           onClick={clearAccessToken}
         >

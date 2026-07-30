@@ -14,7 +14,7 @@ export function CheckoutEmptyState() {
         </p>
       </div>
 
-      <Button asChild>
+      <Button asChild variant="accent">
         <Link to="/market/catalog">Перейти в каталог</Link>
       </Button>
     </section>

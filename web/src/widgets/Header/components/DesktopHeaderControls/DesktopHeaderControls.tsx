@@ -34,8 +34,9 @@ function CatalogButton({
     <Button
       type="button"
       asChild
+      variant="accent"
+      aria-expanded={isActive}
       onMouseEnter={onMouseEnter}
-      className={[isActive && 'bg-white text-foreground border border-border hover:bg-white'].filter(Boolean).join(' ')}
     >
       <Link to={to} onClick={onClick}>
         {label}

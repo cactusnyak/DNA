@@ -9,7 +9,7 @@ export function TextLink({ className, muted = true, ...props }: TextLinkProps) {
   return (
     <Link
       className={[
-        'underline-offset-4 transition-colors hover:underline',
+        'underline-offset-4 hover:underline',
         muted
           ? 'text-muted-foreground hover:text-foreground'
           : 'text-foreground hover:text-foreground/80',

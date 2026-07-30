@@ -22,7 +22,7 @@ export function CatalogHeader({
       <h1 className="text-2xl font-semibold">{title}</h1>
 
       {showCatalogLink && (
-        <Button asChild variant="outline">
+        <Button asChild variant="secondary">
           <Link to={getPlatformCatalogHref(section)}>Перейти в каталог</Link>
         </Button>
       )}

@@ -23,7 +23,7 @@ export function CollectionQuickCreate({
         onChange={(event) => onChange(event.target.value)}
       />
 
-      <Button type="button" variant="outline" onClick={onCreate}>
+      <Button type="button" variant="secondary" onClick={onCreate}>
         Быстро создать
       </Button>
     </div>

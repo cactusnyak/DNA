@@ -28,7 +28,7 @@ export function GlobalSearchSectionResults({
               key={section.id}
               to={section.href}
               onClick={onNavigate}
-              className="rounded-lg px-3 py-2 transition-colors hover:bg-muted"
+              className="rounded-lg px-3 py-2 hover:bg-muted"
             >
               <p className="text-sm font-medium">{section.title}</p>
 

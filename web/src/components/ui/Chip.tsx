@@ -15,7 +15,7 @@ export function Chip({
     <button
       type="button"
       className={[
-        'inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-sm leading-none transition-colors',
+        'inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-sm leading-none',
         active
           ? 'border-foreground bg-foreground text-background'
           : 'border-border bg-background text-foreground hover:bg-muted',

@@ -47,7 +47,7 @@ export function Gallery({ images, title }: GalleryProps) {
                 key={image.id}
                 type="button"
                 className={[
-                  'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted transition-colors sm:size-16 sm:rounded-xl',
+                  'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted sm:size-16 sm:rounded-xl',
                   isActive
                     ? 'border-foreground'
                     : 'border-border hover:border-foreground/40',
@@ -81,7 +81,7 @@ export function Gallery({ images, title }: GalleryProps) {
         <img
           src={activeImage.url}
           alt={activeImage.alt ?? title}
-          className="relative size-full object-contain transition-transform duration-200"
+          className="relative size-full object-contain "
           style={{
             transform: isZoomed ? 'scale(1.4)' : 'scale(1)',
             transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
