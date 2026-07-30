@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { HttpError } from '@/shared/api/http-client';
 
 import {
   getCurrentUser,
@@ -56,6 +57,7 @@ export function Authorization() {
   );
 
   const [step, setStep] = useState<AuthorizationStep>('login');
+  const [resendSeconds, setResendSeconds] = useState(0);
 
   const [formValue, setFormValue] = useState<AuthorizationFormValue>(() =>
     getInitialAuthorizationFormValue({
@@ -120,8 +122,9 @@ export function Authorization() {
 
   const sendOtpMutation = useMutation({
     mutationFn: () => sendOtp(buildSendOtpPayload(formValue, mode)),
-    onSuccess: () => {
+    onSuccess: (response) => {
       setStep('otp');
+      setResendSeconds(response.resendAfterSeconds);
     },
   });
 
@@ -140,6 +143,12 @@ export function Authorization() {
       navigate('/profile', { replace: true });
     },
   });
+
+  useEffect(() => {
+    if (resendSeconds <= 0) return;
+    const timeout = window.setTimeout(() => setResendSeconds((value) => Math.max(0, value - 1)), 1000);
+    return () => window.clearTimeout(timeout);
+  }, [resendSeconds]);
 
   useEffect(() => {
     if (!referralCodeFromUrl) {
@@ -174,6 +183,7 @@ export function Authorization() {
   }
 
   function handleSendOtp() {
+    if (sendOtpMutation.isPending || resendSeconds > 0) return;
     sendOtpMutation.mutate();
   }
 
@@ -181,12 +191,14 @@ export function Authorization() {
     verifyOtpMutation.mutate();
   }
 
-  const errorMessage =
-    sendOtpMutation.error ||
-      verifyOtpMutation.error ||
-      oauthMutation.error
-      ? 'Не удалось выполнить действие. Проверьте данные и попробуйте ещё раз.'
-      : oauthError ?? undefined;
+  const requestError = sendOtpMutation.error || verifyOtpMutation.error || oauthMutation.error;
+  const errorMessage = requestError instanceof HttpError && requestError.status === 429
+    ? 'Слишком много попыток. Подождите и попробуйте снова.'
+    : requestError instanceof HttpError && requestError.status >= 500
+      ? 'Сервис отправки временно недоступен. Попробуйте позже.'
+      : requestError
+        ? 'Неверный или истёкший код либо данные не удалось подтвердить.'
+        : oauthError ?? undefined;
 
   return (
     <AuthorizationForm
@@ -199,6 +211,7 @@ export function Authorization() {
         oauthMutation.isPending
       }
       errorMessage={errorMessage}
+      resendSeconds={resendSeconds}
       availableOAuthProviders={
         availableOAuthProviders?.length
           ? availableOAuthProviders

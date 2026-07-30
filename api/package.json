@@ -24,7 +24,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "tsx prisma/seeds/default/seed.ts",
     "seed:images": "tsx prisma/seeds/default/seed-images.ts",
-    "seed:production": "tsx prisma/seeds/production/seed.ts"
+    "seed:production": "tsx prisma/seeds/production/seed.ts",
+    "sms-ru:check": "tsx scripts/sms-ru.ts check",
+    "sms-ru:callback:list": "tsx scripts/sms-ru.ts callback:list",
+    "sms-ru:callback:add": "tsx scripts/sms-ru.ts callback:add",
+    "sms-ru:callback:delete": "tsx scripts/sms-ru.ts callback:delete"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1090.0",

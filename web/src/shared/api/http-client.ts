@@ -21,6 +21,19 @@ type RequestOptions<TBody = unknown> = {
 
 const API_PREFIX = '/api';
 
+export class HttpError extends Error {
+  readonly status: number;
+
+  constructor(
+    message: string,
+    status: number,
+  ) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+  }
+}
+
 function buildApiPath(path: string) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
@@ -83,7 +96,7 @@ export async function httpClient<TResponse, TBody = unknown>(
     const message = Array.isArray(payload.error?.message)
       ? payload.error.message.join(', ')
       : payload.error?.message ?? `Request failed with status ${response.status}`;
-    throw new Error(message);
+    throw new HttpError(message, response.status);
   }
 
   return payload.data;

@@ -17,7 +17,7 @@ export const legalOwner = {
 export const externalServices = {
   hosting: { name: 'Selectel', status: 'active' as ServiceStatus, country: 'Россия' },
   payment: { name: 'ЮKassa', status: 'active' as ServiceStatus },
-  sms: { name: null, status: 'notConfigured' as ServiceStatus },
+  sms: { name: 'ООО «СМС.РУ»', status: 'active' as ServiceStatus },
   systemEmail: { name: null, status: 'notConfigured' as ServiceStatus },
   analytics: { name: null, status: 'notConfigured' as ServiceStatus },
   advertising: { name: null, status: 'notConfigured' as ServiceStatus },
@@ -51,4 +51,3 @@ export const referralProgram = {
 // TODO: LEGAL_REVIEW_MINIMUM_AGE
 // TODO: LEGAL_REVIEW_LIFETIME_REFERRAL_BINDING
 // TODO: LEGAL_REVIEW — заполнить неизвестные сроки хранения, адрес возврата и параметры доставки.
-

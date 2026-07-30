@@ -20,6 +20,7 @@ type AuthorizationFormProps = {
   value: AuthorizationFormValue;
   isPending?: boolean;
   errorMessage?: string;
+  resendSeconds?: number;
   availableOAuthProviders?: OAuthProvider[];
   onModeChange: (mode: AuthorizationMode) => void;
   onChange: (value: AuthorizationFormValue) => void;
@@ -33,6 +34,7 @@ export function AuthorizationForm({
   value,
   isPending = false,
   errorMessage,
+  resendSeconds = 0,
   availableOAuthProviders = oauthProviderItems.map((item) => item.id),
   onModeChange,
   onChange,
@@ -136,6 +138,8 @@ export function AuthorizationForm({
                 value={value.otpCode}
                 placeholder="000000"
                 autoComplete="one-time-code"
+                maxLength={6}
+                pattern="[0-9]{6}"
                 onChange={getInputChangeHandler('otpCode')}
               />
             </>
@@ -190,10 +194,12 @@ export function AuthorizationForm({
               type="button"
               variant="ghost"
               className="w-full"
-              disabled={isPending}
+              disabled={isPending || resendSeconds > 0}
               onClick={onSendOtp}
             >
-              Отправить код повторно
+              {resendSeconds > 0
+                ? `Отправить повторно через ${resendSeconds} сек.`
+                : 'Отправить код повторно'}
             </Button>
 
             <Button
@@ -218,7 +224,7 @@ export function AuthorizationForm({
               {isPending ? 'Отправляем код...' : 'Получить код'}
             </Button>
 
-            {isRegisterMode && <LegalFormNotice />}
+            <LegalFormNotice />
 
             {visibleOAuthProviderItems.length > 0 && (
               <>

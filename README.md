@@ -108,6 +108,7 @@ The main backend environment variables are listed in `api/.env.example`:
 - PostgreSQL connection and JWT secret;
 - frontend URL for CORS and OAuth redirects;
 - SMTP settings for OTP delivery;
+- OTP security limits and SMS.RU delivery settings;
 - Yandex OAuth settings;
 - local or S3-compatible storage configuration;
 - a flag that enables exceptional permanent order deletion by the owner.
@@ -129,7 +130,21 @@ Secrets and production configuration must not be committed to the repository.
 | `npm run build --prefix api` | Build the backend |
 | `npm test --prefix api` | Run backend unit tests |
 | `npm run test:e2e --prefix api` | Run backend end-to-end tests |
+| `npm run sms-ru:check --prefix api` | Check SMS.RU credentials, sender, balance, limit, and configuration without sending SMS |
+| `npm run sms-ru:callback:list --prefix api` | List SMS.RU callbacks |
+| `npm run sms-ru:callback:add --prefix api` | Register `SMS_RU_WEBHOOK_URL` explicitly |
+| `npm run sms-ru:callback:delete --prefix api` | Delete `SMS_RU_WEBHOOK_URL` explicitly |
 
 ## Production
 
 `docker-compose.production.yml` starts PostgreSQL, the NestJS API, and the frontend served by Caddy. Caddy serves the compiled SPA, proxies `/api` and `/uploads` to the backend, and terminates HTTPS connections. Production settings are supplied through `.env.production` and must be stored outside version control.
+
+### SMS.RU OTP rollout
+
+Local development uses `OTP_DELIVERY_PROVIDER=console`. Production phone delivery requires `OTP_DELIVERY_PROVIDER=sms_ru`, a strong `OTP_HASH_SECRET`, `SMS_RU_API_ID`, the approved `SMS_RU_SENDER_NAME`, and an operator-approved message matching `SMS_RU_OTP_MESSAGE_TEMPLATE`. Start with `SMS_RU_TEST_MODE=true`, run `npm run sms-ru:check --prefix api`, and only then explicitly switch test mode off. The diagnostic command never sends SMS.
+
+Apply database changes with `npx prisma migrate deploy` before restarting `docker compose -f docker-compose.production.yml up -d --build`. The migration is additive; new code never writes plaintext OTP. Rollback should restore the previous application image without dropping the additive columns.
+
+SMS.RU failures for insufficient balance (201), an unavailable operator/sender combination (204), missing sender (221), template mismatch (222), and frequency controls (230–233) become safe public errors. Sender approval for one operator does not imply approval for others. T2 authorization pricing requires separate approval of the exact OTP template; confirm it in SMS.RU before real delivery.
+
+Callback management is deliberately manual and never runs at application startup or deploy. Incoming callback parsing remains disabled until the exact current payload is captured from an official/test callback. Public OTP forms have database-backed limits, but CAPTCHA should be added before high-volume promotion; no CAPTCHA provider is currently configured.
