@@ -2,6 +2,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { FormInputField } from '@/components/ui/FormField';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { getOAuthUrl, type OAuthProvider } from '@/entities/auth';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
@@ -102,23 +103,15 @@ export function AuthorizationForm({
       </header>
 
       {!isOtpStep && (
-        <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
-          {authorizationModeItems.map((item) => {
-            const isActive = mode === item.mode;
-
-            return (
-              <Button
-                key={item.mode}
-                type="button"
-                variant={isActive ? 'default' : 'ghost'}
-                className="h-9"
-                onClick={() => onModeChange(item.mode)}
-              >
-                {item.label}
-              </Button>
-            );
-          })}
-        </div>
+        <SegmentedControl
+          options={authorizationModeItems.map((item) => ({
+            value: item.mode,
+            label: item.label,
+          }))}
+          value={mode}
+          onChange={onModeChange}
+          className="mt-6 flex w-full"
+        />
       )}
 
       <form
