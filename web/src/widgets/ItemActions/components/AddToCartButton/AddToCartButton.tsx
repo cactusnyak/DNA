@@ -20,7 +20,7 @@ type AddToCartButtonProps = {
   );
 
 export function AddToCartButton({
-  variant = 'secondary',
+  variant = 'card',
   itemType,
   item,
   selectedAdditions = [],
@@ -69,7 +69,7 @@ export function AddToCartButton({
   return (
     <Button
       type="button"
-      variant="accent"
+      variant="secondary"
       size={variant === 'details' ? 'lg' : 'default'}
       className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
       onClick={() => {

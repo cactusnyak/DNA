@@ -61,7 +61,7 @@ export function MyAdsManager() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold">Мои объявления</h2>
 
-        <Button asChild>
+        <Button asChild variant="accent">
           <Link to="/ads/new">Разместить объявление</Link>
         </Button>
       </div>

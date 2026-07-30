@@ -30,7 +30,7 @@ type ItemActionsProps = {
 export function ItemActions({
   itemType,
   item,
-  variant = 'secondary',
+  variant = 'card',
   showAddToCartButton = true,
   showBuyNowButton = true,
   showFavouriteButton = false,
@@ -114,6 +114,7 @@ export function ItemActions({
       {isProduct && showBuyNowButton && (
         <Button
           type="button"
+          variant='accent'
           size={variant === 'details' ? 'lg' : 'default'}
           className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
           onClick={handleBuyNow}

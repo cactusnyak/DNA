@@ -29,7 +29,7 @@ const buttonVariants = cva(
           'bg-primary/5 text-primary hover:bg-primary/10 aria-expanded:bg-primary/10 aria-expanded:text-foreground',
 
         accent:
-          'bg-primary/5 text-primary hover:bg-primary/10 aria-expanded:bg-primary/10 aria-expanded:text-foreground',
+          'bg-primary text-primary-foreground hover:bg-primary/80 aria-expanded:bg-primary/80',
 
         ghost:
           'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50',
