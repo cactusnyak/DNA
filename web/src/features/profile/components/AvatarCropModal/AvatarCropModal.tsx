@@ -109,6 +109,7 @@ export function AvatarCropModal({
             </Button>
             <Button
               type="button"
+              variant="accent"
               disabled={!cropArea || isProcessing}
               onClick={handleConfirm}
             >

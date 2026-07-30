@@ -130,7 +130,7 @@ export function ProfileEditModal({
             <Button type="button" variant="secondary" onClick={onClose}>
               Отмена
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" variant="accent" disabled={isPending}>
               {isPending ? 'Сохраняем...' : 'Сохранить'}
             </Button>
           </div>

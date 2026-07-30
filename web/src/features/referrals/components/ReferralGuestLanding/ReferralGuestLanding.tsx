@@ -30,7 +30,7 @@ export function ReferralGuestLanding() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg">
+            <Button asChild variant="accent" size="lg">
               <Link to="/authorization">
                 Войти или зарегистрироваться
                 <ArrowRight

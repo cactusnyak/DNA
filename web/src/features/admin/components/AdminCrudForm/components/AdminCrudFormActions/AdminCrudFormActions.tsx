@@ -15,7 +15,7 @@ export function AdminCrudFormActions({
         Отмена
       </Button>
 
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" variant="accent" disabled={isPending}>
         {isPending ? 'Сохраняем...' : 'Сохранить'}
       </Button>
     </div>

@@ -137,11 +137,10 @@ export function AdminCollectionItemsEditor({
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" variant="accent" disabled={isPending}>
           {isPending ? 'Сохраняем...' : 'Сохранить состав'}
         </Button>
       </div>
     </form>
   );
 }
-

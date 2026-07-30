@@ -175,6 +175,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       {stage !== 'widget' && (
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
+            variant="accent"
             onClick={() => initiateMutation.mutate()}
             disabled={initiateMutation.isPending || stage === 'loading'}
           >

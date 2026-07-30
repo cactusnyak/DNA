@@ -388,7 +388,7 @@ export function AdForm({
       )}
 
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={isFormPending}>
+        <Button type="submit" variant="accent" disabled={isFormPending}>
           {isUploadingImages
             ? 'Загружаем изображения...'
             : isPending

@@ -30,7 +30,7 @@ export function BottomConfirm({
           {children}
         </div>
 
-        <Button type="button" onClick={onConfirm}>
+        <Button type="button" variant="accent" onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>

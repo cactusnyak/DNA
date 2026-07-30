@@ -153,7 +153,7 @@ export function GlobalSearchDropdown({
             )}
 
             <div className="p-4">
-              <Button className="w-full" asChild>
+              <Button className="w-full" asChild variant="accent">
                 <Link
                   to={`/search?q=${encodeURIComponent(searchValue.trim())}`}
                   onClick={onNavigate}

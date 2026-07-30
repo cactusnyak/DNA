@@ -68,13 +68,13 @@ export function StateCard({
         {action && (
           <div className="flex justify-center">
             {action.to ? (
-              <Button asChild variant={action.variant}>
+              <Button asChild variant={action.variant ?? 'accent'}>
                 <Link to={action.to}>{action.label}</Link>
               </Button>
             ) : (
               <Button
                 type="button"
-                variant={action.variant}
+                variant={action.variant ?? 'accent'}
                 onClick={action.onClick}
               >
                 {action.label}

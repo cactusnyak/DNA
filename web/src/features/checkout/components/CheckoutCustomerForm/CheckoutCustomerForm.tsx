@@ -112,6 +112,7 @@ export function CheckoutCustomerForm({
 
         <Button
           type="submit"
+          variant="accent"
           size="lg"
           className="w-full"
           disabled={isSubmitDisabled || isPending}

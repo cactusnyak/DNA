@@ -178,6 +178,7 @@ export function AuthorizationForm({
           <div className="flex flex-col gap-3">
             <Button
               type="submit"
+              variant="accent"
               size="lg"
               className="w-full"
               disabled={isPending}
@@ -209,6 +210,7 @@ export function AuthorizationForm({
           <>
             <Button
               type="submit"
+              variant="accent"
               size="lg"
               className="w-full"
               disabled={isPending}
