@@ -8,12 +8,23 @@ type UsePageScrollLazyLoadingProps<T> = {
   threshold?: number;
 };
 
+const MD_BREAKPOINT = 768;
+const LG_BREAKPOINT = 1024;
+const XL2_BREAKPOINT = 1536;
+
+function getResponsiveThreshold(width: number): number {
+  if (width >= XL2_BREAKPOINT) return 0.8;
+  if (width >= LG_BREAKPOINT) return 0.7;
+  if (width >= MD_BREAKPOINT) return 0.6;
+  return 0.5;
+}
+
 export function usePageScrollLazyLoading<T>({
   fetchFunction,
   initialChunkSize = 12,
   chunkSize = 12,
   enabled = true,
-  threshold = 0.9,
+  threshold,
 }: UsePageScrollLazyLoadingProps<T>) {
   const [items, setItems] = useState<T[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +89,9 @@ export function usePageScrollLazyLoading<T>({
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = window.innerHeight;
 
-      if ((scrollTop + clientHeight) / scrollHeight > threshold) {
+      const activeThreshold = threshold ?? getResponsiveThreshold(window.innerWidth);
+
+      if ((scrollTop + clientHeight) / scrollHeight > activeThreshold) {
         loadMoreItems();
       }
     };
