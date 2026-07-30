@@ -36,7 +36,7 @@ export function FavouriteButtonBase({
         className={[
           'size-4 ',
           isFavourite
-            ? 'fill-red-500 stroke-red-500'
+            ? 'fill-favourite stroke-favourite'
             : `fill-transparent ${inactiveIconClassName} group-hover/fav:stroke-red-400`,
         ].filter(Boolean).join(' ')}
         aria-hidden="true"
