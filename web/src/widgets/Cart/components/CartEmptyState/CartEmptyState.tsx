@@ -11,6 +11,7 @@ export function CartEmptyState() {
       action={{
         label: 'Перейти в каталог',
         to: '/market/catalog',
+        variant: 'accent',
       }}
     />
   );
