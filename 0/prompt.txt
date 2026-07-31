@@ -1,0 +1,18 @@
+Refactor the boolean form field used in the admin interface.
+
+Currently, the “Required addition” field uses a native checkbox. We already have a custom checkbox component used in `AdminRecordsTable`, so extract it into the shared `FormFields` layer and reuse it instead of keeping a table-specific implementation.
+
+The boolean form field should support two visual variants while keeping the same underlying field type and behavior:
+
+- `checkbox` — the classic checkbox style currently used in admin tables;
+- `toggle` — a switch-style control.
+
+Use the `toggle` variant for the “Required addition” field.
+
+Requirements:
+- preserve existing checkbox behavior in `AdminRecordsTable`;
+- avoid duplicating logic between checkbox and toggle variants;
+- keep accessibility, disabled state, labels, checked state, and change handlers working consistently;
+- follow the existing project structure and styling conventions;
+- update exports and imports where necessary;
+- do not change unrelated admin form logic.
