@@ -280,6 +280,20 @@ export class UsersService {
     }
   }
 
+  async markEmailVerified(userId: string) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { emailVerifiedAt: new Date() },
+    });
+  }
+
+  async updatePasswordHash(userId: string, passwordHash: string) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+  }
+
   async updateCurrentUser(
     userId: string,
     data: {

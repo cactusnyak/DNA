@@ -13,7 +13,7 @@ import { CookieNotice } from '@/widgets/CookieNotice';
 export function MainLayout() {
   return (
     <div
-      className="min-h-screen overflow-x-hidden bg-background pb-[var(--main-layout-mobile-bottom-padding)] text-foreground md:pb-0"
+      className="min-h-screen overflow-x-hidden page-dot-background bg-page pb-[var(--main-layout-mobile-bottom-padding)] text-foreground md:pb-0"
       style={
         {
           '--main-layout-mobile-bottom-padding': mobileNavigationHeightVar(),
@@ -23,7 +23,6 @@ export function MainLayout() {
       <Header />
 
       <div
-        className="page-dot-background bg-page"
         style={{
           marginTop: headerHeightVar(),
           minHeight: `calc(100vh - ${headerHeightVar()})`,

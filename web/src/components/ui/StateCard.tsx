@@ -50,8 +50,8 @@ export function StateCard({
     >
       <div className="flex flex-col gap-6">
         {Icon && (
-          <span className="mx-auto flex items-center justify-center">
-            <Icon className="size-8" strokeWidth={1.5} />
+          <span className="p-3 shadow-card-md rounded-xl bg-white mx-auto flex items-center justify-center">
+            <Icon className="size-8 text-primary" strokeWidth={1.5} />
           </span>
         )}
 

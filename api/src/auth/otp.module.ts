@@ -5,6 +5,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UsersModule } from '../users/users.module';
 
+import { AuthCapabilitiesModule } from './capabilities/auth-capabilities.module';
 import { OtpController } from './otp.controller';
 import { ConsoleOtpDeliveryProvider } from './console-otp-delivery.provider';
 import { OTP_DELIVERY_PROVIDER } from './otp-delivery.provider';
@@ -14,7 +15,13 @@ import { SmsRuOtpDeliveryProvider } from '../integrations/sms-ru/sms-ru-otp-deli
 import { TokenModule } from './token.module';
 
 @Module({
-  imports: [NotificationsModule, PrismaModule, UsersModule, TokenModule],
+  imports: [
+    NotificationsModule,
+    PrismaModule,
+    UsersModule,
+    TokenModule,
+    AuthCapabilitiesModule,
+  ],
   controllers: [OtpController],
   providers: [
     OtpService,

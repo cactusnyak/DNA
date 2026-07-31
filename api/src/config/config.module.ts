@@ -125,6 +125,64 @@ import * as Joi from 'joi';
           .optional(),
         TRUST_PROXY: Joi.boolean().default(false),
         HARD_DELETE_ORDERS_ENABLED: Joi.boolean().default(false),
+
+        AUTH_LOGIN_METHODS: Joi.string().default('email,otp,yandex'),
+        AUTH_REGISTRATION_METHODS: Joi.string().default('email,yandex'),
+        AUTH_PRIMARY_LOGIN_METHOD: Joi.string().default('email'),
+        AUTH_PRIMARY_REGISTRATION_METHOD: Joi.string().default('email'),
+
+        PASSWORD_HASH_SECRET_PEPPER: Joi.string().allow('').optional(),
+        EMAIL_VERIFICATION_TOKEN_TTL_SECONDS: Joi.number()
+          .integer()
+          .min(60)
+          .max(7 * 86400)
+          .default(86400),
+        PASSWORD_RESET_TOKEN_TTL_SECONDS: Joi.number()
+          .integer()
+          .min(60)
+          .max(86400)
+          .default(1800),
+        PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS: Joi.number()
+          .integer()
+          .min(1)
+          .max(3600)
+          .default(60),
+        PASSWORD_RESET_MAX_REQUESTS_PER_EMAIL_PER_HOUR: Joi.number()
+          .integer()
+          .min(1)
+          .max(100)
+          .default(5),
+        PASSWORD_RESET_MAX_REQUESTS_PER_IP_PER_HOUR: Joi.number()
+          .integer()
+          .min(1)
+          .max(1000)
+          .default(15),
+        EMAIL_VERIFICATION_REQUEST_COOLDOWN_SECONDS: Joi.number()
+          .integer()
+          .min(1)
+          .max(3600)
+          .default(60),
+        EMAIL_VERIFICATION_MAX_REQUESTS_PER_EMAIL_PER_HOUR: Joi.number()
+          .integer()
+          .min(1)
+          .max(100)
+          .default(5),
+
+        EMAIL_DELIVERY_PROVIDER: Joi.string()
+          .valid('console', 'resend')
+          .default('console'),
+        RESEND_API_KEY: Joi.string().when('EMAIL_DELIVERY_PROVIDER', {
+          is: 'resend',
+          then: Joi.required(),
+          otherwise: Joi.string().allow('').optional(),
+        }),
+        RESEND_FROM_EMAIL: Joi.string().when('EMAIL_DELIVERY_PROVIDER', {
+          is: 'resend',
+          then: Joi.required(),
+          otherwise: Joi.string().allow('').optional(),
+        }),
+        RESEND_REPLY_TO_EMAIL: Joi.string().allow('').optional(),
+        RESEND_WEBHOOK_SECRET: Joi.string().allow('').optional(),
       }),
       validationOptions: {
         abortEarly: false,

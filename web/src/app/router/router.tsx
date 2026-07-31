@@ -14,6 +14,9 @@ import { AdsPage } from '@/pages/ads/AdsPage';
 import { AdminPage } from '@/pages/admin/AdminPage';
 import { AuthorizationPage } from '@/pages/authorization/AuthorizationPage';
 import { CartPage } from '@/pages/cart/CartPage';
+import { ForgotPasswordPage } from '@/pages/forgot-password/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage';
+import { VerifyEmailPage } from '@/pages/verify-email/VerifyEmailPage';
 import { CatalogPage } from '@/pages/catalog/CatalogPage';
 import { CategoryPage } from '@/pages/category/CategoryPage';
 import { CheckoutPage } from '@/pages/checkout/CheckoutPage';
@@ -333,6 +336,39 @@ export const router = createBrowserRouter([
           breadcrumb: {
             type: BREADCRUMB_TYPE.STATIC,
             label: 'Авторизация',
+          },
+        } satisfies BreadcrumbHandle,
+      },
+
+      {
+        path: '/forgot-password',
+        element: <ForgotPasswordPage />,
+        handle: {
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Восстановление пароля',
+          },
+        } satisfies BreadcrumbHandle,
+      },
+
+      {
+        path: '/reset-password',
+        element: <ResetPasswordPage />,
+        handle: {
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Новый пароль',
+          },
+        } satisfies BreadcrumbHandle,
+      },
+
+      {
+        path: '/verify-email',
+        element: <VerifyEmailPage />,
+        handle: {
+          breadcrumb: {
+            type: BREADCRUMB_TYPE.STATIC,
+            label: 'Подтверждение почты',
           },
         } satisfies BreadcrumbHandle,
       },

@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 
 import { UsersService } from '../users/users.service';
 
+import { AuthCapabilitiesService } from './capabilities/auth-capabilities.service';
+import { AuthMethod, AuthOperation } from './capabilities/auth-method.enum';
 import { TokenService } from './token.service';
 
 type OAuthProvider = 'yandex';
@@ -48,6 +50,7 @@ export class OAuthService {
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
     private readonly configService: ConfigService,
+    private readonly authCapabilities: AuthCapabilitiesService,
   ) {}
 
   getAuthorizationUrl(
@@ -56,6 +59,12 @@ export class OAuthService {
     inviterReferralCode?: string,
   ) {
     const normalizedProvider = this.validateProvider(provider);
+    const operation =
+      mode === 'register' ? AuthOperation.REGISTRATION : AuthOperation.LOGIN;
+    this.authCapabilities.assertEnabled(
+      this.toAuthMethod(normalizedProvider),
+      operation,
+    );
     const state = this.encodeState({
       provider: normalizedProvider,
       mode: mode === 'register' ? 'register' : 'login',
@@ -80,7 +89,20 @@ export class OAuthService {
       this.configService.get<string>('YANDEX_CLIENT_SECRET') &&
       this.configService.get<string>('YANDEX_REDIRECT_URI');
 
-    return isConfigured ? ['yandex'] : [];
+    if (!isConfigured) {
+      return [];
+    }
+
+    return this.authCapabilities.isEnabled(
+      AuthMethod.YANDEX,
+      AuthOperation.LOGIN,
+    ) ||
+      this.authCapabilities.isEnabled(
+        AuthMethod.YANDEX,
+        AuthOperation.REGISTRATION,
+      )
+      ? ['yandex']
+      : [];
   }
 
   async handleCallback(provider: string, code: string, state?: string) {
@@ -94,6 +116,13 @@ export class OAuthService {
     if (parsedState.provider !== normalizedProvider) {
       throw new BadRequestException('OAuth state provider mismatch');
     }
+
+    this.authCapabilities.assertEnabled(
+      this.toAuthMethod(normalizedProvider),
+      parsedState.mode === 'register'
+        ? AuthOperation.REGISTRATION
+        : AuthOperation.LOGIN,
+    );
 
     if (!code) {
       throw new BadRequestException('OAuth code is missing');
@@ -125,6 +154,14 @@ export class OAuthService {
   private validateProvider(value: string): OAuthProvider {
     if (value === 'yandex') {
       return value;
+    }
+
+    throw new BadRequestException('Unsupported OAuth provider');
+  }
+
+  private toAuthMethod(provider: OAuthProvider): AuthMethod {
+    if (provider === 'yandex') {
+      return AuthMethod.YANDEX;
     }
 
     throw new BadRequestException('Unsupported OAuth provider');

@@ -42,9 +42,14 @@ enum AdStatus {
   ARCHIVED
 }
 
+enum AuthTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
 model User {
   id             String    @id @default(uuid())
-  email          String?
+  email          String?   @unique
   nickname       String
   nicknameSuffix String    @unique @default(dbgenerated("gen_random_uuid()"))
   firstName      String?
@@ -55,6 +60,7 @@ model User {
   deletedAt      DateTime?
 
   passwordHash    String?
+  emailVerifiedAt DateTime?
   oauthProvider   String?
   oauthProviderId String?
 
@@ -69,6 +75,7 @@ model User {
   orders     Order[]
   ads        Ad[]
   favourites Favourite[]
+  authTokens AuthToken[]
 
   invitedReferrals Referral[] @relation("Inviter")
   receivedReferral Referral?  @relation("Invited")
@@ -76,6 +83,21 @@ model User {
 
   @@unique([oauthProvider, oauthProviderId])
   @@index([phone])
+}
+
+model AuthToken {
+  id         String        @id @default(uuid())
+  userId     String
+  type       AuthTokenType
+  tokenHash  String        @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, createdAt])
+  @@index([expiresAt])
 }
 
 model OtpCode {
