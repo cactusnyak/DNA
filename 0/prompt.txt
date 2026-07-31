@@ -1,0 +1,6 @@
+# Files mentioned by the user:
+
+## dna_product_additions_codex_prompt.txt: /Users/fedorshevchenko/Downloads/dna_product_additions_codex_prompt.txt
+
+## My request for Codex:
+Итак, в прикрепленном текстовом файле описана задача по созданию нового функционала, сязанного с созданием дополнений для каждого товара. Сможешь реализовать?
