@@ -1,0 +1,88 @@
+import { Button } from '@/components/ui/Button';
+import type { Ad } from '@/entities/ad';
+import { useCartStore } from '@/entities/cart';
+import type { Product, SelectedProductAddition } from '@/entities/product';
+import { createCartConfigurationKey } from '@/entities/product/lib/product-additions';
+import {
+  ProductQuantityCounter,
+  getProductActionHeightClass,
+  type ProductQuantityCounterVariant,
+} from '@/widgets/ProductQuantityCounter';
+
+type AddToCartButtonProps = {
+  variant?: ProductQuantityCounterVariant;
+  selectedAdditions?: SelectedProductAddition[];
+  isConfigurationValid?: boolean;
+  onInvalidConfiguration?: () => void;
+} & (
+    | { itemType: 'product'; item: Product }
+    | { itemType: 'ad'; item: Ad }
+  );
+
+export function AddToCartButton({
+  variant = 'card',
+  itemType,
+  item,
+  selectedAdditions = [],
+  isConfigurationValid = true,
+  onInvalidConfiguration,
+}: AddToCartButtonProps) {
+  const configurationKey =
+    itemType === 'product'
+      ? createCartConfigurationKey(item.id, selectedAdditions)
+      : item.id;
+  const quantity = useCartStore((state) =>
+    state.items.find((cartItem) =>
+      (cartItem.configurationKey ?? cartItem.product.id) === configurationKey,
+    )?.quantity ?? 0,
+  );
+  const addItem = useCartStore((state) => state.addItem);
+  const adItems = useCartStore((state) => state.adItems);
+  const addAdItem = useCartStore((state) => state.addAdItem);
+  const removeAdItem = useCartStore((state) => state.removeAdItem);
+
+  if (itemType === 'ad') {
+    const isInCart = adItems.some((i) => i.ad.id === item.id);
+
+    return (
+      <Button
+        type="button"
+        variant={isInCart ? 'outline' : 'default'}
+        size={variant === 'details' ? 'lg' : 'default'}
+        className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
+        onClick={() => (isInCart ? removeAdItem(item.id) : addAdItem(item))}
+      >
+        {isInCart ? 'Убрать из корзины' : 'В корзину'}
+      </Button>
+    );
+  }
+
+  if (quantity > 0) {
+    return (
+      <ProductQuantityCounter
+        productId={configurationKey}
+        variant={variant}
+      />
+    );
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size={variant === 'details' ? 'lg' : 'default'}
+      className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
+      onClick={() => {
+        if (!isConfigurationValid) {
+          onInvalidConfiguration?.();
+          return;
+        }
+        addItem(item, selectedAdditions);
+      }}
+    >
+      В корзину
+    </Button>
+  );
+}
+
+Can you make add to cart button with little accent, for example, like hovered segment control in `SegmentControl.tsx`
