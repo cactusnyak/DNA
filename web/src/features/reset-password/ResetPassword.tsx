@@ -33,12 +33,14 @@ export function ResetPassword() {
 
   if (!token) {
     return (
-      <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
-        <h1 className="text-2xl font-semibold">Ссылка недействительна</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          В ссылке отсутствует токен сброса пароля. Запросите новую ссылку.
-        </p>
-        <Button asChild variant="secondary" className="mt-6 w-full">
+      <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold">Ссылка недействительна</h1>
+          <p className="text-sm leading-6 text-muted-foreground">
+            В ссылке отсутствует токен сброса пароля. Запросите новую ссылку.
+          </p>
+        </div>
+        <Button asChild variant="secondary" className="w-full">
           <Link to="/forgot-password">Запросить новую ссылку</Link>
         </Button>
       </section>
@@ -46,8 +48,8 @@ export function ResetPassword() {
   }
 
   return (
-    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
-      <header className="space-y-2">
+    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+      <header className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">Восстановление доступа</p>
         <h1 className="text-2xl font-semibold">Новый пароль</h1>
         <p className="text-sm leading-6 text-muted-foreground">
@@ -56,7 +58,7 @@ export function ResetPassword() {
       </header>
 
       {mutation.isSuccess ? (
-        <div className="mt-6 space-y-4">
+        <div className="flex flex-col gap-4">
           <p className="rounded-lg border border-border bg-muted/40 px-3 py-3 text-sm">
             Пароль успешно обновлён. Теперь вы можете войти с новым паролем.
           </p>
@@ -65,7 +67,7 @@ export function ResetPassword() {
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6" autoComplete="off">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6" autoComplete="off">
           <FormInputField
             name="newPassword"
             required
