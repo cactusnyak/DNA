@@ -1,0 +1,6 @@
+# Files mentioned by the user:
+
+## [12:48:40 AM] Starting compilation in watch mode....pdf: /Users/fedorshevchenko/Desktop/[12:48:40 AM] Starting compilation in watch mode....pdf
+
+## My request for Codex:
+I have such output after trying to run my `api`. Can you check my project and fix problems. Maybe we should make some Prisma or other back-end fucking deals. Can you help me with it?
