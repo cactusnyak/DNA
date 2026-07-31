@@ -12,7 +12,7 @@ export function AdminOverviewCard({
   description,
 }: AdminOverviewCardProps) {
   return (
-    <article className="space-y-4 rounded-2xl border border-border p-5">
+    <article className="space-y-4 bg-background p-5 md:bg-white">
       <h4 className="text-sm font-semibold text-muted-foreground">
         {label}
       </h4>
