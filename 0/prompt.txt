@@ -1,0 +1,30 @@
+Look at element with styles `text-center py-8 text-sm text-muted-foreground`, this is the search result:
+
+5 results - 5 files
+
+web/src/widgets/AdsFeed/AdsFeed.tsx:
+  92        {!hasMore && items.length > 0 && (
+  93:         <div className="text-center py-8 text-sm text-muted-foreground">
+  94            Показаны все объявления
+
+web/src/widgets/AdsListing/AdsListing.tsx:
+  92        {!hasMore && items.length > 0 && (
+  93:         <div className="text-center py-8 text-sm text-muted-foreground">
+  94            Показаны все объявления
+
+web/src/widgets/CombinedFeed/CombinedFeed.tsx:
+  87        {!hasMore && items.length > 0 && (
+  88:         <div className="text-center py-8 text-sm text-muted-foreground">
+  89            Показаны все товары и объявления
+
+web/src/widgets/ProductsFeed/ProductsFeed.tsx:
+  86        {!hasMore && items.length > 0 && (
+  87:         <div className="text-center py-8 text-sm text-muted-foreground">
+  88            Показаны все товары
+
+web/src/widgets/ProductsListing/ProductsListing.tsx:
+  93        {!hasMore && items.length > 0 && (
+  94:         <div className="text-center py-8 text-sm text-muted-foreground">
+  95            Показаны все товары
+
+Can you separate it in an conmponent and reuse it replacad current native html
