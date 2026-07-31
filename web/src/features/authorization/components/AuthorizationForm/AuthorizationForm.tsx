@@ -98,8 +98,8 @@ export function AuthorizationForm({
   }
 
   return (
-    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
-      <header className="space-y-2">
+    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+      <header className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">
           {isOtpStep
             ? 'Подтверждение'
@@ -124,35 +124,37 @@ export function AuthorizationForm({
       </header>
 
       {!isOtpStep && (
-        <SegmentedControl
-          options={authorizationModeItems.map((item) => ({
-            value: item.mode,
-            label: item.label,
-          }))}
-          value={mode}
-          onChange={onModeChange}
-          className="mt-6 flex w-full"
-        />
-      )}
+        <div className="flex flex-col gap-3">
+          <SegmentedControl
+            options={authorizationModeItems.map((item) => ({
+              value: item.mode,
+              label: item.label,
+            }))}
+            value={mode}
+            onChange={onModeChange}
+            className="flex w-full"
+          />
 
-      {!isOtpStep && visibleMethodItems.length > 1 && (
-        <SegmentedControl
-          options={visibleMethodItems.map((item) => ({
-            value: item.method,
-            label: item.label,
-          }))}
-          value={activeMethod}
-          onChange={onMethodChange}
-          className="mt-3 flex w-full"
-        />
+          {visibleMethodItems.length > 1 && (
+            <SegmentedControl
+              options={visibleMethodItems.map((item) => ({
+                value: item.method,
+                label: item.label,
+              }))}
+              value={activeMethod}
+              onChange={onMethodChange}
+              className="flex w-full"
+            />
+          )}
+        </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 space-y-6"
+        className="flex flex-col gap-6"
         autoComplete="off"
       >
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {isOtpStep ? (
             <>
               <FormInputField
@@ -214,14 +216,12 @@ export function AuthorizationForm({
               )}
 
               {isEmailMethod && !isRegisterMode && (
-                <div className="text-right">
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-                  >
-                    Забыли пароль?
-                  </Link>
-                </div>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                >
+                  Забыли пароль?
+                </Link>
               )}
             </>
           )}

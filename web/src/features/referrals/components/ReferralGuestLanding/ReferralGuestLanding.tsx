@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, BadgePercent } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 
@@ -12,8 +12,8 @@ export function ReferralGuestLanding() {
     <section className="relative overflow-hidden rounded-4xl bg-card p-6 shadow-card-2xl sm:p-8 lg:p-10">
       <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(420px,0.9fr)] lg:items-center lg:gap-14">
         <div className="max-w-3xl space-y-7">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <Sparkles className="size-4" />
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/3 px-4 py-1.5 text-sm font-medium text-primary">
+            <BadgePercent className="size-4" />
             Реферальная программа
           </div>
 
@@ -58,9 +58,9 @@ export function ReferralGuestLanding() {
                   dividerClass,
                 ].filter(Boolean).join(' ')}
               >
-                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
-                  <Icon className="size-5 text-primary" />
-                </div>
+                <span className="p-3 shadow-card-sm rounded-xl bg-white flex w-fit">
+                  <Icon className="size-5 text-primary" strokeWidth={1.5} />
+                </span>
 
                 <h2 className="mt-5 text-base font-semibold">
                   {benefit.title}
