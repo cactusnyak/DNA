@@ -1,0 +1,1 @@
+look at `GlobalSearchItemResults`: can we make so if there are not found items/categories/sections wihtout an error (when we have 0 non error mathes), we display that resutl search section. Can you make it?
