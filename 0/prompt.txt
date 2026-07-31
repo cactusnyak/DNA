@@ -1,0 +1,1 @@
+I have some bug in `/<market | ad>/catalog/<categories>` page: there is rendering a catalog controls (filtering and sorting) and if I go to a leaf category (category without subcategories), I can see in 'Подкатегории' the seld category. It's a logical bug, can you fix it?
