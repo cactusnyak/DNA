@@ -1,0 +1,1 @@
+Can you make ProductDetailInfo HTML like in AdDetailsInfo
