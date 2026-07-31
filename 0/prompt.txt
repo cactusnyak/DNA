@@ -1,0 +1,9 @@
+Can you check each button without set variant or set as default which we can style as accentm like this:
+
+- in forms
+- create an entity in admin panel
+- etc
+
+Main condition: the button should be relevant for accent styling
+
+Just apply accent variant for such buttons
