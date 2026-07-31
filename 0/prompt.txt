@@ -1,0 +1,1 @@
+Now the last refactor on today: can you inspect all components which are using `cn` util and replace it on default tailwind classes. Also remove the `utils/cn` file.
