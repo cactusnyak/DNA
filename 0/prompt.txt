@@ -1,0 +1,1 @@
+Now look at `BalanceHere`: the big button with `Реферальная программа` text content can be hovered on our `BalanceCard`, can you fix hovering (the button should be adapt on possible size). Maybe we should fix some styles exactly in parent element of `BalanceHere` and `BalanceCard`.
