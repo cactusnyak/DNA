@@ -1,0 +1,1 @@
+can you remove  `pages/favorites/FavoritesPage.tsx` endpoint and remove related record in `audit...content.mjs`  ['pages/favorites/FavoritesPage.tsx', 'не подключена к роутеру (legacy-файл)']
