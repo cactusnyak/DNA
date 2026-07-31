@@ -1,0 +1,1 @@
+Oh, I'm actualy not seeng selected styles for desctope menu `NavLink`, and your trying to make filling of bg for icons in mobile is cringe. I thought that we can use filled version of icons via lucid icon api, don't make ourself filling. If there is not ability of using lucid icon api, make primary stroke color for seleted option.
