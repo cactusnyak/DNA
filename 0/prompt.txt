@@ -1,0 +1,39 @@
+Listen, we need to redesign the behavior and appearance of the global search.
+
+- Desktop:
+  - Keep the current behavior and layout as they are.
+  - Add the shared feature described below.
+  - Add a “View all results” button that links to the new search results page.
+
+- Mobile:
+  - Remove the current dropdown search results entirely.
+  - Keep only the search input.
+  - When the user submits the query from the keyboard, for example by pressing Enter or Search, navigate them to the full search results page.
+
+- Shared feature:
+  Create a dedicated full search results page. It should contain the same types of content that are currently displayed inside the global search results container, but with a revised structure:
+
+- The main focus should be on listings, meaning both market products and ads.
+- Render the same combined listings grid that is currently used on the home page, but filter the items by search matches in both the title and description.
+- Render the filters from `CatalogControls` alongside the listings grid.
+
+- Before the listings grid, add a compact search results section for other parts of the platform, specifically categories and system sections.
+- Use the following structure:
+  - `<Categories | Sections>`
+  - A set of compact chips or badges for each matching category or section.
+
+- Add breadcrumbs and a proper URL structure.
+- The breadcrumb should look like:
+  `Home / Search for "{search query}"`
+- The search query should also be stored in the URL as a query parameter, for example:
+  `/search?q=iphone`
+- Opening such a URL directly should render the corresponding search results.
+
+- The “View all results” button in the current desktop search results container should navigate to this new page.
+
+Additional requirements:
+
+- Preserve the current desktop search behavior unless a change is explicitly described above.
+- On mobile, submitting the search should close the current search interface and navigate to the new results page.
+- Make sure the search page works correctly after a browser refresh and when opened directly by URL.
+- Reuse existing components and data-fetching logic where possible instead of duplicating the current home page grid or `CatalogControls` behavior.
