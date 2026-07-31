@@ -1,0 +1,1 @@
+Now, look at `DesktopNavigation` and mobile version: we should add to accent styles on opened tab. For desctope just make `border-primary/15 bg-primary/5` style, for mobile, can we use fiiled version of used icons and color them in primary color?
