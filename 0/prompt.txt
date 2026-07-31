@@ -1,0 +1,1 @@
+HI! Can you inspect deprecated components (`.tsx` files), which we don't use actually and remove them
