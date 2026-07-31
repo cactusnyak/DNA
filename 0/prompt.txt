@@ -1,0 +1,10 @@
+I have such erors when I try to open admin panel:
+
+http-client.ts:70 
+ GET http://localhost:5173/api/admin/catalog 500 (Internal Server Error)
+http-client.ts:70 
+ GET http://localhost:5173/api/admin/catalog 500 (Internal Server Error)
+http-client.ts:70 
+ GET http://localhost:5173/api/admin/catalog 500 (Internal Server Error)
+http-client.ts:70 
+ GET http://localhost:5173/api/admin/catalog 500 (Internal Server Error)
