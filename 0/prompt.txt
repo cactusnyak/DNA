@@ -1,0 +1,10 @@
+So, I have `seed-production` and `seed-production-data`. Can you make unified `seed-production` with merged data directly. Also there is a problem with desctiption key value: russian grammar is broken, for example there is such a text:
+
+```
+Курятник до 15 кур с покраской двускатразмер 3000:1400высота1600каркас : брус сухойстроганныйвнутренняя отделка:осп 9ммнаружная отделка: имитациябруса 16*140утеплитель:50mmКрыша двускат мягкая черепицаЦена: 85.000утепленныйЦена: 75.000 летнийТалдом
+```
+
+Random `:`, unformattes size notation like ` 3000:1400высота1600` (should be normal, like `3000x1400x1600`). Can you complete current task in two steps:
+
+- normilize description
+- make unified `seed-production` with merded data directly there
