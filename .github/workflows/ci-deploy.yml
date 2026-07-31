@@ -18,8 +18,6 @@ jobs:
       run:
         working-directory: api
     env:
-      # prisma.config.ts resolves these at load time (even for `generate`);
-      # tests are unit tests with mocks, so no real DB connection is made.
       DATABASE_URL: postgresql://dna_user:dna_password@localhost:5432/dna
       JWT_SECRET: ci-test-secret
       OTP_HASH_SECRET: ci-test-otp-hash-secret-at-least-32-characters
