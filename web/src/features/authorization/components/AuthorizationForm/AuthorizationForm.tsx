@@ -132,7 +132,7 @@ export function AuthorizationForm({
             }))}
             value={mode}
             onChange={onModeChange}
-            className="flex w-full"
+            className="flex w-full shrink-0 h-12"
           />
 
           {visibleMethodItems.length > 1 && (
@@ -143,7 +143,7 @@ export function AuthorizationForm({
               }))}
               value={activeMethod}
               onChange={onMethodChange}
-              className="flex w-full"
+              className="flex w-full shrink-0 h-12"
             />
           )}
         </div>

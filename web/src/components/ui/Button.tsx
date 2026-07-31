@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react';
 
 import { Slot } from 'radix-ui';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { twMerge } from 'tailwind-merge';
 
 const buttonVariants = cva(
   [
@@ -97,11 +98,13 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={buttonVariants({
-        variant,
-        size,
-        className,
-      })}
+      className={twMerge(
+        buttonVariants({
+          variant,
+          size,
+          className,
+        }),
+      )}
       {...props}
     />
   );

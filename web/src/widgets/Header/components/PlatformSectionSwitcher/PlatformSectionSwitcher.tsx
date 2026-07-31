@@ -21,7 +21,7 @@ export function PlatformSectionSwitcher({
     <SegmentedControl
       options={options}
       value={activeSectionId ?? ''}
-      className="shrink-0"
+      className="shrink-0 h-10"
     />
   );
 }

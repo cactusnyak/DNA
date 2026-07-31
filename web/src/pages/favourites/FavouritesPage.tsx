@@ -61,6 +61,7 @@ export function FavouritesPage() {
         ]}
         value={tab}
         onChange={(v) => setTab(v as Tab)}
+        className='shrink-0 h-10'
       />
 
       {!accessToken && (guestProductItems.length > 0 || guestAdItems.length > 0) && (

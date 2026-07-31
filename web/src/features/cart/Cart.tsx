@@ -43,6 +43,7 @@ export function Cart() {
         ]}
         value={tab}
         onChange={(value) => setTab(value as Tab)}
+        className='shrink-0 h-10'
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">

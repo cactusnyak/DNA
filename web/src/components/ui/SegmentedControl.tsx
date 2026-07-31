@@ -26,7 +26,7 @@ export function SegmentedControl<T extends string>({
       {options.map((option) => {
         const isActive = option.value === value;
 
-        const itemClass = `inline-flex h-8 flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:h-9 sm:rounded-lg sm:px-4 sm:text-sm ${isActive ? 'bg-primary text-primary-foreground ring-1 ring-primary' : 'text-primary hover:bg-primary/10'}`;
+        const itemClass = `inline-flex h-full flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:h-full sm:rounded-lg sm:px-4 sm:text-sm ${isActive ? 'bg-primary text-primary-foreground ring-1 ring-primary' : 'text-primary hover:bg-primary/10'}`;
 
         if (option.href) {
           return (
