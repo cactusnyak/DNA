@@ -1,0 +1,1 @@
+Now, look at `CartSummary` component and look there at `flex flex-col gap-4 p-5` block (and all inner elements). Now there is bad styled `flex items-start justify-between gap-4` element, this styled feels like a crutch. Maybe will be better rewtire it like a grid.
