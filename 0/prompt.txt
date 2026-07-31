@@ -1,0 +1,70 @@
+import { Heart } from 'lucide-react';
+
+import { useFavourite } from '../../hooks/use-favourite';
+import type { FavouriteItem } from '../../types/favourite-item';
+
+type FavouriteButtonProps = {
+  item: FavouriteItem;
+  className?: string;
+};
+
+type FavouriteButtonBaseProps = {
+  item: FavouriteItem;
+  className: string;
+};
+
+function FavouriteButtonBase({
+  item,
+  className,
+}: FavouriteButtonBaseProps) {
+  const { isFavourite, toggle, isPending } = useFavourite(item);
+
+  return (
+    <button
+      type="button"
+      aria-label={isFavourite ? 'Убрать из избранного' : 'Добавить в избранное'}
+      disabled={isPending}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      }}
+      className={[
+        'group/fav flex cursor-pointer items-center justify-center p-1 backdrop-blur-sm disabled:opacity-50',
+        className,
+      ].filter(Boolean).join(' ')}
+    >
+      <Heart
+        className={[
+          'size-4 fill-white',
+          isFavourite
+            ? 'fill-red-500 stroke-red-500'
+            : 'stroke-[#5c5c5c] group-hover/fav:stroke-red-400',
+        ].filter(Boolean).join(' ')}
+      />
+    </button>
+  );
+}
+
+export function CardFavouriteButton({ item }: Pick<FavouriteButtonProps, 'item'>) {
+  return (
+    <FavouriteButtonBase
+      item={item}
+      className="rounded-full bg-black/20"
+    />
+  );
+}
+
+export function FavouriteButton({ item, className }: FavouriteButtonProps) {
+  return (
+    <FavouriteButtonBase
+      item={item}
+      className={[
+        'rounded-full bg-black/20',
+        className,
+      ].filter(Boolean).join(' ')}
+    />
+  );
+}
+
+Можешь поправить тупорылый темный фон для кнопки, а также состояние кнопки (добавлен ов ихбранное — кнпока заполнена).
