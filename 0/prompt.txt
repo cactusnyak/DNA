@@ -1,0 +1,1 @@
+Nice, now I want to make some frontend refactoring. Can you point on the file which respond for bottom noticifation container, for example, for ask to user to accept cookie end etc. Just tell me file name
