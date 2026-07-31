@@ -1,0 +1,7 @@
+So, we have block with such styles:
+
+```
+space-y-8 p-10 rounded-3xl bg-white shadow-card-2xl
+```
+
+How can we separate it in a component which is reused. Also can you make adaprive: decrease padding depended on screen size
