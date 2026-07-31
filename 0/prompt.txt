@@ -1,0 +1,1 @@
+now look at `ProductAdditionsField`: there are native inputs which we try not to use. Can you use FormField. If some need field type are absient, add them to `FormField`. Save consistenty.
