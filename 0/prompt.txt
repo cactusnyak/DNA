@@ -1,0 +1,6 @@
+# Files mentioned by the user:
+
+## import type { ChangeEvent, FormEvent } from 'react'; import { Button } from '@/…: /Users/fedorshevchenko/.codex/attachments/ef25abcf-d7e0-40b0-86ec-a2abdc27f695/pasted-text.txt
+
+## My request for Codex:
+Look at (AuthorizationFrom). There is a switcher log in/registration. Can you style it like `SegmentedControl` options. And also can you make so that in `SegmentedControl` text was primary color of unselected options (and use primary for the option oin Authorization form switcher)
