@@ -1,0 +1,1 @@
+Can you look at `LegalFormNotice`, exactly its usage: can you remove it from such places, where it's waste. For example, in avatar chaning modal: there we use it legal norice, but it's waste. Also can you change pipeline of avatar changing: it's waste to open a modal for it, we can make it immidiatly by clicking to the button which in current vesrion open the modal.
