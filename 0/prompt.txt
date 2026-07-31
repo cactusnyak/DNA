@@ -1,0 +1,1 @@
+Can you check favourite button: can you make in `index.css` separated color for favorite button (in active state, for the heart icon) and apply it. Make this color value as `#fc2198`.
