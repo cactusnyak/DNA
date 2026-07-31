@@ -1,0 +1,72 @@
+import { Heart } from 'lucide-react';
+
+import { useFavourite } from '../../hooks/use-favourite';
+import type { FavouriteItem } from '../../types/favourite-item';
+
+type FavouriteButtonProps = {
+  item: FavouriteItem;
+  className?: string;
+};
+
+type FavouriteButtonBaseProps = {
+  item: FavouriteItem;
+  className: string;
+};
+
+function FavouriteButtonBase({
+  item,
+  className,
+}: FavouriteButtonBaseProps) {
+  const { isFavourite, toggle, isPending } = useFavourite(item);
+
+  return (
+    <button
+      type="button"
+      aria-label={isFavourite ? 'Убрать из избранного' : 'Добавить в избранное'}
+      aria-pressed={isFavourite}
+      disabled={isPending}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      }}
+      className={[
+        'group/fav flex cursor-pointer items-center justify-center p-1 backdrop-blur-sm transition-colors disabled:opacity-50',
+        className,
+      ].filter(Boolean).join(' ')}
+    >
+      <Heart
+        className={[
+          'size-4 transition-colors',
+          isFavourite
+            ? 'fill-red-500 stroke-red-500'
+            : 'fill-transparent stroke-foreground group-hover/fav:stroke-red-400',
+        ].filter(Boolean).join(' ')}
+        aria-hidden="true"
+      />
+    </button>
+  );
+}
+
+export function CardFavouriteButton({ item }: Pick<FavouriteButtonProps, 'item'>) {
+  return (
+    <FavouriteButtonBase
+      item={item}
+      className="rounded-full bg-white/80 shadow-sm hover:bg-white"
+    />
+  );
+}
+
+export function FavouriteButton({ item, className }: FavouriteButtonProps) {
+  return (
+    <FavouriteButtonBase
+      item={item}
+      className={[
+        'rounded-full bg-muted hover:bg-muted/80',
+        className,
+      ].filter(Boolean).join(' ')}
+    />
+  );
+}
+
+Раздели на разные файлы и убери обводку у кнопки общего вида
