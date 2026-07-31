@@ -1,0 +1,15 @@
+Now, let’s make the header more compact on small screens.
+
+The header contains a `SegmentedControl` as well as the main header elements. Please reduce the overall height of the header on small screens.
+
+For the `SegmentedControl`:
+- Reduce its vertical padding.
+- Slightly decrease the font size.
+- Keep it readable and easy to use on touch devices.
+
+For the header:
+- Reduce the logo size.
+- Set a fixed minimum height appropriate for small screens.
+- Keep the layout vertically aligned and visually balanced.
+
+Also, make sure to review the `setHeaderHeight` logic. It must continue to calculate and update the header height correctly after these style changes.
