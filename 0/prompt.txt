@@ -1,0 +1,1 @@
+So, there is a trashhold set as 0.9, but we should change the value depended on screen size. Can you make grade of trashhold value
