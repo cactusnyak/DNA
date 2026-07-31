@@ -1,0 +1,1 @@
+Can you inspect all buttons with `ArrowRight` and add in these buttons animation of arrow moving to right as in `SectionTitle`
