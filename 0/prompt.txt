@@ -1,0 +1,1 @@
+clear all db please. And also I have something looping (I show my prisma studio and open some new table and seeing infinity loading). clear all db please and check possible loops
