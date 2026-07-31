@@ -1,0 +1,1 @@
+can you check `cd api npm run start:dev` comand. I'm trying to run the `api`, but there are lots of errors. Can you fix them, please
