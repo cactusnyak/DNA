@@ -1,0 +1,3 @@
+className="absolute inset-0 size-full scale-105 object-cover opacity-60 blur-md"
+
+Можешь подобрать лучшее соотношение увеличения, прозрачности и размытия. Напиши код мне в ответе, а не переписывай в файле
