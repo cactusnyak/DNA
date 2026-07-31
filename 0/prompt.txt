@@ -1,0 +1,1 @@
+well, now let's look at MobileNavigation and MainLayout: I want to do next: when we have mobile displaying (MobileNavigation is showing), we should apply for main layout div (`<div className="min-h-screen overflow-x-hidden bg-background text-foreground">`) bottom padding which is equal to `mobileNavigationHeightVar`.
