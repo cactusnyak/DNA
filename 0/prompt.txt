@@ -1,0 +1,5 @@
+<article className="flex flex-col gap-9 m-0 p-6 rounded-xl sm:m-1 sm:p-8 sm:rounded-lg md:m-2 md:p-10 md:rounded-xl lg:m-3 lg:p-12 lg:rounded-xl xl:m-5 xl:p-15 xl:rounded-2xl bg-white shadow-[0_0_90px_-10px_rgba(15,23,42,0.10)]">
+
+can you just optimize styles (save current styles, but just remove waste classes and make them oreder)
+
+It's in web/src/features/legal/components/LegalDocumentLayout.tsx
