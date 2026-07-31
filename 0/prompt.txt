@@ -1,0 +1,1 @@
+Can you look at balance hero and balance card: can you separate them gradients or bg color into intex.css and make it colors more similiar to the primary
