@@ -1,0 +1,1 @@
+unfortunaly it's not working. Can you justwrite a comand for user record deleting. You can drop all the table due to I have no other related data
