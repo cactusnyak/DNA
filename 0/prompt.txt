@@ -1,0 +1,1 @@
+I have select a user as a removed and his password became empty. How can I return it or generate hash bassed on `123456` password
