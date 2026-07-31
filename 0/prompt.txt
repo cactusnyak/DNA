@@ -1,0 +1,1 @@
+unfortunately it's no working: I have general scroll of the page and the main conditional is always visible of aside controls, I think just sticky position insn't enough
