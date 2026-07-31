@@ -1,0 +1,6 @@
+# Files mentioned by the user:
+
+## LegalDocumentLayout.tsx: /Users/fedorshevchenko/Projects/work/dna/web/src/features/legal/components/LegalDocumentLayout.tsx (lines 1-44)
+
+## My request for Codex:
+Давай LegalRevisionDate сделаем частью LegalDocumentMeta?
