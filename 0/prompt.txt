@@ -1,0 +1,1 @@
+Yes, I can see the interface of cropping, but I'm seeing a black bg instead uploaded image. Can you fix it, please?
