@@ -1,0 +1,7 @@
+Well, but can you look at block of category and section results: you have made them as a unify tabbed block, but I asked to make it just as headr + list of links, not as a tabulated content. Fix it, should be just like this:
+
+Категории
+[список категорий]
+
+Разделы
+[список разделов]
