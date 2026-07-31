@@ -1,0 +1,16 @@
+Давай теперь по правкам по дизайну, есть такой блок:
+
+```
+      <div className="flex flex-wrap gap-2">
+        {types.map((type) => (
+          <Button key={type.key} type="button" variant="outline"
+            onClick={() => onChange([...value, createAddition(type.key)])}>
+            Добавить: {type.name}
+          </Button>
+        ))}
+      </div>
+```
+
+В `web/src/features/admin/components/AdminCrudForm/components/ProductAdditionsFields/ProductAdditionsFields.tsx`
+
+Сейчас он выглядит как отделенные друг от друга кнопки с идиотским префиксом «Добавить: ». Давай мы префикс вынесем в заголовок «Добавить тип дополнения», а разрозненные кнопки сделаем как одну большую кнопку, растянутую на всю ширину разделенную на подкнопки.
