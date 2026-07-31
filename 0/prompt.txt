@@ -1,0 +1,1 @@
+Click on already selected option should return init unselected state of a select. Can you chek such a behaviour
