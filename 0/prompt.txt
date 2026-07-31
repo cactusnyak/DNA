@@ -1,0 +1,5 @@
+Заметил очень странну вещь: у нас на фронте есть одинаковых по своей сути компонента: web/src/widgets/Catalog/components/ProductGrid/components/ProductCard/ProductCard.tsx и web/src/widgets/ProductsListing/components/ProductCard/ProductCard.tsx
+
+Что за фигня. Для объявлений у нас 1 компонент: web/src/widgets/AdsListing/components/AdCard/AdCard.tsx
+
+Можешь убрать дубликат карточки продукта
