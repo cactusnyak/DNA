@@ -1,0 +1,1 @@
+So, the last UI changes: let's look at `AdDetails` and `ProductDetails` and at inner components. Can you make more logical and comfortable grouping of elements.
