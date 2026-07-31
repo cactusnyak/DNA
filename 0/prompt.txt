@@ -1,0 +1,5 @@
+Please improve the behavior of the global search input on both mobile and desktop devices:
+
+- The global search is placed inside the header, whose visibility can change dynamically. Add an appropriate top offset to the search results container so that it is never partially hidden behind the header.
+- On mobile devices, the search results container may disappear unexpectedly while the user is interacting with the search input. Fix this behavior and keep the search interface stable while it is active.
+- On mobile devices, disable scrolling of the main page while the search interface is open. Only the search results container should remain scrollable.
