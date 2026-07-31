@@ -1,0 +1,1 @@
+Can you remove all `transition` styles in all components using it (exception — catalog controls).
