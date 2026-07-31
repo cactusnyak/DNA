@@ -1,0 +1,1 @@
+No no no, I mean if, for example, in seaction respond for «Предложения» subseaction, we hide the seaction (`<section className="flex flex-col gap-3 p-4">`)
