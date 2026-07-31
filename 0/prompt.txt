@@ -1,0 +1,1 @@
+Can you refactor code of `SearcPage` to divide it content on components. Also we have duplication of `rounded-full border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:border-ring hover:bg-muted`, it's a style of plate, we can make it like a singular component with conditional rendering
