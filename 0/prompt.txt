@@ -1,0 +1,1 @@
+Yep, but make for placeholder naming more gray color (for displaying that it's a placeholder, not named yet)
