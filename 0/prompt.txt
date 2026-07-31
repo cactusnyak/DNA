@@ -1,0 +1,1 @@
+Can you add configurated color for box shaddow and apply it for all box shadow which we use?
