@@ -1,0 +1,8 @@
+And the las feat: let's add an element right from 
+```    
+<span className="rounded-full bg-muted px-3 py-1.5 text-xs">
+    {types.find((type) => type.key === addition.type)?.name ?? addition.type}
+</span>
+```
+
+Wich will just display a name of addition (from name field) or display placeholder like `addition <current  number>`.
