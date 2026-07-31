@@ -1,0 +1,1 @@
+can you make the stroke color for default icon state like text color in «В корзину»
