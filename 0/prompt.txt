@@ -1,0 +1,1 @@
+Maybe we call it like BottomConfirm, due to it's not just a notification: we have confirm button there. but otherwise do that you have suggested to me.
