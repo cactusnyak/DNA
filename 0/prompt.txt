@@ -1,0 +1,1 @@
+no, let's fix some optional problem: each input should have ID or name, otherwise the browser warn about that. Can you make prop for an input name and aplly it for each input we use. Pick relevant name for each inout
