@@ -1,0 +1,1 @@
+Давай сейчас обратим внимание на `web/src/widgets/ProductDetails/components/ProductAdditionsSelector/ProductAdditionsSelector.tsx`, просто чуть поправим стили, нужно сделать этот блок более лаконичным, в частности сделать более компактными кнопки для boolean и number, для всех кнопок (например, для «Да/Нет») довить `cursor-pointer` стиль.
