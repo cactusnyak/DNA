@@ -1,0 +1,1 @@
+Can you check state card: can you apply accent variant for return to the catalog buttons via current config of StateCart
