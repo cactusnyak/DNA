@@ -1,0 +1,1 @@
+Well, now I want to add a cropper for image as a intermediate layer of the avatar uploading pipeline. Can we use some build in library for this?
