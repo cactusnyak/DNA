@@ -1,0 +1,1 @@
+can you look in admin panel tables, privately, on user table: tehre is an image column. Can you make such column for categories and items (products/ads)?
