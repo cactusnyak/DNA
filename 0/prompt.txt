@@ -1,0 +1,7 @@
+Look at `CategoryTreeNode`. There is an usage of `CategoryImage`, but can you, as for dropdown version of category image, make separated category preview with separated category image. So, we will have 6 similiar components:
+
+- category preview for an item page
+- for dropdown
+- and for current usage (catalog page)
+
+style current category preview image like image for dropdown
