@@ -1,0 +1,1 @@
+return transition for big button on hpme page 'Реферальная программа' and for section title
