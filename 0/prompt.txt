@@ -1,0 +1,22 @@
+<div className="flex items-center justify-between gap-3">
+            <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
+              {types.find((type) => type.key === addition.type)?.name ?? addition.type}
+            </span>
+            <div className="flex gap-1">
+              <Button type="button" size="icon" variant="ghost" disabled={index === 0}
+                onClick={() => move(index, -1)} aria-label="Переместить вверх">
+                <ArrowUp className="size-4" />
+              </Button>
+              <Button type="button" size="icon" variant="ghost" disabled={index === value.length - 1}
+                onClick={() => move(index, 1)} aria-label="Переместить вниз">
+                <ArrowDown className="size-4" />
+              </Button>
+              <Button type="button" size="icon" variant="ghost"
+                onClick={() => onChange(value.filter((_, itemIndex) => itemIndex !== index))}
+                aria-label="Удалить дополнение">
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+          </div>
+
+There just replace trash icon into cross and make separated group (separate arrow buttons to the group)
