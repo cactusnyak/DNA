@@ -1,0 +1,101 @@
+import { type FormEvent, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { Link, useSearchParams } from 'react-router-dom';
+import { HttpError } from '@/shared/api/http-client';
+
+import { Button } from '@/components/ui/Button';
+import { FormInputField } from '@/components/ui/FormField';
+import { confirmPasswordReset } from '@/entities/auth';
+
+export function ResetPassword() {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token') ?? '';
+
+  const [newPassword, setNewPassword] = useState('');
+
+  const mutation = useMutation({
+    mutationFn: () => confirmPasswordReset(token, newPassword),
+  });
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (mutation.isPending) return;
+    mutation.mutate();
+  }
+
+  const errorMessage =
+    mutation.error instanceof HttpError
+      ? mutation.error.status === 400
+        ? 'Ссылка для сброса пароля недействительна или устарела. Запросите новую.'
+        : 'Не удалось обновить пароль. Попробуйте ещё раз.'
+      : undefined;
+
+  if (!token) {
+    return (
+      <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
+        <h1 className="text-2xl font-semibold">Ссылка недействительна</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          В ссылке отсутствует токен сброса пароля. Запросите новую ссылку.
+        </p>
+        <Button asChild variant="secondary" className="mt-6 w-full">
+          <Link to="/forgot-password">Запросить новую ссылку</Link>
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
+      <header className="space-y-2">
+        <p className="text-sm font-medium text-muted-foreground">Восстановление доступа</p>
+        <h1 className="text-2xl font-semibold">Новый пароль</h1>
+        <p className="text-sm leading-6 text-muted-foreground">
+          Придумайте новый пароль для входа в аккаунт.
+        </p>
+      </header>
+
+      {mutation.isSuccess ? (
+        <div className="mt-6 space-y-4">
+          <p className="rounded-lg border border-border bg-muted/40 px-3 py-3 text-sm">
+            Пароль успешно обновлён. Теперь вы можете войти с новым паролем.
+          </p>
+          <Button asChild variant="accent" className="w-full">
+            <Link to="/authorization">Войти</Link>
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="mt-6 space-y-6" autoComplete="off">
+          <FormInputField
+            name="newPassword"
+            required
+            type="password"
+            label="Новый пароль"
+            caption="Минимум 8 символов"
+            value={newPassword}
+            placeholder="••••••••"
+            minLength={8}
+            autoComplete="off"
+            onChange={(event) => setNewPassword(event.target.value)}
+          />
+
+          {errorMessage && (
+            <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {errorMessage}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            variant="accent"
+            size="lg"
+            className="w-full"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? 'Обновляем...' : 'Обновить пароль'}
+          </Button>
+        </form>
+      )}
+    </section>
+  );
+}

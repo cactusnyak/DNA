@@ -1,4 +1,6 @@
 import type {
+  LoginEmailPayload,
+  RegisterEmailPayload,
   SendOtpPayload,
   VerifyOtpPayload,
 } from '@/entities/auth';
@@ -34,5 +36,25 @@ export function buildVerifyOtpPayload(
     code: value.otpCode.trim(),
     nickname: mode === 'register' ? value.nickname.trim() : undefined,
     inviterReferralCode: normalizeOptionalString(value.inviterReferralCode),
+  };
+}
+
+export function buildRegisterEmailPayload(
+  value: AuthorizationFormValue,
+): RegisterEmailPayload {
+  return {
+    email: value.login.trim(),
+    password: value.password,
+    nickname: value.nickname.trim(),
+    inviterReferralCode: normalizeOptionalString(value.inviterReferralCode),
+  };
+}
+
+export function buildLoginEmailPayload(
+  value: AuthorizationFormValue,
+): LoginEmailPayload {
+  return {
+    email: value.login.trim(),
+    password: value.password,
   };
 }

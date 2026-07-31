@@ -1,11 +1,23 @@
+export { confirmEmailVerification } from './api/confirm-email-verification';
+export { confirmPasswordReset } from './api/confirm-password-reset';
+export { getAuthConfig } from './api/get-auth-config';
 export { getCurrentUser } from './api/get-current-user';
 export { getOAuthProviders } from './api/get-oauth-providers';
 export { getOAuthUrl } from './api/get-oauth-url';
+export { loginEmail } from './api/login-email';
+export { registerEmail } from './api/register-email';
+export { requestEmailVerification } from './api/request-email-verification';
+export { requestPasswordReset } from './api/request-password-reset';
 export { sendOtp } from './api/send-otp';
 export { verifyOtp } from './api/verify-otp';
+export { AuthCapabilitiesProvider } from './model/auth-capabilities-context';
+export { useAuthCapabilities } from './model/use-auth-capabilities';
 export { useAuthStore } from './model/auth-store';
 
+export type { AuthConfig, AuthMethod } from './types/auth-config';
 export type { AuthResponse } from './types/auth-response';
 export type { OAuthProvider } from './types/oauth-provider';
+export type { LoginEmailPayload } from './api/login-email';
+export type { RegisterEmailPayload } from './api/register-email';
 export type { SendOtpPayload } from './api/send-otp';
 export type { VerifyOtpPayload } from './api/verify-otp';

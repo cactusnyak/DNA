@@ -21,6 +21,8 @@ import { NotificationService } from '../notifications/notification.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 
+import { AuthCapabilitiesService } from './capabilities/auth-capabilities.service';
+import { AuthMethod, AuthOperation } from './capabilities/auth-method.enum';
 import type { SendOtpDto } from './dto/send-otp.dto';
 import type { VerifyOtpDto } from './dto/verify-otp.dto';
 import {
@@ -39,15 +41,22 @@ export class OtpService {
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
     private readonly config: ConfigService,
+    private readonly authCapabilities: AuthCapabilitiesService,
     @Inject(OTP_DELIVERY_PROVIDER)
     private readonly deliveryProvider: OtpDeliveryProvider,
   ) {}
 
   async sendOtp(dto: SendOtpDto, clientIp?: string) {
+    const purpose = this.parseMode(dto.mode);
+    this.authCapabilities.assertEnabled(
+      AuthMethod.OTP,
+      purpose === 'register'
+        ? AuthOperation.REGISTRATION
+        : AuthOperation.LOGIN,
+    );
     const { value: login, type } = this.parseLogin(
       this.required(dto.login, 'login'),
     );
-    const purpose = this.parseMode(dto.mode);
     const now = new Date();
     const ttlSeconds = this.config.getOrThrow<number>('OTP_CODE_TTL_SECONDS');
     const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
@@ -170,8 +179,14 @@ export class OtpService {
   }
 
   async verifyOtp(dto: VerifyOtpDto) {
-    const { value: login } = this.parseLogin(this.required(dto.login, 'login'));
     const purpose = this.parseMode(dto.mode);
+    this.authCapabilities.assertEnabled(
+      AuthMethod.OTP,
+      purpose === 'register'
+        ? AuthOperation.REGISTRATION
+        : AuthOperation.LOGIN,
+    );
+    const { value: login } = this.parseLogin(this.required(dto.login, 'login'));
     const code = this.required(dto.code, 'code');
     const now = new Date();
     const maxAttempts = this.config.getOrThrow<number>(
