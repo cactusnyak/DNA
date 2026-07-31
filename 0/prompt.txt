@@ -1,0 +1,15 @@
+hi, I want to make little redesign of the platform. Firtt of all, tell me, how can we configurate main design system parameters, like accent color, color for bg and etc.
+
+Fisrt of all I want to add a bg for this element:
+
+```
+      <div style={{ marginTop: headerHeightVar() }}>
+        <Breadcrumbs />
+
+        <main className="mx-auto max-w-7xl px-4 py-8 pb-24">
+          <Outlet />
+        </main>
+      </div>
+```
+
+In `MainLayout` and add accent color of the brand to color buttons, accent elements and etc.
