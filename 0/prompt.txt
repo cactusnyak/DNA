@@ -1,0 +1,8 @@
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. When addressing multiple comments, label each answer with its annotation number (for example, `Annotation 1`) so the user can match it to the numbered annotation.
+<response-annotations>
+[{"text":"Page preview card: CategoryPreviewCard.tsxDropdown category item: CategoryColumn.tsxPage preview image: CategoryPreviewImage.tsxCompact dropdown image: CategoryImage.tsx"}]
+</response-annotations>
+
+## My request for Codex:
+Current version of styles of elements is good, but I asked to make normal component seprataion for two types preview card and for two types of preview images. Can you make normal separation and give me 4 real separated files. Save current architecture style and make separation consistent and understandable. Don't forget to make understandable nameing for components. After creation send me future actual 4 files
