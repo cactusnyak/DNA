@@ -1,0 +1,1 @@
+Look at Button.tsx. How we can make so that if we call `Button` component and set classname with some styles, that styles was more proirity than preset in `Button.tsx` config?
