@@ -1,0 +1,6 @@
+# Files mentioned by the user:
+
+## LegalDocumentLayout.tsx: /Users/fedorshevchenko/Projects/work/dna/web/src/features/legal/components/LegalDocumentLayout.tsx (line 9)
+
+## My request for Codex:
+Можешь добавить достаточно массивную, но аккуратную тень
