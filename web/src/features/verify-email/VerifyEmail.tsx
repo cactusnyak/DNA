@@ -21,14 +21,13 @@ export function VerifyEmail() {
 
     processedTokenRef.current = token;
     mutation.mutate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   return (
-    <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-5 sm:p-6">
+    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Подтверждение почты</h1>
 
-      <div className="mt-6 space-y-4">
+      <div className="flex flex-col gap-4">
         {!token && (
           <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             В ссылке отсутствует токен подтверждения.
