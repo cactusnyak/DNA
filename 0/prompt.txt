@@ -1,0 +1,1 @@
+Look at Gallery.tsx: can you switch off zomming of photos on mobile devices
