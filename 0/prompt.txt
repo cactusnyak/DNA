@@ -1,0 +1,1 @@
+Nice, now, you now that for catalof button exists a state of activation (showing dropdown): can you for active catalog button aply styles that that we use for hovered accent button
