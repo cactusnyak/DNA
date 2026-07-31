@@ -1,0 +1,9 @@
+Nice, now, we have a block like this:
+
+```
+      <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        {emptyText}
+      </div>
+```
+
+It's a block for stab `{emptyText}`, and there are many such elements. can we separate it as a ui component?
