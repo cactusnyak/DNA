@@ -1,0 +1,1 @@
+Look at `ForgotPassword`, `ResetPassword` and `VerifyEmail` conponents. Can you replace all margin based spasing (spacy-y-*, m-* and etc.) on gap with `flex flex col` util classes combinations
