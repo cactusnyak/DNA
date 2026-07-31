@@ -1,0 +1,1 @@
+Can you style bg for this: `<div className="bg-page" style={{ marginTop: headerHeightVar() }}>`  as a dotted bg with gradient transparent of dots (more clear visible dotts in the center and radial increasing of transparent).
