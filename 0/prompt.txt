@@ -1,0 +1,8 @@
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. When addressing multiple comments, label each answer with its annotation number (for example, `Annotation 1`) so the user can match it to the numbered annotation.
+<response-annotations>
+[{"text":"Page card: CategoryPreviewCard.tsxPage image: CategoryPreviewImage.tsx"}]
+</response-annotations>
+
+## My request for Codex:
+Now, look at these components (annotation) and two screenshots. As you can se, item without image has another size than item with image. Can you consistent size (the ref is sizes of item with image).
