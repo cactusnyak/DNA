@@ -1,0 +1,1 @@
+Now some smal fix to the custom select form field: now we have a kind of a header option which is selected if we don't select something in the select yet, but I don't want to display (exactly in the dropdown) such options and also I want to make ability of unselecting. Also add some small gap between options (e.g. gap-1).
