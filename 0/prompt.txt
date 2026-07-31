@@ -1,0 +1,4 @@
+fedorshevchenko@Fedors-MacBook-Pro api % node -e "const { randomBytes, scryptSync } = require('node:crypto'); const salt = randomBytes(16).toString('hex'); const hash = scryptSync('123456', salt, 64).toString('hex'); console.log(`scrypt:${salt}:${hash}`);"
+zsh: command not found: scrypt::
+
+fedorshevchenko@Fedors-MacBook-Pro api %
