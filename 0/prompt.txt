@@ -1,0 +1,1 @@
+Посмотри на Button.tsx: можешь для outline варианта сделать обводку и фон как border border-primary/15 bg-primary/5
