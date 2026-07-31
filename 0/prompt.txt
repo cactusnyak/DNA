@@ -1,0 +1,1 @@
+Now the problem related with item feeds (market, ads, combined). There is a lazy loadong depended on scroll, and there is a trashhold. Can you send me a link for related files and after my own analyze I will ask for you
