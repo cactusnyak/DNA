@@ -1,0 +1,1 @@
+Look at `BalanceCard` component: there is a badge with 2 buttons ('Пополнить', 'Вывести'). So, that badge oferflow the card if card has enough small width, but can we make `flex-shrink: 0` similiar behaviour for the card to avoid hidden overflowinf of inner content?
