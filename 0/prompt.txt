@@ -1,0 +1,1 @@
+Check product additions fields component again: add new button of setting shich will just switch visibility of grpuped fields of addition (displayed after adding as a default and shoild be hide automaticly, if added new addition)
