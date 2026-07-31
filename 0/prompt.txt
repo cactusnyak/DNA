@@ -1,0 +1,4 @@
+accent:
+          'bg-primary/5 text-primary hover:bg-primary/10 aria-expanded:bg-primary/10 aria-expanded:text-foreground',
+
+make it reall as accented button in Button.tsx based on custom accent colors in index.ss. Make relevant hovering effect (just more transparant primary color for bg)
