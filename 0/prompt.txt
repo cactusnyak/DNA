@@ -1,0 +1,1 @@
+can you use set some custom color in `index.css` with such value: #2100ff, which we can use for icon stroke coloring for mobile navigation.
