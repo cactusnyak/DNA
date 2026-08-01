@@ -241,6 +241,7 @@ export function useAdminCrudHandlers({
         imageUrl: '',
         imageAlt: '',
         isActive: true,
+        isOversized: false,
       });
 
       return category.id;
@@ -260,6 +261,7 @@ export function useAdminCrudHandlers({
       imageUrls: [],
       additions: [],
       isActive: true,
+      isOversizedOverride: null,
     });
 
     return product.id;

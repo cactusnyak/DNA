@@ -36,6 +36,19 @@ const statusFilterOptions = [
   },
 ];
 
+function getProductOversizedLabel(product: AdminProduct) {
+  if (product.isOversizedOverride === true) return 'Крупногабаритный';
+  if (product.isOversizedOverride === false) return 'Обычный товар';
+  return `Наследовать от категории (${product.isOversized ? 'Да' : 'Нет'})`;
+}
+
+const oversizedFilterOptions = [
+  { value: 'Крупногабаритный', label: 'Крупногабаритный' },
+  { value: 'Обычный товар', label: 'Обычный товар' },
+  { value: 'Наследовать от категории (Да)', label: 'Наследуется: Да' },
+  { value: 'Наследовать от категории (Нет)', label: 'Наследуется: Нет' },
+];
+
 function getCategoryFilterOptions(products: AdminProduct[]) {
   const optionsByValue = new Map<string, string>();
 
@@ -76,7 +89,7 @@ export function AdminProductRecordsView({
           )
         }
         getMeta={(product) =>
-          `${product.category?.name ?? 'Без категории'} · ${formatPrice(product.price)} · ${product.location?.name ?? 'Без геопозиции'} · ${getAdminRecordStatusLabel(product)}`
+          `${product.category?.name ?? 'Без категории'} · ${formatPrice(product.price)} · ${getProductOversizedLabel(product)} · ${product.location?.name ?? 'Без геопозиции'} · ${getAdminRecordStatusLabel(product)}`
         }
         renderActions={renderActions}
         emptyText="Продукты не найдены."
@@ -154,6 +167,15 @@ export function AdminProductRecordsView({
           },
           getValue: (product) => product.price,
           render: (product) => formatPrice(product.price),
+        },
+        {
+          key: 'isOversized',
+          title: 'Крупногабаритность',
+          width: 250,
+          sortable: true,
+          filter: { type: 'select', options: oversizedFilterOptions },
+          getValue: getProductOversizedLabel,
+          render: getProductOversizedLabel,
         },
         {
           key: 'locationName',

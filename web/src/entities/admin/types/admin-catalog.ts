@@ -11,6 +11,7 @@ import type { ContentDescription } from '@/shared/types/content-description';
 export type AdminCatalogCollectionType = 'CATEGORY' | 'PRODUCT';
 
 export type AdminMarketCategory = MarketCategory & {
+  isOversized: boolean;
   isActive: boolean;
   deletedAt?: string | null;
   productsCount: number;
@@ -21,6 +22,8 @@ export type AdminProduct = Product & {
   categoryId: string;
   isActive: boolean;
   deletedAt?: string | null;
+  isOversized: boolean;
+  isOversizedOverride: boolean | null;
 };
 
 export type AdminAdCategory = AdCategory & {
@@ -129,6 +132,7 @@ export type AdminMarketCategoryPayload = {
   imageUrl?: string;
   imageAlt?: string;
   isActive: boolean;
+  isOversized: boolean;
 };
 
 export type AdminProductPayload = {
@@ -141,6 +145,7 @@ export type AdminProductPayload = {
   additions: ProductAddition[];
   location?: Location;
   isActive: boolean;
+  isOversizedOverride: boolean | null;
 };
 
 export type AdminProductAdditionType = {

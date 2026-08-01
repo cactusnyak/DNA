@@ -20,6 +20,7 @@ export class MarketProductsController {
       priceTo: query.priceTo,
       categoryIds: query.categoryIds,
       sort: query.sort,
+      oversized: query.oversized,
     });
   }
 

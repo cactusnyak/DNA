@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, OversizedDeliveryQuoteStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -12,17 +12,21 @@ import {
   type SelectedProductAddition,
 } from '../products/product-additions';
 
-import type { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
+import type {
+  CreateOrderDto,
+  CreateOrderItemDto,
+} from './dto/create-order.dto';
 
 type NormalizedOrderItem = {
   productId: string;
   quantity: number;
   selectedAdditions: SelectedProductAddition[];
+  deliveryQuoteId?: string;
 };
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createOrderDto: CreateOrderDto, userId?: string) {
     const customerName = this.getRequiredString(
@@ -42,7 +46,9 @@ export class OrdersService {
 
     const customerEmail = this.getOptionalString(createOrderDto.customerEmail);
     const comment = this.getOptionalString(createOrderDto.comment);
-    const guestSessionId = this.getOptionalString(createOrderDto.guestSessionId);
+    const guestSessionId = this.getOptionalString(
+      createOrderDto.guestSessionId,
+    );
 
     const normalizedItems = this.getNormalizedItems(createOrderDto.items);
     const productIds = Array.from(
@@ -59,6 +65,9 @@ export class OrdersService {
         id: true,
         price: true,
         additions: true,
+        location: true,
+        isOversizedOverride: true,
+        category: { select: { isOversized: true } },
       },
     });
 
@@ -78,6 +87,14 @@ export class OrdersService {
       products.map((product) => [product.id, product]),
     );
 
+    const quoteIds = normalizedItems
+      .map((item) => item.deliveryQuoteId)
+      .filter((id): id is string => Boolean(id));
+    const quotes = await this.prismaService.oversizedDeliveryQuote.findMany({
+      where: { id: { in: quoteIds } },
+    });
+    const quoteById = new Map(quotes.map((quote) => [quote.id, quote]));
+    const now = new Date();
     const orderItems = normalizedItems.map((item) => {
       const product = productById.get(item.productId);
 
@@ -89,17 +106,71 @@ export class OrdersService {
         product.additions,
         item.selectedAdditions,
       );
+      const isOversized =
+        product.isOversizedOverride ?? product.category.isOversized;
+      const quote = item.deliveryQuoteId
+        ? quoteById.get(item.deliveryQuoteId)
+        : undefined;
+      if (isOversized) {
+        if (!quote)
+          throw new BadRequestException(
+            `Для крупногабаритного товара ${item.productId} требуется подтверждённый расчёт доставки.`,
+          );
+        if (
+          quote.productId !== item.productId ||
+          quote.quantity !== item.quantity
+        )
+          throw new BadRequestException(
+            'Расчёт доставки не соответствует товару или количеству.',
+          );
+        if (
+          quote.userId
+            ? quote.userId !== userId
+            : quote.guestSessionId !== guestSessionId
+        )
+          throw new BadRequestException(
+            'Расчёт доставки принадлежит другому покупателю.',
+          );
+        if (
+          quote.status !== OversizedDeliveryQuoteStatus.ACCEPTED ||
+          quote.confirmedDeliveryPrice == null ||
+          (quote.expiresAt && quote.expiresAt <= now)
+        )
+          throw new BadRequestException(
+            'Расчёт доставки не подтверждён или истёк.',
+          );
+      } else if (quote)
+        throw new BadRequestException(
+          'Расчёт доставки нельзя применить к обычному товару.',
+        );
       return {
         productId: item.productId,
         quantity: item.quantity,
         baseUnitPrice: product.price,
         unitPrice: product.price + resolved.additionsTotal,
         selectedAdditions: resolved.snapshot,
+        isOversized,
+        deliveryQuoteId: quote?.id,
+        deliveryPrice: quote?.confirmedDeliveryPrice ?? 0,
+        deliverySnapshot: quote
+          ? {
+              quoteId: quote.id,
+              dispatchLocation: quote.dispatchLocation,
+              destinationRegion: quote.destinationRegion,
+              destinationCity: quote.destinationCity,
+              destinationAddress: quote.destinationAddress,
+              quantity: quote.quantity,
+              status: quote.status,
+              managerComment: quote.managerComment,
+              confirmedAt: quote.updatedAt,
+              expiresAt: quote.expiresAt,
+            }
+          : undefined,
       };
     });
 
     const totalAmount = orderItems.reduce(
-      (sum, item) => sum + item.unitPrice * item.quantity,
+      (sum, item) => sum + item.unitPrice * item.quantity + item.deliveryPrice,
       0,
     );
 
@@ -125,6 +196,10 @@ export class OrdersService {
             baseUnitPrice: item.baseUnitPrice,
             unitPrice: item.unitPrice,
             selectedAdditions: item.selectedAdditions,
+            isOversized: item.isOversized,
+            deliveryQuoteId: item.deliveryQuoteId,
+            deliveryPrice: item.deliveryPrice,
+            deliverySnapshot: item.deliverySnapshot,
           })),
         },
       },
@@ -234,6 +309,7 @@ export class OrdersService {
         productId: item.productId,
         quantity: (current?.quantity ?? 0) + quantity,
         selectedAdditions: canonicalSelection,
+        deliveryQuoteId: this.getOptionalString(item.deliveryQuoteId),
       });
     });
 
@@ -261,6 +337,10 @@ export class OrdersService {
         baseUnitPrice: item.baseUnitPrice,
         unitPrice: item.unitPrice,
         selectedAdditions: item.selectedAdditions ?? [],
+        isOversized: item.isOversized,
+        deliveryQuoteId: item.deliveryQuoteId ?? undefined,
+        deliveryPrice: item.deliveryPrice,
+        deliverySnapshot: item.deliverySnapshot ?? undefined,
         product: item.product ? this.mapOrderProduct(item.product) : undefined,
       })),
     };
@@ -285,6 +365,9 @@ export class OrdersService {
       description: product.description,
       price: product.price,
       additions: product.additions ?? [],
+      location: product.location,
+      isOversizedOverride: product.isOversizedOverride,
+      isOversized: product.isOversizedOverride ?? product.category.isOversized,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images

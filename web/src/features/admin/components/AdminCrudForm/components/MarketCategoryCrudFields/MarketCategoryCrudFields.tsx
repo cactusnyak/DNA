@@ -3,6 +3,7 @@ import {
   FormInputField,
   FormSelectField,
   FormTextareaField,
+  FormToggleField,
 } from '@/components/ui/FormField';
 import type { AdminMarketCategory } from '@/entities/admin';
 
@@ -85,6 +86,12 @@ export function MarketCategoryCrudFields({
         label="Описание"
         value={String(values.description ?? '')}
         onChange={(event) => onValueChange('description', event.target.value)}
+      />
+      <FormToggleField
+        label="Крупногабаритная категория"
+        caption="Применяется только к товарам, назначенным непосредственно этой категории. Дочерние категории не наследуют значение."
+        checked={Boolean(values.isOversized)}
+        onCheckedChange={(checked) => onValueChange('isOversized', checked)}
       />
     </div>
   );

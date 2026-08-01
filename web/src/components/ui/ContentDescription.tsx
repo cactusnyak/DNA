@@ -13,7 +13,13 @@ export function ContentDescription({
   if (!description.blocks.length) return null;
 
   return (
-    <section className={['space-y-3 pt-2', className].filter(Boolean).join(' ')}>
+    <section
+      className={[
+        'flex flex-col gap-4 rounded-xl shadow-card-md p-4 bg-white md:shadow-none md:p-0',
+        className,
+      ].filter(Boolean).join(' ')}
+    >
+      <h2 className="text-lg font-medium">Описание</h2>
       <ContentDescriptionEngine description={description} />
     </section>
   );

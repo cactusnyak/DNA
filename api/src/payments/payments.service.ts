@@ -25,11 +25,11 @@ export class PaymentsService {
 
   async createPayment(params: {
     orderId: string;
-    amountKopecks: number;
+    amountRubles: number;
     description: string;
     returnUrl: string;
   }): Promise<YookassaPayment> {
-    const amountRubles = (params.amountKopecks / 100).toFixed(2);
+    const amountRubles = params.amountRubles.toFixed(2);
 
     const response = await fetch(`${this.baseUrl}/payments`, {
       method: 'POST',

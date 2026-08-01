@@ -84,8 +84,8 @@ export function ItemGallery({ images, title }: ItemGalleryProps) {
             <span
               key={index}
               className={[
-                'w-3 h-0.5 flex-1 rounded-full ',
-                index === activeIndex ? 'bg-foreground' : 'bg-background/70',
+                'w-3 h-[2.5px] flex-1 rounded-full ',
+                index === activeIndex ? 'bg-accent' : 'bg-accent/50',
               ].join(' ')}
             />
           ))}

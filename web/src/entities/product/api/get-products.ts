@@ -14,6 +14,7 @@ type GetProductsParams = {
   priceTo?: number;
   categoryIds?: string[];
   sortRules?: CatalogSortRule[];
+  oversized?: boolean;
 };
 
 function buildSortParam(sortRules?: CatalogSortRule[]) {
@@ -38,6 +39,7 @@ export function getProducts(params: GetProductsParams = {}) {
       priceTo: params.priceTo,
       categoryIds: params.categoryIds?.join(','),
       sort: buildSortParam(params.sortRules),
+      oversized: params.oversized,
     },
   });
 }

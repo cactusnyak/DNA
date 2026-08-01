@@ -11,6 +11,14 @@ type DescriptionBlockRenderer = (
   key: string,
 ) => ReactNode;
 
+type DescriptionBlockGroup = {
+  blocks: ContentDescriptionBlock[];
+};
+
+type ContentDescriptionEngineProps = {
+  description: ContentDescription;
+};
+
 const blockRenderers = {
   heading: (block, key) => (
     <h2 key={key} className="text-lg font-medium">
@@ -22,15 +30,10 @@ const blockRenderers = {
       <LinkifyText text={block.text} />
     </p>
   ),
-} satisfies Record<ContentDescriptionBlock['type'], DescriptionBlockRenderer>;
-
-type ContentDescriptionEngineProps = {
-  description: ContentDescription;
-};
-
-type DescriptionBlockGroup = {
-  blocks: ContentDescriptionBlock[];
-};
+} satisfies Record<
+  ContentDescriptionBlock['type'],
+  DescriptionBlockRenderer
+>;
 
 function groupDescriptionBlocks(
   blocks: ContentDescriptionBlock[],
@@ -51,14 +54,21 @@ export function ContentDescriptionEngine({
 }: ContentDescriptionEngineProps) {
   const groups = groupDescriptionBlocks(description.blocks);
 
-  return groups.map((group, groupIndex) => (
-    <div key={`description-group-${groupIndex}`} className="space-y-3">
-      {group.blocks.map((block, blockIndex) =>
-        blockRenderers[block.type](
-          block,
-          `${block.type}-${groupIndex}-${blockIndex}`,
-        ),
-      )}
+  return (
+    <div className="flex flex-col gap-6">
+      {groups.map((group, groupIndex) => (
+        <div
+          key={`description-group-${groupIndex}`}
+          className="flex flex-col gap-3"
+        >
+          {group.blocks.map((block, blockIndex) =>
+            blockRenderers[block.type](
+              block,
+              `${block.type}-${groupIndex}-${blockIndex}`,
+            ),
+          )}
+        </div>
+      ))}
     </div>
-  ));
+  );
 }

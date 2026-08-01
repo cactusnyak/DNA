@@ -16,6 +16,7 @@ type CatalogControlsProps = {
   priceFilter: CatalogPriceFilterValue;
   selectedCategoryIds: string[];
   sortRules: CatalogSortRule[];
+  oversizedFilter?: 'all' | 'oversized' | 'regular';
   showFilters?: boolean;
   showSorting?: boolean;
   subcategoryOptions?: CatalogSubcategoryFilterOption[];
@@ -23,6 +24,7 @@ type CatalogControlsProps = {
   onPriceFilterChange: (value: CatalogPriceFilterValue) => void;
   onSelectedCategoryIdsChange: (categoryIds: string[]) => void;
   onSortRulesChange: (rules: CatalogSortRule[]) => void;
+  onOversizedFilterChange?: (value: 'all' | 'oversized' | 'regular') => void;
 };
 
 export function CatalogControls({
@@ -30,6 +32,7 @@ export function CatalogControls({
   priceFilter,
   selectedCategoryIds,
   sortRules,
+  oversizedFilter = 'all',
   showFilters = true,
   showSorting = true,
   subcategoryOptions,
@@ -37,6 +40,7 @@ export function CatalogControls({
   onPriceFilterChange,
   onSelectedCategoryIdsChange,
   onSortRulesChange,
+  onOversizedFilterChange,
 }: CatalogControlsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -81,6 +85,8 @@ export function CatalogControls({
               subcategoryOptions={subcategoryOptions}
               onPriceFilterChange={onPriceFilterChange}
               onSelectedCategoryIdsChange={onSelectedCategoryIdsChange}
+              oversizedFilter={oversizedFilter}
+              onOversizedFilterChange={onOversizedFilterChange}
             />
           )}
         </div>

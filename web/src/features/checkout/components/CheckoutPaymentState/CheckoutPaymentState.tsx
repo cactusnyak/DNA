@@ -144,7 +144,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
           {order.items.map((item) => (
             <li key={item.id} className="flex justify-between gap-4">
               <span>{item.product?.title ?? `Товар ${item.productId}`} × {item.quantity}</span>
-              <span className="shrink-0">{formatPrice(item.unitPrice * item.quantity)}</span>
+              <span className="shrink-0">{formatPrice(item.unitPrice * item.quantity + item.deliveryPrice)}</span>
             </li>
           ))}
         </ul>
