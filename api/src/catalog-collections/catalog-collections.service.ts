@@ -141,6 +141,7 @@ export class CatalogCollectionsService {
       description: category.description ?? undefined,
       parentId: category.parentId ?? undefined,
       image: category.image ?? undefined,
+      isOversized: category.isOversized,
     };
   }
 
@@ -155,6 +156,8 @@ export class CatalogCollectionsService {
       price: product.price,
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
+      isOversizedOverride: product.isOversizedOverride,
+      isOversized: product.isOversizedOverride ?? product.category.isOversized,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images

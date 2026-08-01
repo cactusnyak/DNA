@@ -29,6 +29,14 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum OversizedDeliveryQuoteStatus {
+  PENDING
+  QUOTED
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
 enum CatalogCollectionType {
   CATEGORY
   PRODUCT
@@ -71,11 +79,12 @@ model User {
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])
 
-  cartItems  CartItem[]
-  orders     Order[]
-  ads        Ad[]
-  favourites Favourite[]
-  authTokens AuthToken[]
+  cartItems               CartItem[]
+  orders                  Order[]
+  ads                     Ad[]
+  favourites              Favourite[]
+  authTokens              AuthToken[]
+  oversizedDeliveryQuotes OversizedDeliveryQuote[]
 
   invitedReferrals Referral[] @relation("Inviter")
   receivedReferral Referral?  @relation("Invited")
@@ -101,24 +110,24 @@ model AuthToken {
 }
 
 model OtpCode {
-  id                  String   @id @default(uuid())
-  login               String
-  type                String
-  purpose             String   @default("login")
-  codeHash             String?
-  expiresAt            DateTime
-  verifyAttempts       Int      @default(0)
-  consumedAt           DateTime?
-  provider             String?
-  providerMessageId    String?  @unique
-  providerStatusCode   Int?
-  deliveryStatus       String?
-  providerErrorCode    String?
-  sentAt               DateTime?
-  deliveredAt          DateTime?
-  failedAt             DateTime?
-  clientIpHash         String?
-  createdAt            DateTime @default(now())
+  id                 String    @id @default(uuid())
+  login              String
+  type               String
+  purpose            String    @default("login")
+  codeHash           String?
+  expiresAt          DateTime
+  verifyAttempts     Int       @default(0)
+  consumedAt         DateTime?
+  provider           String?
+  providerMessageId  String?   @unique
+  providerStatusCode Int?
+  deliveryStatus     String?
+  providerErrorCode  String?
+  sentAt             DateTime?
+  deliveredAt        DateTime?
+  failedAt           DateTime?
+  clientIpHash       String?
+  createdAt          DateTime  @default(now())
 
   // Kept nullable for a rolling migration; new code never writes plaintext OTP.
   code String?
@@ -175,8 +184,9 @@ model MarketCategory {
   parentId    String?
   imageId     String?
 
-  isActive  Boolean   @default(true)
-  deletedAt DateTime?
+  isActive    Boolean   @default(true)
+  isOversized Boolean   @default(false)
+  deletedAt   DateTime?
 
   parent   MarketCategory?  @relation("MarketCategoryTree", fields: [parentId], references: [id])
   children MarketCategory[] @relation("MarketCategoryTree")
@@ -190,14 +200,15 @@ model MarketCategory {
 }
 
 model Product {
-  id          String @id @default(uuid())
-  categoryId  String
-  title       String
-  slug        String
-  description Json   @db.JsonB
-  price       Int
-  additions   Json?  @db.JsonB
-  location    Json?  @db.JsonB
+  id                  String   @id @default(uuid())
+  categoryId          String
+  title               String
+  slug                String
+  description         Json     @db.JsonB
+  price               Int
+  additions           Json?    @db.JsonB
+  location            Json?    @db.JsonB
+  isOversizedOverride Boolean?
 
   isActive  Boolean   @default(true)
   deletedAt DateTime?
@@ -212,7 +223,8 @@ model Product {
   orderItems OrderItem[]
   favourites Favourite[]
 
-  collectionProducts CatalogCollectionProduct[]
+  collectionProducts      CatalogCollectionProduct[]
+  oversizedDeliveryQuotes OversizedDeliveryQuote[]
 }
 
 model AdCategory {
@@ -330,16 +342,55 @@ model Order {
 }
 
 model OrderItem {
-  id                String @id @default(uuid())
+  id                String  @id @default(uuid())
   orderId           String
   productId         String
   quantity          Int
   baseUnitPrice     Int
   unitPrice         Int
-  selectedAdditions Json?  @db.JsonB
+  selectedAdditions Json?   @db.JsonB
+  isOversized       Boolean @default(false)
+  deliveryQuoteId   String? @unique
+  deliveryPrice     Int     @default(0)
+  deliverySnapshot  Json?   @db.JsonB
 
-  order   Order   @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  order         Order                   @relation(fields: [orderId], references: [id])
+  product       Product                 @relation(fields: [productId], references: [id])
+  deliveryQuote OversizedDeliveryQuote? @relation(fields: [deliveryQuoteId], references: [id])
+}
+
+model OversizedDeliveryQuote {
+  id                     String                       @id @default(uuid())
+  productId              String
+  userId                 String?
+  guestSessionId         String?
+  quantity               Int
+  dispatchLocation       Json                         @db.JsonB
+  destinationRegion      String
+  destinationCity        String
+  destinationAddress     String
+  customerName           String
+  customerPhone          String
+  customerEmail          String?
+  customerComment        String?
+  unloadingRequired      Boolean                      @default(false)
+  accessRestrictions     String?
+  status                 OversizedDeliveryQuoteStatus @default(PENDING)
+  confirmedDeliveryPrice Int?
+  currency               Currency                     @default(RUB)
+  managerComment         String?
+  expiresAt              DateTime?
+  acceptedAt             DateTime?
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+
+  product   Product    @relation(fields: [productId], references: [id])
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderItem OrderItem?
+
+  @@index([productId, status])
+  @@index([userId, createdAt])
+  @@index([guestSessionId, createdAt])
 }
 
 model ReferralLevel {

@@ -60,7 +60,7 @@ export class PaymentsController {
 
     const payment = await this.paymentsService.createPayment({
       orderId: order.id,
-      amountKopecks: order.totalAmount,
+      amountRubles: order.totalAmount,
       description: `Заказ №${order.id.slice(0, 8)}`,
       returnUrl,
     });

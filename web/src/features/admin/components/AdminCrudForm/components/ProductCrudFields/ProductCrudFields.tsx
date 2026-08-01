@@ -68,6 +68,8 @@ export function ProductCrudFields({
         onValueChange={(value) => onValueChange('categoryId', value)}
       />
 
+      <FormSelectField label="Крупногабаритность" caption={`При наследовании сейчас: ${categories.find((category) => category.id === values.categoryId)?.isOversized ? 'крупногабаритный' : 'обычный товар'}`} value={String(values.isOversizedOverride ?? 'inherit')} options={[{ value: 'inherit', label: 'Наследовать от категории' }, { value: 'oversized', label: 'Крупногабаритный' }, { value: 'regular', label: 'Обычный товар' }]} onValueChange={(value) => onValueChange('isOversizedOverride', value)} />
+
       <FormInputField
         name="price"
         required

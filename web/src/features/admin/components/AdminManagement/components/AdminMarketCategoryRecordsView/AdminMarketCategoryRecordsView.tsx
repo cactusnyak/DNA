@@ -26,6 +26,11 @@ const statusFilterOptions = [
   { value: 'Удалено', label: 'Удалено' },
 ];
 
+const oversizedFilterOptions = [
+  { value: 'Да', label: 'Да' },
+  { value: 'Нет', label: 'Нет' },
+];
+
 export function AdminMarketCategoryRecordsView({
   categories,
   viewMode,
@@ -41,7 +46,7 @@ export function AdminMarketCategoryRecordsView({
           <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
         }
         renderMeta={(category) =>
-          `slug: ${category.slug} · продуктов: ${category.productsCount}`
+          `slug: ${category.slug} · продуктов: ${category.productsCount} · крупногабаритная: ${category.isOversized ? 'да' : 'нет'}`
         }
         renderActions={renderActions}
       />
@@ -62,7 +67,7 @@ export function AdminMarketCategoryRecordsView({
             : 'Без описания'
         }
         getMeta={(category) =>
-          `slug: ${category.slug} · ${getAdminRecordStatusLabel(category)}`
+          `slug: ${category.slug} · крупногабаритная: ${category.isOversized ? 'да' : 'нет'} · ${getAdminRecordStatusLabel(category)}`
         }
         renderActions={renderActions}
         emptyText="Категории маркета не найдены."
@@ -135,6 +140,15 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'numberRange' },
           getValue: (category) => category.productsCount,
           render: (category) => category.productsCount,
+        },
+        {
+          key: 'isOversized',
+          title: 'Крупногабаритная',
+          width: 180,
+          sortable: true,
+          filter: { type: 'select', options: oversizedFilterOptions },
+          getValue: (category) => category.isOversized ? 'Да' : 'Нет',
+          render: (category) => category.isOversized ? 'Да' : 'Нет',
         },
         {
           key: 'status',

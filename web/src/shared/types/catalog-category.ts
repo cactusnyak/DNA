@@ -16,4 +16,5 @@ export type CatalogCategory = {
   description?: string;
   parentId?: string;
   image?: Image;
+  isOversized?: boolean;
 };

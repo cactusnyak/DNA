@@ -4,6 +4,7 @@ import type { Product } from '@/entities/product';
 import { getPlatformCategoryHref } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 import { ContentDescription } from '@/components/ui/ContentDescription';
+import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
 
 type ProductDetailsInfoProps = {
   product: Product;
@@ -11,23 +12,24 @@ type ProductDetailsInfoProps = {
 
 export function ProductDetailsInfo({ product }: ProductDetailsInfoProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <header className="flex flex-col gap-2">
+    <div className="flex flex-col gap-5">
+      <header className="flex gap-2">
         <Link
           to={getPlatformCategoryHref(
             'market',
             product.category.path ?? product.category.slug,
           )}
-          className='w-fit underline-offset-4 hover:underline text-muted-foreground hover:text-foreground text-sm'
+          className="w-fit rounded-sm bg-primary/5 px-2 py-1 text-xs text-primary underline-offset-4 hover:bg-primary/10"
         >
           {product.category.name}
         </Link>
+        {product.isOversized && <OversizedIndicator />}
       </header>
 
-      <div className="flex flex-col gap-2">
-        <div>
+      <div className="flex flex-col gap-6">
+        <div className='flex flex-col gap-2'>
           <h1 className="text-2xl font-semibold">{product.title}</h1>
-          <p className="text-3xl font-semibold">
+          <p className="text-3xl font-semibold text-primary">
             {formatPrice(product.price)}
           </p>
         </div>

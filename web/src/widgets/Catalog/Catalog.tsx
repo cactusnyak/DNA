@@ -50,11 +50,13 @@ export function Catalog({
     priceFilter,
     selectedCategoryIds,
     sortRules,
+    oversizedFilter,
     isPending: isProductsPending,
     error: productsError,
     setPriceFilter,
     setSelectedCategoryIds,
     setSortRules,
+    setOversizedFilter,
   } = useCatalogProducts({ section, categorySlug });
 
   const {
@@ -177,6 +179,7 @@ export function Catalog({
             priceFilter={priceFilter}
             selectedCategoryIds={selectedCategoryIds}
             sortRules={sortRules}
+            oversizedFilter={oversizedFilter}
             showFilters={showFilters}
             showSorting={showSorting}
             subcategoryOptions={subcategoryOptions}
@@ -184,6 +187,7 @@ export function Catalog({
             onPriceFilterChange={setPriceFilter}
             onSelectedCategoryIdsChange={setSelectedCategoryIds}
             onSortRulesChange={setSortRules}
+            onOversizedFilterChange={setOversizedFilter}
           />
         )}
 

@@ -6,6 +6,7 @@ import {
   type PlatformSectionId,
 } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
+import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
 
 type ProductCardContentProps = {
   section: PlatformSectionId;
@@ -37,6 +38,7 @@ export function ProductCardContent({
 
       <div className="mt-2">
         <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
+        {product.isOversized && <OversizedIndicator className="mt-2" />}
 
         {showAdditionsSummary && (product.additions?.length ?? 0) > 0 && (
           <div className="mt-2 text-xs text-muted-foreground">

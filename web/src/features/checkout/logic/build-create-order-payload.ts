@@ -31,6 +31,7 @@ export function buildCreateOrderPayload({
       productId: item.product.id,
       quantity: item.quantity,
       selectedAdditions: item.selectedAdditions ?? [],
+      deliveryQuoteId: item.deliveryQuote?.status === 'ACCEPTED' ? item.deliveryQuote.id : undefined,
     })),
   };
 }

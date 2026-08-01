@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeProductAdditions } from './product-additions';
+import { resolveEffectiveOversizedStatus } from './oversized-status';
 
 type FindAllProductsParams = {
   categorySlug?: string;
@@ -10,6 +11,7 @@ type FindAllProductsParams = {
   priceTo?: number;
   categoryIds?: string[];
   sort?: string;
+  oversized?: boolean;
 };
 
 type CatalogSortField = 'title' | 'category' | 'createdAt' | 'price';
@@ -69,6 +71,18 @@ export class ProductsService {
         gte: params.priceFrom,
         lte: params.priceTo,
       };
+    }
+
+    if (typeof params.oversized === 'boolean') {
+      where.OR = params.oversized
+        ? [
+            { isOversizedOverride: true },
+            { isOversizedOverride: null, category: { isOversized: true } },
+          ]
+        : [
+            { isOversizedOverride: false },
+            { isOversizedOverride: null, category: { isOversized: false } },
+          ];
     }
 
     const products = await this.prismaService.product.findMany({
@@ -302,6 +316,7 @@ export class ProductsService {
       description: category.description ?? undefined,
       parentId: category.parentId ?? undefined,
       image: category.image ?? undefined,
+      isOversized: category.isOversized,
     };
   }
 
@@ -315,6 +330,11 @@ export class ProductsService {
       description: product.description,
       price: product.price,
       location: product.location,
+      isOversizedOverride: product.isOversizedOverride,
+      isOversized: resolveEffectiveOversizedStatus(
+        product.isOversizedOverride,
+        product.category.isOversized,
+      ),
       additions: normalizeProductAdditions(product.additions),
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,

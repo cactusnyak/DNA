@@ -29,7 +29,7 @@ export function ProductAdditionsSelector({
   if (!additions.length) return null;
 
   return (
-    <section className="flex w-full flex-col gap-3 rounded-xl">
+    <section className="flex flex-col gap-4 rounded-xl shadow-card-md p-4 bg-white md:shadow-none md:p-0">
       <h2 className="text-lg font-medium">Дополнения</h2>
       <div className="flex w-full flex-col gap-2.5 rounded-xl">
         {additions.map((addition) => {
@@ -56,7 +56,7 @@ export function ProductAdditionsSelector({
                     <button
                       key={String(value)}
                       type="button"
-                      className={`h-6 cursor-pointer rounded-md border px-3 text-xs font-medium ${selection?.type === 'boolean' && selection.value === value
+                      className={`cursor-pointer rounded-md border py-1.5 px-3 text-xs font-medium ${selection?.type === 'boolean' && selection.value === value
                         ? 'border-transparent bg-primary/5 text-primary/80'
                         : 'border-border bg-background hover:bg-muted'
                         }`}

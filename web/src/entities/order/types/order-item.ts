@@ -5,6 +5,7 @@ export type CreateOrderItem = {
   productId: string;
   quantity: number;
   selectedAdditions: SelectedProductAddition[];
+  deliveryQuoteId?: string;
 };
 
 export type OrderItem = {
@@ -23,4 +24,8 @@ export type OrderItem = {
     totalPrice: number;
   }>;
   product?: Product;
+  isOversized: boolean;
+  deliveryQuoteId?: string;
+  deliveryPrice: number;
+  deliverySnapshot?: unknown;
 };

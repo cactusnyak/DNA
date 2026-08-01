@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 
-import type { CartStoreItem } from '@/entities/cart';
+import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
+import { useCartStore, type CartStoreItem } from '@/entities/cart';
 import { formatPrice } from '@/shared/utils/format-price';
+import { OversizedDeliveryModal } from '@/widgets/OversizedDeliveryModal';
 
 type CheckoutOrderSummaryProps = {
   items: CartStoreItem[];
@@ -12,9 +14,25 @@ export function CheckoutOrderSummary({
   items,
   totalAmount,
 }: CheckoutOrderSummaryProps) {
+  const setQuote = useCartStore((state) => state.setDeliveryQuote);
+
+  const productsAmount = items.reduce(
+    (sum, item) => sum + item.configuredUnitPrice * item.quantity,
+    0,
+  );
+
+  const oversizedDeliveryAmount = items.reduce(
+    (sum, item) =>
+      sum +
+      (item.deliveryQuote?.status === 'ACCEPTED'
+        ? (item.deliveryQuote.confirmedDeliveryPrice ?? 0)
+        : 0),
+    0,
+  );
+
   return (
-    <aside className="overflow-hidden rounded-2xl shadow-card-2xl lg:sticky lg:top-28 lg:self-start bg-white">
-      <div className='p-5'>
+    <aside className="overflow-hidden rounded-2xl bg-white shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
+      <div className="p-5">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Ваш заказ</h2>
 
@@ -26,14 +44,25 @@ export function CheckoutOrderSummary({
           </Link>
         </div>
 
-        <div className="mt-5 space-y-4">
+        <div className="mt-5 flex flex-col gap-4">
           {items.map((item) => {
             const image = item.product.images[0];
-            const itemTotal = item.product.price * item.quantity;
+            const itemKey = item.configurationKey ?? item.product.id;
+
+            const deliveryPrice =
+              item.deliveryQuote?.status === 'ACCEPTED'
+                ? (item.deliveryQuote.confirmedDeliveryPrice ?? 0)
+                : 0;
+
+            const itemTotal =
+              item.configuredUnitPrice * item.quantity + deliveryPrice;
 
             return (
-              <div key={item.product.id} className="flex gap-3">
-                <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
+              <div
+                key={itemKey}
+                className="flex flex-col gap-3 sm:flex-row"
+              >
+                <div className="aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:aspect-auto sm:size-16">
                   {image && (
                     <img
                       src={image.url}
@@ -52,11 +81,35 @@ export function CheckoutOrderSummary({
                   </Link>
 
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {item.quantity} × {formatPrice(item.product.price)}
+                    {item.quantity} ×{' '}
+                    {formatPrice(item.configuredUnitPrice)}
                   </p>
+
+                  {item.product.isOversized && (
+                    <div className="mt-2 flex flex-col gap-1">
+                      <OversizedIndicator />
+
+                      <OversizedDeliveryModal
+                        product={item.product}
+                        quantity={item.quantity}
+                        configuredUnitPrice={item.configuredUnitPrice}
+                        initialQuote={item.deliveryQuote}
+                        triggerClassName="h-auto min-h-8 w-full whitespace-normal px-3 py-2 leading-4 sm:w-fit text-xs text-left"
+                        triggerLabel={
+                          item.deliveryQuote?.status === 'ACCEPTED'
+                            ? `Доставка: ${formatPrice(
+                              item.deliveryQuote
+                                .confirmedDeliveryPrice ?? 0,
+                            )}`
+                            : 'Доставка не рассчитана — рассчитать'
+                        }
+                        onAccepted={(quote) => setQuote(itemKey, quote)}
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <p className="shrink-0 text-sm font-semibold">
+                <p className="shrink-0 text-left text-sm font-semibold sm:text-right">
                   {formatPrice(itemTotal)}
                 </p>
               </div>
@@ -65,16 +118,27 @@ export function CheckoutOrderSummary({
         </div>
       </div>
 
-      <div className="mt-5 border-t border-border p-5">
+      <div className="mt-5 flex flex-col gap-3 border-t border-border p-5">
+        <div className="flex items-center justify-between gap-4 text-sm">
+          <span className="text-muted-foreground">Товары</span>
+          <span>{formatPrice(productsAmount)}</span>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 text-sm">
+          <span className="text-muted-foreground">
+            Крупногабаритная доставка
+          </span>
+          <span>{formatPrice(oversizedDeliveryAmount)}</span>
+        </div>
+
         <div className="flex items-center justify-between gap-4">
           <span className="text-sm text-muted-foreground">Итого</span>
-
           <span className="text-xl font-semibold">
             {formatPrice(totalAmount)}
           </span>
         </div>
 
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           После подтверждения мы создадим заказ. Онлайн-оплата и доставка пока
           находятся в разработке.
         </p>

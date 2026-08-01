@@ -38,6 +38,8 @@ export type Product = {
   description: ContentDescription;
   price: number;
   location?: Location | null;
+  isOversized: boolean;
+  isOversizedOverride?: boolean | null;
   additions: ProductAddition[];
   createdAt: string;
   updatedAt: string;

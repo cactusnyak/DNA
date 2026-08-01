@@ -54,6 +54,10 @@ export class FavouritesService {
         ? {
             ...fav.product,
             additions: normalizeProductAdditions(fav.product.additions),
+            isOversizedOverride: fav.product.isOversizedOverride,
+            isOversized:
+              fav.product.isOversizedOverride ??
+              fav.product.category.isOversized,
             images: fav.product.images.map((pi: any) => pi.image),
           }
         : null,
@@ -74,7 +78,9 @@ export class FavouritesService {
     }
 
     if (productId && adId) {
-      throw new BadRequestException('Provide either productId or adId, not both');
+      throw new BadRequestException(
+        'Provide either productId or adId, not both',
+      );
     }
 
     return this.prismaService.favourite.create({
@@ -82,7 +88,11 @@ export class FavouritesService {
     });
   }
 
-  async removeFavourite(params: { userId: string; productId?: string; adId?: string }) {
+  async removeFavourite(params: {
+    userId: string;
+    productId?: string;
+    adId?: string;
+  }) {
     const { userId, productId, adId } = params;
 
     if (!productId && !adId) {

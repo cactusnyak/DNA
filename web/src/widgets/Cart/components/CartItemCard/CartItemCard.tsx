@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
@@ -32,18 +32,29 @@ export function CartItemCard({
   onRemove,
   className,
 }: CartItemCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <Link to={href} className="block">
-      <article
-        className={[
-          'grid grid-cols-[96px_minmax(0,1fr)] overflow-hidden rounded-2xl bg-white shadow-card-xl sm:grid-cols-[120px_minmax(0,1fr)]',
-          className,
-        ]
-          .filter(Boolean)
-          .join(' ')}
-      >
-        <div className="p-2">
-          <div className="aspect-[4/5] overflow-hidden rounded-lg bg-muted/50">
+    <article
+      role="link"
+      tabIndex={0}
+      aria-label={`Открыть ${title}`}
+      className={[
+        'flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-card-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:grid sm:grid-cols-[120px_minmax(0,1fr)]',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      onClick={() => navigate(href)}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        navigate(href);
+      }}
+    >
+        <div className="p-2 sm:p-3">
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted/50 sm:aspect-[4/5]">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -59,8 +70,8 @@ export function CartItemCard({
         </div>
 
         <div className="flex min-w-0 flex-col justify-between gap-4 p-3 sm:p-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 space-y-1">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <div className="flex min-w-0 flex-col gap-1">
               <h3 className="line-clamp-2 text-sm font-semibold leading-5 sm:text-base">
                 {title}
               </h3>
@@ -68,7 +79,7 @@ export function CartItemCard({
               {category}
             </div>
 
-            <div className="shrink-0 space-y-0.5 text-right">
+            <div className="flex shrink-0 flex-col gap-0.5 text-left sm:text-right">
               {price}
 
               {priceMeta && (
@@ -80,7 +91,7 @@ export function CartItemCard({
           </div>
 
           <div
-            className="flex items-end justify-between gap-4"
+            className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4"
             onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
@@ -88,7 +99,7 @@ export function CartItemCard({
           >
             {actions}
 
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="flex shrink-0 items-center justify-end gap-1 self-end">
               {favouriteButton}
 
               <Button
@@ -107,7 +118,6 @@ export function CartItemCard({
             </div>
           </div>
         </div>
-      </article>
-    </Link>
+    </article>
   );
 }

@@ -54,6 +54,7 @@ body {
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-resource-link: var(--resource-link);
   --color-favourite: var(--favourite);
   --color-mobile-navigation-active: var(--mobile-navigation-active);
   --color-logo: var(--logo-color);
@@ -107,6 +108,7 @@ body {
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: #291b87;
+  --resource-link: #252eeb;
   --primary-foreground: #ffffff;
   --favourite: #fc2198;
   --mobile-navigation-active: #2100ff;
