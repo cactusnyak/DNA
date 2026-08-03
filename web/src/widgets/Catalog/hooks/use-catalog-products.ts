@@ -20,6 +20,7 @@ export function useCatalogProducts({
 }: UseCatalogProductsParams) {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [sortRules, setSortRules] = useState<CatalogSortRule[]>([]);
+  const [oversizedFilter, setOversizedFilter] = useState<'all' | 'oversized' | 'regular'>('all');
 
   const {
     data: baseProducts = [],
@@ -80,6 +81,7 @@ export function useCatalogProducts({
       priceFilter.to,
       selectedCategoryIds,
       sortRules,
+      oversizedFilter,
     ],
     queryFn: () =>
       getProducts({
@@ -89,6 +91,7 @@ export function useCatalogProducts({
         priceTo: priceFilter.to,
         categoryIds: selectedCategoryIds,
         sortRules,
+        oversized: oversizedFilter === 'all' ? undefined : oversizedFilter === 'oversized',
       }),
     enabled: isFilteredQueryEnabled,
   });
@@ -100,6 +103,7 @@ export function useCatalogProducts({
     priceFilter,
     selectedCategoryIds,
     sortRules,
+    oversizedFilter,
     isPending:
       isBaseProductsPending ||
       (isFilteredQueryEnabled && isFilteredProductsPending),
@@ -107,5 +111,6 @@ export function useCatalogProducts({
     setPriceFilter,
     setSelectedCategoryIds,
     setSortRules,
+    setOversizedFilter,
   };
 }

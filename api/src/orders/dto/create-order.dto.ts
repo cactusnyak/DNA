@@ -4,6 +4,7 @@ export type CreateOrderItemDto = {
   productId: string;
   quantity: number;
   selectedAdditions?: SelectedProductAddition[];
+  deliveryQuoteId?: string;
 };
 
 export type CreateOrderDto = {

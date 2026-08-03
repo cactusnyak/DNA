@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeProductAdditions } from '../products/product-additions';
+import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
 
 @Injectable()
 export class AdminService {
@@ -222,6 +223,7 @@ export class AdminService {
       parentId: category.parentId ?? undefined,
       image: category.image ?? undefined,
       isActive: category.isActive,
+      isOversized: category.isOversized,
       deletedAt: category.deletedAt,
       productsCount: category._count?.products ?? 0,
     };
@@ -240,6 +242,11 @@ export class AdminService {
       price: product.price,
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
+      isOversizedOverride: product.isOversizedOverride,
+      isOversized: resolveEffectiveOversizedStatus(
+        product.isOversizedOverride,
+        product.category?.isOversized ?? false,
+      ),
       isActive: product.isActive,
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,

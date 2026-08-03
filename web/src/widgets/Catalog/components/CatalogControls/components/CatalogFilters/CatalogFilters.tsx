@@ -18,6 +18,8 @@ type CatalogFiltersProps = {
   subcategoryOptions?: CatalogSubcategoryFilterOption[];
   onPriceFilterChange: (value: CatalogPriceFilterValue) => void;
   onSelectedCategoryIdsChange: (categoryIds: string[]) => void;
+  oversizedFilter?: 'all' | 'oversized' | 'regular';
+  onOversizedFilterChange?: (value: 'all' | 'oversized' | 'regular') => void;
 };
 
 export function CatalogFilters({
@@ -27,6 +29,8 @@ export function CatalogFilters({
   subcategoryOptions: subcategoryOptionsProp,
   onPriceFilterChange,
   onSelectedCategoryIdsChange,
+  oversizedFilter = 'all',
+  onOversizedFilterChange,
 }: CatalogFiltersProps) {
   const priceBounds = useMemo(() => getPriceBounds(products as Product[]), [products]);
   const subcategoryOptions = useMemo(
@@ -46,6 +50,7 @@ export function CatalogFilters({
       to: priceBounds.max,
     });
     onSelectedCategoryIdsChange([]);
+    onOversizedFilterChange?.('all');
   }
 
   return (
@@ -66,6 +71,7 @@ export function CatalogFilters({
           onChange={onPriceFilterChange}
         />
       </FilterSection>
+      {onOversizedFilterChange && <FilterSection title="Тип доставки"><label className="flex flex-col gap-1 text-sm"><span className="sr-only">Тип товара</span><select className="h-9 rounded-lg border border-input bg-background px-3" value={oversizedFilter} onChange={(event) => onOversizedFilterChange(event.target.value as 'all' | 'oversized' | 'regular')}><option value="all">Все товары</option><option value="oversized">Крупногабаритные</option><option value="regular">Обычные</option></select></label></FilterSection>}
 
       {subcategoryOptions.length > 0 && (
         <FilterSection title="Подкатегории">

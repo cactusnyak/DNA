@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
+import { DeliveryQuotesModule } from './delivery-quotes/delivery-quotes.module';
 import { FeedModule } from './feed/feed.module';
 import { HealthModule } from './health/health.module';
 import { MarketModule } from './market/market.module';
@@ -21,6 +22,7 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule,
+    DeliveryQuotesModule,
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60_000, limit: 100 }],
     }),

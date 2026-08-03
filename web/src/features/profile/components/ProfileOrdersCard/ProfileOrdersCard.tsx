@@ -6,6 +6,7 @@ import {
   type Order,
 } from '@/entities/order';
 import { formatPrice } from '@/shared/utils/format-price';
+import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
 
 type ProfileOrdersCardProps = {
   orders: Order[];
@@ -173,8 +174,10 @@ export function ProfileOrdersCard({
                     {item.product?.title ?? `Товар ${item.productId}`}
                   </span>
 
+                  {item.isOversized && <span className="flex flex-wrap items-center gap-2"><OversizedIndicator /> Доставка: {formatPrice(item.deliveryPrice)}</span>}
+
                   <span className="shrink-0 text-muted-foreground">
-                    {item.quantity} × {formatPrice(item.unitPrice)}
+                    Итого: {formatPrice(item.unitPrice * item.quantity + item.deliveryPrice)}
                   </span>
                 </div>
               ))}

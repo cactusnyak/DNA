@@ -96,6 +96,7 @@ export async function buildAdminCrudPayload({
       imageUrl,
       imageAlt: String(values.imageAlt ?? ''),
       isActive: Boolean(values.isActive),
+      ...(tabId === 'market-categories' ? { isOversized: Boolean(values.isOversized) } : {}),
     };
   }
 
@@ -118,6 +119,7 @@ export async function buildAdminCrudPayload({
         ? (values.additions as ProductAddition[])
         : [],
       isActive: Boolean(values.isActive),
+      isOversizedOverride: values.isOversizedOverride === 'inherit' ? null : values.isOversizedOverride === 'oversized',
     };
   }
 

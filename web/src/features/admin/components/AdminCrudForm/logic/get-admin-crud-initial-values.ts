@@ -32,6 +32,7 @@ export function getAdminCrudInitialValues(
       imageFile: null,
       imageAlt: category?.image?.alt ?? '',
       isActive: category?.isActive ?? true,
+      isOversized: category?.isOversized ?? false,
     };
   }
 
@@ -51,6 +52,7 @@ export function getAdminCrudInitialValues(
       imageFiles: [],
       additions: product?.additions ?? [],
       isActive: product?.isActive ?? true,
+      isOversizedOverride: product?.isOversizedOverride == null ? 'inherit' : product.isOversizedOverride ? 'oversized' : 'regular',
     };
   }
 

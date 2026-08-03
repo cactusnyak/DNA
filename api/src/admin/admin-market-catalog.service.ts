@@ -12,6 +12,7 @@ import {
   normalizeProductAdditions,
   productAdditionsToJson,
 } from '../products/product-additions';
+import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
 
 import { AdminInputService } from './admin-input.service';
 
@@ -48,6 +49,10 @@ export class AdminMarketCatalogService {
         imageId: await this.createImageFromPayload(payload),
         sortOrder: this.adminInputService.getNumber(payload.sortOrder, 0),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
+        isOversized: this.adminInputService.getBoolean(
+          payload.isOversized,
+          false,
+        ),
       },
       include: this.categoryInclude,
     });
@@ -87,6 +92,10 @@ export class AdminMarketCatalogService {
         ),
         sortOrder: this.adminInputService.getNumber(payload.sortOrder, 0),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
+        isOversized: this.adminInputService.getBoolean(
+          payload.isOversized,
+          false,
+        ),
       },
       include: this.categoryInclude,
     });
@@ -129,6 +138,9 @@ export class AdminMarketCatalogService {
           normalizeProductAdditions(payload.additions),
         ),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
+        isOversizedOverride: this.getNullableBoolean(
+          payload.isOversizedOverride,
+        ),
       },
     });
 
@@ -173,6 +185,9 @@ export class AdminMarketCatalogService {
           normalizeProductAdditions(payload.additions),
         ),
         isActive: this.adminInputService.getBoolean(payload.isActive, true),
+        isOversizedOverride: this.getNullableBoolean(
+          payload.isOversizedOverride,
+        ),
       },
     });
 
@@ -729,6 +744,11 @@ export class AdminMarketCatalogService {
       price: product.price,
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
+      isOversizedOverride: product.isOversizedOverride,
+      isOversized: resolveEffectiveOversizedStatus(
+        product.isOversizedOverride,
+        product.category?.isOversized ?? false,
+      ),
       isActive: product.isActive,
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,
@@ -765,8 +785,13 @@ export class AdminMarketCatalogService {
       parentId: category.parentId ?? undefined,
       image: category.image ?? undefined,
       isActive: category.isActive,
+      isOversized: category.isOversized,
       deletedAt: category.deletedAt,
       productsCount: category._count?.products ?? 0,
     };
+  }
+
+  private getNullableBoolean(value: unknown): boolean | null {
+    return typeof value === 'boolean' ? value : null;
   }
 }
