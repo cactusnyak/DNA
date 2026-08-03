@@ -28,10 +28,13 @@ export function OversizedDeliveryModal({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
+    <div className='flex flex-col gap-2'>
+      <p className='text-amber-700 dark:text-amber-300 text-xs'>
+        Доставка не рассчитана
+      </p>
       <Button
         type="button"
-        variant="warning"
+        variant="outline"
         className={triggerClassName}
         onClick={(event) => {
           event.preventDefault();
@@ -57,6 +60,6 @@ export function OversizedDeliveryModal({
           onAccepted={onAccepted}
         />
       </Modal>
-    </>
+    </div>
   );
 }

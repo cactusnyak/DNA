@@ -296,7 +296,7 @@ export function OversizedDeliveryCalculator({
         </p>
       )}
 
-      <Button variant='secondary' type="submit" disabled={mutation.isPending}>
+      <Button variant='accent' type="submit" disabled={mutation.isPending}>
         {mutation.isPending
           ? 'Отправляем…'
           : 'Отправить запрос на расчёт'}

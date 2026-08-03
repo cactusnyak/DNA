@@ -82,17 +82,14 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
                   setQuote(item.configurationKey ?? product.id, quote)
                 }
               />
-              <p
-                className={
-                  item.deliveryQuote?.status === 'ACCEPTED'
-                    ? 'px-3 text-emerald-700 dark:text-emerald-300 text-xs'
-                    : 'px-3 text-amber-700 dark:text-amber-300 text-xs'
-                }
-              >
-                {item.deliveryQuote?.status === 'ACCEPTED'
-                  ? `Доставка: ${formatPrice(item.deliveryQuote.confirmedDeliveryPrice ?? 0)}`
-                  : 'Доставка не рассчитана'}
-              </p>
+              {item.deliveryQuote?.status === 'ACCEPTED' && (
+                <p className="px-3 text-xs text-emerald-700 dark:text-emerald-300">
+                  Доставка:{' '}
+                  {formatPrice(
+                    item.deliveryQuote.confirmedDeliveryPrice ?? 0,
+                  )}
+                </p>
+              )}
             </div>
           )}
           {additionLines.map((line) => <p key={line}>{line}</p>)}
