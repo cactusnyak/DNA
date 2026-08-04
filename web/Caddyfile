@@ -14,3 +14,8 @@ dna-platform.shop {
     file_server
   }
 }
+
+stage.dna-platform.shop {
+  encode zstd gzip
+  reverse_proxy dna-staging-web:80
+}
