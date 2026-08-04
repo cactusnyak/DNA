@@ -23,13 +23,16 @@ jobs:
       OTP_HASH_SECRET: ci-test-otp-hash-secret-at-least-32-characters
       WEB_APP_URL: http://localhost:5173
       PORT: "3000"
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: api/package-lock.json
+
       - run: npm install
       - run: npx prisma generate
       - run: npm test
@@ -41,43 +44,63 @@ jobs:
     defaults:
       run:
         working-directory: web
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: web/package-lock.json
+
       - run: npm install
       - run: npx vite build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: web-dist
-          path: web/dist
-          if-no-files-found: error
 
   deploy:
-    name: Deploy web to Netlify (dna-demo)
+    name: Deploy to staging VPS
     needs: [api, web]
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: https://dna-demo.netlify.app
+      url: https://stage.dna-platform.shop
+    timeout-minutes: 30
+
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: web-dist
-          path: web/dist
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli@26.2.0
-      - name: Deploy to Netlify (production)
+      - name: Configure SSH
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: >-
-          netlify deploy
-          --prod
-          --dir=web/dist
-          --site="$NETLIFY_SITE_ID"
-          --message "dev@${{ github.sha }} via GitHub Actions"
+          SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: |
+          set -Eeuo pipefail
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+          USER: ${{ secrets.STAGING_USER }}
+        run: |
+          ssh \
+            -o BatchMode=yes \
+            -o ConnectTimeout=10 \
+            "$USER@$HOST" \
+            'echo "Staging SSH connection established"'
+
+      - name: Deploy staging
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+          USER: ${{ secrets.STAGING_USER }}
+        run: |
+          ssh \
+            -o BatchMode=yes \
+            "$USER@$HOST" \
+            '/home/deploy/bin/deploy-staging.sh'
