@@ -7,12 +7,16 @@ import {
 import { OversizedDeliveryQuoteStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
+import { DeliveryQuoteEmailService } from './delivery-quote-email.service';
 
 type Owner = { userId?: string; guestSessionId?: string };
 
 @Injectable()
 export class DeliveryQuotesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly deliveryQuoteEmail: DeliveryQuoteEmailService,
+  ) {}
 
   async create(body: Record<string, unknown>, owner: Owner) {
     const product = await this.prisma.product.findFirst({
@@ -40,7 +44,7 @@ export class DeliveryQuotesService {
     const guestSessionId = owner.userId
       ? undefined
       : this.required(owner.guestSessionId, 'guestSessionId');
-    return this.prisma.oversizedDeliveryQuote.create({
+    const quote = await this.prisma.oversizedDeliveryQuote.create({
       data: {
         productId: product.id,
         userId: owner.userId,
@@ -65,6 +69,10 @@ export class DeliveryQuotesService {
       },
       include: { product: true },
     });
+
+    await this.deliveryQuoteEmail.notifyManager(quote);
+
+    return quote;
   }
 
   async findOwned(id: string, owner: Owner) {
