@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 
@@ -41,6 +41,7 @@ export function OversizedDeliveryCalculator({
 }: Props) {
   const token = useAuthStore((state) => state.accessToken);
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
+  const clientRequestId = useRef(crypto.randomUUID());
 
   const [quote, setQuote] = useState(initialQuote);
   const [form, setForm] = useState({
@@ -62,6 +63,7 @@ export function OversizedDeliveryCalculator({
           ...form,
           productId: product.id,
           guestSessionId,
+          clientRequestId: clientRequestId.current,
           quantity,
         },
         token,

@@ -6,7 +6,7 @@ export type DeliveryQuote = {
   expiresAt?: string | null; createdAt: string;
 };
 export type CreateDeliveryQuotePayload = {
-  productId: string; guestSessionId: string; quantity: number;
+  productId: string; guestSessionId: string; clientRequestId: string; quantity: number;
   destinationRegion: string; destinationCity: string; destinationAddress: string;
   customerName: string; customerPhone: string; customerEmail?: string;
   customerComment?: string; unloadingRequired: boolean; accessRestrictions?: string;

@@ -18,9 +18,14 @@ describe('DeliveryQuoteEmailService', () => {
   };
 
   it('sends the notification to the configured manager address', async () => {
-    const sendEmail = jest.fn().mockResolvedValue({ provider: 'console' });
+    const sendEmail = jest.fn().mockResolvedValue({
+      provider: 'resend',
+      externalMessageId: 'email-789',
+    });
     const config = {
-      get: jest.fn().mockReturnValue('manager@example.com'),
+      get: jest.fn((key: string) =>
+        key === 'MANAGER_EMAIL' ? 'manager@example.com' : 'resend',
+      ),
     } as unknown as ConfigService;
     const provider = { sendEmail } as EmailDeliveryProvider;
     const service = new DeliveryQuoteEmailService(config, provider);
@@ -31,6 +36,7 @@ describe('DeliveryQuoteEmailService', () => {
       expect.objectContaining({
         to: 'manager@example.com',
         idempotencyKey: 'delivery-quote-quote-123',
+        logContext: { deliveryRequestId: 'quote-123' },
       }),
     );
   });
@@ -47,5 +53,34 @@ describe('DeliveryQuoteEmailService', () => {
       ServiceUnavailableException,
     );
     expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-delivering provider instead of reporting success', async () => {
+    const sendEmail = jest.fn();
+    const config = {
+      get: jest.fn((key: string) =>
+        key === 'MANAGER_EMAIL' ? 'manager@example.com' : 'console',
+      ),
+    } as unknown as ConfigService;
+    const service = new DeliveryQuoteEmailService(config, { sendEmail });
+
+    await expect(service.notifyManager(quote)).rejects.toBeInstanceOf(
+      ServiceUnavailableException,
+    );
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('rejects a provider response without a confirmed message ID', async () => {
+    const sendEmail = jest.fn().mockResolvedValue({ provider: 'resend' });
+    const config = {
+      get: jest.fn((key: string) =>
+        key === 'MANAGER_EMAIL' ? 'manager@example.com' : 'resend',
+      ),
+    } as unknown as ConfigService;
+    const service = new DeliveryQuoteEmailService(config, { sendEmail });
+
+    await expect(service.notifyManager(quote)).rejects.toBeInstanceOf(
+      ServiceUnavailableException,
+    );
   });
 });

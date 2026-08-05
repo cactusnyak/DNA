@@ -18,10 +18,12 @@ import { ResendEmailProvider } from './providers/resend-email.provider';
         config: ConfigService,
         consoleProvider: ConsoleEmailProvider,
         resendProvider: ResendEmailProvider,
-      ) =>
-        config.get<string>('EMAIL_DELIVERY_PROVIDER') === 'resend'
-          ? resendProvider
-          : consoleProvider,
+      ) => {
+        const provider = config.get<string>('EMAIL_DELIVERY_PROVIDER');
+        if (provider === 'resend') return resendProvider;
+        if (provider === 'console') return consoleProvider;
+        throw new Error(`Unsupported email delivery provider: ${provider}`);
+      },
     },
   ],
   exports: [EMAIL_DELIVERY_PROVIDER, AuthEmailSenderService],
