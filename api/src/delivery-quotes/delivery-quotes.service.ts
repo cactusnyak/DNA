@@ -2,19 +2,39 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { OversizedDeliveryQuoteStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
+import { DeliveryQuoteEmailService } from './delivery-quote-email.service';
 
 type Owner = { userId?: string; guestSessionId?: string };
 
 @Injectable()
 export class DeliveryQuotesService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(DeliveryQuotesService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly deliveryQuoteEmail: DeliveryQuoteEmailService,
+  ) {}
 
   async create(body: Record<string, unknown>, owner: Owner) {
+    const clientRequestId = this.required(
+      body.clientRequestId,
+      'clientRequestId',
+    );
+    const existing = await this.prisma.oversizedDeliveryQuote.findUnique({
+      where: { clientRequestId },
+      include: { product: true },
+    });
+    if (existing) {
+      this.assertOwner(existing, owner);
+      return this.notifyManagerIfNeeded(existing);
+    }
+
     const product = await this.prisma.product.findFirst({
       where: {
         id: this.required(body.productId, 'productId'),
@@ -40,8 +60,11 @@ export class DeliveryQuotesService {
     const guestSessionId = owner.userId
       ? undefined
       : this.required(owner.guestSessionId, 'guestSessionId');
-    return this.prisma.oversizedDeliveryQuote.create({
-      data: {
+    const quote = await this.prisma.oversizedDeliveryQuote.upsert({
+      where: { clientRequestId },
+      update: {},
+      create: {
+        clientRequestId,
         productId: product.id,
         userId: owner.userId,
         guestSessionId,
@@ -65,6 +88,10 @@ export class DeliveryQuotesService {
       },
       include: { product: true },
     });
+
+    this.assertOwner(quote, owner);
+
+    return this.notifyManagerIfNeeded(quote);
   }
 
   async findOwned(id: string, owner: Owner) {
@@ -166,5 +193,49 @@ export class DeliveryQuotesService {
   }
   private optional(value: unknown) {
     return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+  }
+
+  private async notifyManagerIfNeeded<
+    T extends {
+      id: string;
+      managerNotifiedAt: Date | null;
+      productId: string;
+      destinationRegion: string;
+      destinationCity: string;
+      destinationAddress: string;
+      customerName: string;
+      customerPhone: string;
+      createdAt: Date;
+      product: { title: string };
+    },
+  >(quote: T): Promise<T> {
+    if (quote.managerNotifiedAt) {
+      this.logger.log(
+        JSON.stringify({
+          event: 'delivery_quote.manager_notification.already_confirmed',
+          deliveryRequestId: quote.id,
+        }),
+      );
+      return quote;
+    }
+
+    const result = await this.deliveryQuoteEmail.notifyManager(quote);
+    await this.prisma.oversizedDeliveryQuote.update({
+      where: { id: quote.id },
+      data: {
+        managerNotifiedAt: new Date(),
+        managerEmailMessageId: result.externalMessageId,
+      },
+    });
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'delivery_quote.manager_notification.confirmed',
+        deliveryRequestId: quote.id,
+        provider: result.provider,
+        externalMessageId: result.externalMessageId,
+      }),
+    );
+    return quote;
   }
 }

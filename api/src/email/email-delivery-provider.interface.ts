@@ -6,6 +6,7 @@ export type SendEmailCommand = {
   html: string;
   text: string;
   idempotencyKey?: string;
+  logContext?: { deliveryRequestId?: string };
 };
 
 export type SendEmailResult = {

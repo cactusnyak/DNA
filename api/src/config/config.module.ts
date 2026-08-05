@@ -62,6 +62,13 @@ import * as Joi from 'joi';
         SMTP_USER: Joi.string().allow('').optional(),
         SMTP_PASS: Joi.string().allow('').optional(),
         SMTP_FROM: Joi.string().email().default('noreply@dna.ru'),
+        MANAGER_EMAIL: Joi.string()
+          .email()
+          .when('EMAIL_DELIVERY_PROVIDER', {
+            is: 'resend',
+            then: Joi.required(),
+            otherwise: Joi.string().allow('').optional(),
+          }),
         OTP_LOG_CODES: Joi.boolean().default(false),
         OTP_DELIVERY_PROVIDER: Joi.string()
           .valid('console', 'sms_ru')

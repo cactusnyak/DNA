@@ -361,6 +361,7 @@ model OrderItem {
 
 model OversizedDeliveryQuote {
   id                     String                       @id @default(uuid())
+  clientRequestId        String                       @unique
   productId              String
   userId                 String?
   guestSessionId         String?
@@ -381,6 +382,8 @@ model OversizedDeliveryQuote {
   managerComment         String?
   expiresAt              DateTime?
   acceptedAt             DateTime?
+  managerNotifiedAt      DateTime?
+  managerEmailMessageId  String?
   createdAt              DateTime                     @default(now())
   updatedAt              DateTime                     @updatedAt
 
