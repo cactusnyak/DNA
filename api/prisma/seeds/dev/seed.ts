@@ -1,3 +1,3 @@
 import { runSeedCli } from '../shared/run.js';
 
-void runSeedCli('production');
+void runSeedCli('dev');
