@@ -166,7 +166,7 @@ Every push to `dev` triggers the `CI & Deploy` GitHub Actions workflow. The work
 The staging environment uses:
 
 * domain: `stage.dna-platform.shop`;
-* project directory: `/home/deploy/dna-staging`;
+* project directory: `/opt/dna-staging`;
 * environment file: `.env.staging`;
 * Compose file: `docker-compose.staging.yml`;
 * Compose project: `dna-staging`;
@@ -177,10 +177,10 @@ The staging environment uses:
 Production is deployed from `main` and uses:
 
 * domain: `dna-platform.shop`;
-* project directory: `/opt/dna`;
+* project directory: `/opt/dna-production`;
 * environment file: `.env.production`;
 * Compose file: `docker-compose.production.yml`;
-* deployment script: `/opt/dna/deploy.sh`.
+* deployment script: `/opt/dna-production/deploy.sh`.
 
 `docker-compose.production.yml` starts PostgreSQL, the NestJS API, and the frontend served by Caddy. Caddy serves the compiled SPA, proxies `/api` and `/uploads` to the backend, terminates HTTPS connections, and routes staging traffic to the isolated staging web container.
 

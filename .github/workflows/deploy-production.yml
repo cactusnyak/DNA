@@ -56,4 +56,4 @@ jobs:
           ssh \
             -o BatchMode=yes \
             "$USER@$HOST" \
-            '/opt/dna/deploy.sh'
+            '/opt/dna-production/deploy.sh'
