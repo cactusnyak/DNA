@@ -1,0 +1,72 @@
+name: dna-staging
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: dna-staging-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.staging
+    volumes:
+      - dna_staging_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - staging_internal
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: dna-staging-api
+    restart: unless-stopped
+    env_file:
+      - .env.staging
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - dna_staging_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "3000"
+    networks:
+      - staging_internal
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: dna-staging-web
+    restart: unless-stopped
+    volumes:
+      - ./web/Caddyfile.staging:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - api
+    expose:
+      - "80"
+    networks:
+      - staging_internal
+      - production_proxy
+
+volumes:
+  dna_staging_postgres_data:
+    external: true
+    name: dna-staging_dna_staging_postgres_data
+
+  dna_staging_uploads:
+    external: true
+    name: dna-staging_dna_staging_uploads
+
+networks:
+  staging_internal:
+
+  production_proxy:
+    external: true
+    name: dna-production-network

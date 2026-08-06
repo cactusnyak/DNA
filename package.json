@@ -7,7 +7,10 @@
     "dev:web": "npm run dev --prefix web",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
-    "db:seed": "npm run seed --prefix api",
+    "db:seed": "npm run seed:dev --prefix api",
+    "db:seed:dev": "npm run seed:dev --prefix api",
+    "db:seed:staging": "npm run seed:staging --prefix api",
+    "db:seed:production": "npm run seed:production --prefix api",
     "db:migrate": "npx prisma migrate dev --prefix api",
     "install:all": "npm install --prefix api && npm install --prefix web"
   }
