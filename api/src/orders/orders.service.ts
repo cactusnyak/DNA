@@ -44,7 +44,13 @@ export class OrdersService {
       'deliveryAddress',
     );
 
-    const customerEmail = this.getOptionalString(createOrderDto.customerEmail);
+    const customerEmail = this.getRequiredString(
+      createOrderDto.customerEmail,
+      'customerEmail',
+    );
+    if (!/^\S+@\S+\.\S+$/.test(customerEmail)) {
+      throw new BadRequestException('customerEmail must be a valid email');
+    }
     const comment = this.getOptionalString(createOrderDto.comment);
     const guestSessionId = this.getOptionalString(
       createOrderDto.guestSessionId,

@@ -79,10 +79,11 @@ export function CheckoutCustomerForm({
 
           <FormInputField
             name="customerEmail"
+            required
             type="email"
             label="Email"
             value={value.customerEmail}
-            placeholder="Необязательно"
+            placeholder="Для отправки электронного чека"
             onChange={getInputChangeHandler('customerEmail')}
           />
 

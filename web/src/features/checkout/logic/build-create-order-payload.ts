@@ -24,7 +24,7 @@ export function buildCreateOrderPayload({
     guestSessionId,
     customerName: formValue.customerName.trim(),
     customerPhone: formValue.customerPhone.trim(),
-    customerEmail: normalizeOptionalString(formValue.customerEmail),
+    customerEmail: formValue.customerEmail.trim(),
     deliveryAddress: formValue.deliveryAddress.trim(),
     comment: normalizeOptionalString(formValue.comment),
     items: items.map((item) => ({

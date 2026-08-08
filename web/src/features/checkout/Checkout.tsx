@@ -31,7 +31,6 @@ export function Checkout() {
   const accessToken = useAuthStore((state) => state.accessToken);
 
   const items = useCartStore((state) => state.items);
-  const clearCart = useCartStore((state) => state.clearCart);
   const totalAmount = useCartStore((state) => state.getTotalAmount());
   const unresolvedOversizedItems = items.filter((item) => item.product.isOversized && item.deliveryQuote?.status !== 'ACCEPTED');
 
@@ -42,7 +41,6 @@ export function Checkout() {
       return createOrder(payload, accessToken);
     },
     onSuccess: (order) => {
-      clearCart();
       setCreatedOrder(order);
     },
   });

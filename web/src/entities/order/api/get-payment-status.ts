@@ -1,18 +1,17 @@
 import { httpClient } from '@/shared/api/http-client';
 
-export type InitiatePaymentResponse = {
-  paymentId: string;
-  confirmationToken: string | null;
-  status: string;
+export type PaymentStatusResponse = {
+  paymentId: string | null;
+  paymentStatus: 'pending' | 'waiting_for_capture' | 'succeeded' | 'canceled' | null;
+  orderStatus: string;
 };
 
-export function initiatePayment(
+export function getPaymentStatus(
   orderId: string,
   accessToken?: string,
   guestSessionId?: string,
-): Promise<InitiatePaymentResponse> {
-  return httpClient<InitiatePaymentResponse>(`/orders/${orderId}/payment`, {
-    method: 'POST',
+) {
+  return httpClient<PaymentStatusResponse>(`/orders/${orderId}/payment`, {
     headers: {
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(guestSessionId ? { 'X-Guest-Session-Id': guestSessionId } : {}),

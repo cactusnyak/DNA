@@ -27,6 +27,21 @@ export type YookassaPayment = {
   description?: string;
   metadata?: Record<string, string>;
   created_at: string;
+  paid: boolean;
+  test: boolean;
+  cancellation_details?: {
+    party?: string;
+    reason?: string;
+  };
+};
+
+export type YookassaReceiptItem = {
+  description: string;
+  quantity: string;
+  amount: YookassaAmount;
+  vat_code: number;
+  payment_mode: 'full_payment';
+  payment_subject: 'commodity' | 'service';
 };
 
 export type YookassaWebhookEvent =

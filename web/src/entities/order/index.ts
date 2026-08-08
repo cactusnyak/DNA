@@ -1,6 +1,8 @@
 export { createOrder } from './api/create-order';
 export { getMyOrders } from './api/get-my-orders';
 export { initiatePayment } from './api/initiate-payment';
+export { getPaymentStatus } from './api/get-payment-status';
+export type { PaymentStatusResponse } from './api/get-payment-status';
 export type { InitiatePaymentResponse } from './api/initiate-payment';
 export { formatOrderStatus } from './utils/format-order-status';
 

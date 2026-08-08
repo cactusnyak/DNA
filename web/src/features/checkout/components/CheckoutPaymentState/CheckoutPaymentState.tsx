@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
+import { useSessionStore } from '@/entities/session';
 import { formatPrice } from '@/shared/utils/format-price';
 
 declare global {
@@ -33,9 +34,15 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   const [errorMessage, setErrorMessage] = useState<string>();
   const widgetRef = useRef<{ destroy: () => void } | null>(null);
   const accessToken = useAuthStore((state) => state.accessToken);
+  const guestSessionId = useSessionStore((state) => state.guestSessionId);
 
   const initiateMutation = useMutation({
-    mutationFn: () => initiatePayment(order.id, accessToken ?? undefined),
+    mutationFn: () =>
+      initiatePayment(
+        order.id,
+        accessToken ?? undefined,
+        accessToken ? undefined : guestSessionId,
+      ),
     onSuccess: (data) => {
       if (!data.confirmationToken) {
         setErrorMessage('Онлайн-оплата пока недоступна. Попробуйте позже.');
@@ -165,8 +172,8 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
 
       {stage !== 'widget' && (
         <p className="text-sm text-muted-foreground">
-          Онлайн-оплата пока находится в разработке и может быть недоступна.
-          Сохраните номер заказа, чтобы уточнить его статус.
+          После оплаты мы автоматически проверим её статус. Не закрывайте
+          страницу банка до завершения операции.
         </p>
       )}
 
@@ -181,7 +188,9 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
           >
             {initiateMutation.isPending || stage === 'loading'
               ? 'Открываем оплату...'
-              : 'Проверить доступность оплаты'}
+              : stage === 'error'
+                ? 'Попробовать оплатить снова'
+                : 'Оплатить заказ'}
           </Button>
 
           <Button asChild variant="secondary">

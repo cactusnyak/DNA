@@ -131,6 +131,25 @@ Environment-specific configuration is stored outside version control:
 
 Secrets and production configuration must never be committed to the repository.
 
+### YooKassa payments
+
+The API accepts one-stage (`capture: true`) payments through the embedded
+YooKassa widget and sends fiscal receipt data for every order. Configure each
+environment with `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY`,
+`YOOKASSA_VAT_CODE=1`, `YOOKASSA_EXPECTED_TEST_MODE`, and optionally
+`YOOKASSA_REQUEST_TIMEOUT_MS`.
+
+Development and staging use test shop `1430696` with
+`YOOKASSA_EXPECTED_TEST_MODE=true`. Production uses live shop `1403591` with
+`YOOKASSA_EXPECTED_TEST_MODE=false`. Store both secret keys only in the
+environment-specific secret files described above.
+
+For HTTP Basic Auth, subscribe to `payment.succeeded` and `payment.canceled`
+in the YooKassa dashboard. Use these HTTPS notification URLs:
+
+* staging: `https://stage.dna-platform.shop/api/payments/webhook`;
+* production: `https://dna-platform.shop/api/payments/webhook`.
+
 ## Useful Commands
 
 | Command                                       | Description                                                                              |
