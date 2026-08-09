@@ -28,19 +28,25 @@ type StateCardAction =
 
 type StateCardProps = {
   icon?: StateCardIcon;
+  iconClassName?: string;
   title: ReactNode;
   description: ReactNode;
   action?: StateCardAction;
+  actions?: StateCardAction[];
   className?: string;
 };
 
 export function StateCard({
   icon: Icon,
+  iconClassName,
   title,
   description,
   action,
+  actions,
   className,
 }: StateCardProps) {
+  const cardActions = actions ?? (action ? [action] : []);
+
   return (
     <section
       className={[
@@ -51,7 +57,10 @@ export function StateCard({
       <div className="flex flex-col gap-6">
         {Icon && (
           <span className="p-3 shadow-card-md rounded-xl bg-white mx-auto flex items-center justify-center">
-            <Icon className="size-8 text-primary" strokeWidth={1.5} />
+            <Icon
+              className={['size-8', iconClassName ?? 'text-primary'].join(' ')}
+              strokeWidth={1.5}
+            />
           </span>
         )}
 
@@ -60,25 +69,32 @@ export function StateCard({
             {title}
           </h1>
 
-          <p className="text-sm leading-6 text-muted-foreground">
+          <div className="text-sm leading-6 text-muted-foreground">
             {description}
-          </p>
+          </div>
         </div>
 
-        {action && (
-          <div className="flex justify-center">
-            {action.to ? (
-              <Button asChild variant={action.variant ?? 'accent'}>
-                <Link to={action.to}>{action.label}</Link>
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant={action.variant ?? 'accent'}
-                onClick={action.onClick}
-              >
-                {action.label}
-              </Button>
+        {cardActions.length > 0 && (
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            {cardActions.map((cardAction, index) =>
+              cardAction.to ? (
+                <Button
+                  key={index}
+                  asChild
+                  variant={cardAction.variant ?? 'accent'}
+                >
+                  <Link to={cardAction.to}>{cardAction.label}</Link>
+                </Button>
+              ) : (
+                <Button
+                  key={index}
+                  type="button"
+                  variant={cardAction.variant ?? 'accent'}
+                  onClick={cardAction.onClick}
+                >
+                  {cardAction.label}
+                </Button>
+              ),
             )}
           </div>
         )}
