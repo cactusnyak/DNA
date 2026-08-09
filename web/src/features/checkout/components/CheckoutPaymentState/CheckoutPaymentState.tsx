@@ -31,8 +31,38 @@ type CheckoutPaymentStateProps = {
 
 type PaymentStage = 'idle' | 'loading' | 'widget' | 'error';
 
+const WIDGET_SCRIPT_ID = 'yookassa-checkout-js';
+const WIDGET_CONTAINER_ID = 'yookassa-widget-container';
+
+function loadCheckoutWidgetScript() {
+  if (window.YooMoneyCheckoutWidget) return Promise.resolve();
+
+  return new Promise<void>((resolve, reject) => {
+    const existingScript = document.getElementById(
+      WIDGET_SCRIPT_ID,
+    ) as HTMLScriptElement | null;
+    const script = existingScript ?? document.createElement('script');
+
+    const handleLoad = () => {
+      if (window.YooMoneyCheckoutWidget) resolve();
+      else reject(new Error('YooKassa widget API is unavailable'));
+    };
+    const handleError = () => reject(new Error('Failed to load YooKassa widget'));
+
+    script.addEventListener('load', handleLoad, { once: true });
+    script.addEventListener('error', handleError, { once: true });
+
+    if (!existingScript) {
+      script.id = WIDGET_SCRIPT_ID;
+      script.src = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
+      document.head.appendChild(script);
+    }
+  });
+}
+
 export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   const [stage, setStage] = useState<PaymentStage>('idle');
+  const [confirmationToken, setConfirmationToken] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const widgetRef = useRef<{ destroy: () => void } | null>(null);
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -52,7 +82,9 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         return;
       }
 
-      loadWidget(data.confirmationToken);
+      setErrorMessage(undefined);
+      setConfirmationToken(data.confirmationToken);
+      setStage('loading');
     },
     onError: () => {
       setErrorMessage('Онлайн-оплата пока недоступна. Попробуйте позже.');
@@ -60,47 +92,48 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     },
   });
 
-  function loadWidget(confirmationToken: string) {
-    setStage('loading');
-
-    const scriptId = 'yookassa-checkout-js';
-
-    function mountWidget() {
-      const widget = new window.YooMoneyCheckoutWidget({
-        confirmation_token: confirmationToken,
-        return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
-        error_callback: () => {
-          setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
-          setStage('error');
-        },
-      });
-
-      widget.render('yookassa-widget-container');
-      widgetRef.current = widget;
-      setStage('widget');
-    }
-
-    if (document.getElementById(scriptId)) {
-      mountWidget();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
-    script.onload = mountWidget;
-    script.onerror = () => {
-      setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
-      setStage('error');
-    };
-    document.head.appendChild(script);
-  }
-
   useEffect(() => {
     return () => {
       widgetRef.current?.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    if (!confirmationToken || stage !== 'loading') return;
+
+    let cancelled = false;
+
+    void loadCheckoutWidgetScript()
+      .then(() => {
+        if (cancelled) return;
+        if (!document.getElementById(WIDGET_CONTAINER_ID)) {
+          throw new Error('YooKassa widget container is unavailable');
+        }
+
+        widgetRef.current?.destroy();
+        const widget = new window.YooMoneyCheckoutWidget({
+          confirmation_token: confirmationToken,
+          return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
+          error_callback: () => {
+            if (cancelled) return;
+            setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
+            setStage('error');
+          },
+        });
+        widgetRef.current = widget;
+        widget.render(WIDGET_CONTAINER_ID);
+        setStage('widget');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
+        setStage('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [confirmationToken, order.id, stage]);
 
   return (
     <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
@@ -126,9 +159,9 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         </p>
       )}
 
-      {stage === 'widget' && (
+      {(stage === 'loading' || stage === 'widget') && (
         <div className="space-y-3">
-          <div id="yookassa-widget-container" className="min-h-[300px]" />
+          <div id={WIDGET_CONTAINER_ID} className="min-h-[300px]" />
           <LegalFormNotice kind="order" />
         </div>
       )}

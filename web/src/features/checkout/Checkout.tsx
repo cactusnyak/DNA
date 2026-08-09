@@ -24,8 +24,9 @@ import { isCheckoutFormValid } from './logic/is-checkout-form-valid';
 import type { CheckoutFormValue } from './types/checkout-form';
 
 export function Checkout() {
+  const checkoutPrefill = useCartStore((state) => state.checkoutPrefill);
   const [formValue, setFormValue] = useState<CheckoutFormValue>(
-    initialCheckoutFormValue,
+    checkoutPrefill ?? initialCheckoutFormValue,
   );
   const [createdOrder, setCreatedOrder] = useState<Order>();
 

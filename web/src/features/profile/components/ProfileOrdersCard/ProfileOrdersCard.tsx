@@ -144,9 +144,9 @@ export function ProfileOrdersCard({
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>
-                <p className="text-sm font-semibold">
+                <Link className="text-sm font-semibold underline-offset-4 hover:underline" to={`/profile/orders/${order.id}`}>
                   Заказ № {order.id.slice(0, 8)}
-                </p>
+                </Link>
 
                 <p className="mt-1 text-xs text-muted-foreground">
                   {formatOrderDate(order.createdAt)} · {getOrderItemsLabel(order)}
@@ -171,7 +171,7 @@ export function ProfileOrdersCard({
                   className="grid gap-1 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-3"
                 >
                   <span className="line-clamp-1 text-muted-foreground">
-                    {item.product?.title ?? `Товар ${item.productId}`}
+                    {item.productTitle ?? item.product?.title ?? `Товар ${item.productId}`}
                   </span>
 
                   {item.isOversized && <span className="flex flex-wrap items-center gap-2"><OversizedIndicator /> Доставка: {formatPrice(item.deliveryPrice)}</span>}

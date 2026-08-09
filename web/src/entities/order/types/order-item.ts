@@ -11,6 +11,7 @@ export type CreateOrderItem = {
 export type OrderItem = {
   id: string;
   productId: string;
+  productTitle?: string;
   quantity: number;
   baseUnitPrice: number;
   unitPrice: number;

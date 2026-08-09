@@ -374,6 +374,7 @@ model OrderItem {
   id                String  @id @default(uuid())
   orderId           String
   productId         String
+  productTitle      String?
   quantity          Int
   baseUnitPrice     Int
   unitPrice         Int

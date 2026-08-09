@@ -23,9 +23,19 @@ export type CartAdItem = {
   ad: Ad;
 };
 
+export type CheckoutPrefill = {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  deliveryAddress: string;
+  comment: string;
+};
+
 type CartStore = {
   items: CartStoreItem[];
   adItems: CartAdItem[];
+  checkoutPrefill?: CheckoutPrefill;
+  replaceItemsForOrder: (items: CartStoreItem[], prefill: CheckoutPrefill) => void;
   addItem: (
     product: Product,
     selectedAdditions?: SelectedProductAddition[],
@@ -52,6 +62,10 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       adItems: [],
+      checkoutPrefill: undefined,
+
+      replaceItemsForOrder: (items, checkoutPrefill) =>
+        set({ items, checkoutPrefill }),
 
       addAdItem: (ad) => {
         if (get().hasAdItem(ad.id)) return;
@@ -235,6 +249,7 @@ export const useCartStore = create<CartStore>()(
       partialize: (state) => ({
         items: state.items,
         adItems: state.adItems,
+        checkoutPrefill: state.checkoutPrefill,
       }),
     },
   ),

@@ -7,6 +7,12 @@ export type Order = OrderCustomer & {
   userId?: string;
   guestSessionId?: string;
   status: OrderStatus;
+  capabilities: {
+    canContinue: boolean;
+    canRepeat: boolean;
+    canRemove: boolean;
+    removeAction?: 'delete' | 'cancel';
+  };
   items: OrderItem[];
   totalAmount: number;
   createdAt: string;

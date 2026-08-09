@@ -1,9 +1,10 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
+  Delete,
   Get,
   Headers,
+  NotFoundException,
   Param,
   Post,
 } from '@nestjs/common';
@@ -53,17 +54,29 @@ export class OrdersController {
       await this.authService.getOptionalMeFromAuthorizationHeader(
         authorizationHeader,
       );
+    if (user) return this.ordersService.findOwnedById(orderId, user.id);
     const order = await this.ordersService.findById(orderId);
-    const ownsUserOrder = Boolean(user && order.userId === user.id);
-    const ownsGuestOrder = Boolean(
-      !order.userId &&
-      order.guestSessionId &&
-      guestSessionId &&
-      order.guestSessionId === guestSessionId,
-    );
-    if (!ownsUserOrder && !ownsGuestOrder) {
-      throw new ForbiddenException('Access denied');
-    }
-    return order;
+    if (!order.userId && order.guestSessionId === guestSessionId) return order;
+    throw new NotFoundException('Order not found');
+  }
+
+  @Post(':orderId/rebuild')
+  async rebuild(
+    @Param('orderId') orderId: string,
+    @Headers('authorization') authorizationHeader?: string,
+  ) {
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
+    return this.ordersService.rebuildOwnedOrder(orderId, user.id);
+  }
+
+  @Delete(':orderId')
+  async remove(
+    @Param('orderId') orderId: string,
+    @Headers('authorization') authorizationHeader?: string,
+  ) {
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
+    return this.ordersService.removeOwnedOrder(orderId, user.id);
   }
 }

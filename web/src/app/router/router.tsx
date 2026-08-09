@@ -26,6 +26,7 @@ import { HomePage } from '@/pages/home/HomePage';
 import { MarketPage } from '@/pages/market/MarketPage';
 import { ProductPage } from '@/pages/product/ProductPage';
 import { ProfilePage } from '@/pages/profile/ProfilePage';
+import { OrderDetailsPage } from '@/pages/profile/OrderDetailsPage';
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage';
 import { SellerPage } from '@/pages/seller/SellerPage';
 import { SearchPage } from '@/pages/search/SearchPage';
@@ -327,6 +328,11 @@ export const router = createBrowserRouter([
             label: 'Профиль',
           },
         } satisfies BreadcrumbHandle,
+      },
+      {
+        path: '/profile/orders/:orderId',
+        element: <OrderDetailsPage />,
+        handle: { breadcrumb: { type: BREADCRUMB_TYPE.STATIC, label: 'Заказ' } } satisfies BreadcrumbHandle,
       },
 
       {
