@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 
 import { useMutation } from '@tanstack/react-query';
 
-import { Button } from '@/components/ui/Button';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
 import { useSessionStore } from '@/entities/session';
-import { formatPrice } from '@/shared/utils/format-price';
+
+import { OrderDetailsTable } from './components/OrderDetailsTable';
+import { OrderItemsList } from './components/OrderItemsList';
+import { PaymentActions } from './components/PaymentActions';
 
 declare global {
   interface Window {
@@ -101,7 +103,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   }, []);
 
   return (
-    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-card p-8">
+    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">
           Заказ создан
@@ -114,48 +116,9 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         </p>
       </div>
 
-      <table className="w-full text-sm">
-        <tbody>
-          <tr className="border-b border-border">
-            <td className="py-3 text-muted-foreground">Дата заказа</td>
-            <td className="py-3 text-right">{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long' }).format(new Date(order.createdAt))}</td>
-          </tr>
-          <tr className="border-b border-border">
-            <td className="py-3 text-muted-foreground">Сумма к оплате</td>
-            <td className="py-3 text-right text-lg font-semibold">
-              {formatPrice(order.totalAmount)}
-            </td>
-          </tr>
-          <tr>
-            <td className="py-3 text-muted-foreground">Статус</td>
-            <td className="py-3 text-right font-medium">Ожидает оплаты</td>
-          </tr>
-          <tr className="border-t border-border">
-            <td className="py-3 text-muted-foreground">Получатель</td>
-            <td className="py-3 text-right">{order.customerName}, {order.customerPhone}</td>
-          </tr>
-          <tr className="border-t border-border">
-            <td className="py-3 text-muted-foreground">Доставка</td>
-            <td className="py-3 text-right">{order.deliveryAddress}</td>
-          </tr>
-          <tr className="border-t border-border">
-            <td className="py-3 text-muted-foreground">Продавец и получатель оплаты</td>
-            <td className="py-3 text-right">ИП Филатов Денис Романович</td>
-          </tr>
-        </tbody>
-      </table>
+      <OrderDetailsTable order={order} />
 
-      <div className="space-y-2">
-        <h2 className="font-semibold">Состав заказа</h2>
-        <ul className="space-y-2 text-sm">
-          {order.items.map((item) => (
-            <li key={item.id} className="flex justify-between gap-4">
-              <span>{item.product?.title ?? `Товар ${item.productId}`} × {item.quantity}</span>
-              <span className="shrink-0">{formatPrice(item.unitPrice * item.quantity + item.deliveryPrice)}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <OrderItemsList items={order.items} />
 
       {stage === 'error' && errorMessage && (
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -180,23 +143,11 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       <p className="text-xs text-muted-foreground">К заказу применяется <Link className="font-medium text-foreground underline underline-offset-2" to="/public-offer">Публичная оферта</Link>.</p>
 
       {stage !== 'widget' && (
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            variant="accent"
-            onClick={() => initiateMutation.mutate()}
-            disabled={initiateMutation.isPending || stage === 'loading'}
-          >
-            {initiateMutation.isPending || stage === 'loading'
-              ? 'Открываем оплату...'
-              : stage === 'error'
-                ? 'Попробовать оплатить снова'
-                : 'Оплатить заказ'}
-          </Button>
-
-          <Button asChild variant="secondary">
-            <Link to="/market/catalog">Вернуться в каталог</Link>
-          </Button>
-        </div>
+        <PaymentActions
+          isPending={initiateMutation.isPending || stage === 'loading'}
+          isRetry={stage === 'error'}
+          onPay={() => initiateMutation.mutate()}
+        />
       )}
     </section>
   );

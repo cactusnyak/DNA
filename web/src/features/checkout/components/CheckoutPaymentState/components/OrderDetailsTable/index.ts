@@ -1,0 +1,1 @@
+export { OrderDetailsTable } from './OrderDetailsTable';
