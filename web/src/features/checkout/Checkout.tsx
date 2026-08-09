@@ -5,6 +5,7 @@ import { SectionHeader } from '@/components/ui/Section';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { useAuthStore } from '@/entities/auth';
 import { useCartStore } from '@/entities/cart';
+import { isQuoteReady } from '@/entities/delivery-quote';
 import {
   createOrder,
   type CreateOrderPayload,
@@ -32,7 +33,11 @@ export function Checkout() {
 
   const items = useCartStore((state) => state.items);
   const totalAmount = useCartStore((state) => state.getTotalAmount());
-  const unresolvedOversizedItems = items.filter((item) => item.product.isOversized && item.deliveryQuote?.status !== 'ACCEPTED');
+  const unresolvedOversizedItems = items.filter(
+    (item) =>
+      item.product.isOversized &&
+      !isQuoteReady(item.deliveryQuote, item.configurationKey, item.quantity),
+  );
 
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
 
@@ -76,7 +81,10 @@ export function Checkout() {
         <CheckoutCustomerForm
           value={formValue}
           isPending={createOrderMutation.isPending}
-          isSubmitDisabled={!isCheckoutFormValid(formValue) || unresolvedOversizedItems.length > 0}
+          isSubmitDisabled={
+            !isCheckoutFormValid(formValue) ||
+            unresolvedOversizedItems.length > 0
+          }
           errorMessage={
             createOrderMutation.isError
               ? 'Не удалось оформить заказ. Проверьте данные и попробуйте ещё раз.'
@@ -85,7 +93,15 @@ export function Checkout() {
           onChange={setFormValue}
           onSubmit={handleSubmit}
         />
-        {unresolvedOversizedItems.length > 0 && <div role="alert" className="h-fit rounded-xl border border-destructive/30 p-4 text-sm text-destructive">Для крупногабаритных товаров сначала примите подтверждённый расчёт доставки.</div>}
+        {unresolvedOversizedItems.length > 0 && (
+          <div
+            role="alert"
+            className="h-fit rounded-xl border border-destructive/30 p-4 text-sm text-destructive"
+          >
+            Для крупногабаритных товаров сначала примите подтверждённый расчёт
+            доставки.
+          </div>
+        )}
 
         <CheckoutOrderSummary items={items} totalAmount={totalAmount} />
       </div>

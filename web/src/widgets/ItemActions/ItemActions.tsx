@@ -5,6 +5,7 @@ import type { Ad } from '@/entities/ad';
 import { useCartStore } from '@/entities/cart';
 import { FavouriteButton } from '@/entities/favourite';
 import type { Product, SelectedProductAddition } from '@/entities/product';
+import { createCartConfigurationKey } from '@/entities/product/lib/product-additions';
 import {
   getProductActionHeightClass,
   type ProductQuantityCounterVariant,
@@ -22,10 +23,7 @@ type ItemActionsProps = {
   selectedAdditions?: SelectedProductAddition[];
   isProductConfigurationValid?: boolean;
   onInvalidProductConfiguration?: () => void;
-} & (
-    | { itemType: 'product'; item: Product }
-    | { itemType: 'ad'; item: Ad }
-  );
+} & ({ itemType: 'product'; item: Product } | { itemType: 'ad'; item: Ad });
 
 export function ItemActions({
   itemType,
@@ -48,7 +46,16 @@ export function ItemActions({
         onInvalidProductConfiguration?.();
         return;
       }
-      addItem(item, selectedAdditions);
+      const configurationKey = createCartConfigurationKey(
+        item.id,
+        selectedAdditions,
+      );
+      const alreadyInCart = useCartStore
+        .getState()
+        .items.some(
+          (cartItem) => cartItem.configurationKey === configurationKey,
+        );
+      if (!alreadyInCart) addItem(item, selectedAdditions);
       navigate('/checkout');
     }
   }
@@ -69,7 +76,7 @@ export function ItemActions({
       {!isProduct && showSellerContactsButton && (
         <SellerContactsButton ad={item} variant={variant} />
       )}
-      
+
       {(showAddToCartButton || showFavouriteButton) && (
         <div className="flex items-start gap-2">
           {showAddToCartButton && (
@@ -103,20 +110,22 @@ export function ItemActions({
               className={[
                 'shrink-0 rounded-lg',
                 variant === 'details' ? 'size-9' : 'size-8',
-              ].filter(Boolean).join(' ')}
+              ]
+                .filter(Boolean)
+                .join(' ')}
             />
           )}
         </div>
       )}
 
-
-
       {isProduct && showBuyNowButton && (
         <Button
           type="button"
-          variant='accent'
+          variant="accent"
           size={variant === 'details' ? 'lg' : 'default'}
-          className={['w-full', getProductActionHeightClass(variant)].filter(Boolean).join(' ')}
+          className={['w-full', getProductActionHeightClass(variant)]
+            .filter(Boolean)
+            .join(' ')}
           onClick={handleBuyNow}
         >
           Купить в 1 клик

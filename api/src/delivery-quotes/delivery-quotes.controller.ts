@@ -62,6 +62,16 @@ export class DeliveryQuotesController {
       typeof body.guestSessionId === 'string' ? body.guestSessionId : undefined,
     ).then((owner) => this.service.accept(id, owner));
   }
+  @Post(':id/cancel') cancel(
+    @Param('id') id: string,
+    @Body() body: Record<string, unknown>,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.owner(
+      authorization,
+      typeof body.guestSessionId === 'string' ? body.guestSessionId : undefined,
+    ).then((owner) => this.service.cancel(id, owner));
+  }
 }
 
 @Controller('admin/delivery-quotes')

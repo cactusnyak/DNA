@@ -58,10 +58,7 @@ export function CheckoutOrderSummary({
               item.configuredUnitPrice * item.quantity + deliveryPrice;
 
             return (
-              <div
-                key={itemKey}
-                className="flex flex-col gap-3 sm:flex-row"
-              >
+              <div key={itemKey} className="flex flex-col gap-3 sm:flex-row">
                 <div className="aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:aspect-auto sm:size-16">
                   {image && (
                     <img
@@ -81,8 +78,7 @@ export function CheckoutOrderSummary({
                   </Link>
 
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {item.quantity} ×{' '}
-                    {formatPrice(item.configuredUnitPrice)}
+                    {item.quantity} × {formatPrice(item.configuredUnitPrice)}
                   </p>
 
                   {item.product.isOversized && (
@@ -91,6 +87,7 @@ export function CheckoutOrderSummary({
 
                       <OversizedDeliveryModal
                         product={item.product}
+                        cartLineKey={itemKey}
                         quantity={item.quantity}
                         configuredUnitPrice={item.configuredUnitPrice}
                         initialQuote={item.deliveryQuote}
@@ -98,12 +95,11 @@ export function CheckoutOrderSummary({
                         triggerLabel={
                           item.deliveryQuote?.status === 'ACCEPTED'
                             ? `Доставка: ${formatPrice(
-                              item.deliveryQuote
-                                .confirmedDeliveryPrice ?? 0,
-                            )}`
+                                item.deliveryQuote.confirmedDeliveryPrice ?? 0,
+                              )}`
                             : 'Доставка не рассчитана — рассчитать'
                         }
-                        onAccepted={(quote) => setQuote(itemKey, quote)}
+                        onQuoteChange={(quote) => setQuote(itemKey, quote)}
                       />
                     </div>
                   )}

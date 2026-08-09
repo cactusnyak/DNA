@@ -392,6 +392,7 @@ model OversizedDeliveryQuote {
   id                     String                       @id @default(uuid())
   clientRequestId        String                       @unique
   productId              String
+  cartLineKey            String
   userId                 String?
   guestSessionId         String?
   quantity               Int
@@ -421,6 +422,7 @@ model OversizedDeliveryQuote {
   orderItem OrderItem?
 
   @@index([productId, status])
+  @@index([cartLineKey, status])
   @@index([userId, createdAt])
   @@index([guestSessionId, createdAt])
 }

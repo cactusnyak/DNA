@@ -13,7 +13,10 @@ type CartProductItemCardProps = {
   onRemove: (configurationKey: string) => void;
 };
 
-export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps) {
+export function CartProductItemCard({
+  item,
+  onRemove,
+}: CartProductItemCardProps) {
   const setQuote = useCartStore((state) => state.setDeliveryQuote);
   const { product, quantity } = item;
   const image = product.images[0];
@@ -39,7 +42,8 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
       selected.type === 'boolean' &&
       !selected.value &&
       !addition.required
-    ) return [];
+    )
+      return [];
     const total =
       addition.type === 'boolean'
         ? selected.value
@@ -52,7 +56,9 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
           ? 'Да'
           : 'Нет'
         : `${selected.value} ${addition.unitLabel} × ${formatPrice(addition.price)}`;
-    return [`${addition.title}: ${value}, ${total ? `+${formatPrice(total)}` : formatPrice(0)}`];
+    return [
+      `${addition.title}: ${value}, ${total ? `+${formatPrice(total)}` : formatPrice(0)}`,
+    ];
   });
   return (
     <CartItemCard
@@ -69,36 +75,44 @@ export function CartProductItemCard({ item, onRemove }: CartProductItemCardProps
               <OversizedIndicator renderAsSpan />
               <OversizedDeliveryModal
                 product={product}
+                cartLineKey={item.configurationKey}
                 quantity={quantity}
                 configuredUnitPrice={item.configuredUnitPrice}
                 initialQuote={item.deliveryQuote}
                 triggerClassName="h-auto min-h-8 w-full whitespace-normal px-3 py-2 text-xs text-left leading-4"
                 triggerLabel={
-                  item.deliveryQuote
-                    ? 'Открыть расчёт доставки'
-                    : undefined
+                  item.deliveryQuote ? 'Открыть расчёт доставки' : undefined
                 }
-                onAccepted={(quote) =>
+                onQuoteChange={(quote) =>
                   setQuote(item.configurationKey ?? product.id, quote)
                 }
               />
               {item.deliveryQuote?.status === 'ACCEPTED' && (
                 <p className="px-3 text-xs text-emerald-700 dark:text-emerald-300">
                   Доставка:{' '}
-                  {formatPrice(
-                    item.deliveryQuote.confirmedDeliveryPrice ?? 0,
-                  )}
+                  {formatPrice(item.deliveryQuote.confirmedDeliveryPrice ?? 0)}
                 </p>
               )}
             </div>
           )}
-          {additionLines.map((line) => <p key={line}>{line}</p>)}
+          {additionLines.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
           {additionLines.length > 0 && (
             <p>Цена единицы: {formatPrice(item.configuredUnitPrice)}</p>
           )}
         </div>
       }
-      price={<p className="text-base font-semibold sm:text-lg">{formatPrice(itemTotal + (item.deliveryQuote?.status === 'ACCEPTED' ? item.deliveryQuote.confirmedDeliveryPrice ?? 0 : 0))}</p>}
+      price={
+        <p className="text-base font-semibold sm:text-lg">
+          {formatPrice(
+            itemTotal +
+              (item.deliveryQuote?.status === 'ACCEPTED'
+                ? (item.deliveryQuote.confirmedDeliveryPrice ?? 0)
+                : 0),
+          )}
+        </p>
+      }
       priceMeta={`${quantity} × ${formatPrice(item.configuredUnitPrice ?? product.price)}${item.deliveryQuote?.status === 'ACCEPTED' ? ' + доставка' : ''}`}
       actions={
         <div className="w-full sm:w-40">

@@ -8,6 +8,7 @@ describe('DeliveryQuotesService.create', () => {
   const body = {
     clientRequestId: 'request-123',
     productId: 'product-456',
+    cartLineKey: 'product-456:[]',
     quantity: 1,
     destinationRegion: 'Московская область',
     destinationCity: 'Химки',
@@ -37,6 +38,7 @@ describe('DeliveryQuotesService.create', () => {
     createdAt: new Date('2026-08-05T10:15:30.000Z'),
     managerNotifiedAt: null,
     managerEmailMessageId: null,
+    status: 'PENDING' as const,
     product,
   };
 
@@ -96,6 +98,31 @@ describe('DeliveryQuotesService.create', () => {
         data: expect.objectContaining({ managerEmailMessageId: 'email-789' }),
       }),
     );
+    expect(prisma.oversizedDeliveryQuote.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          cartLineKey: body.cartLineKey,
+          quantity: body.quantity,
+        }),
+      }),
+    );
+  });
+
+  it('cancels an active owned quote before its cart-line quantity changes', async () => {
+    const { service, prisma } = build(quote);
+    prisma.oversizedDeliveryQuote.update.mockResolvedValueOnce({
+      ...quote,
+      status: 'CANCELLED',
+    });
+
+    await expect(service.cancel(quote.id, owner)).resolves.toEqual(
+      expect.objectContaining({ status: 'CANCELLED' }),
+    );
+    expect(prisma.oversizedDeliveryQuote.update).toHaveBeenCalledWith({
+      where: { id: quote.id },
+      data: { status: 'CANCELLED' },
+      include: { product: true },
+    });
   });
 
   it('propagates provider failure and retains the request for a safe retry', async () => {

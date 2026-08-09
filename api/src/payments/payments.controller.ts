@@ -31,6 +31,7 @@ const ORDER_FOR_PAYMENT_INCLUDE = {
       product: {
         select: { title: true },
       },
+      deliveryQuote: true,
     },
   },
 } satisfies Prisma.OrderInclude;
@@ -64,6 +65,23 @@ export class PaymentsController {
     if (order.status !== OrderStatus.AWAITING_PAYMENT) {
       throw new BadRequestException(
         `Cannot initiate payment for order with status ${order.status}`,
+      );
+    }
+
+    const invalidOversizedItem = order.items.find(
+      (item) =>
+        item.isOversized &&
+        (!item.deliveryQuote ||
+          item.deliveryQuote.status !== 'ACCEPTED' ||
+          item.deliveryQuote.productId !== item.productId ||
+          item.deliveryQuote.quantity !== item.quantity ||
+          item.deliveryQuote.confirmedDeliveryPrice !== item.deliveryPrice ||
+          (item.deliveryQuote.expiresAt &&
+            item.deliveryQuote.expiresAt <= new Date())),
+    );
+    if (invalidOversizedItem) {
+      throw new BadRequestException(
+        'Для крупногабаритных товаров требуется действующий принятый расчёт доставки.',
       );
     }
 

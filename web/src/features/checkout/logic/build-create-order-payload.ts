@@ -1,5 +1,6 @@
 import type { CartStoreItem } from '@/entities/cart';
 import type { CreateOrderPayload } from '@/entities/order';
+import { isQuoteReady } from '@/entities/delivery-quote';
 
 import type { CheckoutFormValue } from '../types/checkout-form';
 
@@ -31,7 +32,13 @@ export function buildCreateOrderPayload({
       productId: item.product.id,
       quantity: item.quantity,
       selectedAdditions: item.selectedAdditions ?? [],
-      deliveryQuoteId: item.deliveryQuote?.status === 'ACCEPTED' ? item.deliveryQuote.id : undefined,
+      deliveryQuoteId: isQuoteReady(
+        item.deliveryQuote,
+        item.configurationKey,
+        item.quantity,
+      )
+        ? item.deliveryQuote?.id
+        : undefined,
     })),
   };
 }

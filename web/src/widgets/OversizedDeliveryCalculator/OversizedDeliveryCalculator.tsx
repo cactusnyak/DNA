@@ -26,24 +26,26 @@ import { formatPrice } from '@/shared/utils/format-price';
 
 type Props = {
   product: Product;
+  cartLineKey: string;
   quantity?: number;
   configuredUnitPrice?: number;
   initialQuote?: DeliveryQuote;
-  onAccepted?: (quote: DeliveryQuote) => void;
+  onQuoteChange?: (quote?: DeliveryQuote) => void;
 };
 
 export function OversizedDeliveryCalculator({
   product,
+  cartLineKey,
   quantity = 1,
   configuredUnitPrice = product.price,
   initialQuote,
-  onAccepted,
+  onQuoteChange,
 }: Props) {
   const token = useAuthStore((state) => state.accessToken);
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
   const clientRequestId = useRef(crypto.randomUUID());
 
-  const [quote, setQuote] = useState(initialQuote);
+  const quote = initialQuote;
   const [form, setForm] = useState({
     destinationRegion: '',
     destinationCity: '',
@@ -62,25 +64,29 @@ export function OversizedDeliveryCalculator({
         {
           ...form,
           productId: product.id,
+          cartLineKey,
           guestSessionId,
           clientRequestId: clientRequestId.current,
           quantity,
         },
         token,
       ),
-    onSuccess: setQuote,
+    onSuccess: (value) => {
+      onQuoteChange?.(value);
+    },
   });
 
   const refresh = useMutation({
     mutationFn: () => getDeliveryQuote(quote!.id, guestSessionId, token),
-    onSuccess: setQuote,
+    onSuccess: (value) => {
+      onQuoteChange?.(value);
+    },
   });
 
   const accept = useMutation({
     mutationFn: () => acceptDeliveryQuote(quote!.id, guestSessionId, token),
     onSuccess: (value) => {
-      setQuote(value);
-      onAccepted?.(value);
+      onQuoteChange?.(value);
     },
   });
 
@@ -144,6 +150,18 @@ export function OversizedDeliveryCalculator({
         )}
 
         <div className="flex flex-wrap gap-2">
+          {(quote.status === 'EXPIRED' || quote.status === 'CANCELLED') && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                clientRequestId.current = crypto.randomUUID();
+                onQuoteChange?.(undefined);
+              }}
+            >
+              Создать новый расчёт
+            </Button>
+          )}
           <Button
             type="button"
             variant="secondary"
@@ -298,10 +316,8 @@ export function OversizedDeliveryCalculator({
         </p>
       )}
 
-      <Button variant='accent' type="submit" disabled={mutation.isPending}>
-        {mutation.isPending
-          ? 'Отправляем…'
-          : 'Отправить запрос на расчёт'}
+      <Button variant="accent" type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? 'Отправляем…' : 'Отправить запрос на расчёт'}
       </Button>
 
       <ManagerLinks />

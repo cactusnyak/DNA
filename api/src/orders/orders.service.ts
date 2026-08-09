@@ -19,6 +19,7 @@ import type {
 
 type NormalizedOrderItem = {
   productId: string;
+  configurationKey: string;
   quantity: number;
   selectedAdditions: SelectedProductAddition[];
   deliveryQuoteId?: string;
@@ -124,7 +125,8 @@ export class OrdersService {
           );
         if (
           quote.productId !== item.productId ||
-          quote.quantity !== item.quantity
+          quote.quantity !== item.quantity ||
+          quote.cartLineKey !== item.configurationKey
         )
           throw new BadRequestException(
             'Расчёт доставки не соответствует товару или количеству.',
@@ -166,6 +168,7 @@ export class OrdersService {
               destinationCity: quote.destinationCity,
               destinationAddress: quote.destinationAddress,
               quantity: quote.quantity,
+              cartLineKey: quote.cartLineKey,
               status: quote.status,
               managerComment: quote.managerComment,
               confirmedAt: quote.updatedAt,
@@ -309,13 +312,27 @@ export class OrdersService {
       const canonicalSelection = [...selectedAdditions].sort((first, second) =>
         first.additionId.localeCompare(second.additionId),
       );
-      const key = `${item.productId}:${JSON.stringify(canonicalSelection)}`;
+      const keySelection = canonicalSelection.map(
+        ({ additionId, type, value }) => ({ additionId, type, value }),
+      );
+      const key = `${item.productId}:${JSON.stringify(keySelection)}`;
       const current = itemByConfiguration.get(key);
+      const deliveryQuoteId = this.getOptionalString(item.deliveryQuoteId);
+      if (
+        current?.deliveryQuoteId &&
+        deliveryQuoteId &&
+        current.deliveryQuoteId !== deliveryQuoteId
+      ) {
+        throw new BadRequestException(
+          'У одной конфигурации товара не может быть нескольких расчётов доставки.',
+        );
+      }
       itemByConfiguration.set(key, {
         productId: item.productId,
+        configurationKey: key,
         quantity: (current?.quantity ?? 0) + quantity,
         selectedAdditions: canonicalSelection,
-        deliveryQuoteId: this.getOptionalString(item.deliveryQuoteId),
+        deliveryQuoteId: current?.deliveryQuoteId ?? deliveryQuoteId,
       });
     });
 
