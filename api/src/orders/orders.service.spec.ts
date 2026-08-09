@@ -26,6 +26,27 @@ describe('OrdersService user order operations', () => {
     service = new OrdersService(prisma as PrismaService);
   });
 
+  it.each([OrderStatus.CREATED, OrderStatus.AWAITING_PAYMENT])(
+    'allows continuing an unpaid order in %s',
+    (status) => {
+      const mapped = (service as any).mapOrder({
+        id: orderId,
+        status,
+        userId: 'user-1',
+        customerName: 'Иван',
+        customerPhone: '+79990000000',
+        deliveryAddress: 'Москва',
+        totalAmount: 100,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        paymentAttempts: [],
+        items: [],
+      });
+
+      expect(mapped.capabilities.canContinue).toBe(true);
+    },
+  );
+
   it('does not reveal an order owned by another user', async () => {
     prisma.order.findFirst.mockResolvedValue(null);
     await expect(

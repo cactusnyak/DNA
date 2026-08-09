@@ -144,7 +144,7 @@ export function ProfileOrdersCard({
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>
-                <Link className="text-sm font-semibold underline-offset-4 hover:underline" to={`/profile/orders/${order.id}`}>
+                <Link className="text-sm font-semibold underline-offset-4 hover:underline" to={`/orders/${order.id}`}>
                   Заказ № {order.id.slice(0, 8)}
                 </Link>
 
@@ -182,6 +182,15 @@ export function ProfileOrdersCard({
                 </div>
               ))}
             </div>
+
+            {order.capabilities.canContinue && (
+              <Link
+                className="mt-4 inline-flex text-sm font-semibold underline-offset-4 hover:underline"
+                to={order.status === 'AWAITING_PAYMENT' ? `/checkout?orderId=${order.id}` : `/orders/${order.id}`}
+              >
+                {order.status === 'AWAITING_PAYMENT' ? 'Перейти к оплате' : 'Продолжить оформление'}
+              </Link>
+            )}
           </article>
         ))}
       </div>

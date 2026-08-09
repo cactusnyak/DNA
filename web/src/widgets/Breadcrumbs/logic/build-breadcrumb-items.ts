@@ -256,6 +256,18 @@ export function buildBreadcrumbItems({
           },
         ];
 
+      case BREADCRUMB_TYPE.ORDER: {
+        const orderId = match.params.orderId;
+        if (!orderId) return [];
+        return [
+          {
+            id: match.id,
+            href: match.pathname,
+            label: `Заказ № ${orderId.slice(0, 8)}`,
+          },
+        ];
+      }
+
       default:
         return [];
     }

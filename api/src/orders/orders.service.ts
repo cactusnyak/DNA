@@ -464,7 +464,9 @@ export class OrdersService {
       comment: order.comment ?? undefined,
       status: order.status,
       capabilities: {
-        canContinue: order.status === OrderStatus.CREATED,
+        canContinue:
+          order.status === OrderStatus.CREATED ||
+          order.status === OrderStatus.AWAITING_PAYMENT,
         canRepeat: true,
         canRemove:
           (order.status === OrderStatus.CREATED ||

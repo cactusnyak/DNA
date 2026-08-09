@@ -94,6 +94,13 @@ export function OrderDetailsPage() {
   }
   const order = orderQuery.data;
   const beginMerge = () => cartItems.length ? setConfirmation('merge') : rebuildMutation.mutate();
+  const continueCheckout = () => {
+    if (order.status === 'AWAITING_PAYMENT') {
+      navigate(`/checkout?orderId=${order.id}`);
+      return;
+    }
+    beginMerge();
+  };
 
   return (
     <ContentCard>
@@ -125,7 +132,8 @@ export function OrderDetailsPage() {
       <p className="mt-6 text-sm text-muted-foreground">При повторе применяются текущие цены и доступные параметры. Исходный заказ останется без изменений.</p>
       {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
       <div className="mt-5 flex flex-wrap gap-3">
-        {order.capabilities.canRepeat && <Button type="button" onClick={beginMerge} disabled={rebuildMutation.isPending}>{order.capabilities.canContinue ? 'Продолжить оформление' : 'Повторить заказ'}</Button>}
+        {order.capabilities.canContinue && <Button type="button" onClick={continueCheckout} disabled={rebuildMutation.isPending}>{order.status === 'AWAITING_PAYMENT' ? 'Перейти к оплате' : 'Продолжить оформление'}</Button>}
+        {!order.capabilities.canContinue && order.capabilities.canRepeat && <Button type="button" onClick={beginMerge} disabled={rebuildMutation.isPending}>Повторить заказ</Button>}
         {order.capabilities.canRemove && <Button type="button" variant="secondary" onClick={() => setConfirmation('remove')}>{order.capabilities.removeAction === 'delete' ? 'Удалить черновик' : 'Отменить заказ'}</Button>}
         <Button type="button" variant="ghost" onClick={() => navigate('/profile')}>Назад</Button>
       </div>

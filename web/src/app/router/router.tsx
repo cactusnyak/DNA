@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom';
 
 import { MainLayout } from '@/app/layouts/MainLayout';
+import { LegacyProfileOrderRedirect } from './LegacyProfileOrderRedirect';
 
 import { AdCreatePage } from '@/pages/ads/AdCreatePage';
 import { AdDetailsPage } from '@/pages/ads/AdDetailsPage';
@@ -330,9 +331,13 @@ export const router = createBrowserRouter([
         } satisfies BreadcrumbHandle,
       },
       {
-        path: '/profile/orders/:orderId',
+        path: '/orders/:orderId',
         element: <OrderDetailsPage />,
-        handle: { breadcrumb: { type: BREADCRUMB_TYPE.STATIC, label: 'Заказ' } } satisfies BreadcrumbHandle,
+        handle: { breadcrumb: { type: BREADCRUMB_TYPE.ORDER } } satisfies BreadcrumbHandle,
+      },
+      {
+        path: '/profile/orders/:orderId',
+        element: <LegacyProfileOrderRedirect />,
       },
 
       {
