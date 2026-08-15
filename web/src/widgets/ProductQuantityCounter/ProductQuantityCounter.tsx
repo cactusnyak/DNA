@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Modal } from '@/components/ui/Modal';
 import { useAuthStore } from '@/entities/auth';
 import { useCartStore } from '@/entities/cart';
@@ -112,7 +113,7 @@ export function ProductQuantityCounter({
           Текущий расчёт доставки зависит от количества и будет отменён. Для
           нового количества потребуется новый расчёт.
         </p>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <div className="flex justify-end gap-2">
           <Button
             type="button"

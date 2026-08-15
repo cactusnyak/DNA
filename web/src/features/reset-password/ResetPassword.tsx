@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { HttpError } from '@/shared/api/http-client';
 
 import { Button } from '@/components/ui/Button';
@@ -82,9 +83,9 @@ export function ResetPassword() {
           />
 
           {errorMessage && (
-            <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <ErrorMessage variant="banner">
               {errorMessage}
-            </p>
+            </ErrorMessage>
           )}
 
           <Button

@@ -1,3 +1,4 @@
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { type AdminOverview } from '@/entities/admin';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
@@ -36,9 +37,9 @@ export function AdminDashboard({
 
       {isOverviewError && (
         <div className="rounded-2xl border border-destructive/20 p-5">
-          <p className="text-sm text-destructive">
+          <ErrorMessage>
             Не удалось загрузить сводку админки.
-          </p>
+          </ErrorMessage>
         </div>
       )}
 

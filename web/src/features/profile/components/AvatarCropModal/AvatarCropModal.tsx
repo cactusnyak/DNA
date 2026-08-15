@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Cropper, { type Area, type Point } from 'react-easy-crop';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Modal } from '@/components/ui/Modal';
 
 import { getCroppedAvatarFile } from './logic/get-cropped-avatar-file';
@@ -96,7 +97,7 @@ export function AvatarCropModal({
             />
           </label>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <ErrorMessage>{error}</ErrorMessage>}
 
           <div className="flex justify-end gap-3">
             <Button

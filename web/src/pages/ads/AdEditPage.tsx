@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SectionHeader } from '@/components/ui/Section';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import {
@@ -63,7 +64,7 @@ export function AdEditPage() {
 
   if (isError || !ad) {
     return (
-      <p className="text-sm text-destructive">Объявление не найдено.</p>
+      <ErrorMessage>Объявление не найдено.</ErrorMessage>
     );
   }
 

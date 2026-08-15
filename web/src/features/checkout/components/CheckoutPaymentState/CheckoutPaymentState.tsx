@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { useMutation } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
@@ -154,9 +155,9 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       <OrderItemsList items={order.items} />
 
       {stage === 'error' && errorMessage && (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        <ErrorMessage variant="banner">
           {errorMessage}
-        </p>
+        </ErrorMessage>
       )}
 
       {(stage === 'loading' || stage === 'widget') && (

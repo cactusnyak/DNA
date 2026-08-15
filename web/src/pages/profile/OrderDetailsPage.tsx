@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { ContentCard } from '@/components/ui/ContentCard';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Modal } from '@/components/ui/Modal';
 import { useAuthStore } from '@/entities/auth';
 import { useCartStore, type CartStoreItem } from '@/entities/cart';
@@ -90,7 +91,7 @@ export function OrderDetailsPage() {
 
   if (orderQuery.isPending) return <ContentCard>Загружаем заказ…</ContentCard>;
   if (orderQuery.isError || !orderQuery.data) {
-    return <ContentCard><p className="text-destructive">Заказ не найден или недоступен.</p><Link to="/profile" className="mt-4 inline-block underline">Вернуться в профиль</Link></ContentCard>;
+    return <ContentCard><ErrorMessage>Заказ не найден или недоступен.</ErrorMessage><Link to="/profile" className="mt-4 inline-block underline">Вернуться в профиль</Link></ContentCard>;
   }
   const order = orderQuery.data;
   const beginMerge = () => cartItems.length ? setConfirmation('merge') : rebuildMutation.mutate();
@@ -130,7 +131,7 @@ export function OrderDetailsPage() {
       </dl>
 
       <p className="mt-6 text-sm text-muted-foreground">При повторе применяются текущие цены и доступные параметры. Исходный заказ останется без изменений.</p>
-      {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+      {error && <ErrorMessage className="mt-3" role="alert">{error}</ErrorMessage>}
       <div className="mt-5 flex flex-wrap gap-3">
         {order.capabilities.canContinue && <Button type="button" onClick={continueCheckout} disabled={rebuildMutation.isPending}>{order.status === 'AWAITING_PAYMENT' ? 'Перейти к оплате' : 'Продолжить оформление'}</Button>}
         {!order.capabilities.canContinue && order.capabilities.canRepeat && <Button type="button" onClick={beginMerge} disabled={rebuildMutation.isPending}>Повторить заказ</Button>}
