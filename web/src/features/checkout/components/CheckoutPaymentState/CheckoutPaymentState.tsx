@@ -94,7 +94,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   }, []);
 
   return (
-    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-card p-8">
+    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-primary/12 bg-card p-8">
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">
           Заказ создан

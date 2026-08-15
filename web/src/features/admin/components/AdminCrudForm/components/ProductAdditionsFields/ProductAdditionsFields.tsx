@@ -82,7 +82,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
 
       <div className='flex flex-col gap-2'>
         {value.map((addition, index) => (
-          <div key={addition.id} className="space-y-3 rounded-2xl border border-border p-4">
+          <div key={addition.id} className="space-y-3 rounded-2xl border border-primary/12 p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-xs">
@@ -277,7 +277,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
               type="button"
               variant="ghost"
               size="sm"
-              className="rounded-full border border-border bg-muted/60 px-3 text-xs hover:bg-muted"
+              className="rounded-full border border-primary/12 bg-muted/60 px-3 text-xs hover:bg-muted"
               onClick={() => addAddition(type.key)}
             >
               {type.name}

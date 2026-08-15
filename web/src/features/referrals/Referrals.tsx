@@ -54,7 +54,7 @@ export function Referrals() {
 
   if (isUserError || !user) {
     return (
-      <section className="rounded-3xl border border-border bg-card p-6">
+      <section className="rounded-3xl border border-primary/12 bg-card p-6">
         <h1 className="text-2xl font-semibold">Сессия завершена</h1>
 
         <p className="mt-2 text-sm leading-6 text-muted-foreground">

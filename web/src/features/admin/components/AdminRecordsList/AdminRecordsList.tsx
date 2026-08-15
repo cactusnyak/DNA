@@ -30,7 +30,7 @@ export function AdminRecordsList<TRecord>({
       {records.map((record) => (
         <article
           key={getRecordKey(record)}
-          className="rounded-2xl border border-border p-4"
+          className="rounded-2xl border border-primary/12 p-4"
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>

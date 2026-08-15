@@ -207,7 +207,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   }
 
   return (
-    <div className="overflow-clip rounded-2xl border border-border bg-background">
+    <div className="overflow-clip rounded-2xl border border-primary/12 bg-background">
       {filterableColumns.length > 0 && (
         <div className="border-b border-border bg-muted/20 p-4">
           <div className="flex flex-col gap-3">
@@ -232,7 +232,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               {hasActiveFilters && (
                 <button
                   type="button"
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-background hover:text-foreground"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-primary/12 px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-background hover:text-foreground"
                   onClick={resetFilters}
                 >
                   <RotateCcw className="size-3.5" strokeWidth={1.5} />
