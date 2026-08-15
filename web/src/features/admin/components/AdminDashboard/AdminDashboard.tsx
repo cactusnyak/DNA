@@ -36,9 +36,9 @@ export function AdminDashboard({
       />
 
       {isOverviewError && (
-        <ErrorMessage>
-          Не удалось загрузить сводку админки.
-        </ErrorMessage>
+          <ErrorMessage>
+            Не удалось загрузить сводку админки.
+          </ErrorMessage>
       )}
 
       <section className="space-y-4">

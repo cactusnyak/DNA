@@ -13,7 +13,7 @@ export function LegalDocumentLayout({ document }: { document: LegalDocument }) {
       />
 
       <div className='flex flex-col gap-6'>
-        <section className="flex flex-col gap-4 border-border/80">
+        <section className="flex flex-col gap-4 border-primary/12">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{document.title}</h1>
           <hr />
           <div className="flex flex-col gap-3">

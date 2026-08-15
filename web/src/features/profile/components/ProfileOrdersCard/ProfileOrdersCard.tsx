@@ -51,7 +51,7 @@ function ProfileOrdersMessage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mt-5 rounded-xl border border-border/80 px-4 py-4">
+    <div className="mt-5 rounded-xl border border-primary/12 px-4 py-4">
       <p
         className={[
           'text-sm leading-6',
@@ -104,7 +104,7 @@ export function ProfileOrdersCard({
       <section>
         <h2 className="text-lg font-semibold">Мои заказы</h2>
 
-        <div className="mt-5 rounded-xl border border-border/80 px-4 py-4">
+        <div className="mt-5 rounded-xl border border-primary/12 px-4 py-4">
           <p className="text-sm leading-6 text-muted-foreground">
             Заказов пока нет. Каталог уже ждёт, как кассир в пустом магазине.
           </p>
@@ -136,11 +136,11 @@ export function ProfileOrdersCard({
         </span>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-xl border border-border/80">
+      <div className="mt-5 overflow-hidden rounded-xl border border-primary/12">
         {orders.map((order) => (
           <article
             key={order.id}
-            className="border-b border-border/80 px-4 py-4 last:border-b-0"
+            className="border-b border-primary/12 px-4 py-4 last:border-b-0"
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>

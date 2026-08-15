@@ -96,7 +96,7 @@ export function Checkout() {
           onSubmit={handleSubmit}
         />
         {unresolvedOversizedItems.length > 0 && (
-          <ErrorMessage as="div" variant="card" role="alert">
+          <ErrorMessage role="alert">
             Для крупногабаритных товаров сначала примите подтверждённый расчёт
             доставки.
           </ErrorMessage>

@@ -36,9 +36,9 @@ export function AdDetailsPage() {
 
   if (isError || !ad) {
     return (
-      <ErrorMessage>
-        Объявление не найдено или недоступно.
-      </ErrorMessage>
+        <ErrorMessage>
+          Объявление не найдено или недоступно.
+        </ErrorMessage>
     );
   }
 

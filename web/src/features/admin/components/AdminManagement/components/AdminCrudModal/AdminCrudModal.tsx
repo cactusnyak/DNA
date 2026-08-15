@@ -75,7 +75,7 @@ export function AdminCrudModal({
         />
 
         {collectionEditingRecord && (
-          <div className="min-h-0 flex-1 overflow-y-auto border-t border-border/80 p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto border-t border-primary/12 p-6">
             <AdminCollectionItemsEditor
               collection={collectionEditingRecord}
               categories={data.marketCategories}

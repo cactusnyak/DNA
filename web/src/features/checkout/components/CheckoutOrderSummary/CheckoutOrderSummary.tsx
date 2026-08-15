@@ -114,7 +114,7 @@ export function CheckoutOrderSummary({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 border-t border-border/80 p-5">
+      <div className="mt-5 flex flex-col gap-3 border-t border-primary/12 p-5">
         <div className="flex items-center justify-between gap-4 text-sm">
           <span className="text-muted-foreground">Товары</span>
           <span>{formatPrice(productsAmount)}</span>

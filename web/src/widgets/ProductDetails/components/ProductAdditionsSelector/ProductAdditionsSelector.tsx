@@ -38,7 +38,7 @@ export function ProductAdditionsSelector({
           return (
             <div
               key={addition.id}
-              className="flex flex-col gap-2 border-t border-border/80 pt-2.5 first:border-0 first:pt-0"
+              className="flex flex-col gap-2 border-t border-primary/12 pt-2.5 first:border-0 first:pt-0"
             >
               <div className="flex items-center justify-between gap-5 text-sm">
                 <span>
@@ -59,7 +59,7 @@ export function ProductAdditionsSelector({
                       type="button"
                       className={`cursor-pointer rounded-md border py-1.5 px-3 text-xs font-medium ${selection?.type === 'boolean' && selection.value === value
                         ? 'border-transparent bg-primary/5 text-primary/80'
-                        : 'border-border/80 bg-background hover:bg-muted'
+                        : 'border-primary/12 bg-background hover:bg-muted'
                         }`}
                       onClick={() =>
                         setSelection({
@@ -99,7 +99,7 @@ export function ProductAdditionsSelector({
                 />
               )}
               {errors[addition.id] && (
-                <ErrorMessage size="xs">{errors[addition.id]}</ErrorMessage>
+                <ErrorMessage>{errors[addition.id]}</ErrorMessage>
               )}
             </div>
           );

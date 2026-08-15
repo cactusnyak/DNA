@@ -50,7 +50,7 @@ export function GlobalSearchItemResults({
         )}
 
         {isError && (
-          <ErrorMessage variant="banner">
+          <ErrorMessage>
             Не удалось загрузить предложения.
           </ErrorMessage>
         )}

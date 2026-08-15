@@ -62,7 +62,7 @@ export function GlobalSearchCategoryResults({
         )}
 
         {isError && (
-          <ErrorMessage variant="banner">
+          <ErrorMessage>
             Не удалось загрузить категории.
           </ErrorMessage>
         )}

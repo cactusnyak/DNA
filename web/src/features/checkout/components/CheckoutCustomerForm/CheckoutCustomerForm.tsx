@@ -107,7 +107,7 @@ export function CheckoutCustomerForm({
         </div>
 
         {errorMessage && (
-          <ErrorMessage variant="banner">
+          <ErrorMessage>
             {errorMessage}
           </ErrorMessage>
         )}

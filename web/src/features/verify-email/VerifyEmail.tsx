@@ -30,7 +30,7 @@ export function VerifyEmail() {
 
       <div className="flex flex-col gap-4">
         {!token && (
-          <ErrorMessage variant="banner">
+          <ErrorMessage>
             В ссылке отсутствует токен подтверждения.
           </ErrorMessage>
         )}
@@ -40,13 +40,13 @@ export function VerifyEmail() {
         )}
 
         {mutation.isSuccess && (
-          <p className="rounded-lg border border-border/80 bg-muted/40 px-3 py-3 text-sm">
+          <p className="rounded-lg border border-primary/12 bg-muted/40 px-3 py-3 text-sm">
             Почта успешно подтверждена.
           </p>
         )}
 
         {mutation.isError && (
-          <ErrorMessage variant="banner">
+          <ErrorMessage>
             Ссылка для подтверждения недействительна или устарела.
           </ErrorMessage>
         )}

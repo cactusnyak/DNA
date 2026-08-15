@@ -179,19 +179,19 @@ export function Profile() {
       )}
 
       {updateProfileMutation.isError && (
-        <ErrorMessage variant="banner">
+        <ErrorMessage>
           Не удалось сохранить изменения. Попробуйте ещё раз.
         </ErrorMessage>
       )}
 
       {updateAvatarMutation.isError && (
-        <ErrorMessage variant="banner">
+        <ErrorMessage>
           Не удалось обновить аватар. Попробуйте ещё раз.
         </ErrorMessage>
       )}
 
       {deleteAccountMutation.isError && (
-        <ErrorMessage variant="banner">
+        <ErrorMessage>
           Не удалось удалить аккаунт. Попробуйте ещё раз.
         </ErrorMessage>
       )}

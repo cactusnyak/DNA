@@ -33,7 +33,7 @@ export function MobileNavigation({ items }: MobileNavigationProps) {
   return (
     <nav
       ref={navigationRef}
-      className="fixed right-0 bottom-0 left-0 z-50 border-t border-border/80 bg-background md:hidden"
+      className="fixed right-0 bottom-0 left-0 z-50 border-t border-primary/12 bg-background md:hidden"
     >
       <div
         className="mx-auto grid max-w-md gap-1"

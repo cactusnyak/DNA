@@ -24,7 +24,7 @@ const buttonVariants = cva(
           '',
 
         outline:
-          'border border-border bg-primary/5 text-primary hover:bg-primary/10 hover:text-foreground aria-expanded:bg-primary/10 aria-expanded:text-foreground',
+          'border border-primary/15 bg-primary/5 text-primary hover:bg-primary/10 hover:text-foreground aria-expanded:bg-primary/10 aria-expanded:text-foreground',
 
         secondary:
           'bg-primary/5 text-primary hover:bg-primary/10 aria-expanded:bg-primary/10 aria-expanded:text-foreground',

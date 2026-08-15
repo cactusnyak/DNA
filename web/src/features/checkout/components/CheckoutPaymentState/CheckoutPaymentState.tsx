@@ -155,7 +155,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       <OrderItemsList items={order.items} />
 
       {stage === 'error' && errorMessage && (
-        <ErrorMessage variant="banner">
+        <ErrorMessage>
           {errorMessage}
         </ErrorMessage>
       )}
