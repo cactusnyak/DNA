@@ -295,7 +295,7 @@ export function AuthorizationForm({
               <>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-primary/12" />
+                    <span className="w-full border-t border-border/80" />
                   </div>
                   <div className="relative flex justify-center text-[10px] uppercase">
                     <span className="bg-card px-2 text-muted-foreground">

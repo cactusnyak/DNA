@@ -31,7 +31,7 @@ export function CollectionItemsPicker({
         return (
           <label
             key={item.id}
-            className="grid gap-3 rounded-xl border border-primary/12 p-3 text-sm sm:grid-cols-[1fr_110px]"
+            className="grid gap-3 rounded-xl border border-border/80 p-3 text-sm sm:grid-cols-[1fr_110px]"
           >
             <span className="flex items-start gap-3">
               <input

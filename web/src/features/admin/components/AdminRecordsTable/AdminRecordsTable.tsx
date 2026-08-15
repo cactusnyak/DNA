@@ -156,7 +156,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         ].filter(Boolean).join(' ')}
       >
         {hasBulkActions && (
-          <td className="w-10 border-r border-primary/12 px-3 py-3">
+          <td className="w-10 border-r border-border/80 px-3 py-3">
             <FormBooleanField
               ariaLabel="Выбрать запись"
               checked={isSelected}
@@ -166,7 +166,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         )}
 
         {hasSubRows && (
-          <td className="w-8 border-r border-primary/12 px-2 py-3 text-center">
+          <td className="w-8 border-r border-border/80 px-2 py-3 text-center">
             {hasChildren ? (
               <button
                 type="button"
@@ -207,9 +207,9 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   }
 
   return (
-    <div className="overflow-clip rounded-2xl border border-primary/12 bg-background">
+    <div className="overflow-clip rounded-2xl border border-border/80 bg-background">
       {filterableColumns.length > 0 && (
-        <div className="border-b border-primary/12 bg-muted/20 p-4">
+        <div className="border-b border-border/80 bg-muted/20 p-4">
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <button
@@ -232,7 +232,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               {hasActiveFilters && (
                 <button
                   type="button"
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-primary/12 px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-background hover:text-foreground"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/80 px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-background hover:text-foreground"
                   onClick={resetFilters}
                 >
                   <RotateCcw className="size-3.5" strokeWidth={1.5} />
@@ -273,7 +273,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                               'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium ',
                               !filterValue
                                 ? 'border-foreground bg-foreground text-background'
-                                : 'border-primary/12 text-muted-foreground hover:bg-background hover:text-foreground',
+                                : 'border-border/80 text-muted-foreground hover:bg-background hover:text-foreground',
                             ].filter(Boolean).join(' ')}
                             onClick={() => updateFilterValue(column.key, '')}
                           >
@@ -291,7 +291,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                                   'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium ',
                                   isActive
                                     ? 'border-foreground bg-foreground text-background'
-                                    : 'border-primary/12 text-muted-foreground hover:bg-background hover:text-foreground',
+                                    : 'border-border/80 text-muted-foreground hover:bg-background hover:text-foreground',
                                 ].filter(Boolean).join(' ')}
                                 onClick={() =>
                                   updateFilterValue(column.key, option.value)
@@ -375,7 +375,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
       )}
 
       {hasBulkActions && selectedCount > 0 && (
-        <div className="flex flex-wrap items-center gap-3 border-b border-primary/12 bg-primary/5 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 border-b border-border/80 bg-primary/5 px-4 py-3">
           <span className="text-sm font-medium">
             Выбрано: {selectedCount}
           </span>
@@ -425,7 +425,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
           <thead className="text-xs tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
-                <th className="sticky top-0 z-10 w-10 border-r border-primary/12 bg-muted/80 px-3 py-3 backdrop-blur-md">
+                <th className="sticky top-0 z-10 w-10 border-r border-border/80 bg-muted/80 px-3 py-3 backdrop-blur-md">
                   <FormBooleanField
                     ariaLabel="Выбрать все"
                     checked={allSelected}
@@ -435,7 +435,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 </th>
               )}
 
-              {hasSubRows && <th className="sticky top-0 z-10 w-8 border-r border-primary/12 bg-muted/80 px-2 py-3 backdrop-blur-md" />}
+              {hasSubRows && <th className="sticky top-0 z-10 w-8 border-r border-border/80 bg-muted/80 px-2 py-3 backdrop-blur-md" />}
 
               {columns.map((column) => {
                 const width =

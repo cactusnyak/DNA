@@ -15,9 +15,9 @@ export function OrderDetailsTable({ order }: OrderDetailsTableProps) {
             key={item.label}
             className={
               item.startsSection
-                ? 'border-t border-primary/12'
+                ? 'border-t border-border/80'
                 : item.endsSection
-                  ? 'border-b border-primary/12'
+                  ? 'border-b border-border/80'
                   : undefined
             }
           >

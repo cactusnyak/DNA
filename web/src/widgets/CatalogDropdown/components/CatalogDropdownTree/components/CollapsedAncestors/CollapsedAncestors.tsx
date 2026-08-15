@@ -32,7 +32,7 @@ export function CollapsedAncestors({
   }
 
   return (
-    <div className="w-44 shrink-0 border-r border-primary/12 pr-2">
+    <div className="w-44 shrink-0 border-r border-border/80 pr-2">
       <ul className="space-y-1 p-1">
         <li>
           <Link

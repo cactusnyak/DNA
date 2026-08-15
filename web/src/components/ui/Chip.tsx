@@ -18,7 +18,7 @@ export function Chip({
         'inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-sm leading-none',
         active
           ? 'border-foreground bg-foreground text-background'
-          : 'border-primary/12 bg-background text-foreground hover:bg-muted',
+          : 'border-border/80 bg-background text-foreground hover:bg-muted',
         className,
       ].filter(Boolean).join(' ')}
       {...props}
