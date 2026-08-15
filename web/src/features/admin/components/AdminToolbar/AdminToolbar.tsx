@@ -56,7 +56,7 @@ export function AdminToolbar({
             type="button"
             variant="default"
             onClick={onCreateClick}
-            className='py-6 px-8 bg-primary text-primary-foreground hover:bg-primary/80 aria-expanded:bg-primary/80 rounded-xl'
+            className='bg-foreground text-background rounded-xl px-8 py-6 hover:bg-foreground/90 aria-expanded:bg-primary/80 border-foreground'
           >
             <Plus className="size-4" strokeWidth={1.5} />
             {createLabel}

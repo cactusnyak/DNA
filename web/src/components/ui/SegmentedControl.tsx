@@ -21,7 +21,7 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   return (
     <div
-      className={`inline-flex items-center gap-1 rounded-xl border border-primary/15 bg-primary/5 p-1 sm:rounded-xl ${className ?? ''}`}
+      className={`inline-flex items-center gap-1 min-h-10 rounded-xl border border-primary/15 bg-primary/5 p-1 sm:rounded-xl ${className ?? ''}`}
     >
       {options.map((option) => {
         const isActive = option.value === value;
