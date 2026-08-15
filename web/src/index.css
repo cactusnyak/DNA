@@ -26,6 +26,8 @@ body {
   color: #0f172a;
 }
 
+@source inline("{hover:,focus:,focus-visible:,active:,disabled:,}{text,bg,border}-{success,warning,dangerous,destructive}{,/{0..100..5}}");
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
@@ -150,7 +152,7 @@ body {
       #ffffff);
 
   --success: color-mix(in srgb, var(--primary) 25%, #00e700);
-  --warning: color-mix(in srgb, var(--primary) 25%, #f7f70a);
+  --warning: color-mix(in srgb, var(--primary) 25%, #ffff00);
   --dangerous: color-mix(in srgb, var(--primary) 25%, #ff7812);
   --destructive: color-mix(in srgb, var(--primary) 25%, #e7000b);
 

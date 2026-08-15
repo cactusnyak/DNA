@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { httpClient } from '@/shared/api/http-client';
 import { Button } from '@/components/ui/Button';
-import { FormInputField, FormTextareaField } from '@/components/ui/FormField';
+import {
+  FormInputField,
+  FormTextareaField,
+} from '@/components/ui/FormField';
+import type {
+  DeliveryQuote,
+  DeliveryQuoteStatus,
+} from '@/entities/delivery-quote';
+import { httpClient } from '@/shared/api/http-client';
 import { formatPrice } from '@/shared/utils/format-price';
-import type { DeliveryQuote, DeliveryQuoteStatus } from '@/entities/delivery-quote';
 
 type AdminQuote = DeliveryQuote & {
-  product: { title: string };
+  product: {
+    title: string;
+  };
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
@@ -17,76 +25,178 @@ type AdminQuote = DeliveryQuote & {
   unloadingRequired: boolean;
 };
 
+type InfoTableRow = {
+  label: string;
+  value: ReactNode;
+};
+
+type InfoTableProps = {
+  title: string;
+  rows: InfoTableRow[];
+};
+
 const STATUS_VARIANTS: Record<
   DeliveryQuoteStatus,
-  { label: string; variant: 'primary' | 'success' | 'warning' | 'dangerous' | 'destructive' }
+  {
+    label: string;
+    className: string;
+  }
 > = {
-  'PENDING': { label: 'Новая', variant: 'warning' },
-  'QUOTED': { label: 'Оценена', variant: 'primary' },
-  'ACCEPTED': { label: 'Оценена', variant: 'success' },
-  'EXPIRED': { label: 'Истекла', variant: 'dangerous' },
-  'CANCELLED': { label: 'Отменена', variant: 'destructive' },
+  PENDING: {
+    label: 'Ожидает расчёта',
+    className: 'bg-warning/5 text-warning hover:bg-warning/10',
+  },
+  QUOTED: {
+    label: 'Расчёт готов',
+    className: 'bg-primary/5 text-primary hover:bg-primary/10',
+  },
+  ACCEPTED: {
+    label: 'Принято',
+    className: 'bg-success/5 text-success hover:bg-success/10',
+  },
+  EXPIRED: {
+    label: 'Срок истёк',
+    className: 'bg-dangerous/5 text-dangerous hover:bg-dangerous/10',
+  },
+  CANCELLED: {
+    label: 'Отменено',
+    className:
+      'bg-destructive/5 text-destructive hover:bg-destructive/10',
+  },
 };
 
 function StatusBadge({ status }: { status: DeliveryQuoteStatus }) {
   const config = STATUS_VARIANTS[status];
 
   return (
-    <span className={`w-fit rounded-sm bg-${config.variant}/5 px-2 py-1 text-xs text-${config.variant} underline-offset-4 hover:bg-${config.variant}/10`}>
+    <span
+      className={`w-fit rounded-sm px-2 py-1 text-xs underline-offset-4 transition-colors ${config.className}`}
+    >
       {config.label}
     </span>
   );
 }
 
-export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
+function InfoTable({ title, rows }: InfoTableProps) {
+  return (
+    <section className="flex w-fit max-w-full flex-col gap-1.5">
+      <h3 className="text-sm font-medium">{title}</h3>
+
+      <div className="w-fit max-w-full overflow-x-auto rounded-lg border border-border/80">
+        <table className="table-auto border-collapse text-sm">
+          <tbody className="divide-y divide-border/80">
+            {rows.map(({ label, value }) => (
+              <tr key={label}>
+                <th
+                  scope="row"
+                  className="whitespace-nowrap bg-muted/15 px-2 py-1 text-left align-top font-medium text-muted-foreground"
+                >
+                  {label}
+                </th>
+
+                <td className="max-w-md whitespace-normal break-words px-2 py-1 align-top">
+                  {value || '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+export function AdminDeliveryQuotes({
+  accessToken,
+}: {
+  accessToken: string;
+}) {
   const client = useQueryClient();
+
   const [drafts, setDrafts] = useState<
-    Record<string, { price: string; comment: string; expiresAt: string }>
+    Record<
+      string,
+      {
+        price: string;
+        comment: string;
+        expiresAt: string;
+      }
+    >
   >({});
 
-  const headers = { Authorization: `Bearer ${accessToken}` };
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+  };
 
   const query = useQuery({
     queryKey: ['admin-delivery-quotes'],
-    queryFn: () => httpClient<AdminQuote[]>('/admin/delivery-quotes', { headers }),
+    queryFn: () =>
+      httpClient<AdminQuote[]>('/admin/delivery-quotes', {
+        headers,
+      }),
   });
 
   const mutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: DeliveryQuoteStatus }) => {
-      const draft = drafts[id] ?? { price: '', comment: '', expiresAt: '' };
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: DeliveryQuoteStatus;
+    }) => {
+      const draft = drafts[id] ?? {
+        price: '',
+        comment: '',
+        expiresAt: '',
+      };
+
       return httpClient(`/admin/delivery-quotes/${id}`, {
         method: 'PATCH',
         headers,
         body: {
           status,
-          confirmedDeliveryPrice: draft.price === '' ? undefined : Number(draft.price),
+          confirmedDeliveryPrice:
+            draft.price === '' ? undefined : Number(draft.price),
           managerComment: draft.comment,
           expiresAt: draft.expiresAt || undefined,
         },
       });
     },
-    onSuccess: () => client.invalidateQueries({ queryKey: ['admin-delivery-quotes'] }),
+    onSuccess: () =>
+      client.invalidateQueries({
+        queryKey: ['admin-delivery-quotes'],
+      }),
   });
 
   if (query.isPending) {
-    return <p className="text-sm text-muted-foreground">Загружаем заявки…</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        Загружаем заявки…
+      </p>
+    );
   }
 
   if (query.isError) {
-    return <ErrorMessage>Не удалось загрузить заявки на доставку.</ErrorMessage>;
+    return (
+      <ErrorMessage>
+        Не удалось загрузить заявки на доставку.
+      </ErrorMessage>
+    );
   }
 
   return (
     <section className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-xl font-semibold">Расчёты крупногабаритной доставки</h2>
-      </div>
+      <h2 className="text-xl font-semibold">
+        Расчёты крупногабаритной доставки
+      </h2>
 
       {!query.data?.length && (
-        <p className="text-sm text-muted-foreground">Заявок пока нет.</p>
+        <p className="text-sm text-muted-foreground">
+          Заявок пока нет.
+        </p>
       )}
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-start gap-4">
         {query.data?.map((quote) => {
           const draft = drafts[quote.id] ?? {
             price: quote.confirmedDeliveryPrice?.toString() ?? '',
@@ -95,42 +205,92 @@ export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
           };
 
           const update = (next: Partial<typeof draft>) => {
-            setDrafts({
-              ...drafts,
-              [quote.id]: { ...draft, ...next },
-            });
+            setDrafts((current) => ({
+              ...current,
+              [quote.id]: {
+                ...draft,
+                ...next,
+              },
+            }));
           };
 
           return (
             <article
               key={quote.id}
-              className="flex flex-col gap-4 rounded-xl border border-border/80 p-5"
+              className="flex min-w-0 flex-1 basis-[30rem] flex-col gap-7 rounded-xl border border-border/80 p-5"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex flex-col gap-1">
-                  <div className="font-medium">
-                    {quote.product.title} · {quote.quantity} шт.
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {quote.destinationRegion}, {quote.destinationCity},{' '}
-                    {quote.destinationAddress}
-                  </div>
+              <header className="flex flex-wrap items-start justify-between gap-3">
+                <div className="font-medium">
+                  {quote.product.title}
+                  {quote.quantity > 1
+                    ? ` · ${quote.quantity} шт.`
+                    : ''}
                 </div>
-                <StatusBadge status={quote.status} />
-              </div>
 
-              <div className="rounded-lg bg-muted/30 px-4 py-3 text-sm">
-                <div className="flex flex-wrap gap-x-4 gap-y-1">
-                  <span className="font-medium">{quote.customerName}</span>
-                  <span>{quote.customerPhone}</span>
-                  {quote.customerEmail && <span>{quote.customerEmail}</span>}
-                </div>
-                {quote.customerComment && (
-                  <div className="mt-1 text-muted-foreground">
-                    Комментарий: {quote.customerComment}
-                  </div>
-                )}
-              </div>
+                <StatusBadge status={quote.status} />
+              </header>
+
+              <InfoTable
+                title="Место назначения"
+                rows={[
+                  {
+                    label: 'Регион',
+                    value: quote.destinationRegion,
+                  },
+                  {
+                    label: 'Город',
+                    value: quote.destinationCity,
+                  },
+                  {
+                    label: 'Адрес',
+                    value: quote.destinationAddress,
+                  },
+                  {
+                    label: 'Разгрузка',
+                    value: quote.unloadingRequired
+                      ? 'Требуется'
+                      : 'Не требуется',
+                  },
+                  ...(quote.accessRestrictions
+                    ? [
+                      {
+                        label: 'Ограничения',
+                        value: quote.accessRestrictions,
+                      },
+                    ]
+                    : []),
+                ]}
+              />
+
+              <InfoTable
+                title="Данные клиента"
+                rows={[
+                  {
+                    label: 'Имя',
+                    value: quote.customerName,
+                  },
+                  {
+                    label: 'Телефон',
+                    value: quote.customerPhone,
+                  },
+                  ...(quote.customerEmail
+                    ? [
+                      {
+                        label: 'Email',
+                        value: quote.customerEmail,
+                      },
+                    ]
+                    : []),
+                  ...(quote.customerComment
+                    ? [
+                      {
+                        label: 'Комментарий',
+                        value: quote.customerComment,
+                      },
+                    ]
+                    : []),
+                ]}
+              />
 
               {quote.confirmedDeliveryPrice != null && (
                 <div className="rounded-lg bg-primary/5 px-4 py-2 text-sm">
@@ -139,19 +299,19 @@ export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
                 </div>
               )}
 
-              <div className="flex flex-col gap-3 border-t border-border/60 pt-4">
-                <div className="text-sm font-medium text-muted-foreground">
-                  Редактирование предложения
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
+              <form className="flex flex-col gap-6">
+                <div className="flex flex-col gap-5">
                   <FormInputField
                     name={`price-${quote.id}`}
-                    label="Цена доставки, ₽"
+                    label="Цена доставки"
                     type="number"
                     min={0}
                     value={draft.price}
-                    onChange={(event) => update({ price: event.target.value })}
+                    onChange={(event) =>
+                      update({
+                        price: event.target.value,
+                      })
+                    }
                   />
 
                   <FormInputField
@@ -159,42 +319,67 @@ export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
                     label="Действует до"
                     type="datetime-local"
                     value={draft.expiresAt}
-                    onChange={(event) => update({ expiresAt: event.target.value })}
+                    onChange={(event) =>
+                      update({
+                        expiresAt: event.target.value,
+                      })
+                    }
+                  />
+
+                  <FormTextareaField
+                    name={`comment-${quote.id}`}
+                    label="Комментарий менеджера"
+                    rows={3}
+                    value={draft.comment}
+                    onChange={(event) =>
+                      update({
+                        comment: event.target.value,
+                      })
+                    }
                   />
                 </div>
 
-                <FormTextareaField
-                  name={`comment-${quote.id}`}
-                  label="Комментарий менеджера"
-                  rows={3}
-                  value={draft.comment}
-                  onChange={(event) => update({ comment: event.target.value })}
-                />
-              </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="accent"
+                    onClick={() =>
+                      mutation.mutate({
+                        id: quote.id,
+                        status: 'QUOTED',
+                      })
+                    }
+                  >
+                    Подтвердить цену
+                  </Button>
 
-              <div className="flex flex-wrap gap-2 border-t border-border/60 pt-4">
-                <Button
-                  type="button"
-                  variant="accent"
-                  onClick={() => mutation.mutate({ id: quote.id, status: 'QUOTED' })}
-                >
-                  Подтвердить цену
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => mutation.mutate({ id: quote.id, status: 'EXPIRED' })}
-                >
-                  Пометить истёкшим
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => mutation.mutate({ id: quote.id, status: 'CANCELLED' })}
-                >
-                  Отменить
-                </Button>
-              </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() =>
+                      mutation.mutate({
+                        id: quote.id,
+                        status: 'EXPIRED',
+                      })
+                    }
+                  >
+                    Пометить истёкшим
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() =>
+                      mutation.mutate({
+                        id: quote.id,
+                        status: 'CANCELLED',
+                      })
+                    }
+                  >
+                    Отменить
+                  </Button>
+                </div>
+              </form>
             </article>
           );
         })}
