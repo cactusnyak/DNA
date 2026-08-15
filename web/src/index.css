@@ -151,10 +151,10 @@ body {
       var(--primary) 2%,
       #ffffff);
 
-  --success: color-mix(in srgb, var(--primary) 25%, #00e700);
-  --warning: color-mix(in srgb, var(--primary) 25%, #ffff00);
-  --dangerous: color-mix(in srgb, var(--primary) 25%, #ff7812);
-  --destructive: color-mix(in srgb, var(--primary) 25%, #e7000b);
+  --success: color-mix(in srgb, var(--primary) 15%, #00e700);
+  --warning: color-mix(in srgb, var(--primary) 15%, #ffd900);
+  --dangerous: color-mix(in srgb, var(--primary) 15%, #ffa412);
+  --destructive: color-mix(in srgb, var(--primary) 15%, #e7000b);
 
   --border: color-mix(in srgb, var(--primary) 15%, #ffffff);
   --input: color-mix(in srgb, var(--primary) 15%, #ffffff);

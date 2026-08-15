@@ -49,7 +49,7 @@ export function AdminDeliveryQuotes({ accessToken }: AdminDeliveryQuotesProps) {
         </p>
       )}
 
-      <div className="max-h-[100vh] overflow flex flex-col items-center gap-4">
+      <div className="flex flex-wrap gap-4">
         {visibleQuotes.map((quote) => (
           <AdminDeliveryQuoteCard
             key={quote.id}
