@@ -156,7 +156,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         ].filter(Boolean).join(' ')}
       >
         {hasBulkActions && (
-          <td className="w-10 px-3 py-3">
+          <td className="w-10 border-r border-border/80 px-3 py-3">
             <FormBooleanField
               ariaLabel="Выбрать запись"
               checked={isSelected}
@@ -166,7 +166,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
         )}
 
         {hasSubRows && (
-          <td className="w-8 px-2 py-3 text-center">
+          <td className="w-8 border-r border-border/80 px-2 py-3 text-center">
             {hasChildren ? (
               <button
                 type="button"
@@ -425,7 +425,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
           <thead className="text-xs tracking-wide text-muted-foreground">
             <tr>
               {hasBulkActions && (
-                <th className="sticky top-0 z-10 w-10 bg-muted/80 px-3 py-3 backdrop-blur-md">
+                <th className="sticky top-0 z-10 w-10 border-r border-border/80 bg-muted/80 px-3 py-3 backdrop-blur-md">
                   <FormBooleanField
                     ariaLabel="Выбрать все"
                     checked={allSelected}
@@ -435,7 +435,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                 </th>
               )}
 
-              {hasSubRows && <th className="sticky top-0 z-10 w-8 bg-muted/80 px-2 py-3 backdrop-blur-md" />}
+              {hasSubRows && <th className="sticky top-0 z-10 w-8 border-r border-border/80 bg-muted/80 px-2 py-3 backdrop-blur-md" />}
 
               {columns.map((column) => {
                 const width =

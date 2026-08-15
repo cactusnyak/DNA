@@ -39,7 +39,7 @@ export function MarkHighlight({
         <mark 
           key={index} 
           className={[
-            'rounded-[4px]',
+            'rounded-[4px] px-0.5',
             levelStyles[level],
             className
           ].filter(Boolean).join(' ')}
