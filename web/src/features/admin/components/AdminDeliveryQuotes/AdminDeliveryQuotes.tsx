@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { httpClient } from '@/shared/api/http-client';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { FormInputField, FormTextareaField } from '@/components/ui/FormField';
 import { formatPrice } from '@/shared/utils/format-price';
 import type { DeliveryQuote, DeliveryQuoteStatus } from '@/entities/delivery-quote';
 
@@ -105,35 +105,30 @@ export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
               </p>
             )}
 
-            <label className="flex flex-col gap-1 text-sm">
-              <span>Цена доставки, ₽</span>
-              <Input
-                name={`price-${quote.id}`}
-                type="number"
-                min="0"
-                value={draft.price}
-                onChange={(e) => update({ price: e.target.value })}
-              />
-            </label>
+            <FormInputField
+              name={`price-${quote.id}`}
+              label="Цена доставки, ₽"
+              type="number"
+              min={0}
+              value={draft.price}
+              onChange={(event) => update({ price: event.target.value })}
+            />
 
-            <label className="flex flex-col gap-1 text-sm">
-              <span>Комментарий менеджера</span>
-              <Input
-                name={`comment-${quote.id}`}
-                value={draft.comment}
-                onChange={(e) => update({ comment: e.target.value })}
-              />
-            </label>
+            <FormTextareaField
+              name={`comment-${quote.id}`}
+              label="Комментарий менеджера"
+              rows={3}
+              value={draft.comment}
+              onChange={(event) => update({ comment: event.target.value })}
+            />
 
-            <label className="flex flex-col gap-1 text-sm">
-              <span>Действует до</span>
-              <Input
-                name={`expires-${quote.id}`}
-                type="datetime-local"
-                value={draft.expiresAt}
-                onChange={(e) => update({ expiresAt: e.target.value })}
-              />
-            </label>
+            <FormInputField
+              name={`expires-${quote.id}`}
+              label="Действует до"
+              type="datetime-local"
+              value={draft.expiresAt}
+              onChange={(event) => update({ expiresAt: event.target.value })}
+            />
 
             <div className="flex flex-wrap gap-2">
               <Button
