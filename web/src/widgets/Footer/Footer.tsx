@@ -13,7 +13,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-primary/12 bg-white">
+    <footer className="border-t border-border/80 bg-white">
       <div>
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:gap-10 md:flex-row md:items-start md:gap-12 lg:gap-16 xl:gap-20">
           <div className="shrink-0 md:w-48 lg:w-56 xl:w-64">
@@ -29,7 +29,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-primary/12 text-xs text-muted-foreground">
+        <div className="border-t border-border/80 text-xs text-muted-foreground">
           <div className="mx-auto max-w-7xl px-4 py-8 flex flex-col gap-2 md:flex-row md:items-center">
             <p>© {currentYear} DNA. Все права защищены.</p>
 

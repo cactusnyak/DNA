@@ -93,7 +93,7 @@ export function MyAdsManager() {
           return (
             <li
               key={ad.id}
-              className="flex flex-wrap items-center gap-4 rounded-2xl border border-primary/12 bg-card p-4"
+              className="flex flex-wrap items-center gap-4 rounded-2xl border border-border/80 bg-card p-4"
             >
               <Link
                 to={`/ads/ad/${ad.slug}`}

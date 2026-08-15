@@ -85,11 +85,11 @@ export function ProfileDetailsCard({
         </div>
       </div>
 
-      <dl className="mt-5 overflow-hidden rounded-xl border border-primary/12">
+      <dl className="mt-5 overflow-hidden rounded-xl border border-border/80">
         {profileDetails.map((item) => (
           <div
             key={item.label}
-            className="grid gap-1 border-b border-primary/12 px-4 py-3 last:border-b-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-4"
+            className="grid gap-1 border-b border-border/80 px-4 py-3 last:border-b-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-4"
           >
             <dt className="text-sm text-muted-foreground">{item.label}</dt>
 

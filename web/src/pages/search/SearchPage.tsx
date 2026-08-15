@@ -36,7 +36,7 @@ export function SearchPage() {
 
   if (!query) {
     return (
-      <div className="rounded-2xl border border-dashed border-primary/12 p-8 text-center">
+      <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center">
         <h1 className="text-2xl font-semibold">Поиск</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Введите поисковый запрос в строке поиска.

@@ -45,7 +45,7 @@ export function AdminTabs({
 
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-      <div className="flex min-w-max items-end gap-0 border-b border-primary/12 sm:min-w-0">
+      <div className="flex min-w-max items-end gap-0 border-b border-border/80 sm:min-w-0">
         {groups.map((group, groupIndex) => (
           <div key={group.id} className="flex items-end">
             {groupIndex > 0 && (
