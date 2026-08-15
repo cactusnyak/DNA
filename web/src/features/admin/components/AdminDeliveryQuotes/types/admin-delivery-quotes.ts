@@ -17,3 +17,4 @@ export type AdminQuoteDraft = { price: string; comment: string; expiresAt: strin
 export type AdminQuoteDrafts = Record<string, AdminQuoteDraft>;
 export type UpdateAdminQuoteVariables = { id: string; status: DeliveryQuoteStatus };
 export type InfoTableRow = { label: string; value: ReactNode };
+export type AdminDeliveryQuotesDateRange = { from: string; to: string };

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminAd } from '@/entities/admin';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { formatAdStatus } from '@/entities/ad';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
@@ -94,9 +95,7 @@ export function AdminAdRecordsView({
           sortable: false,
           getValue: (ad) => ad.id,
           render: (ad) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {ad.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={ad.id} />
           ),
         },
         {

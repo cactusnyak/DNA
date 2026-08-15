@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminCatalogCollection } from '@/entities/admin';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -98,9 +99,7 @@ export function AdminCollectionRecordsView({
           sortable: false,
           getValue: (collection) => collection.id,
           render: (collection) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {collection.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={collection.id} />
           ),
         },
         {

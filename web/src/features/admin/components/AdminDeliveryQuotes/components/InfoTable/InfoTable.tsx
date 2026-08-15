@@ -5,7 +5,7 @@ type InfoTableProps = { title: string; rows: InfoTableRow[] };
 export function InfoTable({ title, rows }: InfoTableProps) {
   return (
     <section className="flex flex-col">
-      <h3 className="mb-2 ml-0.5 text-sm font-medium">{title}</h3>
+      <span className="mb-2 ml-0.5 text-sm font-medium">{title}</span>
       <div className="w-full max-w-full overflow-hidden rounded-lg border border-border/50 bg-white lg:w-fit">
         <table className="w-full table-fixed border-collapse text-xs lg:w-auto lg:table-auto">
           <tbody className="divide-y divide-border/50">

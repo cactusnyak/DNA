@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminProduct } from '@/entities/admin';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
 import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
@@ -125,9 +126,7 @@ export function AdminProductRecordsView({
           sortable: false,
           getValue: (product) => product.id,
           render: (product) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {product.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={product.id} />
           ),
         },
         {

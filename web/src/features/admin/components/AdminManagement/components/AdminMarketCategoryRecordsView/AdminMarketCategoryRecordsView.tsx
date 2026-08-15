@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminMarketCategory } from '@/entities/admin';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 import { buildCategoryTree } from '../../../../logic/build-category-tree';
@@ -106,9 +107,7 @@ export function AdminMarketCategoryRecordsView({
           sortable: false,
           getValue: (category) => category.id,
           render: (category) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {category.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={category.id} />
           ),
         },
         {
