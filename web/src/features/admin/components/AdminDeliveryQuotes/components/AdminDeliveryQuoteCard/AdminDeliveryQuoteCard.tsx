@@ -16,7 +16,7 @@ type AdminDeliveryQuoteCardProps = {
 
 export function AdminDeliveryQuoteCard({ quote, draft = getAdminQuoteDraft(quote), onDraftChange, onStatusChange }: AdminDeliveryQuoteCardProps) {
   return (
-    <article className="flex min-w-0 flex-1 basis-[30rem] flex-col gap-7 rounded-xl border border-border/80 p-5">
+    <article className="flex min-w-0 flex-1 basis-[30rem] flex-col gap-7 rounded-xl bg-muted/20 border border-border/80 p-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="font-medium">
           {quote.product.title}{quote.quantity > 1 ? ` · ${quote.quantity} шт.` : ''}

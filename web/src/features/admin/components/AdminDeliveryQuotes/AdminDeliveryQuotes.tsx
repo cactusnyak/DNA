@@ -10,7 +10,7 @@ export function AdminDeliveryQuotes({ accessToken }: AdminDeliveryQuotesProps) {
   if (query.isError) return <ErrorMessage>Не удалось загрузить заявки на доставку.</ErrorMessage>;
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="space-y-4">
       <h2 className="text-xl font-semibold">Расчёты крупногабаритной доставки</h2>
       {!query.data?.length && <p className="text-sm text-muted-foreground">Заявок пока нет.</p>}
       <div className="flex flex-wrap items-start gap-4">
