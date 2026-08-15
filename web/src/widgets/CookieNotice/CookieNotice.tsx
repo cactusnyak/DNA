@@ -13,7 +13,7 @@ export function CookieNotice() {
   return (
     <BottomConfirm
       ariaLabel="Уведомление о локальном хранении"
-      confirmLabel="Понятно"
+      confirmLabel="Принять"
       onConfirm={acknowledge}
     >
       DNA использует только необходимое локальное хранение браузера для входа,
