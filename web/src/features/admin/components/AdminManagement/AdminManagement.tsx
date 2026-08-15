@@ -83,7 +83,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
 
   const collectionEditingRecord =
     state.activeTabId === 'collections' &&
-    isAdminCatalogCollection(state.editingRecord)
+      isAdminCatalogCollection(state.editingRecord)
       ? state.editingRecord
       : undefined;
 
@@ -121,18 +121,24 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     }
     if (state.activeTabId === 'collections') {
       return [
-        { label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => {
-          // For now, use individual delete operations for each selected collection
-          ids.forEach(id => mutations.deleteCollectionMutation.mutate(id));
-        }},
-        { label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => {
-          // For now, use individual restore operations for each selected collection
-          ids.forEach(id => mutations.restoreCollectionMutation.mutate(id));
-        }},
-        { label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => {
-          // For now, use individual hard delete operations for each selected collection
-          ids.forEach(id => mutations.hardDeleteCollectionMutation.mutate(id));
-        }},
+        {
+          label: 'Пометить удалёнными', variant: 'warning' as const, icon: 'archive' as const, onClick: (ids) => {
+            // For now, use individual delete operations for each selected collection
+            ids.forEach(id => mutations.deleteCollectionMutation.mutate(id));
+          }
+        },
+        {
+          label: 'Восстановить', icon: 'restore' as const, onClick: (ids) => {
+            // For now, use individual restore operations for each selected collection
+            ids.forEach(id => mutations.restoreCollectionMutation.mutate(id));
+          }
+        },
+        {
+          label: 'Удалить навсегда', variant: 'destructive' as const, icon: 'trash' as const, onClick: (ids) => {
+            // For now, use individual hard delete operations for each selected collection
+            ids.forEach(id => mutations.hardDeleteCollectionMutation.mutate(id));
+          }
+        },
       ];
     }
     if (state.activeTabId === 'ad-categories') {
@@ -184,11 +190,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
 
   if (isError || !data) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <ErrorMessage>
-          Не удалось загрузить данные управления.
-        </ErrorMessage>
-      </div>
+      <ErrorMessage>
+        Не удалось загрузить данные управления.
+      </ErrorMessage>
     );
   }
 

@@ -39,11 +39,9 @@ export function ProductsFeed({
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <ErrorMessage>
-          Не удалось загрузить товары: {error}
-        </ErrorMessage>
-      </div>
+      <ErrorMessage>
+        Не удалось загрузить товары: {error}
+      </ErrorMessage>
     );
   }
 

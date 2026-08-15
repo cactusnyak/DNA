@@ -36,11 +36,9 @@ export function AdDetailsPage() {
 
   if (isError || !ad) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <ErrorMessage>
-          Объявление не найдено или недоступно.
-        </ErrorMessage>
-      </div>
+      <ErrorMessage>
+        Объявление не найдено или недоступно.
+      </ErrorMessage>
     );
   }
 

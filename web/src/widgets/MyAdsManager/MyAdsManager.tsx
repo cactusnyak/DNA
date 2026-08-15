@@ -77,11 +77,9 @@ export function MyAdsManager() {
       )}
 
       {isError && (
-        <div className="rounded-2xl border border-destructive/20 p-5">
-          <ErrorMessage>
-            Не удалось загрузить ваши объявления.
-          </ErrorMessage>
-        </div>
+        <ErrorMessage>
+          Не удалось загрузить ваши объявления.
+        </ErrorMessage>
       )}
 
       {!isPending && !isError && !ads.length && (
@@ -93,55 +91,55 @@ export function MyAdsManager() {
           const cover = ad.images?.[0];
 
           return (
-          <li
-            key={ad.id}
-            className="flex flex-wrap items-center gap-4 rounded-2xl border border-border/80 bg-card p-4"
-          >
-            <Link
-              to={`/ads/ad/${ad.slug}`}
-              className="size-16 shrink-0 overflow-hidden rounded-xl bg-muted"
+            <li
+              key={ad.id}
+              className="flex flex-wrap items-center gap-4 rounded-2xl border border-border/80 bg-card p-4"
             >
-              {cover ? (
-                <img
-                  src={cover.url}
-                  alt={cover.alt ?? ad.title}
-                  className="size-full object-cover"
-                />
-              ) : (
-                <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-                  Нет фото
-                </div>
-              )}
-            </Link>
-
-            <div className="min-w-0 flex-1">
               <Link
                 to={`/ads/ad/${ad.slug}`}
-                className="font-semibold underline-offset-4 hover:underline"
+                className="size-16 shrink-0 overflow-hidden rounded-xl bg-muted"
               >
-                {ad.title}
+                {cover ? (
+                  <img
+                    src={cover.url}
+                    alt={cover.alt ?? ad.title}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
+                    Нет фото
+                  </div>
+                )}
               </Link>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {formatPrice(ad.price)} · {formatAdStatus(ad.status)}
-              </p>
-            </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="secondary" size="sm">
-                <Link to={`/ads/my/${ad.id}/edit`}>Редактировать</Link>
-              </Button>
+              <div className="min-w-0 flex-1">
+                <Link
+                  to={`/ads/ad/${ad.slug}`}
+                  className="font-semibold underline-offset-4 hover:underline"
+                >
+                  {ad.title}
+                </Link>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {formatPrice(ad.price)} · {formatAdStatus(ad.status)}
+                </p>
+              </div>
 
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                disabled={deleteMutation.isPending}
-                onClick={() => handleDelete(ad.id)}
-              >
-                Удалить
-              </Button>
-            </div>
-          </li>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild variant="secondary" size="sm">
+                  <Link to={`/ads/my/${ad.id}/edit`}>Редактировать</Link>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => handleDelete(ad.id)}
+                >
+                  Удалить
+                </Button>
+              </div>
+            </li>
           );
         })}
       </ul>
