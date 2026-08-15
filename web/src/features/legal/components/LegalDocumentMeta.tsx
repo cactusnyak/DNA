@@ -26,7 +26,7 @@ export function LegalDocumentMeta({
   }, [description, title]);
 
   return (
-    <p className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-muted/60 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+    <p className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/12 bg-muted/60 px-3 py-1.5 text-xs font-medium text-muted-foreground">
       <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
       Редакция от {revisionDate}
     </p>

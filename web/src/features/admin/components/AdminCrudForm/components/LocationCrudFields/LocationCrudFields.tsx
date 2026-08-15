@@ -15,7 +15,7 @@ export function LocationCrudFields({
   onValueChange,
 }: LocationCrudFieldsProps) {
   return (
-    <fieldset className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+    <fieldset className="flex flex-col gap-4 rounded-2xl border border-primary/12 bg-card p-5">
       <legend className="px-1 text-sm font-medium">Геопозиция</legend>
 
       <FormInputField

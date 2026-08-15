@@ -39,7 +39,7 @@ export function VerifyEmail() {
         )}
 
         {mutation.isSuccess && (
-          <p className="rounded-lg border border-border bg-muted/40 px-3 py-3 text-sm">
+          <p className="rounded-lg border border-primary/12 bg-muted/40 px-3 py-3 text-sm">
             Почта успешно подтверждена.
           </p>
         )}
