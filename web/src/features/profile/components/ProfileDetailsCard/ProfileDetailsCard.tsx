@@ -85,7 +85,7 @@ export function ProfileDetailsCard({
         </div>
       </div>
 
-      <dl className="mt-5 overflow-hidden rounded-xl border border-border">
+      <dl className="mt-5 overflow-hidden rounded-xl border border-primary/12">
         {profileDetails.map((item) => (
           <div
             key={item.label}

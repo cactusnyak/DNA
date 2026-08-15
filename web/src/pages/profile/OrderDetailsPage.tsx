@@ -114,7 +114,7 @@ export function OrderDetailsPage() {
 
       <div className="mt-6 grid gap-3">
         {order.items.map((item) => (
-          <article key={item.id} className="rounded-xl border border-border p-4">
+          <article key={item.id} className="rounded-xl border border-primary/12 p-4">
             <div className="flex justify-between gap-3"><strong>{item.productTitle ?? item.product?.title ?? item.productId}</strong><span>{item.quantity} × {formatPrice(item.unitPrice)}</span></div>
             {item.selectedAdditions.length > 0 && <ul className="mt-2 text-sm text-muted-foreground">{item.selectedAdditions.map((addition) => <li key={addition.additionId}>{addition.title}: {typeof addition.value === 'boolean' ? (addition.value ? 'да' : 'нет') : addition.value}</li>)}</ul>}
             {item.deliveryPrice > 0 && <p className="mt-2 text-sm">Доставка: {formatPrice(item.deliveryPrice)}</p>}
