@@ -5,7 +5,7 @@ import { SectionHeader } from '@/components/ui/Section';
 
 import { AdminManagement } from '../AdminManagement';
 import { AdminOverviewCard } from '../AdminOverviewCard';
-import { AdminDeliveryQuotes } from '../AdminDeliveryQuotes/AdminDeliveryQuotes';
+import { AdminDeliveryQuotes } from '../AdminDeliveryQuotes';
 
 type AdminDashboardProps = {
   accessToken: string;

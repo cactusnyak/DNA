@@ -84,7 +84,7 @@ export function AdminRecordActions({
       {canSoftDelete && (
         <Button
           type="button"
-          variant="warning"
+          variant="dangerous"
           size="icon-sm"
           aria-label="Пометить удаленным"
           title="Пометить удаленным"
