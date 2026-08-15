@@ -22,7 +22,7 @@ export function UserCrudFields({
   return (
     <div className="flex flex-col gap-5">
       {user && (
-        <div className="rounded-xl border border-primary/12 bg-muted/40 p-4 text-sm">
+        <div className="rounded-xl border border-border/80 bg-muted/40 p-4 text-sm">
           <p className="font-semibold">
             {user.nickname}
             <code className="ml-2 rounded bg-muted px-1 py-0.5 text-xs font-mono">

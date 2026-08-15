@@ -80,7 +80,7 @@ export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
         return (
           <article
             key={quote.id}
-            className="flex flex-col gap-3 rounded-xl border border-primary/12 p-4"
+            className="flex flex-col gap-3 rounded-xl border border-border/80 p-4"
           >
             <div className="flex flex-wrap justify-between gap-2">
               <strong>

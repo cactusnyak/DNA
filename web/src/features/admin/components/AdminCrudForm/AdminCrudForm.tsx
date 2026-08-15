@@ -145,7 +145,7 @@ export function AdminCrudForm({
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-primary/12 bg-background p-6">
+      <div className="shrink-0 border-t border-border/80 bg-background p-6">
         <AdminCrudFormActions isPending={isFormPending} onCancel={onCancel} />
       </div>
     </form>

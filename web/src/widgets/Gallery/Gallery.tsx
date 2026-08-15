@@ -61,7 +61,7 @@ export function Gallery({ images, title }: GalleryProps) {
                   'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted sm:size-16 sm:rounded-xl',
                   isActive
                     ? 'border-foreground'
-                    : 'border-primary/12 hover:border-foreground/40',
+                    : 'border-border/80 hover:border-foreground/40',
                 ].filter(Boolean).join(' ')}
                 onClick={() => setActiveImageIndex(index)}
               >
@@ -77,7 +77,7 @@ export function Gallery({ images, title }: GalleryProps) {
       )}
 
       <div
-        className="relative order-1 aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-xl border border-primary/12 bg-muted sm:order-2 sm:max-h-[32rem] sm:rounded-2xl sm:cursor-zoom-in"
+        className="relative order-1 aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-xl border border-border/80 bg-muted sm:order-2 sm:max-h-[32rem] sm:rounded-2xl sm:cursor-zoom-in"
         onMouseEnter={() => setIsZoomed(canZoomGallery())}
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}
