@@ -172,7 +172,7 @@ function EmptyState({
   linkLabel: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-4">
+    <div className="rounded-2xl border border-dashed border-primary/12 p-8 text-center space-y-4">
       <p className="text-sm text-muted-foreground">{text}</p>
       <Button asChild variant="secondary">
         <Link to={to}>{linkLabel}</Link>

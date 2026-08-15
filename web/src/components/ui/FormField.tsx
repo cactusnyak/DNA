@@ -122,7 +122,7 @@ const SELECT_TRIGGER_CLASS_NAME =
   'flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-primary/12 bg-background px-3 py-2 text-left text-sm outline-none hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 const FILE_DROPZONE_CLASS_NAME =
-  'flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center hover:border-ring hover:bg-muted/50';
+  'flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-primary/12 bg-muted/30 px-4 py-5 text-center hover:border-ring hover:bg-muted/50';
 
 function FormFieldRoot({
   label,
@@ -554,7 +554,7 @@ export function FormImageFileField({
               />
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-3 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-primary/12 px-3 py-2">
               <div className="min-w-0 text-xs text-muted-foreground">
                 {file ? (
                   <>
@@ -699,7 +699,7 @@ export function FormImageFilesField({
                   </button>
                 </div>
 
-                <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                <div className="border-t border-primary/12 px-3 py-2 text-xs text-muted-foreground">
                   Текущее изображение #{index + 1}
                 </div>
               </div>
@@ -728,7 +728,7 @@ export function FormImageFilesField({
                   </button>
                 </div>
 
-                <div className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                <div className="border-t border-primary/12 px-3 py-2 text-xs text-muted-foreground">
                   <span className="block truncate font-medium text-foreground">
                     {file.name}
                   </span>

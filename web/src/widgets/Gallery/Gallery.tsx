@@ -61,7 +61,7 @@ export function Gallery({ images, title }: GalleryProps) {
                   'size-14 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-muted sm:size-16 sm:rounded-xl',
                   isActive
                     ? 'border-foreground'
-                    : 'border-border hover:border-foreground/40',
+                    : 'border-primary/12 hover:border-foreground/40',
                 ].filter(Boolean).join(' ')}
                 onClick={() => setActiveImageIndex(index)}
               >

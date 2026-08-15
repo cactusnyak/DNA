@@ -140,7 +140,7 @@ export function ProfileOrdersCard({
         {orders.map((order) => (
           <article
             key={order.id}
-            className="border-b border-border px-4 py-4 last:border-b-0"
+            className="border-b border-primary/12 px-4 py-4 last:border-b-0"
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>

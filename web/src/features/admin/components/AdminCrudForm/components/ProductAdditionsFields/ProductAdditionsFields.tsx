@@ -72,7 +72,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
   }
 
   return (
-    <section className="space-y-4 border-y border-border/50 my-6 px-4 py-6">
+    <section className="space-y-4 border-y border-primary/12 my-6 px-4 py-6">
       <div>
         <h3 className="font-medium">Дополнения</h3>
         <p className="text-sm text-muted-foreground">

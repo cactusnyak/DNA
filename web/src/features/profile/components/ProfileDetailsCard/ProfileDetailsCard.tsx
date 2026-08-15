@@ -89,7 +89,7 @@ export function ProfileDetailsCard({
         {profileDetails.map((item) => (
           <div
             key={item.label}
-            className="grid gap-1 border-b border-border px-4 py-3 last:border-b-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-4"
+            className="grid gap-1 border-b border-primary/12 px-4 py-3 last:border-b-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-4"
           >
             <dt className="text-sm text-muted-foreground">{item.label}</dt>
 

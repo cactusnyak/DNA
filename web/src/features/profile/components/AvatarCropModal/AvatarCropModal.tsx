@@ -81,7 +81,7 @@ export function AvatarCropModal({
           )}
         </div>
 
-        <div className="shrink-0 space-y-4 border-t border-border p-5">
+        <div className="shrink-0 space-y-4 border-t border-primary/12 p-5">
           <label className="block space-y-2">
             <span className="text-sm font-medium">Масштаб</span>
             <input

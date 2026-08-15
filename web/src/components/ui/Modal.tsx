@@ -108,7 +108,7 @@ export function Modal({
         onMouseDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border px-5 py-4">
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-primary/12 px-5 py-4">
           <h3 id={titleId} className="text-lg font-medium text-foreground">
             {title}
           </h3>

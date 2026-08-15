@@ -47,7 +47,7 @@ export function Header() {
   return (
     <header
       ref={dropdownContainerRef}
-      className="fixed top-0 left-0 right-0 z-40 border-b border-border/50 bg-background/90 backdrop-blur-xl w-full"
+      className="fixed top-0 left-0 right-0 z-40 border-b border-primary/12 bg-background/90 backdrop-blur-xl w-full"
       style={{
         transform: isHidden ? 'translateY(-100%)' : 'translateY(0)',
         transition: `transform ${HEADER_ANIMATION_DURATION_MS}ms ${HEADER_ANIMATION_EASING}`,
@@ -55,7 +55,7 @@ export function Header() {
       }}
       onMouseLeave={closeCatalogDropdown}
     >
-      <div className="w-full border-b border-border/50">
+      <div className="w-full border-b border-primary/12">
         <div className="mx-auto flex min-h-12 w-full max-w-7xl items-center gap-3 p-3 sm:min-h-14 sm:p-3 md:min-h-16 md:gap-4 md:p-4 lg:gap-8">
           <HeaderLogo onClick={closeCatalogDropdown} />
 

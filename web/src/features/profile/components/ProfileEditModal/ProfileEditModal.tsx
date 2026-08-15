@@ -117,7 +117,7 @@ export function ProfileEditModal({
           />
         </div>
 
-        <div className="flex flex-col gap-5 border-t  border-border p-6">
+        <div className="flex flex-col gap-5 border-t  border-primary/12 p-6">
           {error && (
             <p className="text-sm text-destructive">
               Не удалось сохранить. Проверьте соединение и попробуйте снова.

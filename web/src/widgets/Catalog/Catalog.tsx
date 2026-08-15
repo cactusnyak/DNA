@@ -199,7 +199,7 @@ export function Catalog({
             compact={shouldShowControls}
           />
         ) : (
-          <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-primary/12 bg-card p-6 text-sm text-muted-foreground">
             {emptyProductsText}
           </div>
         )}
