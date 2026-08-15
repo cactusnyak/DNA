@@ -50,7 +50,7 @@ export function AdminDashboard({
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Сводки</h2>
 
-        <div className="grid gap-px bg-border sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-px bg-border/50 sm:grid-cols-2 xl:grid-cols-3">
           <AdminOverviewCard
             label="Пользователи"
             value={getOverviewValue(overview?.usersCount, isOverviewPending)}
