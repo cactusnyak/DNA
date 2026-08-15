@@ -95,48 +95,87 @@ body {
 }
 
 :root {
-  --page: #fcfcff;
-  --logo-color: color-mix(in srgb, var(--primary) 30%, #050816);
-  --shadow-color: rgb(41 27 135 / 3%);
-  --shadow-color-strong: rgb(27 18 88 / 5%);
-  --shadow-brand-glow-color: rgb(41 27 135 / 8%);
-  --shadow-accent-glow-color: rgb(148 225 209 / 6%);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
   --primary: #291b87;
-  --resource-link: #252eeb;
-  --primary-foreground: #ffffff;
-  --favourite: #fc2198;
-  --mobile-navigation-active: #2100ff;
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: #eeecfc;
-  --accent-foreground: #4331b9;
-  --background-content: #fafafe;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: #291b87;
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+
+  --page: color-mix(in srgb, var(--primary) 1%, #ffffff);
+  --logo-color: color-mix(in srgb, var(--primary) 50%, #000000);
+
+  --shadow-color: color-mix(in srgb, var(--primary) 3%, transparent);
+  --shadow-color-strong: color-mix(in srgb,
+      color-mix(in srgb, var(--primary) 65%, #000000) 5%,
+      transparent);
+  --shadow-brand-glow-color: color-mix(in srgb,
+      var(--primary) 8%,
+      transparent);
+  --shadow-accent-glow-color: color-mix(in srgb,
+      color-mix(in srgb, var(--primary) 15%, #94e1d1) 6%,
+      transparent);
+
+  --background: color-mix(in srgb, var(--primary) 1%, #ffffff);
+  --foreground: color-mix(in srgb, var(--primary) 50%, #050816);
+
+  --card: color-mix(in srgb, var(--primary) 1%, #ffffff);
+  --card-foreground: color-mix(in srgb, var(--primary) 20%, #171717);
+
+  --popover: color-mix(in srgb, var(--primary) 1%, #ffffff);
+  --popover-foreground: color-mix(in srgb, var(--primary) 20%, #171717);
+
+  --resource-link: color-mix(in srgb, var(--primary) 25%, #252eeb);
+  --primary-foreground: color-mix(in srgb, var(--primary) 1%, #ffffff);
+  --favourite: color-mix(in srgb, var(--primary) 15%, #fc2198);
+  --mobile-navigation-active: color-mix(in srgb,
+      var(--primary) 20%,
+      #2100ff);
+
+  --secondary: color-mix(in srgb, var(--primary) 4%, #f7f7f7);
+  --secondary-foreground: color-mix(in srgb,
+      var(--primary) 20%,
+      #222222);
+
+  --muted: color-mix(in srgb, var(--primary) 4%, #f7f7f7);
+  --muted-foreground: color-mix(in srgb,
+      var(--primary) 30%,
+      #757575);
+
+  --accent: color-mix(in srgb, var(--primary) 10%, #ffffff);
+  --accent-foreground: color-mix(in srgb,
+      var(--primary) 75%,
+      #ffffff);
+
+  --background-content: color-mix(in srgb,
+      var(--primary) 2%,
+      #ffffff);
+
+  --destructive: color-mix(in srgb, var(--primary) 25%, #e7000b);
+
+  --border: color-mix(in srgb, var(--primary) 15%, #eeeeee);
+  --input: color-mix(in srgb, var(--primary) 8%, #eeeeee);
+  --ring: color-mix(in srgb, var(--primary) 90%, #000000);
+
+  --chart-1: color-mix(in srgb, var(--primary) 15%, #dedede);
+  --chart-2: color-mix(in srgb, var(--primary) 35%, #8e8e8e);
+  --chart-3: color-mix(in srgb, var(--primary) 50%, #707070);
+  --chart-4: color-mix(in srgb, var(--primary) 65%, #5f5f5f);
+  --chart-5: color-mix(in srgb, var(--primary) 80%, #454545);
+
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  --sidebar: color-mix(in srgb, var(--primary) 2%, #ffffff);
+  --sidebar-foreground: color-mix(in srgb,
+      var(--primary) 20%,
+      #171717);
+  --sidebar-primary: color-mix(in srgb,
+      var(--primary) 30%,
+      #222222);
+  --sidebar-primary-foreground: color-mix(in srgb,
+      var(--primary) 2%,
+      #ffffff);
+  --sidebar-accent: color-mix(in srgb, var(--primary) 4%, #f7f7f7);
+  --sidebar-accent-foreground: color-mix(in srgb,
+      var(--primary) 20%,
+      #222222);
+  --sidebar-border: color-mix(in srgb, var(--primary) 8%, #eeeeee);
+  --sidebar-ring: color-mix(in srgb, var(--primary) 35%, #b5b5b5);
 }
 
 .dark {
