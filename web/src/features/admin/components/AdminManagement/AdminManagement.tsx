@@ -8,6 +8,7 @@ import {
   getAdminReferrals,
   uploadAdminImage,
 } from '@/entities/admin';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 
 import { AdminTabs } from '../AdminTabs';
@@ -184,9 +185,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
   if (isError || !data) {
     return (
       <div className="rounded-2xl border border-destructive/20 p-5">
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Не удалось загрузить данные управления.
-        </p>
+        </ErrorMessage>
       </div>
     );
   }

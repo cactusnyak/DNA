@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 
 import { ContentCard } from '@/components/ui/ContentCard';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { getFeed } from '@/entities/feed';
 import { getCatalogCategories } from '@/shared/catalog';
 import { PLATFORM_SECTION } from '@/shared/platform';
@@ -63,9 +64,9 @@ export function SearchPage() {
           Ищем объявления и товары...
         </p>
       ) : isFeedError ? (
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Не удалось загрузить результаты поиска.
-        </p>
+        </ErrorMessage>
       ) : (
         <SearchListings key={query} items={feedItems} query={query} />
       )}

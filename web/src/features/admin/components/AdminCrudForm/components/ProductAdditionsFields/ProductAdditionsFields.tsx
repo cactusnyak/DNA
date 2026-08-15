@@ -8,6 +8,7 @@ import {
   FormInputField,
   FormSelectField,
 } from '@/components/ui/FormField';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useAuthStore } from '@/entities/auth';
 import { getAdminProductAdditionTypes } from '@/entities/admin';
 import type { ProductAddition } from '@/entities/product';
@@ -265,7 +266,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
           </div>
         ))}
 
-        {isError && <p className="text-sm text-destructive">Не удалось загрузить типы дополнений.</p>}
+        {isError && <ErrorMessage>Не удалось загрузить типы дополнений.</ErrorMessage>}
       </div>
 
       <div className="space-y-2">

@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ContentCard } from '@/components/ui/ContentCard';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCategorySlugFromPath } from '@/shared/catalog';
 import {
@@ -104,7 +105,7 @@ export function Catalog({
             showCatalogLink={showCatalogLink}
           />
         )}
-        <p className="text-destructive">Не удалось загрузить данные</p>
+        <ErrorMessage>Не удалось загрузить данные</ErrorMessage>
       </section>
     );
   }

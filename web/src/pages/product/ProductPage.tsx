@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getProduct } from '@/entities/product/api/get-product';
 import { ProductDetails } from '@/widgets/ProductDetails';
@@ -19,7 +20,7 @@ export function ProductPage() {
   });
 
   if (!productSlug) {
-    return <p className="text-destructive">Товар не найден</p>;
+    return <ErrorMessage>Товар не найден</ErrorMessage>;
   }
 
   if (isPending) {
@@ -32,7 +33,7 @@ export function ProductPage() {
   }
 
   if (error || !product) {
-    return <p className="text-destructive">Не удалось загрузить товар</p>;
+    return <ErrorMessage>Не удалось загрузить товар</ErrorMessage>;
   }
 
   return <ProductDetails key={product.id} product={product} />;

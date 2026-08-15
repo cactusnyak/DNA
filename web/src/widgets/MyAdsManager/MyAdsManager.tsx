@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { deleteAd, formatAdStatus, getMyAds } from '@/entities/ad';
 import { useAuthStore } from '@/entities/auth';
 import { formatPrice } from '@/shared/utils/format-price';
@@ -77,9 +78,9 @@ export function MyAdsManager() {
 
       {isError && (
         <div className="rounded-2xl border border-destructive/20 p-5">
-          <p className="text-sm text-destructive">
+          <ErrorMessage>
             Не удалось загрузить ваши объявления.
-          </p>
+          </ErrorMessage>
         </div>
       )}
 

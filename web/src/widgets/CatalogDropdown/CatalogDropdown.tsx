@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getAds } from '@/entities/ad';
 import { getCatalogCategories } from '@/shared/catalog';
@@ -78,9 +79,9 @@ export function CatalogDropdown({ section, onClose }: CatalogDropdownProps) {
           )}
 
           {categoriesError && (
-            <p className="text-sm text-destructive">
+            <ErrorMessage>
               Не удалось загрузить категории
-            </p>
+            </ErrorMessage>
           )}
 
           {!!categories?.length && (

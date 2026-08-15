@@ -2,6 +2,7 @@ import type {
   ProductAddition,
   SelectedProductAddition,
 } from '@/entities/product';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type Props = {
@@ -98,7 +99,7 @@ export function ProductAdditionsSelector({
                 />
               )}
               {errors[addition.id] && (
-                <p className="text-xs text-destructive">{errors[addition.id]}</p>
+                <ErrorMessage>{errors[addition.id]}</ErrorMessage>
               )}
             </div>
           );

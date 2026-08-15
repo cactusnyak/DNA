@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCatalogCategories } from '@/shared/catalog';
 import { getCategorySlugFromPath } from '@/shared/catalog';
@@ -43,7 +44,7 @@ export function CategoryPage({ section }: CategoryPageProps) {
   }
 
   if (error || !currentCategory) {
-    return <p className="text-destructive">Категория не найдена</p>;
+    return <ErrorMessage>Категория не найдена</ErrorMessage>;
   }
 
   return (

@@ -2,6 +2,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { FormInputField } from '@/components/ui/FormField';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { getOAuthUrl, type OAuthProvider } from '@/entities/auth';
@@ -228,9 +229,9 @@ export function AuthorizationForm({
         </div>
 
         {errorMessage && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             {errorMessage}
-          </p>
+          </ErrorMessage>
         )}
 
         {isOtpStep ? (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SectionHeader } from '@/components/ui/Section';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { useAuthStore } from '@/entities/auth';
@@ -95,13 +96,10 @@ export function Checkout() {
           onSubmit={handleSubmit}
         />
         {unresolvedOversizedItems.length > 0 && (
-          <div
-            role="alert"
-            className="h-fit rounded-xl border border-destructive/30 p-4 text-sm text-destructive"
-          >
+          <ErrorMessage role="alert">
             Для крупногабаритных товаров сначала примите подтверждённый расчёт
             доставки.
-          </div>
+          </ErrorMessage>
         )}
 
         <CheckoutOrderSummary items={items} totalAmount={totalAmount} />

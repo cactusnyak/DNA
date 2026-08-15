@@ -1,5 +1,6 @@
 import { Network } from 'lucide-react';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import type { ReferralTreeUser } from '@/entities/referral';
 
@@ -54,9 +55,9 @@ export function ReferralTree({
           Приведённые пользователи
         </h2>
 
-        <p className="mt-4 text-sm text-destructive">
+        <ErrorMessage className="mt-4">
           Не удалось загрузить дерево приглашённых.
-        </p>
+        </ErrorMessage>
       </section>
     );
   }

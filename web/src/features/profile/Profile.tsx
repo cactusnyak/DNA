@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SectionHeader } from '@/components/ui/Section';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
@@ -178,21 +179,21 @@ export function Profile() {
       )}
 
       {updateProfileMutation.isError && (
-        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <ErrorMessage>
           Не удалось сохранить изменения. Попробуйте ещё раз.
-        </p>
+        </ErrorMessage>
       )}
 
       {updateAvatarMutation.isError && (
-        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <ErrorMessage>
           Не удалось обновить аватар. Попробуйте ещё раз.
-        </p>
+        </ErrorMessage>
       )}
 
       {deleteAccountMutation.isError && (
-        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <ErrorMessage>
           Не удалось удалить аккаунт. Попробуйте ещё раз.
-        </p>
+        </ErrorMessage>
       )}
 
       <ProfileDangerZone

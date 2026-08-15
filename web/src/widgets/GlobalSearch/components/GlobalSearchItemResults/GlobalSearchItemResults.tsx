@@ -1,5 +1,6 @@
 import type { UIEvent } from 'react';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import type { Ad } from '@/entities/ad';
 import type { Product } from '@/entities/product';
 
@@ -49,9 +50,9 @@ export function GlobalSearchItemResults({
         )}
 
         {isError && (
-          <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          <ErrorMessage>
             Не удалось загрузить предложения.
-          </p>
+          </ErrorMessage>
         )}
 
         {!isPending && !isError && !hasResults && (

@@ -8,6 +8,7 @@ import {
   FormTextareaField,
 } from '@/components/ui/FormField';
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import type { Ad, CreateAdPayload } from '@/entities/ad';
 import { getCurrentUser } from '@/entities/auth';
 import { getAdCategories } from '@/entities/ad-category';
@@ -382,9 +383,9 @@ export function AdForm({
       <LegalFormNotice />
 
       {error && (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+        <ErrorMessage>
           {error}
-        </div>
+        </ErrorMessage>
       )}
 
       <div className="flex flex-wrap gap-3">

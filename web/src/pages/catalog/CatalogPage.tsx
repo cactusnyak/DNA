@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getCatalogCategories } from '@/shared/catalog';
 import {
@@ -36,7 +37,7 @@ export function CatalogPage({ section }: CatalogPageProps) {
   }
 
   if (error) {
-    return <p className="text-destructive">Не удалось загрузить категории</p>;
+    return <ErrorMessage>Не удалось загрузить категории</ErrorMessage>;
   }
 
   return (

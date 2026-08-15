@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { FormToggleField } from '@/components/ui/FormField';
 import type { AdminAdCategory, AdminMarketCategory } from '@/entities/admin';
 
@@ -137,9 +138,9 @@ export function AdminCrudForm({
           )}
 
           {submitError && (
-            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+            <ErrorMessage>
               {submitError}
-            </div>
+            </ErrorMessage>
           )}
         </div>
       </div>

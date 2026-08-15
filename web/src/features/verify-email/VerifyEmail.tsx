@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { confirmEmailVerification } from '@/entities/auth';
 
 export function VerifyEmail() {
@@ -29,9 +30,9 @@ export function VerifyEmail() {
 
       <div className="flex flex-col gap-4">
         {!token && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             В ссылке отсутствует токен подтверждения.
-          </p>
+          </ErrorMessage>
         )}
 
         {mutation.isPending && (
@@ -45,9 +46,9 @@ export function VerifyEmail() {
         )}
 
         {mutation.isError && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             Ссылка для подтверждения недействительна или устарела.
-          </p>
+          </ErrorMessage>
         )}
 
         <Button asChild variant="secondary" className="w-full">

@@ -8,6 +8,7 @@ import {
   FormTextareaField,
   FormToggleField,
 } from '@/components/ui/FormField';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { ResourceLink } from '@/components/ui/ResourceLink';
 import { useAuthStore } from '@/entities/auth';
 import {
@@ -311,9 +312,9 @@ export function OversizedDeliveryCalculator({
       />
 
       {mutation.isError && (
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Не удалось отправить запрос. Проверьте поля и попробуйте снова.
-        </p>
+        </ErrorMessage>
       )}
 
       <Button variant="accent" type="submit" disabled={mutation.isPending}>

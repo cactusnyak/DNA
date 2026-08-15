@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { getCategoryHref } from '@/shared/catalog';
 import { PLATFORM_SECTION, type PlatformSectionId } from '@/shared/platform';
@@ -61,9 +62,9 @@ export function GlobalSearchCategoryResults({
         )}
 
         {isError && (
-          <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          <ErrorMessage>
             Не удалось загрузить категории.
-          </p>
+          </ErrorMessage>
         )}
 
         {!isPending && !isError && categoryResults.length === 0 && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { httpClient } from '@/shared/api/http-client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -51,7 +52,7 @@ export function AdminDeliveryQuotes({ accessToken }: { accessToken: string }) {
   }
 
   if (query.isError) {
-    return <p className="text-sm text-destructive">Не удалось загрузить заявки на доставку.</p>;
+    return <ErrorMessage>Не удалось загрузить заявки на доставку.</ErrorMessage>;
   }
 
   return (
