@@ -93,7 +93,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="pointer-events-auto fixed inset-0 z-[80] flex items-center justify-center bg-foreground/45 p-4 backdrop-blur-sm"
+      className="pointer-events-auto fixed inset-0 z-[80] flex items-center justify-center bg-muted-foreground/50 p-4 backdrop-blur-sm"
       onMouseDown={onClose}
     >
       <section
