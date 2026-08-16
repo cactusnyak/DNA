@@ -30,7 +30,7 @@ export function ProductAdditionsSelector({
   if (!additions.length) return null;
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl shadow-card-md p-4 bg-white md:shadow-none md:p-0">
+    <section className="flex flex-col gap-4 rounded-xl shadow-card-md p-4 bg-page md:shadow-none md:p-0">
       <h2 className="text-lg font-medium">Дополнения</h2>
       <div className="flex w-full flex-col gap-2.5 rounded-xl">
         {additions.map((addition) => {

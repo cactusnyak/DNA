@@ -10,7 +10,7 @@ export function CardFavouriteButton({ item }: CardFavouriteButtonProps) {
   return (
     <FavouriteButtonBase
       item={item}
-      className="rounded-full bg-white/75 shadow-sm"
+      className="rounded-full bg-page/75 shadow-sm"
       inactiveIconClassName="stroke-primary"
     />
   );

@@ -25,7 +25,7 @@ export function VerifyEmail() {
   }, [token]);
 
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+    <section className="rounded-2xl bg-page p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Подтверждение почты</h1>
 
       <div className="flex flex-col gap-4">

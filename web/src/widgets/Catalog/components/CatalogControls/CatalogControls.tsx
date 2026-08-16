@@ -71,7 +71,7 @@ export function CatalogControls({
         </div>
 
         <div
-          className={`space-y-6 rounded-2xl bg-white p-4 shadow-card-xl lg:mt-0 lg:block lg:pt-4 ${isOpen ? 'mt-3' : 'hidden'}`}
+          className={`space-y-6 rounded-2xl bg-page p-4 shadow-card-xl lg:mt-0 lg:block lg:pt-4 ${isOpen ? 'mt-3' : 'hidden'}`}
         >
           {showSorting && (
             <CatalogSorting value={sortRules} onChange={onSortRulesChange} />

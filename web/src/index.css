@@ -22,8 +22,8 @@ body {
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 @source inline("{hover:,focus:,focus-visible:,active:,disabled:,}{text,bg,border}-{success,warning,dangerous,destructive}{,/{0..100..5}}");
@@ -101,6 +101,7 @@ body {
 
 :root {
   --primary: #291b87;
+  --primary-foreground: color-mix(in srgb, var(--primary) 5%, #ffffff);
 
   --page: color-mix(in srgb, var(--primary) 1%, #ffffff);
   --logo-color: color-mix(in srgb, var(--primary) 50%, #000000);
@@ -126,7 +127,6 @@ body {
   --popover-foreground: color-mix(in srgb, var(--primary) 20%, #171717);
 
   --resource-link: color-mix(in srgb, var(--primary) 25%, #252eeb);
-  --primary-foreground: color-mix(in srgb, var(--primary) 1%, #ffffff);
   --favourite: color-mix(in srgb, var(--primary) 15%, #fc2198);
   --mobile-navigation-active: color-mix(in srgb,
       var(--primary) 20%,
@@ -189,19 +189,18 @@ body {
 .dark {
   color-scheme: dark;
 
-  /* A lighter version of the brand color for dark surfaces */
-  --primary: #7567dc;
-  --primary-foreground: #100c26;
+  --primary: #9787ff;
+  --primary-foreground: color-mix(in srgb, var(--primary) 5%, #ffffff);
 
   --page: color-mix(in srgb, var(--primary) 7%, #09090f);
   --background: color-mix(in srgb, var(--primary) 7%, #09090f);
   --foreground: color-mix(in srgb, var(--primary) 4%, #f8f8fc);
 
-  --logo-color: color-mix(in srgb, var(--primary) 70%, #ffffff);
+  --logo-color: color-mix(in srgb, var(--primary) 25%, #ffffff);
 
-  --shadow-color: color-mix(in srgb, #000000 50%, transparent);
+  --shadow-color: color-mix(in srgb, #000000 20%, transparent);
   --shadow-color-strong: color-mix(in srgb,
-      #000000 75%,
+      #000000 35%,
       transparent);
   --shadow-brand-glow-color: color-mix(in srgb,
       var(--primary) 28%,
@@ -265,7 +264,6 @@ body {
       var(--primary) 4%,
       #f4f4f8);
   --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: color-mix(in srgb,
       var(--primary) 15%,
       #24242e);

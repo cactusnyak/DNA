@@ -10,12 +10,6 @@ type MarkHighlightProps = {
   className?: string;
 };
 
-const levelStyles = {
-  1: 'bg-yellow-100 text-yellow-800',
-  2: 'bg-yellow-200 text-yellow-900', 
-  3: 'bg-orange-200 text-orange-900',
-};
-
 export function MarkHighlight({ 
   text, 
   searchValue, 
@@ -39,8 +33,8 @@ export function MarkHighlight({
         <mark 
           key={index} 
           className={[
-            'rounded-[4px] px-0.5',
-            levelStyles[level],
+            'rounded-[4px]',
+            'bg-yellow-100 text-yellow-800',
             className
           ].filter(Boolean).join(' ')}
         >

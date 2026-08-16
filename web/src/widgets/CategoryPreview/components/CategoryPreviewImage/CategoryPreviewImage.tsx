@@ -24,7 +24,7 @@ export function CategoryPreviewImage({
 
   return (
     <div
-      className={`${categoryPreviewLabelClassName} ${categoryPreviewSizeClassName} bg-white text-foreground`}
+      className={`${categoryPreviewLabelClassName} ${categoryPreviewSizeClassName} bg-page text-foreground`}
     >
       <span>{category.name}</span>
     </div>

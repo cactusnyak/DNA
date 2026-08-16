@@ -21,7 +21,7 @@ export function ForgotPassword() {
   }
 
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+    <section className="rounded-2xl bg-page p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">Восстановление доступа</p>
         <h1 className="text-2xl font-semibold">Забыли пароль?</h1>

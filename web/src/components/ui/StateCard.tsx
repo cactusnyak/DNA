@@ -50,13 +50,13 @@ export function StateCard({
   return (
     <section
       className={[
-        'mx-auto max-w-xl rounded-3xl p-6 text-center shadow-card-2xl bg-white sm:px-8 sm:py-10',
+        'mx-auto max-w-xl rounded-3xl p-6 text-center shadow-card-2xl bg-page sm:px-8 sm:py-10',
         className,
       ].filter(Boolean).join(' ')}
     >
       <div className="flex flex-col gap-6">
         {Icon && (
-          <span className="p-3 shadow-card-md rounded-xl bg-white mx-auto flex items-center justify-center">
+          <span className="p-3 shadow-card-md rounded-xl bg-page mx-auto flex items-center justify-center">
             <Icon
               className={['size-8', iconClassName ?? 'text-primary'].join(' ')}
               strokeWidth={1.5}

@@ -31,7 +31,7 @@ export function CheckoutOrderSummary({
   );
 
   return (
-    <aside className="overflow-hidden rounded-2xl bg-white shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
+    <aside className="overflow-hidden rounded-2xl bg-page shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
       <div className="p-5">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Ваш заказ</h2>

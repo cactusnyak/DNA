@@ -58,7 +58,7 @@ export function ReferralGuestLanding() {
                   dividerClass,
                 ].filter(Boolean).join(' ')}
               >
-                <span className="p-3 shadow-card-sm rounded-xl bg-white flex w-fit">
+                <span className="p-3 shadow-card-sm rounded-xl bg-page flex w-fit">
                   <Icon className="size-5 text-primary" strokeWidth={1.5} />
                 </span>
 

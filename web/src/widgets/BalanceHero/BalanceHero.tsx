@@ -74,7 +74,7 @@ export function BalanceHero({
           </div>
         ) : (
           <div className="grid w-full gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
-            <div className="rounded-3xl border border-white/20 bg-white/5 p-6 text-white backdrop-blur-2xl">
+            <div className="rounded-3xl border border-white/20 bg-page/5 p-6 text-white backdrop-blur-2xl">
               <h2 className="text-xl font-semibold">{title}</h2>
               {guestText && (
                 <p className="mt-2 text-sm text-indigo-100/75">{guestText}</p>

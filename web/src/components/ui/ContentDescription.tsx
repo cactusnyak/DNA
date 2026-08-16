@@ -15,7 +15,7 @@ export function ContentDescription({
   return (
     <section
       className={[
-        'flex flex-col gap-4 rounded-xl shadow-card-md p-4 bg-white md:shadow-none md:p-0',
+        'flex flex-col gap-4 rounded-xl shadow-card-md p-4 bg-page md:shadow-none md:p-0',
         className,
       ].filter(Boolean).join(' ')}
     >

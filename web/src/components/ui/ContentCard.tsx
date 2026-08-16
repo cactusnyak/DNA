@@ -13,7 +13,7 @@ export function ContentCard({
 }: ContentCardProps) {
   return (
     <Component
-      className={`space-y-8 md:rounded-3xl md:bg-white md:p-5 md:shadow-card-2xl lg:p-8 xl:p-10 ${className}`}
+      className={`space-y-8 md:rounded-3xl md:bg-page md:p-5 md:shadow-card-2xl lg:p-8 xl:p-10 ${className}`}
     >
       {children}
     </Component>

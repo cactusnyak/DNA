@@ -34,7 +34,7 @@ function InfoTable({ title, rows }: { title: string; rows: { label: string; valu
   return (
     <section className="flex flex-col">
       <span className="mb-2 ml-0.5 text-sm font-medium">{title}</span>
-      <div className="w-full max-w-full overflow-hidden rounded-lg border border-border/50 bg-white">
+      <div className="w-full max-w-full overflow-hidden rounded-lg border border-border/50 bg-page">
         <table className="w-full table-fixed border-collapse text-xs">
           <tbody className="divide-y divide-border/50">
             {rows.map(({ label, value }) => (

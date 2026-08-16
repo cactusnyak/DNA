@@ -40,7 +40,7 @@ export function CartItemCard({
       tabIndex={0}
       aria-label={`Открыть ${title}`}
       className={[
-        'flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-card-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:grid sm:grid-cols-[120px_minmax(0,1fr)]',
+        'flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-page shadow-card-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:grid sm:grid-cols-[120px_minmax(0,1fr)]',
         className,
       ]
         .filter(Boolean)

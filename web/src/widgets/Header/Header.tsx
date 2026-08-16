@@ -13,6 +13,7 @@ import { HeaderCatalogDropdown } from './components/HeaderCatalogDropdown';
 import { HeaderLogo } from './components/HeaderLogo';
 import { MobileHeaderControls } from './components/MobileHeaderControls';
 import { PlatformSectionSwitcher } from './components/PlatformSectionSwitcher';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { useCatalogDropdown } from './logic/use-catalog-dropdown';
 import { useScrollHide } from './logic/use-scroll-hide';
 
@@ -68,6 +69,8 @@ export function Header() {
             onCatalogOpen={openCatalogDropdown}
             onNavigate={closeCatalogDropdown}
           />
+
+          <ThemeSwitcher />
         </div>
       </div>
 
