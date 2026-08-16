@@ -17,11 +17,5 @@ export function renderHighlightedText(
     return text;
   }
 
-  return (
-    <MarkHighlight 
-      text={text} 
-      searchValue={searchValue} 
-      level={1}
-    />
-  );
+  return <MarkHighlight text={text} searchValue={searchValue} />;
 }

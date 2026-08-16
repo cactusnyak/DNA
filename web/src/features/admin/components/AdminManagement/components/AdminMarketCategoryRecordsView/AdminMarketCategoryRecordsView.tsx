@@ -46,7 +46,7 @@ export function AdminMarketCategoryRecordsView({
       <AdminCategoryTreeView
         categories={categories}
         renderTitle={(category) =>
-          <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
+          <MarkHighlight text={category.name} searchValue={searchValue} />
         }
         renderMeta={(category) =>
           `slug: ${category.slug} · продуктов: ${category.productsCount} · крупногабаритная: ${category.isOversized ? 'да' : 'нет'}`
@@ -62,11 +62,11 @@ export function AdminMarketCategoryRecordsView({
         records={categories}
         getRecordKey={(category) => category.id}
         getTitle={(category) =>
-          <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
+          <MarkHighlight text={category.name} searchValue={searchValue} />
         }
         getDescription={(category) =>
           category.description
-            ? <MarkHighlight text={category.description} searchValue={searchValue} level={2} />
+            ? <MarkHighlight text={category.description} searchValue={searchValue} />
             : 'Без описания'
         }
         getMeta={(category) =>
@@ -120,7 +120,7 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'text', placeholder: 'Название' },
           getValue: (category) => category.name,
           render: (category) =>
-            <MarkHighlight text={category.name} searchValue={searchValue} level={1} />,
+            <MarkHighlight text={category.name} searchValue={searchValue} />,
         },
         {
           key: 'slug',
@@ -130,7 +130,7 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'text', placeholder: 'Slug' },
           getValue: (category) => category.slug,
           render: (category) =>
-            <MarkHighlight text={category.slug} searchValue={searchValue} level={2} />,
+            <MarkHighlight text={category.slug} searchValue={searchValue} />,
         },
         {
           key: 'products',
