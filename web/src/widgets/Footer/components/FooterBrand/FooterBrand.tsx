@@ -6,7 +6,10 @@ export function FooterBrand() {
   return (
     <section className="space-y-4">
       <Link to="/" className="inline-flex items-center">
-        <LogoMain className="h-7 w-auto" aria-label="DNA" />
+        <LogoMain
+          className="h-5 w-auto [&_path]:fill-logo md:h-6"
+          aria-label="DNA"
+        />
       </Link>
 
       <p className="max-w-sm text-sm leading-6 text-muted-foreground">
