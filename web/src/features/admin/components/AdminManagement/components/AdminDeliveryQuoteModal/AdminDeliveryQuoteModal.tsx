@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { FormInputField, FormTextareaField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { ResourceLink } from '@/components/ui/ResourceLink';
@@ -33,13 +34,13 @@ function InfoTable({ title, rows }: { title: string; rows: { label: string; valu
   return (
     <section className="flex flex-col">
       <span className="mb-2 ml-0.5 text-sm font-medium">{title}</span>
-      <div className="w-full max-w-full overflow-hidden rounded-lg border border-border/50 bg-white lg:w-fit">
-        <table className="w-full table-fixed border-collapse text-xs lg:w-auto lg:table-auto">
+      <div className="w-full max-w-full overflow-hidden rounded-lg border border-border/50 bg-white">
+        <table className="w-full table-fixed border-collapse text-xs">
           <tbody className="divide-y divide-border/50">
             {rows.map(({ label, value }) => (
               <tr key={label}>
-                <th scope="row" className="w-1/3 whitespace-nowrap px-2 py-1 text-left align-top font-medium lg:w-auto">{label}</th>
-                <td className="max-w-0 truncate px-2 py-1 align-top lg:max-w-md">{value || '—'}</td>
+                <th scope="row" className="w-1/3 whitespace-nowrap px-2 py-1 text-left align-top font-medium">{label}</th>
+                <td className="max-w-0 truncate px-2 py-1 align-top">{value || '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -65,57 +66,75 @@ export function AdminDeliveryQuoteModal({ accessToken, isOpen, quote, onClose }:
           expiresAt: draft.expiresAt || undefined,
         },
       }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['admin-delivery-quotes', accessToken] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['admin-delivery-quotes', accessToken],
+      });
+      onClose();
+    },
   });
 
   const setField = (next: Partial<Draft>) => setDraft((current) => ({ ...current, ...next }));
 
   return (
-    <Modal isOpen={isOpen} title={`Заявка №${quote.id.slice(0, 8)}`} size="lg" onClose={onClose}>
-      <div className="flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto p-5">
-        <div className="flex flex-col gap-5">
-          <InfoTable title="Данные о товаре" rows={[
-            { label: 'Название', value: `${quote.product.title}${quote.quantity > 1 ? ` · ${quote.quantity} шт.` : ''}` },
-            { label: 'ID', value: <AdminShortId value={quote.productId} /> },
-            { label: 'Ссылка', value: <ResourceLink href={`/product/${quote.productId}`}>{quote.product.title}</ResourceLink> },
-          ]} />
-          <InfoTable title="Место назначения" rows={[
-            { label: 'Регион', value: quote.destinationRegion },
-            { label: 'Город', value: quote.destinationCity },
-            { label: 'Адрес', value: quote.destinationAddress },
-            { label: 'Разгрузка', value: quote.unloadingRequired ? 'Требуется' : 'Не требуется' },
-            ...(quote.accessRestrictions ? [{ label: 'Ограничения', value: quote.accessRestrictions }] : []),
-          ]} />
-          <InfoTable title="Данные клиента" rows={[
-            { label: 'Имя', value: quote.customerName },
-            { label: 'Телефон', value: quote.customerPhone },
-            ...(quote.customerEmail ? [{ label: 'Email', value: quote.customerEmail }] : []),
-            ...(quote.customerComment ? [{ label: 'Комментарий', value: quote.customerComment }] : []),
-          ]} />
+    <Modal
+      isOpen={isOpen}
+      title={`Заявка на расчёт крупногабаритной доставки №${quote.id.slice(0, 8)}`}
+      size="lg"
+      onClose={onClose}
+    >
+      <form className="flex max-h-full min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex flex-col gap-7 p-6">
+            <div className="flex flex-col gap-5">
+              <InfoTable title="Данные о товаре" rows={[
+                { label: 'Название', value: `${quote.product.title}${quote.quantity > 1 ? ` · ${quote.quantity} шт.` : ''}` },
+                { label: 'ID', value: <AdminShortId value={quote.productId} /> },
+                { label: 'Ссылка', value: <ResourceLink href={`/product/${quote.productId}`}>{quote.product.title}</ResourceLink> },
+              ]} />
+              <InfoTable title="Место назначения" rows={[
+                { label: 'Регион', value: quote.destinationRegion },
+                { label: 'Город', value: quote.destinationCity },
+                { label: 'Адрес', value: quote.destinationAddress },
+                { label: 'Разгрузка', value: quote.unloadingRequired ? 'Требуется' : 'Не требуется' },
+                ...(quote.accessRestrictions ? [{ label: 'Ограничения', value: quote.accessRestrictions }] : []),
+              ]} />
+              <InfoTable title="Данные клиента" rows={[
+                { label: 'Имя', value: quote.customerName },
+                { label: 'Телефон', value: quote.customerPhone },
+                ...(quote.customerEmail ? [{ label: 'Email', value: quote.customerEmail }] : []),
+                ...(quote.customerComment ? [{ label: 'Комментарий', value: quote.customerComment }] : []),
+              ]} />
+            </div>
+
+            {quote.confirmedDeliveryPrice != null && (
+              <div className="rounded-lg bg-primary/5 px-4 py-2 text-sm">
+                <span className="font-medium">Текущая цена:</span>{' '}{formatPrice(quote.confirmedDeliveryPrice)}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <FormInputField name={`price-${quote.id}`} label="Цена доставки" type="number" min={0} value={draft.price} className="flex-1" onChange={(event) => setField({ price: event.target.value })} />
+                <FormInputField name={`expires-${quote.id}`} label="Действует до" type="datetime-local" value={draft.expiresAt} className="flex-1" onChange={(event) => setField({ expiresAt: event.target.value })} />
+              </div>
+              <FormTextareaField name={`comment-${quote.id}`} label="Комментарий менеджера" rows={3} value={draft.comment} onChange={(event) => setField({ comment: event.target.value })} />
+            </div>
+
+            {mutation.isError && (
+              <ErrorMessage>Не удалось обновить расчёт доставки.</ErrorMessage>
+            )}
+          </div>
         </div>
 
-        {quote.confirmedDeliveryPrice != null && (
-          <div className="rounded-lg bg-primary/5 px-4 py-2 text-sm">
-            <span className="font-medium">Текущая цена:</span>{' '}{formatPrice(quote.confirmedDeliveryPrice)}
-          </div>
-        )}
-
-        <form className="flex flex-col gap-6">
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <FormInputField name={`price-${quote.id}`} label="Цена доставки" type="number" min={0} value={draft.price} className="flex-1" onChange={(event) => setField({ price: event.target.value })} />
-              <FormInputField name={`expires-${quote.id}`} label="Действует до" type="datetime-local" value={draft.expiresAt} className="flex-1" onChange={(event) => setField({ expiresAt: event.target.value })} />
-            </div>
-            <FormTextareaField name={`comment-${quote.id}`} label="Комментарий менеджера" rows={3} value={draft.comment} onChange={(event) => setField({ comment: event.target.value })} />
-          </div>
-          <div className="flex flex-wrap gap-2">
+        <div className="shrink-0 border-t border-border/80 bg-background p-6">
+          <div className="flex flex-wrap justify-end gap-2">
             <Button type="button" variant="accent" disabled={mutation.isPending} onClick={() => mutation.mutate('QUOTED')}>Подтвердить цену</Button>
             <Button type="button" variant="dangerous" disabled={mutation.isPending} onClick={() => mutation.mutate('EXPIRED')}>Пометить истёкшим</Button>
             <Button type="button" variant="destructive" disabled={mutation.isPending} onClick={() => mutation.mutate('CANCELLED')}>Отменить</Button>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </Modal>
   );
 }
