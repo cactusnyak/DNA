@@ -1,4 +1,4 @@
-import { twMerge } from 'tailwind-merge';
+import { Code } from '@/components/ui/Code';
 
 type AdminShortIdProps = {
   value: string;
@@ -12,14 +12,10 @@ export function AdminShortId({
   className,
 }: AdminShortIdProps) {
   return (
-    <code
+    <Code
+      value={value.slice(0, length)}
       title={value}
-      className={twMerge(
-        'truncate rounded bg-muted px-1 py-0.5 text-xs font-mono',
-        className,
-      )}
-    >
-      {value.slice(0, length)}
-    </code>
+      className={className}
+    />
   );
 }

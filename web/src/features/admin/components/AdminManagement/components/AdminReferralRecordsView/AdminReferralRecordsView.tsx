@@ -1,5 +1,6 @@
 import type { AdminReferralUser } from '@/entities/admin';
 import { AdminShortId } from '@/features/admin/components/AdminShortId';
+import { Code } from '@/components/ui/Code';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -93,9 +94,7 @@ export function AdminReferralRecordsView({
           getValue: (user) => user.referralCode ?? '',
           render: (user) =>
             user.referralCode ? (
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">
-                {user.referralCode}
-              </code>
+              <Code value={user.referralCode} className="px-1.5" />
             ) : (
               <span className="text-muted-foreground">—</span>
             ),
