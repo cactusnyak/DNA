@@ -210,7 +210,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
       {filterableColumns.length > 0 && (
         <div className="border-b border-border/80 bg-muted/20 p-4">
           <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 h-[32px]">
               <button
                 type="button"
                 onClick={() => setIsFiltersOpen((prev) => !prev)}
@@ -233,6 +233,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                   type="button"
                   variant="secondary"
                   onClick={resetFilters}
+                  className='h-[32px]'
                 >
                   Сбросить
                 </Button>
@@ -268,7 +269,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                           <button
                             type="button"
                             className={[
-                              'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium ',
+                              'cursor-pointer rounded-lg border px-2 py-1 text-xs font-medium ',
                               !filterValue
                                 ? 'border-foreground bg-foreground text-background'
                                 : 'border-border/80 text-muted-foreground hover:bg-background hover:text-foreground',
@@ -286,7 +287,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                                 key={option.value}
                                 type="button"
                                 className={[
-                                  'cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs font-medium ',
+                                  'cursor-pointer rounded-lg border px-2 py-1 text-xs font-medium ',
                                   isActive
                                     ? 'border-foreground bg-foreground text-background'
                                     : 'border-border/80 text-muted-foreground hover:bg-background hover:text-foreground',
