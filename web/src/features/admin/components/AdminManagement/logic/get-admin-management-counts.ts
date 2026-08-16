@@ -7,6 +7,7 @@ export function getAdminManagementCounts(data?: AdminCatalogData) {
     'market-products': data?.products.length ?? 0,
     collections: data?.collections.length ?? 0,
     orders: data?.orders.length ?? 0,
+    'delivery-quotes': data?.deliveryQuotes.length ?? 0,
     'ad-categories': data?.adCategories.length ?? 0,
     ads: data?.ads.length ?? 0,
     users: data?.users.length ?? 0,

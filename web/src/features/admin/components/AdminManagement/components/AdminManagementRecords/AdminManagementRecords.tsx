@@ -23,6 +23,7 @@ import { AdminOrderRecordsView } from '../AdminOrderRecordsView';
 import { AdminProductRecordsView } from '../AdminProductRecordsView';
 import { AdminReferralRecordsView } from '../AdminReferralRecordsView/AdminReferralRecordsView';
 import { AdminUserRecordsView } from '../AdminUserRecordsView';
+import { AdminDeliveryQuoteRecordsView } from '../AdminDeliveryQuoteRecordsView';
 
 import type {
   EditableRecord,
@@ -128,6 +129,17 @@ export function AdminManagementRecords({
         referrals={records.referrals}
         viewMode={viewMode}
         searchValue={searchValue}
+      />
+    );
+  }
+
+  if (activeTabId === 'delivery-quotes') {
+    return (
+      <AdminDeliveryQuoteRecordsView
+        quotes={records.deliveryQuotes}
+        viewMode={viewMode}
+        searchValue={searchValue}
+        renderActions={(quote) => renderActions(quote)}
       />
     );
   }

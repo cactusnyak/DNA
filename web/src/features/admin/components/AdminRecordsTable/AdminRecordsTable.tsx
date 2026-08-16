@@ -6,7 +6,6 @@ import {
   ArrowUpDown,
   ChevronDown,
   ChevronRight,
-  RotateCcw,
   Trash2,
   Undo2,
 } from 'lucide-react';
@@ -230,14 +229,13 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
               </button>
 
               {hasActiveFilters && (
-                <button
+                <Button
                   type="button"
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/80 px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-background hover:text-foreground"
+                  variant="secondary"
                   onClick={resetFilters}
                 >
-                  <RotateCcw className="size-3.5" strokeWidth={1.5} />
                   Сбросить
-                </button>
+                </Button>
               )}
             </div>
 
@@ -306,8 +304,12 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                     );
                   }
 
-                  if (filterConfig.type === 'numberRange') {
+                  if (
+                    filterConfig.type === 'numberRange' ||
+                    filterConfig.type === 'dateRange'
+                  ) {
                     const rangeValue = getAdminTableRangeFilterValue(filterValue);
+                    const inputType = filterConfig.type === 'dateRange' ? 'date' : 'number';
 
                     return (
                       <div key={column.key} className="space-y-2">
@@ -318,7 +320,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             name={`${String(column.key)}From`}
-                            type="number"
+                            type={inputType}
                             value={rangeValue.from ?? ''}
                             placeholder="От"
                             className="h-9"
@@ -333,7 +335,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
 
                           <Input
                             name={`${String(column.key)}To`}
-                            type="number"
+                            type={inputType}
                             value={rangeValue.to ?? ''}
                             placeholder="До"
                             className="h-9"

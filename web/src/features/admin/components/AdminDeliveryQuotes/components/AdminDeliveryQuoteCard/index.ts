@@ -1,1 +1,0 @@
-export { AdminDeliveryQuoteCard } from './AdminDeliveryQuoteCard';

@@ -3,11 +3,13 @@ import type { ReactNode } from 'react';
 import type { Order } from '@/entities/order';
 import { formatOrderStatus } from '@/entities/order';
 import { formatPrice } from '@/shared/utils/format-price';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import type { DeletedAwareRecord } from '../../../AdminRecordsTable/types/admin-records-table';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
+import { getOrderStatusVariant } from '../../../../logic/get-admin-status-variant';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
 type AdminOrderRecord = Order & DeletedAwareRecord;
@@ -125,7 +127,7 @@ export function AdminOrderRecordsView({
             options: getOrderStatusFilterOptions(orders),
           },
           getValue: (order) => order.status,
-          render: (order) => formatOrderStatus(order.status),
+          render: (order) => <StatusBadge text={formatOrderStatus(order.status)} variant={getOrderStatusVariant(order.status)} />,
         },
       ]}
     />

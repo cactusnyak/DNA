@@ -1,1 +1,0 @@
-export { AdminDeliveryQuotes } from './AdminDeliveryQuotes';

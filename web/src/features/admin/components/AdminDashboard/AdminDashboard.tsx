@@ -5,7 +5,6 @@ import { SectionHeader } from '@/components/ui/Section';
 
 import { AdminManagement } from '../AdminManagement';
 import { AdminOverviewCard } from '../AdminOverviewCard';
-import { AdminDeliveryQuotes } from '../AdminDeliveryQuotes';
 
 type AdminDashboardProps = {
   accessToken: string;
@@ -45,8 +44,6 @@ export function AdminDashboard({
         <h2 className="text-xl font-semibold">База данных</h2>
         <AdminManagement accessToken={accessToken} />
       </section>
-      <AdminDeliveryQuotes accessToken={accessToken} />
-
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Сводки</h2>
 

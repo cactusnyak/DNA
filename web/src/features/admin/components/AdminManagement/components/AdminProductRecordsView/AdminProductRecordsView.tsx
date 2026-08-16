@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminProduct } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
@@ -11,6 +12,7 @@ import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
+import { getAdminRecordStatusVariant } from '../../../../logic/get-admin-status-variant';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
@@ -219,7 +221,7 @@ export function AdminProductRecordsView({
             options: statusFilterOptions,
           },
           getValue: (product) => getAdminRecordStatusLabel(product),
-          render: (product) => getAdminRecordStatusLabel(product),
+          render: (product) => <StatusBadge text={getAdminRecordStatusLabel(product)} variant={getAdminRecordStatusVariant(product)} />,
         },
       ]}
     />

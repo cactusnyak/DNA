@@ -3,6 +3,7 @@ export type AdminManagementTabId =
   | 'market-products'
   | 'collections'
   | 'orders'
+  | 'delivery-quotes'
   | 'ad-categories'
   | 'ads'
   | 'users'

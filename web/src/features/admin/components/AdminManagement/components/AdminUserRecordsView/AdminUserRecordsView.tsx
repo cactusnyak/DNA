@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { AdminUser } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { USER_ROLE_LABELS } from '@/entities/user';
 import { AdminShortId } from '@/features/admin/components/AdminShortId';
 
@@ -171,7 +172,7 @@ export function AdminUserRecordsView({
             ],
           },
           getValue: (user) => (user.isActive ? 'Активен' : 'Удалён'),
-          render: (user) => (user.isActive ? 'Активен' : 'Удалён'),
+          render: (user) => <StatusBadge text={user.isActive ? 'Активен' : 'Удалён'} variant={user.isActive ? 'access' : 'destructive'} />,
         },
       ]}
     />
