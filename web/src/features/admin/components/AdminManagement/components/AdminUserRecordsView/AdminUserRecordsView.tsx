@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 
 import type { AdminUser } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { USER_ROLE_LABELS } from '@/entities/user';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -94,9 +96,7 @@ export function AdminUserRecordsView({
           sortable: false,
           getValue: (user) => user.id,
           render: (user) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {user.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={user.id} />
           ),
         },
         {
@@ -126,9 +126,7 @@ export function AdminUserRecordsView({
           filter: { type: 'text', placeholder: 'Суффикс' },
           getValue: (user) => user.nicknameSuffix,
           render: (user) =>
-            <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {user.nicknameSuffix.slice(0, 8)}
-            </code>,
+            <AdminShortId value={user.nicknameSuffix} />,
         },
         {
           key: 'email',
@@ -174,7 +172,7 @@ export function AdminUserRecordsView({
             ],
           },
           getValue: (user) => (user.isActive ? 'Активен' : 'Удалён'),
-          render: (user) => (user.isActive ? 'Активен' : 'Удалён'),
+          render: (user) => <StatusBadge text={user.isActive ? 'Активен' : 'Удалён'} variant={user.isActive ? 'access' : 'destructive'} />,
         },
       ]}
     />

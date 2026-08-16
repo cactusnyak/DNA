@@ -1,3 +1,4 @@
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { getProducts } from '@/entities/product/api/get-products';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
 import { ListEndMessage } from '@/components/ui/ListEndMessage';
@@ -38,11 +39,9 @@ export function ProductsFeed({
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <p className="text-sm text-destructive">
-          Не удалось загрузить товары: {error}
-        </p>
-      </div>
+      <ErrorMessage>
+        Не удалось загрузить товары: {error}
+      </ErrorMessage>
     );
   }
 

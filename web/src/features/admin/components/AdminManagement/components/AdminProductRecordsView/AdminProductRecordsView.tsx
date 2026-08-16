@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 
 import type { AdminProduct } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
 import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
@@ -10,6 +12,7 @@ import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
+import { getAdminRecordStatusVariant } from '../../../../logic/get-admin-status-variant';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
@@ -125,9 +128,7 @@ export function AdminProductRecordsView({
           sortable: false,
           getValue: (product) => product.id,
           render: (product) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {product.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={product.id} />
           ),
         },
         {
@@ -220,7 +221,7 @@ export function AdminProductRecordsView({
             options: statusFilterOptions,
           },
           getValue: (product) => getAdminRecordStatusLabel(product),
-          render: (product) => getAdminRecordStatusLabel(product),
+          render: (product) => <StatusBadge text={getAdminRecordStatusLabel(product)} variant={getAdminRecordStatusVariant(product)} />,
         },
       ]}
     />

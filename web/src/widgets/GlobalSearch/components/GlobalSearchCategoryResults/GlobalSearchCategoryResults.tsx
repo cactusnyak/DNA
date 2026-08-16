@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import type { CatalogCategory } from '@/shared/types/catalog-category';
 import { getCategoryHref } from '@/shared/catalog';
 import { PLATFORM_SECTION, type PlatformSectionId } from '@/shared/platform';
@@ -61,9 +62,9 @@ export function GlobalSearchCategoryResults({
         )}
 
         {isError && (
-          <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          <ErrorMessage>
             Не удалось загрузить категории.
-          </p>
+          </ErrorMessage>
         )}
 
         {!isPending && !isError && categoryResults.length === 0 && (
@@ -98,7 +99,7 @@ export function GlobalSearchCategoryResults({
               <div className="min-w-0 py-1">
                 <div className="flex items-start justify-between gap-2">
                   <p className="line-clamp-1 text-sm font-medium">
-                    <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
+                    <MarkHighlight text={category.name} searchValue={searchValue} />
                   </p>
                   <span className="shrink-0 rounded-md bg-muted px-1.5 py-1 text-[10px] font-medium leading-none text-muted-foreground">
                     {section === PLATFORM_SECTION.MARKET ? 'Маркет' : 'Доска'}
@@ -107,9 +108,9 @@ export function GlobalSearchCategoryResults({
 
                 <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
                   {category.description ? (
-                    <MarkHighlight text={category.description} searchValue={searchValue} level={2} />
+                    <MarkHighlight text={category.description} searchValue={searchValue} />
                   ) : (
-                    <MarkHighlight text={category.path} searchValue={searchValue} level={2} />
+                    <MarkHighlight text={category.path} searchValue={searchValue} />
                   )}
                 </p>
               </div>

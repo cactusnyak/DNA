@@ -8,6 +8,7 @@ import {
   FormInputField,
   FormSelectField,
 } from '@/components/ui/FormField';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useAuthStore } from '@/entities/auth';
 import { getAdminProductAdditionTypes } from '@/entities/admin';
 import type { ProductAddition } from '@/entities/product';
@@ -72,7 +73,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
   }
 
   return (
-    <section className="space-y-4 border-y border-border/50 my-6 px-4 py-6">
+    <section className="space-y-4 border-y border-border/80 my-6 px-4 py-6">
       <div>
         <h3 className="font-medium">Дополнения</h3>
         <p className="text-sm text-muted-foreground">
@@ -82,7 +83,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
 
       <div className='flex flex-col gap-2'>
         {value.map((addition, index) => (
-          <div key={addition.id} className="space-y-3 rounded-2xl border border-primary/12 p-4">
+          <div key={addition.id} className="space-y-3 rounded-2xl border border-border/80 p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-xs">
@@ -265,7 +266,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
           </div>
         ))}
 
-        {isError && <p className="text-sm text-destructive">Не удалось загрузить типы дополнений.</p>}
+        {isError && <ErrorMessage>Не удалось загрузить типы дополнений.</ErrorMessage>}
       </div>
 
       <div className="space-y-2">
@@ -277,7 +278,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
               type="button"
               variant="ghost"
               size="sm"
-              className="rounded-full border border-primary/12 bg-muted/60 px-3 text-xs hover:bg-muted"
+              className="rounded-full border border-border/80 bg-muted/60 px-3 text-xs hover:bg-muted"
               onClick={() => addAddition(type.key)}
             >
               {type.name}

@@ -54,9 +54,9 @@ export function AdminToolbar({
         {canCreate && (
           <Button
             type="button"
-            variant="default"
+            variant="accent"
             onClick={onCreateClick}
-            className='py-6 px-8 bg-primary text-primary-foreground hover:bg-primary/80 aria-expanded:bg-primary/80 rounded-xl'
+            className='rounded-xl px-8 py-6'
           >
             <Plus className="size-4" strokeWidth={1.5} />
             {createLabel}

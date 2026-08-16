@@ -23,7 +23,7 @@ export function CategoryPreviewCard({
   return (
     <Link
       to={getCategoryHref(categories, category.id, section)}
-      className="group relative block h-fit w-fit overflow-hidden rounded-xl shadow-card-lg hover:border-primary/30 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      className="group relative block h-fit w-fit overflow-hidden rounded-xl shadow-card-lg hover:border-border hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       aria-label={category.name}
     >
       <CategoryPreviewImage category={category} />

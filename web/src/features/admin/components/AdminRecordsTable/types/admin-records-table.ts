@@ -15,7 +15,7 @@ export type AdminTableSortState = {
   direction: AdminTableSortDirection;
 } | null;
 
-export type AdminTableFilterType = 'text' | 'select' | 'numberRange';
+export type AdminTableFilterType = 'text' | 'select' | 'numberRange' | 'dateRange';
 
 export type AdminTableSelectFilterOption = {
   value: string;

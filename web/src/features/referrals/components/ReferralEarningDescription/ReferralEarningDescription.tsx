@@ -82,7 +82,7 @@ export function ReferralEarningDescription({
           {infoBlocks.map((block) => (
             <div
               key={block.title}
-              className="flex flex-col gap-4 rounded-2xl bg-white shadow-card-2xl p-6"
+              className="flex flex-col gap-4 rounded-2xl bg-page shadow-card-2xl p-6"
             >
               <p className="text-sm font-semibold">{block.title}</p>
 

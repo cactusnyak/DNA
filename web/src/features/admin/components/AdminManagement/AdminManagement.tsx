@@ -8,13 +8,16 @@ import {
   getAdminReferrals,
   uploadAdminImage,
 } from '@/entities/admin';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
+import { httpClient } from '@/shared/api/http-client';
 
 import { AdminTabs } from '../AdminTabs';
 import { AdminToolbar } from '../AdminToolbar';
 
 import { adminManagementTabs } from '../../data/admin-management-tabs';
 import { AdminCrudModal } from './components/AdminCrudModal';
+import { AdminDeliveryQuoteModal } from './components/AdminDeliveryQuoteModal';
 import { AdminManagementRecords } from './components/AdminManagementRecords';
 import { AdminRecordActions } from './components/AdminRecordActions';
 import { useAdminCrudHandlers } from './hooks/use-admin-crud-handlers';
@@ -24,7 +27,7 @@ import { useFilteredAdminRecords } from './hooks/use-filtered-admin-records';
 import { getAdminManagementCounts } from './logic/get-admin-management-counts';
 import { isAdminCatalogCollection } from './logic/is-admin-catalog-collection';
 import type { AdminBulkAction } from '../AdminRecordsTable/types/admin-records-table';
-import type { AdminCatalogData } from './types/admin-management-records';
+import type { AdminCatalogData, AdminCrudRecord, AdminDeliveryQuote } from './types/admin-management-records';
 import type { EditableRecord } from './types/admin-management-records';
 
 type AdminManagementProps = {
@@ -50,12 +53,24 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     queryFn: () => getAdminReferrals(accessToken),
   });
 
+  const {
+    data: deliveryQuotes = [],
+    isPending: areDeliveryQuotesPending,
+    isError: areDeliveryQuotesError,
+  } = useQuery({
+    queryKey: ['admin-delivery-quotes', accessToken],
+    queryFn: () =>
+      httpClient<AdminDeliveryQuote[]>('/admin/delivery-quotes', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+  });
+
   const data: AdminCatalogData | undefined = catalogData
-    ? { ...catalogData, referrals: referralsData }
+    ? { ...catalogData, referrals: referralsData, deliveryQuotes }
     : undefined;
 
-  const isPending = isCatalogPending;
-  const isError = isCatalogError;
+  const isPending = isCatalogPending || areDeliveryQuotesPending;
+  const isError = isCatalogError || areDeliveryQuotesError;
 
   function refreshAdminData() {
     queryClient.invalidateQueries({
@@ -86,6 +101,18 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       ? state.editingRecord
       : undefined;
 
+  const selectedDeliveryQuote =
+    state.editingRecord && 'destinationRegion' in state.editingRecord
+      ? state.editingRecord
+      : undefined;
+  const deliveryQuoteEditingRecord = selectedDeliveryQuote
+    ? deliveryQuotes.find((quote) => quote.id === selectedDeliveryQuote.id) ??
+      selectedDeliveryQuote
+    : undefined;
+  const crudEditingRecord = deliveryQuoteEditingRecord
+    ? undefined
+    : state.editingRecord as AdminCrudRecord | undefined;
+
   const handlers = useAdminCrudHandlers({
     activeTabId: state.activeTabId,
     editingRecord: state.editingRecord,
@@ -98,6 +125,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       ads: [],
       users: [],
       referrals: [],
+      deliveryQuotes: [],
     },
     mutations,
     resetEditing: state.resetEditing,
@@ -183,11 +211,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
 
   if (isError || !data) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Не удалось загрузить данные управления.
-        </p>
-      </div>
+        </ErrorMessage>
     );
   }
 
@@ -207,7 +233,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
           state.activeTabId,
         )}
         canCreate={
-          !['orders', 'ads', 'users', 'referrals'].includes(state.activeTabId)
+          !['orders', 'delivery-quotes', 'ads', 'users', 'referrals'].includes(state.activeTabId)
         }
         createLabel={activeTab?.createLabel}
         onSearchChange={state.setSearchValue}
@@ -218,7 +244,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       <AdminCrudModal
         isOpen={state.isCrudFormOpen}
         activeTabId={state.activeTabId}
-        editingRecord={state.editingRecord}
+        editingRecord={crudEditingRecord}
         collectionEditingRecord={collectionEditingRecord}
         data={data}
         isCrudFormPending={mutations.isCrudFormPending}
@@ -232,6 +258,16 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         onQuickCreate={handlers.handleQuickCreate}
       />
 
+      {deliveryQuoteEditingRecord && (
+        <AdminDeliveryQuoteModal
+          key={deliveryQuoteEditingRecord.id}
+          accessToken={accessToken}
+          isOpen
+          quote={deliveryQuoteEditingRecord}
+          onClose={state.resetEditing}
+        />
+      )}
+
       <AdminManagementRecords
         activeTabId={state.activeTabId}
         viewMode={state.viewMode}
@@ -243,4 +279,3 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     </section>
   );
 }
-

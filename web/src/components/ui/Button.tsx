@@ -24,7 +24,7 @@ const buttonVariants = cva(
           '',
 
         outline:
-          'border border-primary/15 bg-primary/5 text-primary hover:bg-primary/10 hover:text-foreground aria-expanded:bg-primary/10 aria-expanded:text-foreground',
+          'border border-border bg-primary/5 text-primary hover:bg-primary/10 hover:text-foreground aria-expanded:bg-primary/10 aria-expanded:text-foreground',
 
         secondary:
           'bg-primary/5 text-primary hover:bg-primary/10 aria-expanded:bg-primary/10 aria-expanded:text-foreground',
@@ -35,8 +35,14 @@ const buttonVariants = cva(
         ghost:
           'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50',
 
+        success:
+          'bg-success/10 text-success hover:bg-success/20 focus-visible:border-success/40 focus-visible:ring-success/20 dark:bg-success/20 dark:hover:bg-success/30 dark:focus-visible:ring-success/40',
+
         warning:
-          'bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 focus-visible:border-amber-500/40 focus-visible:ring-amber-500/20 dark:bg-amber-500/15 dark:text-amber-300 dark:hover:bg-amber-500/25 dark:focus-visible:ring-amber-500/35',
+          'bg-warning/10 text-warning hover:bg-warning/20 focus-visible:border-warning/40 focus-visible:ring-warning/20 dark:bg-warning/20 dark:hover:bg-warning/30 dark:focus-visible:ring-warning/40',
+
+        dangerous:
+          'bg-dangerous/10 text-dangerous hover:bg-dangerous/20 focus-visible:border-dangerous/40 focus-visible:ring-dangerous/20 dark:bg-dangerous/20 dark:hover:bg-dangerous/30 dark:focus-visible:ring-dangerous/40',
 
         destructive:
           'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',

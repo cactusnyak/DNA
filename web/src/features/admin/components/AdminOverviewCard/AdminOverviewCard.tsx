@@ -12,14 +12,14 @@ export function AdminOverviewCard({
   description,
 }: AdminOverviewCardProps) {
   return (
-    <article className="space-y-4 bg-background p-5 md:bg-white">
+    <article className="space-y-4 bg-background p-5 md:bg-page">
       <h4 className="text-sm font-semibold text-muted-foreground">
         {label}
       </h4>
 
       <div className="space-y-2">
         <div>
-          <span className="text-3xl font-bold">
+          <span className="text-3xl font-bold text-primary">
             {value}
           </span>
         </div>

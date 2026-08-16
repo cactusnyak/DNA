@@ -43,7 +43,8 @@ export function useAdminManagementState() {
     viewMode,
     editingRecord,
     isCreating,
-    isCrudFormOpen: isCreating || Boolean(editingRecord),
+    isCrudFormOpen:
+      isCreating || Boolean(editingRecord && !('destinationRegion' in editingRecord)),
     setSearchValue,
     setViewMode,
     resetEditing,

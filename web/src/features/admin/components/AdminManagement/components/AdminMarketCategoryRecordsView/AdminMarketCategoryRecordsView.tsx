@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 
 import type { AdminMarketCategory } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { MarkHighlight } from '@/widgets/MarkHighlight';
 
 import { buildCategoryTree } from '../../../../logic/build-category-tree';
@@ -10,6 +12,7 @@ import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
+import { getAdminRecordStatusVariant } from '../../../../logic/get-admin-status-variant';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
 type AdminMarketCategoryRecordsViewProps = {
@@ -43,7 +46,7 @@ export function AdminMarketCategoryRecordsView({
       <AdminCategoryTreeView
         categories={categories}
         renderTitle={(category) =>
-          <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
+          <MarkHighlight text={category.name} searchValue={searchValue} />
         }
         renderMeta={(category) =>
           `slug: ${category.slug} · продуктов: ${category.productsCount} · крупногабаритная: ${category.isOversized ? 'да' : 'нет'}`
@@ -59,11 +62,11 @@ export function AdminMarketCategoryRecordsView({
         records={categories}
         getRecordKey={(category) => category.id}
         getTitle={(category) =>
-          <MarkHighlight text={category.name} searchValue={searchValue} level={1} />
+          <MarkHighlight text={category.name} searchValue={searchValue} />
         }
         getDescription={(category) =>
           category.description
-            ? <MarkHighlight text={category.description} searchValue={searchValue} level={2} />
+            ? <MarkHighlight text={category.description} searchValue={searchValue} />
             : 'Без описания'
         }
         getMeta={(category) =>
@@ -106,9 +109,7 @@ export function AdminMarketCategoryRecordsView({
           sortable: false,
           getValue: (category) => category.id,
           render: (category) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {category.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={category.id} />
           ),
         },
         {
@@ -119,7 +120,7 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'text', placeholder: 'Название' },
           getValue: (category) => category.name,
           render: (category) =>
-            <MarkHighlight text={category.name} searchValue={searchValue} level={1} />,
+            <MarkHighlight text={category.name} searchValue={searchValue} />,
         },
         {
           key: 'slug',
@@ -129,7 +130,7 @@ export function AdminMarketCategoryRecordsView({
           filter: { type: 'text', placeholder: 'Slug' },
           getValue: (category) => category.slug,
           render: (category) =>
-            <MarkHighlight text={category.slug} searchValue={searchValue} level={2} />,
+            <MarkHighlight text={category.slug} searchValue={searchValue} />,
         },
         {
           key: 'products',
@@ -157,7 +158,7 @@ export function AdminMarketCategoryRecordsView({
           sortable: true,
           filter: { type: 'select', options: statusFilterOptions },
           getValue: (category) => getAdminRecordStatusLabel(category),
-          render: (category) => getAdminRecordStatusLabel(category),
+          render: (category) => <StatusBadge text={getAdminRecordStatusLabel(category)} variant={getAdminRecordStatusVariant(category)} />,
         },
       ]}
     />

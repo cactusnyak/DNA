@@ -1,4 +1,6 @@
 import type { AdminReferralUser } from '@/entities/admin';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
+import { Code } from '@/components/ui/Code';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
@@ -51,9 +53,7 @@ export function AdminReferralRecordsView({
           sortable: false,
           getValue: (user) => user.id,
           render: (user) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {user.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={user.id} />
           ),
         },
         {
@@ -74,9 +74,7 @@ export function AdminReferralRecordsView({
           filter: { type: 'text', placeholder: 'Суффикс' },
           getValue: (user) => user.nicknameSuffix,
           render: (user) =>
-            <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {user.nicknameSuffix.slice(0, 8)}
-            </code>,
+            <AdminShortId value={user.nicknameSuffix} />,
         },
         {
           key: 'email',
@@ -96,9 +94,7 @@ export function AdminReferralRecordsView({
           getValue: (user) => user.referralCode ?? '',
           render: (user) =>
             user.referralCode ? (
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">
-                {user.referralCode}
-              </code>
+              <Code value={user.referralCode} className="px-1.5" />
             ) : (
               <span className="text-muted-foreground">—</span>
             ),

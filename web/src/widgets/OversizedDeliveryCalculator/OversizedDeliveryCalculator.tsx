@@ -8,6 +8,7 @@ import {
   FormTextareaField,
   FormToggleField,
 } from '@/components/ui/FormField';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { ResourceLink } from '@/components/ui/ResourceLink';
 import { useAuthStore } from '@/entities/auth';
 import {
@@ -26,24 +27,26 @@ import { formatPrice } from '@/shared/utils/format-price';
 
 type Props = {
   product: Product;
+  cartLineKey: string;
   quantity?: number;
   configuredUnitPrice?: number;
   initialQuote?: DeliveryQuote;
-  onAccepted?: (quote: DeliveryQuote) => void;
+  onQuoteChange?: (quote?: DeliveryQuote) => void;
 };
 
 export function OversizedDeliveryCalculator({
   product,
+  cartLineKey,
   quantity = 1,
   configuredUnitPrice = product.price,
   initialQuote,
-  onAccepted,
+  onQuoteChange,
 }: Props) {
   const token = useAuthStore((state) => state.accessToken);
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
   const clientRequestId = useRef(crypto.randomUUID());
 
-  const [quote, setQuote] = useState(initialQuote);
+  const quote = initialQuote;
   const [form, setForm] = useState({
     destinationRegion: '',
     destinationCity: '',
@@ -62,31 +65,35 @@ export function OversizedDeliveryCalculator({
         {
           ...form,
           productId: product.id,
+          cartLineKey,
           guestSessionId,
           clientRequestId: clientRequestId.current,
           quantity,
         },
         token,
       ),
-    onSuccess: setQuote,
+    onSuccess: (value) => {
+      onQuoteChange?.(value);
+    },
   });
 
   const refresh = useMutation({
     mutationFn: () => getDeliveryQuote(quote!.id, guestSessionId, token),
-    onSuccess: setQuote,
+    onSuccess: (value) => {
+      onQuoteChange?.(value);
+    },
   });
 
   const accept = useMutation({
     mutationFn: () => acceptDeliveryQuote(quote!.id, guestSessionId, token),
     onSuccess: (value) => {
-      setQuote(value);
-      onAccepted?.(value);
+      onQuoteChange?.(value);
     },
   });
 
   if (!product.location) {
     return (
-      <div className="flex flex-col gap-3 rounded-xl border border-primary/12 p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-border/80 p-4">
         <p className="text-sm text-muted-foreground">
           Место отправления не указано, поэтому создать запрос на сайте пока
           нельзя.
@@ -100,7 +107,7 @@ export function OversizedDeliveryCalculator({
   if (quote) {
     return (
       <div
-        className="flex flex-col gap-3 rounded-xl border border-primary/12 p-4"
+        className="flex flex-col gap-3 rounded-xl border border-border/80 p-4"
         aria-live="polite"
       >
         <h2 className="font-semibold">Индивидуальный расчёт доставки</h2>
@@ -144,6 +151,18 @@ export function OversizedDeliveryCalculator({
         )}
 
         <div className="flex flex-wrap gap-2">
+          {(quote.status === 'EXPIRED' || quote.status === 'CANCELLED') && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                clientRequestId.current = crypto.randomUUID();
+                onQuoteChange?.(undefined);
+              }}
+            >
+              Создать новый расчёт
+            </Button>
+          )}
           <Button
             type="button"
             variant="secondary"
@@ -293,15 +312,13 @@ export function OversizedDeliveryCalculator({
       />
 
       {mutation.isError && (
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Не удалось отправить запрос. Проверьте поля и попробуйте снова.
-        </p>
+        </ErrorMessage>
       )}
 
-      <Button variant='accent' type="submit" disabled={mutation.isPending}>
-        {mutation.isPending
-          ? 'Отправляем…'
-          : 'Отправить запрос на расчёт'}
+      <Button variant="accent" type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? 'Отправляем…' : 'Отправить запрос на расчёт'}
       </Button>
 
       <ManagerLinks />

@@ -15,7 +15,7 @@ export function SearchResultPlate({
   return (
     <Link
       to={to}
-      className="flex gap-2 rounded-full border border-primary/12 bg-background px-2.5 py-1 text-xs hover:border-ring hover:bg-muted"
+      className="flex gap-2 rounded-full border border-border/80 bg-background px-2.5 py-1 text-xs hover:border-ring hover:bg-muted"
     >
       {children}
 

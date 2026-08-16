@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 
 import { ContentCard } from '@/components/ui/ContentCard';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { getFeed } from '@/entities/feed';
 import { getCatalogCategories } from '@/shared/catalog';
 import { PLATFORM_SECTION } from '@/shared/platform';
@@ -35,7 +36,7 @@ export function SearchPage() {
 
   if (!query) {
     return (
-      <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+      <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center">
         <h1 className="text-2xl font-semibold">Поиск</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Введите поисковый запрос в строке поиска.
@@ -63,9 +64,9 @@ export function SearchPage() {
           Ищем объявления и товары...
         </p>
       ) : isFeedError ? (
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Не удалось загрузить результаты поиска.
-        </p>
+        </ErrorMessage>
       ) : (
         <SearchListings key={query} items={feedItems} query={query} />
       )}

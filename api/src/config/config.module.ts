@@ -54,6 +54,13 @@ import * as Joi from 'joi';
         S3_FORCE_PATH_STYLE: Joi.boolean().default(false),
         YOOKASSA_SHOP_ID: Joi.string().allow('').optional(),
         YOOKASSA_SECRET_KEY: Joi.string().allow('').optional(),
+        YOOKASSA_VAT_CODE: Joi.number().integer().min(1).max(12).default(1),
+        YOOKASSA_EXPECTED_TEST_MODE: Joi.boolean().optional(),
+        YOOKASSA_REQUEST_TIMEOUT_MS: Joi.number()
+          .integer()
+          .min(1000)
+          .max(60000)
+          .default(10000),
         YANDEX_CLIENT_ID: Joi.string().allow('').optional(),
         YANDEX_CLIENT_SECRET: Joi.string().allow('').optional(),
         YANDEX_REDIRECT_URI: Joi.string().uri().allow('').optional(),

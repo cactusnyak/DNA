@@ -65,7 +65,7 @@ export function FavouritesPage() {
       />
 
       {!accessToken && (guestProductItems.length > 0 || guestAdItems.length > 0) && (
-        <p className="rounded-xl border border-primary/12 px-4 py-3 text-sm text-muted-foreground">
+        <p className="rounded-xl border border-border/80 px-4 py-3 text-sm text-muted-foreground">
           Вы не авторизованы — избранное сохранено локально.{' '}
           <Link to="/authorization" className="font-medium underline-offset-4 hover:underline">
             Войдите
@@ -172,7 +172,7 @@ function EmptyState({
   linkLabel: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-4">
+    <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center space-y-4">
       <p className="text-sm text-muted-foreground">{text}</p>
       <Button asChild variant="secondary">
         <Link to={to}>{linkLabel}</Link>

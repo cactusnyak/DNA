@@ -29,14 +29,14 @@ export function BalanceCard({
       <div className="balance-card-accent-glow pointer-events-none absolute -bottom-24 -left-16 z-0 size-52 rounded-full blur-3xl" />
 
       <div className="relative z-10">
-        <div className="inline-flex items-center rounded-full bg-white/10 p-1 text-xs font-medium text-indigo-100/75">
+        <div className="inline-flex items-center rounded-full bg-page/10 p-1 text-xs font-medium text-indigo-100/75">
           <div className="flex items-center gap-1.5 px-3">
             <WalletCards className="size-3.5" />
             {label}
           </div>
           <div className="flex gap-0.5">
             <Button
-              className="h-fit flex-1 rounded-l-full rounded-r-[3px] border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
+              className="h-fit flex-1 rounded-l-full rounded-r-[3px] border-white/20 bg-page/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
               onClick={() =>
                 window.alert('Функция пополнения баланса находится в разработке')
               }
@@ -45,7 +45,7 @@ export function BalanceCard({
             </Button>
 
             <Button
-              className="h-fit flex-1 rounded-l-[3px] rounded-r-full border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
+              className="h-fit flex-1 rounded-l-[3px] rounded-r-full border-white/20 bg-page/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
               onClick={() =>
                 window.alert('Функция вывода средств находится в разработке')
               }

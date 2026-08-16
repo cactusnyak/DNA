@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { HttpError } from '@/shared/api/http-client';
 
 import { Button } from '@/components/ui/Button';
@@ -33,7 +34,7 @@ export function ResetPassword() {
 
   if (!token) {
     return (
-      <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+      <section className="rounded-2xl bg-page p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">Ссылка недействительна</h1>
           <p className="text-sm leading-6 text-muted-foreground">
@@ -48,7 +49,7 @@ export function ResetPassword() {
   }
 
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+    <section className="rounded-2xl bg-page p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">Восстановление доступа</p>
         <h1 className="text-2xl font-semibold">Новый пароль</h1>
@@ -59,7 +60,7 @@ export function ResetPassword() {
 
       {mutation.isSuccess ? (
         <div className="flex flex-col gap-4">
-          <p className="rounded-lg border border-primary/12 bg-muted/40 px-3 py-3 text-sm">
+          <p className="rounded-lg border border-border/80 bg-muted/40 px-3 py-3 text-sm">
             Пароль успешно обновлён. Теперь вы можете войти с новым паролем.
           </p>
           <Button asChild variant="accent" className="w-full">
@@ -82,9 +83,9 @@ export function ResetPassword() {
           />
 
           {errorMessage && (
-            <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <ErrorMessage>
               {errorMessage}
-            </p>
+            </ErrorMessage>
           )}
 
           <Button

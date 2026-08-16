@@ -3,11 +3,15 @@ import { Link } from 'react-router-dom';
 
 import { useMutation } from '@tanstack/react-query';
 
-import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
-import { formatPrice } from '@/shared/utils/format-price';
+import { useSessionStore } from '@/entities/session';
+
+import { OrderDetailsTable } from './components/OrderDetailsTable';
+import { OrderItemsList } from './components/OrderItemsList';
+import { PaymentActions } from './components/PaymentActions';
 
 declare global {
   interface Window {
@@ -28,14 +32,50 @@ type CheckoutPaymentStateProps = {
 
 type PaymentStage = 'idle' | 'loading' | 'widget' | 'error';
 
+const WIDGET_SCRIPT_ID = 'yookassa-checkout-js';
+const WIDGET_CONTAINER_ID = 'yookassa-widget-container';
+
+function loadCheckoutWidgetScript() {
+  if (window.YooMoneyCheckoutWidget) return Promise.resolve();
+
+  return new Promise<void>((resolve, reject) => {
+    const existingScript = document.getElementById(
+      WIDGET_SCRIPT_ID,
+    ) as HTMLScriptElement | null;
+    const script = existingScript ?? document.createElement('script');
+
+    const handleLoad = () => {
+      if (window.YooMoneyCheckoutWidget) resolve();
+      else reject(new Error('YooKassa widget API is unavailable'));
+    };
+    const handleError = () => reject(new Error('Failed to load YooKassa widget'));
+
+    script.addEventListener('load', handleLoad, { once: true });
+    script.addEventListener('error', handleError, { once: true });
+
+    if (!existingScript) {
+      script.id = WIDGET_SCRIPT_ID;
+      script.src = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
+      document.head.appendChild(script);
+    }
+  });
+}
+
 export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   const [stage, setStage] = useState<PaymentStage>('idle');
+  const [confirmationToken, setConfirmationToken] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const widgetRef = useRef<{ destroy: () => void } | null>(null);
   const accessToken = useAuthStore((state) => state.accessToken);
+  const guestSessionId = useSessionStore((state) => state.guestSessionId);
 
   const initiateMutation = useMutation({
-    mutationFn: () => initiatePayment(order.id, accessToken ?? undefined),
+    mutationFn: () =>
+      initiatePayment(
+        order.id,
+        accessToken ?? undefined,
+        accessToken ? undefined : guestSessionId,
+      ),
     onSuccess: (data) => {
       if (!data.confirmationToken) {
         setErrorMessage('Онлайн-оплата пока недоступна. Попробуйте позже.');
@@ -43,7 +83,9 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         return;
       }
 
-      loadWidget(data.confirmationToken);
+      setErrorMessage(undefined);
+      setConfirmationToken(data.confirmationToken);
+      setStage('loading');
     },
     onError: () => {
       setErrorMessage('Онлайн-оплата пока недоступна. Попробуйте позже.');
@@ -51,50 +93,51 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     },
   });
 
-  function loadWidget(confirmationToken: string) {
-    setStage('loading');
-
-    const scriptId = 'yookassa-checkout-js';
-
-    function mountWidget() {
-      const widget = new window.YooMoneyCheckoutWidget({
-        confirmation_token: confirmationToken,
-        return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
-        error_callback: () => {
-          setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
-          setStage('error');
-        },
-      });
-
-      widget.render('yookassa-widget-container');
-      widgetRef.current = widget;
-      setStage('widget');
-    }
-
-    if (document.getElementById(scriptId)) {
-      mountWidget();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = 'https://yookassa.ru/checkout-widget/v1/checkout-widget.js';
-    script.onload = mountWidget;
-    script.onerror = () => {
-      setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
-      setStage('error');
-    };
-    document.head.appendChild(script);
-  }
-
   useEffect(() => {
     return () => {
       widgetRef.current?.destroy();
     };
   }, []);
 
+  useEffect(() => {
+    if (!confirmationToken || stage !== 'loading') return;
+
+    let cancelled = false;
+
+    void loadCheckoutWidgetScript()
+      .then(() => {
+        if (cancelled) return;
+        if (!document.getElementById(WIDGET_CONTAINER_ID)) {
+          throw new Error('YooKassa widget container is unavailable');
+        }
+
+        widgetRef.current?.destroy();
+        const widget = new window.YooMoneyCheckoutWidget({
+          confirmation_token: confirmationToken,
+          return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
+          error_callback: () => {
+            if (cancelled) return;
+            setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
+            setStage('error');
+          },
+        });
+        widgetRef.current = widget;
+        widget.render(WIDGET_CONTAINER_ID);
+        setStage('widget');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
+        setStage('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [confirmationToken, order.id, stage]);
+
   return (
-    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-primary/12 bg-card p-8">
+    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">
           Заказ создан
@@ -107,87 +150,38 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         </p>
       </div>
 
-      <table className="w-full text-sm">
-        <tbody>
-          <tr className="border-b border-border">
-            <td className="py-3 text-muted-foreground">Дата заказа</td>
-            <td className="py-3 text-right">{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long' }).format(new Date(order.createdAt))}</td>
-          </tr>
-          <tr className="border-b border-border">
-            <td className="py-3 text-muted-foreground">Сумма к оплате</td>
-            <td className="py-3 text-right text-lg font-semibold">
-              {formatPrice(order.totalAmount)}
-            </td>
-          </tr>
-          <tr>
-            <td className="py-3 text-muted-foreground">Статус</td>
-            <td className="py-3 text-right font-medium">Ожидает оплаты</td>
-          </tr>
-          <tr className="border-t border-border">
-            <td className="py-3 text-muted-foreground">Получатель</td>
-            <td className="py-3 text-right">{order.customerName}, {order.customerPhone}</td>
-          </tr>
-          <tr className="border-t border-border">
-            <td className="py-3 text-muted-foreground">Доставка</td>
-            <td className="py-3 text-right">{order.deliveryAddress}</td>
-          </tr>
-          <tr className="border-t border-border">
-            <td className="py-3 text-muted-foreground">Продавец и получатель оплаты</td>
-            <td className="py-3 text-right">ИП Филатов Денис Романович</td>
-          </tr>
-        </tbody>
-      </table>
+      <OrderDetailsTable order={order} />
 
-      <div className="space-y-2">
-        <h2 className="font-semibold">Состав заказа</h2>
-        <ul className="space-y-2 text-sm">
-          {order.items.map((item) => (
-            <li key={item.id} className="flex justify-between gap-4">
-              <span>{item.product?.title ?? `Товар ${item.productId}`} × {item.quantity}</span>
-              <span className="shrink-0">{formatPrice(item.unitPrice * item.quantity + item.deliveryPrice)}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <OrderItemsList items={order.items} />
 
       {stage === 'error' && errorMessage && (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        <ErrorMessage>
           {errorMessage}
-        </p>
+        </ErrorMessage>
       )}
 
-      {stage === 'widget' && (
+      {(stage === 'loading' || stage === 'widget') && (
         <div className="space-y-3">
-          <div id="yookassa-widget-container" className="min-h-[300px]" />
+          <div id={WIDGET_CONTAINER_ID} className="min-h-[300px]" />
           <LegalFormNotice kind="order" />
         </div>
       )}
 
       {stage !== 'widget' && (
         <p className="text-sm text-muted-foreground">
-          Онлайн-оплата пока находится в разработке и может быть недоступна.
-          Сохраните номер заказа, чтобы уточнить его статус.
+          После оплаты мы автоматически проверим её статус. Не закрывайте
+          страницу банка до завершения операции.
         </p>
       )}
 
       <p className="text-xs text-muted-foreground">К заказу применяется <Link className="font-medium text-foreground underline underline-offset-2" to="/public-offer">Публичная оферта</Link>.</p>
 
       {stage !== 'widget' && (
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            variant="accent"
-            onClick={() => initiateMutation.mutate()}
-            disabled={initiateMutation.isPending || stage === 'loading'}
-          >
-            {initiateMutation.isPending || stage === 'loading'
-              ? 'Открываем оплату...'
-              : 'Проверить доступность оплаты'}
-          </Button>
-
-          <Button asChild variant="secondary">
-            <Link to="/market/catalog">Вернуться в каталог</Link>
-          </Button>
-        </div>
+        <PaymentActions
+          isPending={initiateMutation.isPending || stage === 'loading'}
+          isRetry={stage === 'error'}
+          onPay={() => initiateMutation.mutate()}
+        />
       )}
     </section>
   );

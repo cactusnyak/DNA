@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { getAd } from '@/entities/ad';
 import { AdDetails } from '@/widgets/AdDetails';
@@ -35,11 +36,9 @@ export function AdDetailsPage() {
 
   if (isError || !ad) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <p className="text-sm text-destructive">
+        <ErrorMessage>
           Объявление не найдено или недоступно.
-        </p>
-      </div>
+        </ErrorMessage>
     );
   }
 

@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/FormField';
 
 import type { CheckoutFormValue } from '../../types/checkout-form';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 type CheckoutCustomerFormProps = {
@@ -79,10 +80,11 @@ export function CheckoutCustomerForm({
 
           <FormInputField
             name="customerEmail"
+            required
             type="email"
             label="Email"
             value={value.customerEmail}
-            placeholder="Необязательно"
+            placeholder="Для отправки электронного чека"
             onChange={getInputChangeHandler('customerEmail')}
           />
 
@@ -105,9 +107,9 @@ export function CheckoutCustomerForm({
         </div>
 
         {errorMessage && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             {errorMessage}
-          </p>
+          </ErrorMessage>
         )}
 
         <Button

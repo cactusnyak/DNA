@@ -1,11 +1,14 @@
 import type { ReactNode } from 'react';
 
 import type { AdminCatalogCollection } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 
 import { AdminRecordsList } from '../../../AdminRecordsList';
 import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
+import { getAdminRecordStatusVariant } from '../../../../logic/get-admin-status-variant';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
@@ -98,9 +101,7 @@ export function AdminCollectionRecordsView({
           sortable: false,
           getValue: (collection) => collection.id,
           render: (collection) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {collection.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={collection.id} />
           ),
         },
         {
@@ -163,7 +164,7 @@ export function AdminCollectionRecordsView({
             options: statusFilterOptions,
           },
           getValue: (collection) => getAdminRecordStatusLabel(collection),
-          render: (collection) => getAdminRecordStatusLabel(collection),
+          render: (collection) => <StatusBadge text={getAdminRecordStatusLabel(collection)} variant={getAdminRecordStatusVariant(collection)} />,
         },
       ]}
     />

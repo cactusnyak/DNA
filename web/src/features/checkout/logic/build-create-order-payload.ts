@@ -1,5 +1,6 @@
 import type { CartStoreItem } from '@/entities/cart';
 import type { CreateOrderPayload } from '@/entities/order';
+import { isQuoteReady } from '@/entities/delivery-quote';
 
 import type { CheckoutFormValue } from '../types/checkout-form';
 
@@ -24,14 +25,20 @@ export function buildCreateOrderPayload({
     guestSessionId,
     customerName: formValue.customerName.trim(),
     customerPhone: formValue.customerPhone.trim(),
-    customerEmail: normalizeOptionalString(formValue.customerEmail),
+    customerEmail: formValue.customerEmail.trim(),
     deliveryAddress: formValue.deliveryAddress.trim(),
     comment: normalizeOptionalString(formValue.comment),
     items: items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
       selectedAdditions: item.selectedAdditions ?? [],
-      deliveryQuoteId: item.deliveryQuote?.status === 'ACCEPTED' ? item.deliveryQuote.id : undefined,
+      deliveryQuoteId: isQuoteReady(
+        item.deliveryQuote,
+        item.configurationKey,
+        item.quantity,
+      )
+        ? item.deliveryQuote?.id
+        : undefined,
     })),
   };
 }

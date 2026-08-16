@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 
 import type { AdminAdCategory } from '@/entities/admin';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 
 import { buildCategoryTree } from '../../../../logic/build-category-tree';
 import { AdminCategoryTreeView } from '../../../AdminCategoryTreeView';
@@ -9,6 +11,7 @@ import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { getAdminRecordStatusLabel } from '../../../../logic/get-admin-record-status-label';
+import { getAdminRecordStatusVariant } from '../../../../logic/get-admin-status-variant';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
@@ -102,9 +105,7 @@ export function AdminAdCategoryRecordsView({
           sortable: false,
           getValue: (category) => category.id,
           render: (category) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {category.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={category.id} />
           ),
         },
         {
@@ -144,7 +145,7 @@ export function AdminAdCategoryRecordsView({
           sortable: true,
           filter: { type: 'select', options: statusFilterOptions },
           getValue: (category) => getAdminRecordStatusLabel(category),
-          render: (category) => getAdminRecordStatusLabel(category),
+          render: (category) => <StatusBadge text={getAdminRecordStatusLabel(category)} variant={getAdminRecordStatusVariant(category)} />,
         },
       ]}
     />

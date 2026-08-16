@@ -5,7 +5,9 @@ import {
   calculateProductAdditionsTotal,
   createDefaultSelectedAdditions,
   validateSelectedProductAdditions,
+  createCartConfigurationKey,
 } from '@/entities/product/lib/product-additions';
+import { useCartStore } from '@/entities/cart';
 import { formatPrice } from '@/shared/utils/format-price';
 import { Gallery } from '@/widgets/Gallery';
 
@@ -19,9 +21,11 @@ type ProductDetailsProps = {
 };
 
 export function ProductDetails({ product }: ProductDetailsProps) {
-  const [selectedAdditions, setSelectedAdditions] = useState<SelectedProductAddition[]>(
-    () => createDefaultSelectedAdditions(product.additions ?? []),
-  );
+  const addItem = useCartStore((state) => state.addItem);
+  const setDeliveryQuote = useCartStore((state) => state.setDeliveryQuote);
+  const [selectedAdditions, setSelectedAdditions] = useState<
+    SelectedProductAddition[]
+  >(() => createDefaultSelectedAdditions(product.additions ?? []));
   const [showErrors, setShowErrors] = useState(false);
   const errors = validateSelectedProductAdditions(
     product.additions ?? [],
@@ -30,11 +34,15 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const configuredUnitPrice =
     product.price +
     calculateProductAdditionsTotal(product.additions ?? [], selectedAdditions);
+  const cartLineKey = createCartConfigurationKey(product.id, selectedAdditions);
+  const cartItem = useCartStore((state) =>
+    state.items.find((item) => item.configurationKey === cartLineKey),
+  );
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <Gallery images={product.images} title={product.title} />
 
-      <div className="flex flex-col gap-5 md:rounded-3xl md:bg-white md:shadow-card-2xl p-0 sm:p-3 md:p-5 lg:p-5">
+      <div className="flex flex-col gap-5 md:rounded-3xl md:bg-page md:shadow-card-2xl p-0 sm:p-3 md:p-5 lg:p-5">
         <ProductDetailsInfo product={product} />
         {(product.additions?.length ?? 0) > 0 && (
           <ProductAdditionsSelector
@@ -47,11 +55,28 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {product.isOversized && (
           <OversizedDeliveryModal
             product={product}
+            cartLineKey={cartLineKey}
+            quantity={cartItem?.quantity ?? 1}
             configuredUnitPrice={configuredUnitPrice}
+            initialQuote={cartItem?.deliveryQuote}
+            onQuoteChange={(quote) => {
+              if (
+                quote &&
+                !useCartStore
+                  .getState()
+                  .items.some((item) => item.configurationKey === cartLineKey)
+              ) {
+                addItem(product, selectedAdditions);
+              }
+              setDeliveryQuote(cartLineKey, quote);
+            }}
           />
         )}
         <p className="text-xl font-semibold">
-          Итого за единицу: <span className='text-primary'>{formatPrice(configuredUnitPrice)}</span>
+          Итого за единицу:{' '}
+          <span className="text-primary">
+            {formatPrice(configuredUnitPrice)}
+          </span>
         </p>
         <div className="">
           <ProductDetailsActions

@@ -1,3 +1,4 @@
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { getFeed } from '@/entities/feed';
 import type { FeedItem } from '@/entities/feed';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
@@ -49,9 +50,7 @@ export function CombinedFeed() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <p className="text-sm text-destructive">Не удалось загрузить ленту: {error}</p>
-      </div>
+      <ErrorMessage>Не удалось загрузить ленту: {error}</ErrorMessage>
     );
   }
 

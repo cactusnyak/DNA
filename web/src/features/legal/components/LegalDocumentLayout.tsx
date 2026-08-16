@@ -5,7 +5,7 @@ import { LegalTableOfContents } from './LegalTableOfContents';
 
 export function LegalDocumentLayout({ document }: { document: LegalDocument }) {
   return (
-    <article className="flex flex-col gap-9 rounded-xl bg-white p-6 shadow-document sm:m-1 sm:rounded-lg sm:p-8 md:m-2 md:rounded-xl md:p-10 lg:m-3 lg:p-12 xl:m-5 xl:rounded-2xl xl:p-15">
+    <article className="flex flex-col gap-9 rounded-xl bg-page p-6 shadow-document sm:m-1 sm:rounded-lg sm:p-8 md:m-2 md:rounded-xl md:p-10 lg:m-3 lg:p-12 xl:m-5 xl:rounded-2xl xl:p-15">
       <LegalDocumentMeta
         title={document.title}
         description={document.description}
@@ -13,7 +13,7 @@ export function LegalDocumentLayout({ document }: { document: LegalDocument }) {
       />
 
       <div className='flex flex-col gap-6'>
-        <section className="flex flex-col gap-4 border-border">
+        <section className="flex flex-col gap-4 border-border/80">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{document.title}</h1>
           <hr />
           <div className="flex flex-col gap-3">

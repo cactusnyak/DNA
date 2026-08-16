@@ -51,7 +51,7 @@ function ProfileOrdersMessage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mt-5 rounded-xl border border-primary/12 px-4 py-4">
+    <div className="mt-5 rounded-xl border border-border/80 px-4 py-4">
       <p
         className={[
           'text-sm leading-6',
@@ -104,7 +104,7 @@ export function ProfileOrdersCard({
       <section>
         <h2 className="text-lg font-semibold">Мои заказы</h2>
 
-        <div className="mt-5 rounded-xl border border-primary/12 px-4 py-4">
+        <div className="mt-5 rounded-xl border border-border/80 px-4 py-4">
           <p className="text-sm leading-6 text-muted-foreground">
             Заказов пока нет. Каталог уже ждёт, как кассир в пустом магазине.
           </p>
@@ -136,17 +136,17 @@ export function ProfileOrdersCard({
         </span>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-xl border border-primary/12">
+      <div className="mt-5 overflow-hidden rounded-xl border border-border/80">
         {orders.map((order) => (
           <article
             key={order.id}
-            className="border-b border-border px-4 py-4 last:border-b-0"
+            className="border-b border-border/80 px-4 py-4 last:border-b-0"
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>
-                <p className="text-sm font-semibold">
+                <Link className="text-sm font-semibold underline-offset-4 hover:underline" to={`/orders/${order.id}`}>
                   Заказ № {order.id.slice(0, 8)}
-                </p>
+                </Link>
 
                 <p className="mt-1 text-xs text-muted-foreground">
                   {formatOrderDate(order.createdAt)} · {getOrderItemsLabel(order)}
@@ -171,7 +171,7 @@ export function ProfileOrdersCard({
                   className="grid gap-1 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-3"
                 >
                   <span className="line-clamp-1 text-muted-foreground">
-                    {item.product?.title ?? `Товар ${item.productId}`}
+                    {item.productTitle ?? item.product?.title ?? `Товар ${item.productId}`}
                   </span>
 
                   {item.isOversized && <span className="flex flex-wrap items-center gap-2"><OversizedIndicator /> Доставка: {formatPrice(item.deliveryPrice)}</span>}
@@ -182,6 +182,15 @@ export function ProfileOrdersCard({
                 </div>
               ))}
             </div>
+
+            {order.capabilities.canContinue && (
+              <Link
+                className="mt-4 inline-flex text-sm font-semibold underline-offset-4 hover:underline"
+                to={order.status === 'AWAITING_PAYMENT' ? `/checkout?orderId=${order.id}` : `/orders/${order.id}`}
+              >
+                {order.status === 'AWAITING_PAYMENT' ? 'Перейти к оплате' : 'Продолжить оформление'}
+              </Link>
+            )}
           </article>
         ))}
       </div>

@@ -9,11 +9,13 @@ export type InitiatePaymentResponse = {
 export function initiatePayment(
   orderId: string,
   accessToken?: string,
+  guestSessionId?: string,
 ): Promise<InitiatePaymentResponse> {
   return httpClient<InitiatePaymentResponse>(`/orders/${orderId}/payment`, {
     method: 'POST',
-    headers: accessToken
-      ? { Authorization: `Bearer ${accessToken}` }
-      : undefined,
+    headers: {
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...(guestSessionId ? { 'X-Guest-Session-Id': guestSessionId } : {}),
+    },
   });
 }

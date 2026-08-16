@@ -1,3 +1,4 @@
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { getAds } from '@/entities/ad';
 import type { Ad } from '@/entities/ad';
 import { EmptyPlaceholder } from '@/components/ui/EmptyPlaceholder';
@@ -50,9 +51,7 @@ function AdsFeedFetched({
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-destructive/20 p-5">
-        <p className="text-sm text-destructive">Не удалось загрузить объявления: {error}</p>
-      </div>
+      <ErrorMessage>Не удалось загрузить объявления: {error}</ErrorMessage>
     );
   }
 

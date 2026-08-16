@@ -24,7 +24,7 @@ export function ReferralEarningCategories({
               'rounded-xl',
               isActive
                 ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border bg-background hover:border-foreground/30 hover:bg-muted/50',
+                : 'border-border/80 bg-background hover:border-foreground/30 hover:bg-muted/50',
             ].join(' ')}
             onClick={() => onActiveCategoryChange(category.id)}
           >

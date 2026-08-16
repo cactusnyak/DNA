@@ -56,6 +56,23 @@ function matchesNumberRangeFilter(value: unknown, filterValue: AdminTableFilterR
   return true;
 }
 
+function matchesDateRangeFilter(value: unknown, filterValue: AdminTableFilterRangeValue) {
+  const dateValue = value instanceof Date ? value.getTime() : new Date(String(value)).getTime();
+
+  if (Number.isNaN(dateValue)) {
+    return false;
+  }
+
+  const from = filterValue.from?.trim()
+    ? new Date(`${filterValue.from}T00:00:00`).getTime()
+    : undefined;
+  const to = filterValue.to?.trim()
+    ? new Date(`${filterValue.to}T23:59:59.999`).getTime()
+    : undefined;
+
+  return (from === undefined || dateValue >= from) && (to === undefined || dateValue <= to);
+}
+
 export function filterAdminTableRecords<TRecord>(
   records: TRecord[],
   columns: AdminTableColumn<TRecord>[],
@@ -80,6 +97,10 @@ export function filterAdminTableRecords<TRecord>(
 
       if (filterConfig.type === 'numberRange' && isRangeFilterValue(filterValue)) {
         return matchesNumberRangeFilter(cellValue, filterValue);
+      }
+
+      if (filterConfig.type === 'dateRange' && isRangeFilterValue(filterValue)) {
+        return matchesDateRangeFilter(cellValue, filterValue);
       }
 
       return typeof filterValue === 'string'

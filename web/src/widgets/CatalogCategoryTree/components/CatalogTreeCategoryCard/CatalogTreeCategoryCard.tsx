@@ -64,7 +64,6 @@ export function CatalogTreeCategoryCard({
         <MarkHighlight
           text={category.name}
           searchValue={searchValue}
-          level={1}
         />
       </Link>
     </div>

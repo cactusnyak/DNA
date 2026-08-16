@@ -1,10 +1,10 @@
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { type AdminOverview } from '@/entities/admin';
 import { ContentCard } from '@/components/ui/ContentCard';
 import { SectionHeader } from '@/components/ui/Section';
 
 import { AdminManagement } from '../AdminManagement';
 import { AdminOverviewCard } from '../AdminOverviewCard';
-import { AdminDeliveryQuotes } from '../AdminDeliveryQuotes/AdminDeliveryQuotes';
 
 type AdminDashboardProps = {
   accessToken: string;
@@ -35,23 +35,19 @@ export function AdminDashboard({
       />
 
       {isOverviewError && (
-        <div className="rounded-2xl border border-destructive/20 p-5">
-          <p className="text-sm text-destructive">
+          <ErrorMessage>
             Не удалось загрузить сводку админки.
-          </p>
-        </div>
+          </ErrorMessage>
       )}
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">База данных</h2>
         <AdminManagement accessToken={accessToken} />
       </section>
-      <AdminDeliveryQuotes accessToken={accessToken} />
-
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Сводки</h2>
 
-        <div className="grid gap-px bg-border sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-px bg-border/50 sm:grid-cols-2 xl:grid-cols-3">
           <AdminOverviewCard
             label="Пользователи"
             value={getOverviewValue(overview?.usersCount, isOverviewPending)}

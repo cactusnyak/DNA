@@ -3,34 +3,55 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import type { DeliveryQuote } from '@/entities/delivery-quote';
+import { isQuoteReady } from '@/entities/delivery-quote';
 import type { Product } from '@/entities/product';
 import { OversizedDeliveryCalculator } from '@/widgets/OversizedDeliveryCalculator/OversizedDeliveryCalculator';
 
 type Props = {
   product: Product;
+  cartLineKey: string;
   quantity?: number;
   configuredUnitPrice?: number;
   initialQuote?: DeliveryQuote;
   triggerLabel?: string;
   triggerClassName?: string;
-  onAccepted?: (quote: DeliveryQuote) => void;
+  onQuoteChange?: (quote?: DeliveryQuote) => void;
 };
 
 export function OversizedDeliveryModal({
   product,
+  cartLineKey,
   quantity = 1,
   configuredUnitPrice = product.price,
   initialQuote,
   triggerLabel = 'Рассчитать крупногабаритную доставку',
   triggerClassName,
-  onAccepted,
+  onQuoteChange,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const isReady = isQuoteReady(initialQuote, cartLineKey, quantity);
+  const stateLabel = !initialQuote
+    ? 'Доставка не рассчитана'
+    : initialQuote.status === 'PENDING'
+      ? 'Запрос отправлен — ожидает расчёта'
+      : initialQuote.status === 'QUOTED'
+        ? 'Расчёт получен — требуется принять'
+        : isReady
+          ? 'Расчёт принят — можно оформлять заказ'
+          : initialQuote.status === 'EXPIRED'
+            ? 'Срок расчёта истёк'
+            : 'Расчёт отменён';
 
   return (
-    <div className='flex flex-col gap-2'>
-      <p className='text-amber-700 dark:text-amber-300 text-xs'>
-        Доставка не рассчитана
+    <div className="flex flex-col gap-2">
+      <p
+        className={
+          isReady
+            ? 'text-emerald-700 dark:text-emerald-300 text-xs'
+            : 'text-amber-700 dark:text-amber-300 text-xs'
+        }
+      >
+        {stateLabel}
       </p>
       <Button
         type="button"
@@ -54,10 +75,11 @@ export function OversizedDeliveryModal({
       >
         <OversizedDeliveryCalculator
           product={product}
+          cartLineKey={cartLineKey}
           quantity={quantity}
           configuredUnitPrice={configuredUnitPrice}
           initialQuote={initialQuote}
-          onAccepted={onAccepted}
+          onQuoteChange={onQuoteChange}
         />
       </Modal>
     </div>

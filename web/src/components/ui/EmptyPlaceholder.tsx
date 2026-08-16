@@ -9,7 +9,7 @@ function EmptyPlaceholder({
   return (
     <div
       data-slot="empty-placeholder"
-      className={`h-fit rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-muted-foreground ${className}`}
+      className={`h-fit rounded-2xl border border-dashed border-border/80 bg-card p-6 text-center text-sm text-muted-foreground ${className}`}
       {...props}
     />
   );

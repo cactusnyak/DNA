@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import type { BreadcrumbItem } from '../../types/breadcrumbs';
 
@@ -44,12 +44,6 @@ export function BreadcrumbsList({ items }: BreadcrumbsListProps) {
                   to={item.href}
                   className={`${isMobileParent ? 'inline-flex shrink-0 items-center gap-0.5 py-1.5 font-medium text-foreground md:py-0 md:font-normal md:text-muted-foreground' : ''} hover:text-foreground`}
                 >
-                  {isMobileParent && (
-                    <ChevronLeft
-                      className="size-4 md:hidden"
-                      aria-hidden="true"
-                    />
-                  )}
                   <span className={isMobileParent ? 'md:hidden' : undefined}>
                     {isMobileParent ? 'Назад' : item.label}
                   </span>

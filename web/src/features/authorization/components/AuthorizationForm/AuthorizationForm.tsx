@@ -2,6 +2,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { FormInputField } from '@/components/ui/FormField';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { getOAuthUrl, type OAuthProvider } from '@/entities/auth';
@@ -98,7 +99,7 @@ export function AuthorizationForm({
   }
 
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+    <section className="rounded-2xl bg-page p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">
           {isOtpStep
@@ -228,9 +229,9 @@ export function AuthorizationForm({
         </div>
 
         {errorMessage && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             {errorMessage}
-          </p>
+          </ErrorMessage>
         )}
 
         {isOtpStep ? (
@@ -295,7 +296,7 @@ export function AuthorizationForm({
               <>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
+                    <span className="w-full border-t border-border/80" />
                   </div>
                   <div className="relative flex justify-center text-[10px] uppercase">
                     <span className="bg-card px-2 text-muted-foreground">

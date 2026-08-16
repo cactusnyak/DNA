@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { referralBenefits } from '../../data/referral-benefits';
 
 export function ReferralGuestLanding() {
-  const dividerClass = 'border-primary/8';
+  const dividerClass = 'border-border/55';
 
   return (
     <section className="relative overflow-hidden rounded-4xl bg-card p-6 shadow-card-2xl sm:p-8 lg:p-10">
@@ -58,7 +58,7 @@ export function ReferralGuestLanding() {
                   dividerClass,
                 ].filter(Boolean).join(' ')}
               >
-                <span className="p-3 shadow-card-sm rounded-xl bg-white flex w-fit">
+                <span className="p-3 shadow-card-sm rounded-xl bg-page flex w-fit">
                   <Icon className="size-5 text-primary" strokeWidth={1.5} />
                 </span>
 

@@ -11,13 +11,13 @@ import { getCrudFormModalTitle } from '../../logic/get-crud-form-modal-title';
 import type { AdminManagementTabId } from '../../../../types/admin-management';
 import type {
   AdminCatalogData,
-  EditableRecord,
+  AdminCrudRecord,
 } from '../../types/admin-management-records';
 
 type AdminCrudModalProps = {
   isOpen: boolean;
   activeTabId: AdminManagementTabId;
-  editingRecord?: EditableRecord;
+  editingRecord?: AdminCrudRecord;
   collectionEditingRecord?: AdminCatalogCollection;
   data: AdminCatalogData;
   isCrudFormPending?: boolean;
@@ -75,7 +75,7 @@ export function AdminCrudModal({
         />
 
         {collectionEditingRecord && (
-          <div className="min-h-0 flex-1 overflow-y-auto border-t border-border p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto border-t border-border/80 p-6">
             <AdminCollectionItemsEditor
               collection={collectionEditingRecord}
               categories={data.marketCategories}
@@ -94,4 +94,3 @@ export function AdminCrudModal({
     </Modal>
   );
 }
-

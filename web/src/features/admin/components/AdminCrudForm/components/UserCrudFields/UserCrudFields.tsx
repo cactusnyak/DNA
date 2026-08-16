@@ -1,4 +1,5 @@
 import { FormSelectField } from '@/components/ui/FormField';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import type { AdminUser } from '@/entities/admin';
 import { USER_ROLE_LABELS } from '@/entities/user';
 import type { UserRole } from '@/entities/user';
@@ -22,12 +23,10 @@ export function UserCrudFields({
   return (
     <div className="flex flex-col gap-5">
       {user && (
-        <div className="rounded-xl border border-primary/12 bg-muted/40 p-4 text-sm">
+        <div className="rounded-xl border border-border/80 bg-muted/40 p-4 text-sm">
           <p className="font-semibold">
             {user.nickname}
-            <code className="ml-2 rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {user.nicknameSuffix.slice(0, 8)}
-            </code>
+            <AdminShortId value={user.nicknameSuffix} className="ml-2" />
           </p>
           <p className="mt-1 text-muted-foreground">{user.email}</p>
         </div>

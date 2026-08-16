@@ -93,7 +93,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="pointer-events-auto fixed inset-0 z-[80] flex items-center justify-center bg-foreground/45 p-4 backdrop-blur-sm"
+      className="pointer-events-auto fixed inset-0 z-[80] flex items-center justify-center bg-muted-foreground/50 p-4 backdrop-blur-sm"
       onMouseDown={onClose}
     >
       <section
@@ -101,14 +101,14 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         className={[
-          'flex h-[calc(100dvh-10rem)] max-h-[calc(100dvh-2rem)] min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-primary/12 bg-background shadow-2xl',
+          'flex h-[calc(100dvh-10rem)] max-h-[calc(100dvh-2rem)] min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-2xl',
           modalSizeClassNames[size],
           className,
         ].filter(Boolean).join(' ')}
         onMouseDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border px-5 py-4">
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border/80 px-5 py-4">
           <h3 id={titleId} className="text-lg font-medium text-foreground">
             {title}
           </h3>

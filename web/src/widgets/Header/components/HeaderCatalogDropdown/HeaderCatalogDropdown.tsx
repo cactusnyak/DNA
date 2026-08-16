@@ -15,7 +15,7 @@ export function HeaderCatalogDropdown({
       className="
         absolute top-full right-0 left-0 hidden
         px-4 pb-4 md:block
-        bg-white/5
+        bg-page/5
       "
     >
       <div className="w-full">

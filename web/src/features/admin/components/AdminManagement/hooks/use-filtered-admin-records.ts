@@ -65,6 +65,20 @@ export function useFilteredAdminRecords(
     [data?.orders, searchValue],
   );
 
+  const filteredDeliveryQuotes = useMemo(
+    () =>
+      filterAdminRecords(data?.deliveryQuotes ?? [], searchValue, (quote) => [
+        quote.id,
+        quote.productId,
+        quote.product.title,
+        quote.customerName,
+        quote.customerPhone,
+        quote.customerEmail,
+        quote.status,
+      ]),
+    [data?.deliveryQuotes, searchValue],
+  );
+
   const filteredAdCategories = useMemo(
     () =>
       filterAdminRecords(data?.adCategories ?? [], searchValue, (category) => [
@@ -121,6 +135,7 @@ export function useFilteredAdminRecords(
     products: filteredProducts,
     collections: filteredCollections,
     orders: filteredOrders,
+    deliveryQuotes: filteredDeliveryQuotes,
     adCategories: filteredAdCategories,
     ads: filteredAds,
     users: filteredUsers,

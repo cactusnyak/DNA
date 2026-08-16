@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { FormInputField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { User } from '@/entities/user';
@@ -117,11 +118,11 @@ export function ProfileEditModal({
           />
         </div>
 
-        <div className="flex flex-col gap-5 border-t  border-border p-6">
+        <div className="flex flex-col gap-5 border-t  border-border/80 p-6">
           {error && (
-            <p className="text-sm text-destructive">
+            <ErrorMessage>
               Не удалось сохранить. Проверьте соединение и попробуйте снова.
-            </p>
+            </ErrorMessage>
           )}
 
           <LegalFormNotice />

@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 
 import type { AdminAd } from '@/entities/admin';
+import { AdminShortId } from '@/features/admin/components/AdminShortId';
 import { formatAdStatus } from '@/entities/ad';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatPrice } from '@/shared/utils/format-price';
 import { formatLocationCoordinates } from '@/shared/utils/format-location-coordinates';
 import { contentDescriptionToPlainText } from '@/shared/utils/content-description';
@@ -11,6 +13,7 @@ import { AdminRecordsTable } from '../../../AdminRecordsTable';
 import { AdminTableImage } from '../../../AdminTableImage';
 import type { AdminBulkAction } from '../../../AdminRecordsTable/types/admin-records-table';
 import { renderHighlightedText } from '../../../../logic/render-highlighted-text';
+import { getAdStatusVariant } from '../../../../logic/get-admin-status-variant';
 import type { AdminViewMode } from '../../../../types/admin-management';
 
 type AdminAdRecordsViewProps = {
@@ -94,9 +97,7 @@ export function AdminAdRecordsView({
           sortable: false,
           getValue: (ad) => ad.id,
           render: (ad) => (
-            <code className="truncate rounded bg-muted px-1 py-0.5 text-xs font-mono">
-              {ad.id.slice(0, 8)}
-            </code>
+            <AdminShortId value={ad.id} />
           ),
         },
         {
@@ -242,7 +243,7 @@ export function AdminAdRecordsView({
             options: getStatusFilterOptions(ads),
           },
           getValue: (ad) => formatAdStatus(ad.status),
-          render: (ad) => formatAdStatus(ad.status),
+          render: (ad) => <StatusBadge text={formatAdStatus(ad.status)} variant={getAdStatusVariant(ad.status)} />,
         },
       ]}
     />

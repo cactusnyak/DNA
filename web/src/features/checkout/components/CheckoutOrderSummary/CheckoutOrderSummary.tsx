@@ -31,7 +31,7 @@ export function CheckoutOrderSummary({
   );
 
   return (
-    <aside className="overflow-hidden rounded-2xl bg-white shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
+    <aside className="overflow-hidden rounded-2xl bg-page shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
       <div className="p-5">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Ваш заказ</h2>
@@ -58,10 +58,7 @@ export function CheckoutOrderSummary({
               item.configuredUnitPrice * item.quantity + deliveryPrice;
 
             return (
-              <div
-                key={itemKey}
-                className="flex flex-col gap-3 sm:flex-row"
-              >
+              <div key={itemKey} className="flex flex-col gap-3 sm:flex-row">
                 <div className="aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg bg-muted sm:aspect-auto sm:size-16">
                   {image && (
                     <img
@@ -81,8 +78,7 @@ export function CheckoutOrderSummary({
                   </Link>
 
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {item.quantity} ×{' '}
-                    {formatPrice(item.configuredUnitPrice)}
+                    {item.quantity} × {formatPrice(item.configuredUnitPrice)}
                   </p>
 
                   {item.product.isOversized && (
@@ -91,6 +87,7 @@ export function CheckoutOrderSummary({
 
                       <OversizedDeliveryModal
                         product={item.product}
+                        cartLineKey={itemKey}
                         quantity={item.quantity}
                         configuredUnitPrice={item.configuredUnitPrice}
                         initialQuote={item.deliveryQuote}
@@ -98,12 +95,11 @@ export function CheckoutOrderSummary({
                         triggerLabel={
                           item.deliveryQuote?.status === 'ACCEPTED'
                             ? `Доставка: ${formatPrice(
-                              item.deliveryQuote
-                                .confirmedDeliveryPrice ?? 0,
-                            )}`
+                                item.deliveryQuote.confirmedDeliveryPrice ?? 0,
+                              )}`
                             : 'Доставка не рассчитана — рассчитать'
                         }
-                        onAccepted={(quote) => setQuote(itemKey, quote)}
+                        onQuoteChange={(quote) => setQuote(itemKey, quote)}
                       />
                     </div>
                   )}
@@ -118,7 +114,7 @@ export function CheckoutOrderSummary({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 border-t border-border p-5">
+      <div className="mt-5 flex flex-col gap-3 border-t border-border/80 p-5">
         <div className="flex items-center justify-between gap-4 text-sm">
           <span className="text-muted-foreground">Товары</span>
           <span>{formatPrice(productsAmount)}</span>

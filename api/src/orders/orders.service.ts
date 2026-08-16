@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import type {
 
 type NormalizedOrderItem = {
   productId: string;
+  configurationKey: string;
   quantity: number;
   selectedAdditions: SelectedProductAddition[];
   deliveryQuoteId?: string;
@@ -44,7 +46,13 @@ export class OrdersService {
       'deliveryAddress',
     );
 
-    const customerEmail = this.getOptionalString(createOrderDto.customerEmail);
+    const customerEmail = this.getRequiredString(
+      createOrderDto.customerEmail,
+      'customerEmail',
+    );
+    if (!/^\S+@\S+\.\S+$/.test(customerEmail)) {
+      throw new BadRequestException('customerEmail must be a valid email');
+    }
     const comment = this.getOptionalString(createOrderDto.comment);
     const guestSessionId = this.getOptionalString(
       createOrderDto.guestSessionId,
@@ -60,9 +68,12 @@ export class OrdersService {
         id: {
           in: productIds,
         },
+        isActive: true,
+        deletedAt: null,
       },
       select: {
         id: true,
+        title: true,
         price: true,
         additions: true,
         location: true,
@@ -118,7 +129,8 @@ export class OrdersService {
           );
         if (
           quote.productId !== item.productId ||
-          quote.quantity !== item.quantity
+          quote.quantity !== item.quantity ||
+          quote.cartLineKey !== item.configurationKey
         )
           throw new BadRequestException(
             'Расчёт доставки не соответствует товару или количеству.',
@@ -160,6 +172,7 @@ export class OrdersService {
               destinationCity: quote.destinationCity,
               destinationAddress: quote.destinationAddress,
               quantity: quote.quantity,
+              cartLineKey: quote.cartLineKey,
               status: quote.status,
               managerComment: quote.managerComment,
               confirmedAt: quote.updatedAt,
@@ -193,6 +206,7 @@ export class OrdersService {
               },
             },
             quantity: item.quantity,
+            productTitle: productById.get(item.productId)?.title,
             baseUnitPrice: item.baseUnitPrice,
             unitPrice: item.unitPrice,
             selectedAdditions: item.selectedAdditions,
@@ -238,8 +252,116 @@ export class OrdersService {
     return this.mapOrder(order);
   }
 
+  async findOwnedById(orderId: string, userId: string) {
+    const order = await this.prismaService.order.findFirst({
+      where: { id: orderId, userId },
+      include: this.getOrderInclude(),
+    });
+    if (!order) throw new NotFoundException('Order not found');
+    return this.mapOrder(order);
+  }
+
+  async rebuildOwnedOrder(orderId: string, userId: string) {
+    const order = await this.prismaService.order.findFirst({
+      where: { id: orderId, userId },
+      include: this.getOrderInclude(),
+    });
+    if (!order) throw new NotFoundException('Order not found');
+
+    const unavailable: string[] = [];
+    const items = order.items.map((item: any) => {
+      const product = item.product;
+      if (!product?.isActive || product.deletedAt) {
+        unavailable.push(product?.title ?? item.productId);
+        return undefined;
+      }
+      try {
+        resolveSelectedProductAdditions(
+          product.additions,
+          (item.selectedAdditions ?? []).map(
+            ({ additionId, type, value }: any) => ({
+              additionId,
+              type,
+              value,
+            }),
+          ),
+        );
+      } catch {
+        unavailable.push(product.title);
+        return undefined;
+      }
+      return {
+        product: this.mapOrderProduct(product),
+        quantity: item.quantity,
+        selectedAdditions: (item.selectedAdditions ?? []).map(
+          ({ additionId, type, value }: any) => ({ additionId, type, value }),
+        ),
+      };
+    });
+    if (unavailable.length) {
+      throw new ConflictException(
+        `Нельзя восстановить позиции: ${unavailable.join(', ')}. Товар недоступен или его конфигурация изменилась.`,
+      );
+    }
+    return {
+      sourceOrderId: order.id,
+      customer: {
+        customerName: order.customerName,
+        customerPhone: order.customerPhone,
+        customerEmail: order.customerEmail ?? '',
+        deliveryAddress: order.deliveryAddress,
+        comment: order.comment ?? '',
+      },
+      items,
+      requiresNewDeliveryQuote: order.items.some(
+        (item: any) => item.isOversized,
+      ),
+    };
+  }
+
+  async removeOwnedOrder(orderId: string, userId: string) {
+    return this.prismaService.$transaction(async (tx) => {
+      const order = await tx.order.findFirst({
+        where: { id: orderId, userId },
+        select: {
+          id: true,
+          status: true,
+          paymentAttempts: { select: { status: true } },
+          _count: { select: { referralRewards: true } },
+        },
+      });
+      if (!order) throw new NotFoundException('Order not found');
+      if (
+        order.status === OrderStatus.CREATED &&
+        order.paymentAttempts.length === 0 &&
+        order._count.referralRewards === 0
+      ) {
+        await tx.orderItem.deleteMany({ where: { orderId } });
+        await tx.order.delete({ where: { id: orderId } });
+        return { action: 'deleted' };
+      }
+      if (order.status !== OrderStatus.AWAITING_PAYMENT) {
+        throw new ConflictException('Заказ в текущем статусе нельзя отменить.');
+      }
+      if (order.paymentAttempts.length > 0) {
+        throw new ConflictException(
+          'Заказ с начатой оплатой нельзя отменить до подтверждения её результата.',
+        );
+      }
+      const updated = await tx.order.updateMany({
+        where: { id: orderId, userId, status: OrderStatus.AWAITING_PAYMENT },
+        data: { status: OrderStatus.CANCELLED },
+      });
+      if (updated.count !== 1) {
+        throw new ConflictException('Статус заказа уже изменился.');
+      }
+      return { action: 'cancelled' };
+    });
+  }
+
   private getOrderInclude() {
     return {
+      paymentAttempts: { select: { status: true } },
       items: {
         include: {
           product: {
@@ -303,13 +425,27 @@ export class OrdersService {
       const canonicalSelection = [...selectedAdditions].sort((first, second) =>
         first.additionId.localeCompare(second.additionId),
       );
-      const key = `${item.productId}:${JSON.stringify(canonicalSelection)}`;
+      const keySelection = canonicalSelection.map(
+        ({ additionId, type, value }) => ({ additionId, type, value }),
+      );
+      const key = `${item.productId}:${JSON.stringify(keySelection)}`;
       const current = itemByConfiguration.get(key);
+      const deliveryQuoteId = this.getOptionalString(item.deliveryQuoteId);
+      if (
+        current?.deliveryQuoteId &&
+        deliveryQuoteId &&
+        current.deliveryQuoteId !== deliveryQuoteId
+      ) {
+        throw new BadRequestException(
+          'У одной конфигурации товара не может быть нескольких расчётов доставки.',
+        );
+      }
       itemByConfiguration.set(key, {
         productId: item.productId,
+        configurationKey: key,
         quantity: (current?.quantity ?? 0) + quantity,
         selectedAdditions: canonicalSelection,
-        deliveryQuoteId: this.getOptionalString(item.deliveryQuoteId),
+        deliveryQuoteId: current?.deliveryQuoteId ?? deliveryQuoteId,
       });
     });
 
@@ -327,12 +463,29 @@ export class OrdersService {
       deliveryAddress: order.deliveryAddress,
       comment: order.comment ?? undefined,
       status: order.status,
+      capabilities: {
+        canContinue:
+          order.status === OrderStatus.CREATED ||
+          order.status === OrderStatus.AWAITING_PAYMENT,
+        canRepeat: true,
+        canRemove:
+          (order.status === OrderStatus.CREATED ||
+            order.status === OrderStatus.AWAITING_PAYMENT) &&
+          (order.paymentAttempts?.length ?? 0) === 0,
+        removeAction:
+          order.status === OrderStatus.CREATED
+            ? 'delete'
+            : order.status === OrderStatus.AWAITING_PAYMENT
+              ? 'cancel'
+              : undefined,
+      },
       totalAmount: order.totalAmount,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       items: order.items.map((item: any) => ({
         id: item.id,
         productId: item.productId,
+        productTitle: item.productTitle ?? item.product?.title,
         quantity: item.quantity,
         baseUnitPrice: item.baseUnitPrice,
         unitPrice: item.unitPrice,
@@ -364,6 +517,8 @@ export class OrdersService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      isActive: product.isActive,
+      deletedAt: product.deletedAt,
       additions: product.additions ?? [],
       location: product.location,
       isOversizedOverride: product.isOversizedOverride,

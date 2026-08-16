@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { confirmEmailVerification } from '@/entities/auth';
 
 export function VerifyEmail() {
@@ -24,14 +25,14 @@ export function VerifyEmail() {
   }, [token]);
 
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
+    <section className="rounded-2xl bg-page p-6 shadow-card-2xl max-w-xl mx-auto flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Подтверждение почты</h1>
 
       <div className="flex flex-col gap-4">
         {!token && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             В ссылке отсутствует токен подтверждения.
-          </p>
+          </ErrorMessage>
         )}
 
         {mutation.isPending && (
@@ -39,15 +40,15 @@ export function VerifyEmail() {
         )}
 
         {mutation.isSuccess && (
-          <p className="rounded-lg border border-primary/12 bg-muted/40 px-3 py-3 text-sm">
+          <p className="rounded-lg border border-border/80 bg-muted/40 px-3 py-3 text-sm">
             Почта успешно подтверждена.
           </p>
         )}
 
         {mutation.isError && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <ErrorMessage>
             Ссылка для подтверждения недействительна или устарела.
-          </p>
+          </ErrorMessage>
         )}
 
         <Button asChild variant="secondary" className="w-full">

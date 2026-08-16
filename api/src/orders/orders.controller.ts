@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
+  NotFoundException,
   Param,
   Post,
 } from '@nestjs/common';
@@ -19,31 +21,62 @@ export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
     private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   @Post()
   async create(
     @Body() createOrderDto: CreateOrderDto,
     @Headers('authorization') authorizationHeader?: string,
   ) {
-    const user = await this.authService.getOptionalMeFromAuthorizationHeader(
-      authorizationHeader,
-    );
+    const user =
+      await this.authService.getOptionalMeFromAuthorizationHeader(
+        authorizationHeader,
+      );
 
     return this.ordersService.create(createOrderDto, user?.id);
   }
 
   @Get('my')
   async findMyOrders(@Headers('authorization') authorizationHeader?: string) {
-    const user = await this.authService.getMeFromAuthorizationHeader(
-      authorizationHeader,
-    );
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
 
     return this.ordersService.findMyOrders(user.id);
   }
 
   @Get(':orderId')
-  findById(@Param('orderId') orderId: string) {
-    return this.ordersService.findById(orderId);
+  async findById(
+    @Param('orderId') orderId: string,
+    @Headers('authorization') authorizationHeader?: string,
+    @Headers('x-guest-session-id') guestSessionId?: string,
+  ) {
+    const user =
+      await this.authService.getOptionalMeFromAuthorizationHeader(
+        authorizationHeader,
+      );
+    if (user) return this.ordersService.findOwnedById(orderId, user.id);
+    const order = await this.ordersService.findById(orderId);
+    if (!order.userId && order.guestSessionId === guestSessionId) return order;
+    throw new NotFoundException('Order not found');
+  }
+
+  @Post(':orderId/rebuild')
+  async rebuild(
+    @Param('orderId') orderId: string,
+    @Headers('authorization') authorizationHeader?: string,
+  ) {
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
+    return this.ordersService.rebuildOwnedOrder(orderId, user.id);
+  }
+
+  @Delete(':orderId')
+  async remove(
+    @Param('orderId') orderId: string,
+    @Headers('authorization') authorizationHeader?: string,
+  ) {
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
+    return this.ordersService.removeOwnedOrder(orderId, user.id);
   }
 }

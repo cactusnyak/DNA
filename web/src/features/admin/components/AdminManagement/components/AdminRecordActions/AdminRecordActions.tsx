@@ -29,11 +29,16 @@ export function AdminRecordActions({
   onHardDelete,
 }: AdminRecordActionsProps) {
   const isUsersTab = activeTabId === 'users';
+  const isDeliveryQuotesTab = activeTabId === 'delivery-quotes';
   const canRestore = !isUsersTab && canRestoreAdminRecord(record);
-  const canSoftDelete = activeTabId !== 'orders' && !canRestore;
+  const canSoftDelete = activeTabId !== 'orders' && !isDeliveryQuotesTab && !canRestore;
 
   const editLabel =
-    activeTabId === 'orders' ? 'Изменить статус заказа' : 'Изменить запись';
+    activeTabId === 'orders'
+      ? 'Изменить статус заказа'
+      : isDeliveryQuotesTab
+        ? 'Открыть расчёт доставки'
+        : 'Изменить запись';
 
   function handleDelete() {
     if (!window.confirm('Пометить запись удаленной?')) {
@@ -68,7 +73,7 @@ export function AdminRecordActions({
         <Pencil className="size-3.5" strokeWidth={1.5} />
       </Button>
 
-      {activeTabId !== 'orders' && !isUsersTab && canRestore && (
+      {activeTabId !== 'orders' && !isDeliveryQuotesTab && !isUsersTab && canRestore && (
         <Button
           type="button"
           variant="secondary"
@@ -84,7 +89,7 @@ export function AdminRecordActions({
       {canSoftDelete && (
         <Button
           type="button"
-          variant="warning"
+          variant="dangerous"
           size="icon-sm"
           aria-label="Пометить удаленным"
           title="Пометить удаленным"
@@ -94,16 +99,18 @@ export function AdminRecordActions({
         </Button>
       )}
 
-      <Button
-        type="button"
-        variant="destructive"
-        size="icon-sm"
-        aria-label="Удалить навсегда"
-        title="Удалить навсегда"
-        onClick={handleHardDelete}
-      >
-        <Trash2 className="size-3.5" strokeWidth={1.5} />
-      </Button>
+      {!isDeliveryQuotesTab && (
+        <Button
+          type="button"
+          variant="destructive"
+          size="icon-sm"
+          aria-label="Удалить навсегда"
+          title="Удалить навсегда"
+          onClick={handleHardDelete}
+        >
+          <Trash2 className="size-3.5" strokeWidth={1.5} />
+        </Button>
+      )}
     </div>
   );
 }

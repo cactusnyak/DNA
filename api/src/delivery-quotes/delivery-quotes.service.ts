@@ -66,6 +66,7 @@ export class DeliveryQuotesService {
       create: {
         clientRequestId,
         productId: product.id,
+        cartLineKey: this.required(body.cartLineKey, 'cartLineKey'),
         userId: owner.userId,
         guestSessionId,
         quantity,
@@ -131,6 +132,21 @@ export class DeliveryQuotesService {
         status: OversizedDeliveryQuoteStatus.ACCEPTED,
         acceptedAt: new Date(),
       },
+    });
+  }
+
+  async cancel(id: string, owner: Owner) {
+    const quote = await this.findOwned(id, owner);
+    if (
+      quote.status === OversizedDeliveryQuoteStatus.EXPIRED ||
+      quote.status === OversizedDeliveryQuoteStatus.CANCELLED
+    ) {
+      return quote;
+    }
+    return this.prisma.oversizedDeliveryQuote.update({
+      where: { id },
+      data: { status: OversizedDeliveryQuoteStatus.CANCELLED },
+      include: { product: true },
     });
   }
 

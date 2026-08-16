@@ -1,26 +1,19 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { BottomConfirm } from '@/components/ui/BottomConfirm';
 
-const storageKey = 'dna-essential-storage-notice';
+import { useCookieNoticeStore } from './cookie-notice-store';
 
 export function CookieNotice() {
-  const [isVisible, setIsVisible] = useState(() => {
-    try { return window.localStorage.getItem(storageKey) !== 'acknowledged'; } catch { return true; }
-  });
+  const isVisible = useCookieNoticeStore((state) => state.isVisible);
+  const acknowledge = useCookieNoticeStore((state) => state.acknowledge);
 
   if (!isVisible) return null;
-
-  function acknowledge() {
-    try { window.localStorage.setItem(storageKey, 'acknowledged'); } catch { /* Storage may be unavailable. */ }
-    setIsVisible(false);
-  }
 
   return (
     <BottomConfirm
       ariaLabel="Уведомление о локальном хранении"
-      confirmLabel="Понятно"
+      confirmLabel="Принять"
       onConfirm={acknowledge}
     >
       DNA использует только необходимое локальное хранение браузера для входа,

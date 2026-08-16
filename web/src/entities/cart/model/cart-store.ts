@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Ad } from '@/entities/ad';
 import type { Product, SelectedProductAddition } from '@/entities/product';
 import type { DeliveryQuote } from '@/entities/delivery-quote';
+import { isQuoteReady } from '@/entities/delivery-quote';
 import {
   calculateProductAdditionsTotal,
   createCartConfigurationKey,
@@ -22,10 +23,23 @@ export type CartAdItem = {
   ad: Ad;
 };
 
+export type CheckoutPrefill = {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  deliveryAddress: string;
+  comment: string;
+};
+
 type CartStore = {
   items: CartStoreItem[];
   adItems: CartAdItem[];
-  addItem: (product: Product, selectedAdditions?: SelectedProductAddition[]) => void;
+  checkoutPrefill?: CheckoutPrefill;
+  replaceItemsForOrder: (items: CartStoreItem[], prefill: CheckoutPrefill) => void;
+  addItem: (
+    product: Product,
+    selectedAdditions?: SelectedProductAddition[],
+  ) => void;
   removeItem: (configurationKey: string) => void;
   increaseItem: (configurationKey: string) => void;
   decreaseItem: (configurationKey: string) => void;
@@ -48,6 +62,10 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       adItems: [],
+      checkoutPrefill: undefined,
+
+      replaceItemsForOrder: (items, checkoutPrefill) =>
+        set({ items, checkoutPrefill }),
 
       addAdItem: (ad) => {
         if (get().hasAdItem(ad.id)) return;
@@ -110,7 +128,11 @@ export const useCartStore = create<CartStore>()(
           items: state.items.map((item) =>
             (item.configurationKey ?? item.product.id) === configurationKey ||
             item.product.id === configurationKey
-              ? { ...item, quantity: item.quantity + 1, deliveryQuote: undefined }
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                  deliveryQuote: undefined,
+                }
               : item,
           ),
         }));
@@ -136,7 +158,11 @@ export const useCartStore = create<CartStore>()(
           items: state.items.map((item) =>
             (item.configurationKey ?? item.product.id) === configurationKey ||
             item.product.id === configurationKey
-              ? { ...item, quantity: item.quantity - 1, deliveryQuote: undefined }
+              ? {
+                  ...item,
+                  quantity: item.quantity - 1,
+                  deliveryQuote: undefined,
+                }
               : item,
           ),
         }));
@@ -158,9 +184,14 @@ export const useCartStore = create<CartStore>()(
         }));
       },
 
-      setDeliveryQuote: (configurationKey, deliveryQuote) => set((state) => ({
-        items: state.items.map((item) => (item.configurationKey ?? item.product.id) === configurationKey ? { ...item, deliveryQuote } : item),
-      })),
+      setDeliveryQuote: (configurationKey, deliveryQuote) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            (item.configurationKey ?? item.product.id) === configurationKey
+              ? { ...item, deliveryQuote }
+              : item,
+          ),
+        })),
 
       clearCart: () => {
         set({
@@ -193,7 +224,13 @@ export const useCartStore = create<CartStore>()(
           (sum, item) =>
             sum +
             (item.configuredUnitPrice ?? item.product.price) * item.quantity +
-            (item.deliveryQuote?.status === 'ACCEPTED' ? item.deliveryQuote.confirmedDeliveryPrice ?? 0 : 0),
+            (isQuoteReady(
+              item.deliveryQuote,
+              item.configurationKey,
+              item.quantity,
+            )
+              ? (item.deliveryQuote?.confirmedDeliveryPrice ?? 0)
+              : 0),
           0,
         );
       },
@@ -212,6 +249,7 @@ export const useCartStore = create<CartStore>()(
       partialize: (state) => ({
         items: state.items,
         adItems: state.adItems,
+        checkoutPrefill: state.checkoutPrefill,
       }),
     },
   ),

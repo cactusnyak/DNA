@@ -1,6 +1,7 @@
 import {
   Boxes,
   ClipboardList,
+  Truck,
   FolderTree,
   GitMerge,
   Layers3,
@@ -58,6 +59,14 @@ export const adminManagementTabs: AdminManagementTab[] = [
     title: 'Заказы',
     description: 'Просмотр заказов и изменение статусов.',
     icon: ClipboardList,
+  },
+  {
+    id: 'delivery-quotes',
+    group: 'orders',
+    groupLabel: 'Заказы',
+    title: 'Расчёты доставки',
+    description: 'Заявки на расчёт крупногабаритной доставки.',
+    icon: Truck,
   },
   {
     id: 'ad-categories',
