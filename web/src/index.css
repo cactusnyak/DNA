@@ -187,7 +187,95 @@ body {
 }
 
 .dark {
-  
+  color-scheme: dark;
+
+  /* A lighter version of the brand color for dark surfaces */
+  --primary: #7567dc;
+  --primary-foreground: #100c26;
+
+  --page: color-mix(in srgb, var(--primary) 7%, #09090f);
+  --background: color-mix(in srgb, var(--primary) 7%, #09090f);
+  --foreground: color-mix(in srgb, var(--primary) 4%, #f8f8fc);
+
+  --logo-color: color-mix(in srgb, var(--primary) 70%, #ffffff);
+
+  --shadow-color: color-mix(in srgb, #000000 50%, transparent);
+  --shadow-color-strong: color-mix(in srgb,
+      #000000 75%,
+      transparent);
+  --shadow-brand-glow-color: color-mix(in srgb,
+      var(--primary) 28%,
+      transparent);
+  --shadow-accent-glow-color: color-mix(in srgb,
+      #94e1d1 18%,
+      transparent);
+
+  --card: color-mix(in srgb, var(--primary) 8%, #15151d);
+  --card-foreground: color-mix(in srgb,
+      var(--primary) 4%,
+      #f4f4f8);
+
+  --popover: color-mix(in srgb, var(--primary) 10%, #181820);
+  --popover-foreground: color-mix(in srgb,
+      var(--primary) 4%,
+      #f4f4f8);
+
+  --resource-link: color-mix(in srgb, var(--primary) 20%, #9aa9ff);
+  --favourite: color-mix(in srgb, var(--primary) 12%, #ff62b6);
+  --mobile-navigation-active: color-mix(in srgb,
+      var(--primary) 25%,
+      #8e83ff);
+
+  --secondary: color-mix(in srgb, var(--primary) 10%, #22222c);
+  --secondary-foreground: color-mix(in srgb,
+      var(--primary) 4%,
+      #f2f2f7);
+
+  --muted: color-mix(in srgb, var(--primary) 8%, #202029);
+  --muted-foreground: color-mix(in srgb,
+      var(--primary) 8%,
+      #aaaab6);
+
+  --accent: color-mix(in srgb, var(--primary) 20%, #292934);
+  --accent-foreground: color-mix(in srgb,
+      var(--primary) 4%,
+      #ffffff);
+
+  --background-content: color-mix(in srgb,
+      var(--primary) 6%,
+      #111118);
+
+  --success: color-mix(in srgb, var(--primary) 8%, #45d483);
+  --warning: color-mix(in srgb, var(--primary) 8%, #f4d04f);
+  --dangerous: color-mix(in srgb, var(--primary) 8%, #ffad4d);
+  --destructive: color-mix(in srgb, var(--primary) 8%, #ff626b);
+
+  --border: color-mix(in srgb, var(--primary) 18%, #393943);
+  --input: color-mix(in srgb, var(--primary) 16%, #41414c);
+  --ring: color-mix(in srgb, var(--primary) 80%, #ffffff);
+
+  --chart-1: color-mix(in srgb, var(--primary) 35%, #b9b2ff);
+  --chart-2: color-mix(in srgb, var(--primary) 20%, #70d7c3);
+  --chart-3: color-mix(in srgb, var(--primary) 15%, #f2cf63);
+  --chart-4: color-mix(in srgb, var(--primary) 15%, #f395bb);
+  --chart-5: color-mix(in srgb, var(--primary) 20%, #72b7f2);
+
+  --sidebar: color-mix(in srgb, var(--primary) 8%, #101017);
+  --sidebar-foreground: color-mix(in srgb,
+      var(--primary) 4%,
+      #f4f4f8);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: color-mix(in srgb,
+      var(--primary) 15%,
+      #24242e);
+  --sidebar-accent-foreground: color-mix(in srgb,
+      var(--primary) 4%,
+      #ffffff);
+  --sidebar-border: color-mix(in srgb,
+      var(--primary) 18%,
+      #34343e);
+  --sidebar-ring: var(--ring);
 }
 
 @layer base {
