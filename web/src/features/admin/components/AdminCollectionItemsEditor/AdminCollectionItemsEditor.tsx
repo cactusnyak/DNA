@@ -103,11 +103,7 @@ export function AdminCollectionItemsEditor({
 
   return (
     <form
-<<<<<<< HEAD
       className="rounded-2xl border border-border/80 bg-card p-5"
-=======
-      className="rounded-2xl border border-primary/12 bg-card p-5"
->>>>>>> origin/main
       onSubmit={handleSubmit}
     >
       <div>

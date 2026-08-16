@@ -4,11 +4,7 @@ import { Button } from '@/components/ui/Button';
 
 export function CheckoutEmptyState() {
   return (
-<<<<<<< HEAD
     <section className="mx-auto max-w-xl space-y-4 rounded-2xl border border-border/80 bg-card p-8 text-center">
-=======
-    <section className="mx-auto max-w-xl space-y-4 rounded-2xl border border-primary/12 bg-card p-8 text-center">
->>>>>>> origin/main
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">Оформлять пока нечего</h1>
 

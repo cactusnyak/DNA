@@ -40,11 +40,7 @@ export function VerifyEmail() {
         )}
 
         {mutation.isSuccess && (
-<<<<<<< HEAD
           <p className="rounded-lg border border-border/80 bg-muted/40 px-3 py-3 text-sm">
-=======
-          <p className="rounded-lg border border-primary/12 bg-muted/40 px-3 py-3 text-sm">
->>>>>>> origin/main
             Почта успешно подтверждена.
           </p>
         )}

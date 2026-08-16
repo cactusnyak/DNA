@@ -23,11 +23,7 @@ export function UserCrudFields({
   return (
     <div className="flex flex-col gap-5">
       {user && (
-<<<<<<< HEAD
         <div className="rounded-xl border border-border/80 bg-muted/40 p-4 text-sm">
-=======
-        <div className="rounded-xl border border-primary/12 bg-muted/40 p-4 text-sm">
->>>>>>> origin/main
           <p className="font-semibold">
             {user.nickname}
             <AdminShortId value={user.nicknameSuffix} className="ml-2" />

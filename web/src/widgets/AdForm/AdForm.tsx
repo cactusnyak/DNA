@@ -249,11 +249,7 @@ export function AdForm({
         onChange={(event) => setDescription(event.target.value)}
       />
 
-<<<<<<< HEAD
       <fieldset className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card p-5">
-=======
-      <fieldset className="flex flex-col gap-4 rounded-2xl border border-primary/12 bg-card p-5">
->>>>>>> origin/main
         <legend className="px-1 text-sm font-medium">Геопозиция</legend>
 
         <FormInputField
@@ -308,11 +304,7 @@ export function AdForm({
       <div className="flex flex-col">
         <span className="mb-2 ml-0.5 text-sm font-medium">Контакты</span>
 
-<<<<<<< HEAD
         <div className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card p-5">
-=======
-        <div className="flex flex-col gap-4 rounded-2xl border border-primary/12 bg-card p-5">
->>>>>>> origin/main
           <FormInputField
             name="contactPhone"
             label="Телефон"
@@ -376,11 +368,7 @@ export function AdForm({
         </p>
       </div>
 
-<<<<<<< HEAD
       <label className="flex items-start gap-3 rounded-xl border border-border/80 bg-card p-4 text-sm leading-6">
-=======
-      <label className="flex items-start gap-3 rounded-xl border border-primary/12 bg-card p-4 text-sm leading-6">
->>>>>>> origin/main
         <input
           name="publicationConsent"
           required

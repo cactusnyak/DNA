@@ -116,17 +116,10 @@ type FormImageFilesFieldProps = FormFieldBaseProps & {
 };
 
 const TEXTAREA_CLASS_NAME =
-<<<<<<< HEAD
   'w-full resize-none rounded-lg border border-border/80 bg-background px-3 py-2 text-sm leading-5 outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 const SELECT_TRIGGER_CLASS_NAME =
   'flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/80 bg-background px-3 py-2 text-left text-sm outline-none hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
-=======
-  'w-full resize-none rounded-lg border border-primary/12 bg-background px-3 py-2 text-sm leading-5 outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
-
-const SELECT_TRIGGER_CLASS_NAME =
-  'flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-primary/12 bg-background px-3 py-2 text-left text-sm outline-none hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
->>>>>>> origin/main
 
 const FILE_DROPZONE_CLASS_NAME =
   'flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/30 px-4 py-5 text-center hover:border-ring hover:bg-muted/50';
@@ -357,11 +350,7 @@ export function FormSelectField({
             id={listboxId}
             role="listbox"
             className={[
-<<<<<<< HEAD
               'absolute left-0 right-0 top-full z-30 mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto rounded-lg border border-border/80 bg-popover p-1 text-sm shadow-lg',
-=======
-              'absolute left-0 right-0 top-full z-30 mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto rounded-lg border border-primary/12 bg-popover p-1 text-sm shadow-lg',
->>>>>>> origin/main
               dropdownClassName,
             ].filter(Boolean).join(' ')}
           >
@@ -443,13 +432,8 @@ export function FormBooleanField({
       disabled={disabled}
       className={[
         variant === 'toggle'
-<<<<<<< HEAD
           ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border/80 bg-background px-3 py-2 text-left text-sm hover:border-ring'
           : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border/80 bg-background text-primary-foreground',
-=======
-          ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-primary/12 bg-background px-3 py-2 text-left text-sm hover:border-ring'
-          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-primary/12 bg-background text-primary-foreground',
->>>>>>> origin/main
         variant === 'checkbox' && (checked || indeterminate) && 'border-primary bg-primary',
         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
@@ -561,11 +545,7 @@ export function FormImageFileField({
     >
       <div className="space-y-3">
         {hasPreview && (
-<<<<<<< HEAD
           <div className="overflow-hidden rounded-xl border border-border/80 bg-muted/30">
-=======
-          <div className="overflow-hidden rounded-xl border border-primary/12 bg-muted/30">
->>>>>>> origin/main
             <div className="relative aspect-video bg-muted">
               <img
                 src={activePreviewUrl}
@@ -699,11 +679,7 @@ export function FormImageFilesField({
             {existingImageUrls.map((imageUrl, index) => (
               <div
                 key={`${imageUrl}-${index}`}
-<<<<<<< HEAD
                 className="overflow-hidden rounded-xl border border-border/80 bg-muted/30"
-=======
-                className="overflow-hidden rounded-xl border border-primary/12 bg-muted/30"
->>>>>>> origin/main
               >
                 <div className="relative aspect-video bg-muted">
                   <img
@@ -732,11 +708,7 @@ export function FormImageFilesField({
             {files.map((file, index) => (
               <div
                 key={`${file.name}-${file.size}-${index}`}
-<<<<<<< HEAD
                 className="overflow-hidden rounded-xl border border-border/80 bg-muted/30"
-=======
-                className="overflow-hidden rounded-xl border border-primary/12 bg-muted/30"
->>>>>>> origin/main
               >
                 <div className="relative aspect-video bg-muted">
                   <img

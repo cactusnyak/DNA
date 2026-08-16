@@ -137,11 +137,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   }, [confirmationToken, order.id, stage]);
 
   return (
-<<<<<<< HEAD
     <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
-=======
-    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-primary/12 bg-card p-8">
->>>>>>> origin/main
       <div className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">
           Заказ создан

@@ -65,11 +65,7 @@ export function FavouritesPage() {
       />
 
       {!accessToken && (guestProductItems.length > 0 || guestAdItems.length > 0) && (
-<<<<<<< HEAD
         <p className="rounded-xl border border-border/80 px-4 py-3 text-sm text-muted-foreground">
-=======
-        <p className="rounded-xl border border-primary/12 px-4 py-3 text-sm text-muted-foreground">
->>>>>>> origin/main
           Вы не авторизованы — избранное сохранено локально.{' '}
           <Link to="/authorization" className="font-medium underline-offset-4 hover:underline">
             Войдите

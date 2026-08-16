@@ -85,11 +85,7 @@ export function ProfileDetailsCard({
         </div>
       </div>
 
-<<<<<<< HEAD
       <dl className="mt-5 overflow-hidden rounded-xl border border-border/80">
-=======
-      <dl className="mt-5 overflow-hidden rounded-xl border border-primary/12">
->>>>>>> origin/main
         {profileDetails.map((item) => (
           <div
             key={item.label}
