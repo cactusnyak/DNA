@@ -93,7 +93,11 @@ export function OversizedDeliveryCalculator({
 
   if (!product.location) {
     return (
+<<<<<<< HEAD
       <div className="flex flex-col gap-3 rounded-xl border border-border/80 p-4">
+=======
+      <div className="flex flex-col gap-3 rounded-xl border border-primary/12 p-4">
+>>>>>>> origin/main
         <p className="text-sm text-muted-foreground">
           Место отправления не указано, поэтому создать запрос на сайте пока
           нельзя.
@@ -107,7 +111,11 @@ export function OversizedDeliveryCalculator({
   if (quote) {
     return (
       <div
+<<<<<<< HEAD
         className="flex flex-col gap-3 rounded-xl border border-border/80 p-4"
+=======
+        className="flex flex-col gap-3 rounded-xl border border-primary/12 p-4"
+>>>>>>> origin/main
         aria-live="polite"
       >
         <h2 className="font-semibold">Индивидуальный расчёт доставки</h2>

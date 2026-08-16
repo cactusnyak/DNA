@@ -76,7 +76,11 @@ export function ProductQuantityCounter({
   return (
     <div
       className={[
+<<<<<<< HEAD
         'grid grid-cols-[2.25rem_1fr_2.25rem] overflow-hidden rounded-lg border border-border/80 bg-background',
+=======
+        'grid grid-cols-[2.25rem_1fr_2.25rem] overflow-hidden rounded-lg border border-primary/12 bg-background',
+>>>>>>> origin/main
         getProductActionHeightClass(variant),
       ]
         .filter(Boolean)

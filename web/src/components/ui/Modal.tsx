@@ -101,7 +101,11 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         className={[
+<<<<<<< HEAD
           'flex h-[calc(100dvh-10rem)] max-h-[calc(100dvh-2rem)] min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-2xl',
+=======
+          'flex h-[calc(100dvh-10rem)] max-h-[calc(100dvh-2rem)] min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-primary/12 bg-background shadow-2xl',
+>>>>>>> origin/main
           modalSizeClassNames[size],
           className,
         ].filter(Boolean).join(' ')}

@@ -77,7 +77,11 @@ export function Gallery({ images, title }: GalleryProps) {
       )}
 
       <div
+<<<<<<< HEAD
         className="relative order-1 aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-xl border border-border/80 bg-muted sm:order-2 sm:max-h-[32rem] sm:rounded-2xl sm:cursor-zoom-in"
+=======
+        className="relative order-1 aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-xl border border-primary/12 bg-muted sm:order-2 sm:max-h-[32rem] sm:rounded-2xl sm:cursor-zoom-in"
+>>>>>>> origin/main
         onMouseEnter={() => setIsZoomed(canZoomGallery())}
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}

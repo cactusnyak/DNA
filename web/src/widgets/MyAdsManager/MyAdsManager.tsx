@@ -91,9 +91,19 @@ export function MyAdsManager() {
           const cover = ad.images?.[0];
 
           return (
+<<<<<<< HEAD
             <li
               key={ad.id}
               className="flex flex-wrap items-center gap-4 rounded-2xl border border-border/80 bg-card p-4"
+=======
+          <li
+            key={ad.id}
+            className="flex flex-wrap items-center gap-4 rounded-2xl border border-primary/12 bg-card p-4"
+          >
+            <Link
+              to={`/ads/ad/${ad.slug}`}
+              className="size-16 shrink-0 overflow-hidden rounded-xl bg-muted"
+>>>>>>> origin/main
             >
               <Link
                 to={`/ads/ad/${ad.slug}`}

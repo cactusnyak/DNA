@@ -20,7 +20,11 @@ export function BottomConfirm({
   return (
     <aside
       className={[
+<<<<<<< HEAD
         'fixed inset-x-3 bottom-20 z-50 mx-auto max-w-3xl rounded-2xl border border-border/12 bg-card p-4 shadow-card-2xl md:bottom-4',
+=======
+        'fixed inset-x-3 bottom-20 z-50 mx-auto max-w-3xl rounded-2xl border border-primary/12 bg-card p-4 shadow-xl md:bottom-4',
+>>>>>>> origin/main
         className,
       ].filter(Boolean).join(' ')}
       aria-label={ariaLabel}

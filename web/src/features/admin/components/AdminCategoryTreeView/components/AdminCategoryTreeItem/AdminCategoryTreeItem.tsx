@@ -23,7 +23,11 @@ export function AdminCategoryTreeItem<T extends AdminCategoryTreeRecord>({
   return (
     <li>
       <div
+<<<<<<< HEAD
         className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 p-4"
+=======
+        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/12 p-4"
+>>>>>>> origin/main
         style={{
           marginLeft: `${level * 20}px`,
         }}

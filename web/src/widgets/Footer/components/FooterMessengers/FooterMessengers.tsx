@@ -20,7 +20,11 @@ export function FooterMessengers({ links }: FooterMessengersProps) {
           <a
             key={link.label}
             href={link.href}
+<<<<<<< HEAD
             className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-background px-3 py-2 text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+=======
+            className="inline-flex items-center gap-2 rounded-full border border-primary/12 bg-background px-3 py-2 text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+>>>>>>> origin/main
           >
             <img
               src={link.logo}
