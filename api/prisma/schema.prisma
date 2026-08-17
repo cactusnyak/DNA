@@ -63,6 +63,72 @@ enum AuthTokenType {
   PASSWORD_RESET
 }
 
+enum WarehouseType {
+  OWN
+  SELLER
+  FULFILLMENT
+}
+
+enum PackageType {
+  BOX
+  PALLET
+  ENVELOPE
+  CRATE
+  OTHER
+}
+
+enum DeliveryServiceKind {
+  DOOR
+  PICKUP
+  EXPRESS
+  CARGO
+  MANUAL
+}
+
+enum DeliveryQuoteStatus {
+  CREATED
+  SELECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum ShipmentStatus {
+  DRAFT
+  WAITING_FOR_ITEMS
+  READY
+  QUOTING
+  BOOKING
+  BOOKED
+  COURIER_ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  BOOKING_FAILED
+  DELIVERY_FAILED
+  CANCELLED
+  RETURNING
+  RETURNED
+  MANUAL_REVIEW
+}
+
+enum ShipmentItemFulfillmentStatus {
+  PENDING
+  PICKING
+  PACKED
+  READY
+  HANDED_OVER
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum ShipmentStatusSource {
+  SYSTEM
+  ADMIN
+  PROVIDER
+  RECONCILIATION
+}
+
 model User {
   id             String    @id @default(uuid())
   email          String?   @unique
@@ -93,6 +159,8 @@ model User {
   favourites              Favourite[]
   authTokens              AuthToken[]
   oversizedDeliveryQuotes OversizedDeliveryQuote[]
+  deliveryQuotes          DeliveryQuote[]
+  shipmentStatusEvents    ShipmentStatusEvent[]    @relation("ShipmentStatusActor")
 
   invitedReferrals Referral[] @relation("Inviter")
   receivedReferral Referral?  @relation("Invited")
@@ -214,6 +282,8 @@ model Product {
   slug                String
   description         Json     @db.JsonB
   price               Int
+  sku                 String?  @unique
+  purchasePrice       Int?
   additions           Json?    @db.JsonB
   location            Json?    @db.JsonB
   isOversizedOverride Boolean?
@@ -233,6 +303,9 @@ model Product {
 
   collectionProducts      CatalogCollectionProduct[]
   oversizedDeliveryQuotes OversizedDeliveryQuote[]
+  shippingProfile         ProductShippingProfile?
+  warehouses              ProductWarehouse[]
+  deliveryServices        ProductDeliveryService[]
 }
 
 model AdCategory {
@@ -343,20 +416,21 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
-  items OrderItem[]
+  user            User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items           OrderItem[]
   paymentAttempts PaymentAttempt[]
+  shipments       Shipment[]
 
   referralRewards ReferralReward[]
 }
 
 model PaymentAttempt {
-  id                String               @id @default(uuid())
-  orderId           String
-  activeOrderId     String?              @unique
-  idempotenceKey    String               @unique
-  providerPaymentId String?              @unique
-  status            PaymentAttemptStatus @default(CREATING)
+  id                 String               @id @default(uuid())
+  orderId            String
+  activeOrderId      String?              @unique
+  idempotenceKey     String               @unique
+  providerPaymentId  String?              @unique
+  status             PaymentAttemptStatus @default(CREATING)
   amount             Int
   currency           Currency             @default(RUB)
   test               Boolean?
@@ -387,6 +461,271 @@ model OrderItem {
   order         Order                   @relation(fields: [orderId], references: [id])
   product       Product                 @relation(fields: [productId], references: [id])
   deliveryQuote OversizedDeliveryQuote? @relation(fields: [deliveryQuoteId], references: [id])
+  shipmentItems ShipmentItem[]
+}
+
+model ProductShippingProfile {
+  id            String   @id @default(uuid())
+  productId     String   @unique
+  isFragile     Boolean  @default(false)
+  isStackable   Boolean  @default(true)
+  ageRestricted Boolean  @default(false)
+  handlingNotes String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product  Product                 @relation(fields: [productId], references: [id], onDelete: Restrict)
+  packages ProductPackageProfile[]
+}
+
+model ProductPackageProfile {
+  id                String      @id @default(uuid())
+  shippingProfileId String
+  sequence          Int
+  name              String?
+  type              PackageType
+  quantity          Int         @default(1)
+  weightGrams       Int
+  lengthMillimeters Int
+  widthMillimeters  Int
+  heightMillimeters Int
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  shippingProfile ProductShippingProfile @relation(fields: [shippingProfileId], references: [id], onDelete: Restrict)
+
+  @@unique([shippingProfileId, sequence])
+  @@index([shippingProfileId])
+}
+
+model Warehouse {
+  id                  String        @id @default(uuid())
+  code                String        @unique
+  name                String
+  type                WarehouseType @default(OWN)
+  country             String?
+  region              String?
+  city                String?
+  street              String?
+  building            String?
+  postalCode          String?
+  fullAddress         String?
+  latitude            Decimal?      @db.Decimal(9, 6)
+  longitude           Decimal?      @db.Decimal(9, 6)
+  contactName         String?
+  contactPhone        String?
+  contactEmail        String?
+  timezone            String?
+  workingHours        Json?         @db.JsonB
+  courierInstructions String?
+  loadingAvailable    Boolean       @default(false)
+  isActive            Boolean       @default(true)
+  isConfigured        Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  products        ProductWarehouse[]
+  providerConfigs WarehouseProviderConfig[]
+  deliveryQuotes  DeliveryQuote[]
+  shipments       Shipment[]
+}
+
+model ProductWarehouse {
+  productId   String
+  warehouseId String
+  isPrimary   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+
+  @@id([productId, warehouseId])
+  @@index([warehouseId])
+}
+
+model DeliveryProvider {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  services         DeliveryService[]
+  warehouseConfigs WarehouseProviderConfig[]
+  quotes           DeliveryQuote[]
+  shipments        Shipment[]
+}
+
+model DeliveryService {
+  id         String              @id @default(uuid())
+  providerId String
+  code       String
+  name       String
+  kind       DeliveryServiceKind
+  isActive   Boolean             @default(true)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  provider  DeliveryProvider         @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  products  ProductDeliveryService[]
+  quotes    DeliveryQuote[]
+  shipments Shipment[]
+
+  @@unique([providerId, code])
+  @@unique([providerId, id])
+  @@index([providerId, isActive])
+}
+
+model ProductDeliveryService {
+  productId         String
+  deliveryServiceId String
+  isEnabled         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  deliveryService DeliveryService @relation(fields: [deliveryServiceId], references: [id], onDelete: Restrict)
+
+  @@id([productId, deliveryServiceId])
+  @@index([deliveryServiceId])
+}
+
+model WarehouseProviderConfig {
+  id                 String   @id @default(uuid())
+  warehouseId        String
+  deliveryProviderId String
+  externalLocationId String?
+  isEnabled          Boolean  @default(false)
+  metadata           Json?    @db.JsonB
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  warehouse        Warehouse        @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  deliveryProvider DeliveryProvider @relation(fields: [deliveryProviderId], references: [id], onDelete: Restrict)
+
+  @@unique([warehouseId, deliveryProviderId])
+  @@index([deliveryProviderId])
+}
+
+model DeliveryQuote {
+  id                  String              @id @default(uuid())
+  deliveryProviderId  String
+  deliveryServiceId   String
+  userId              String?
+  guestSessionId      String?
+  status              DeliveryQuoteStatus @default(CREATED)
+  originWarehouseId   String
+  originSnapshot      Json                @db.JsonB
+  destinationSnapshot Json                @db.JsonB
+  cargoSnapshot       Json                @db.JsonB
+  providerCost        Int
+  customerCharge      Int
+  subsidyAmount       Int                 @default(0)
+  markupAmount        Int                 @default(0)
+  currency            Currency            @default(RUB)
+  expiresAt           DateTime
+  providerQuoteId     String?
+  providerPayload     Json?               @db.JsonB
+  fingerprint         String
+  selectedAt          DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  deliveryProvider DeliveryProvider @relation(fields: [deliveryProviderId], references: [id], onDelete: Restrict)
+  deliveryService  DeliveryService  @relation(fields: [deliveryProviderId, deliveryServiceId], references: [providerId, id], onDelete: Restrict)
+  user             User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  originWarehouse  Warehouse        @relation(fields: [originWarehouseId], references: [id], onDelete: Restrict)
+  shipment         Shipment?
+
+  @@index([userId, status, expiresAt])
+  @@index([guestSessionId, status, expiresAt])
+  @@index([deliveryProviderId, providerQuoteId])
+  @@index([fingerprint])
+}
+
+model Shipment {
+  id                  String         @id @default(uuid())
+  orderId             String
+  deliveryProviderId  String
+  deliveryServiceId   String
+  deliveryQuoteId     String?        @unique
+  originWarehouseId   String
+  originSnapshot      Json           @db.JsonB
+  destinationSnapshot Json           @db.JsonB
+  cargoSnapshot       Json           @db.JsonB
+  serviceSnapshot     Json           @db.JsonB
+  status              ShipmentStatus @default(DRAFT)
+  providerOrderId     String?
+  trackingId          String?
+  trackingUrl         String?
+  providerCost        Int
+  customerCharge      Int
+  subsidyAmount       Int            @default(0)
+  markupAmount        Int            @default(0)
+  currency            Currency       @default(RUB)
+  idempotencyKey      String         @unique
+  providerMetadata    Json?          @db.JsonB
+  attemptCount        Int            @default(0)
+  lastErrorCode       String?
+  lastErrorMessage    String?
+  lastAttemptedAt     DateTime?
+  bookedAt            DateTime?
+  pickedUpAt          DateTime?
+  deliveredAt         DateTime?
+  cancelledAt         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  order            Order                 @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  deliveryProvider DeliveryProvider      @relation(fields: [deliveryProviderId], references: [id], onDelete: Restrict)
+  deliveryService  DeliveryService       @relation(fields: [deliveryProviderId, deliveryServiceId], references: [providerId, id], onDelete: Restrict)
+  deliveryQuote    DeliveryQuote?        @relation(fields: [deliveryQuoteId], references: [id], onDelete: SetNull)
+  originWarehouse  Warehouse             @relation(fields: [originWarehouseId], references: [id], onDelete: Restrict)
+  items            ShipmentItem[]
+  statusEvents     ShipmentStatusEvent[]
+
+  @@index([orderId])
+  @@index([status])
+  @@index([deliveryProviderId, providerOrderId])
+  @@index([trackingId])
+  @@index([status, attemptCount, lastAttemptedAt])
+}
+
+model ShipmentItem {
+  id                String                        @id @default(uuid())
+  shipmentId        String
+  orderItemId       String
+  quantity          Int
+  fulfillmentStatus ShipmentItemFulfillmentStatus @default(PENDING)
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+
+  shipment  Shipment  @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+
+  @@unique([shipmentId, orderItemId])
+  @@index([orderItemId])
+}
+
+model ShipmentStatusEvent {
+  id             String               @id @default(uuid())
+  shipmentId     String
+  previousStatus ShipmentStatus?
+  status         ShipmentStatus
+  source         ShipmentStatusSource
+  actorUserId    String?
+  providerStatus String?
+  metadata       Json?                @db.JsonB
+  createdAt      DateTime             @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  actor    User?    @relation("ShipmentStatusActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([shipmentId, createdAt])
+  @@index([source, createdAt])
 }
 
 model OversizedDeliveryQuote {

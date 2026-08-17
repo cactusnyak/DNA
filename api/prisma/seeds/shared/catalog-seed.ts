@@ -15,6 +15,8 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 
+import { seedLogisticsFoundation } from './logistics-seed.js';
+
 type SeedImage = {
   localPath: string;
   sortOrder: number;
@@ -3659,6 +3661,8 @@ export async function runCatalogSeed(options: {
   }
 
   const { rootCategory, categoryByKind } = await ensureCategories();
+
+  await seedLogisticsFoundation(prisma);
 
   const results: ImportResult[] = [];
 
