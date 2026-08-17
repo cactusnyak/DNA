@@ -45,6 +45,13 @@ export class AdminService {
               image: true,
             },
           },
+          shippingProfile: {
+            include: { packages: { orderBy: { sequence: 'asc' } } },
+          },
+          warehouses: { include: { warehouse: true } },
+          deliveryServices: {
+            include: { deliveryService: { include: { provider: true } } },
+          },
         },
         orderBy: {
           createdAt: 'desc',
@@ -240,6 +247,8 @@ export class AdminService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      sku: product.sku,
+      purchasePrice: product.purchasePrice,
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
       isOversizedOverride: product.isOversizedOverride,
@@ -251,6 +260,10 @@ export class AdminService {
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
+      shippingProfile: product.shippingProfile,
+      warehouses: product.warehouses ?? [],
+      deliveryServices: product.deliveryServices ?? [],
+      logisticsReadiness: this.getProductLogisticsReadiness(product),
       images: (product.images ?? [])
         .map((productImage: any) => productImage.image)
         .sort(
@@ -258,6 +271,48 @@ export class AdminService {
             firstImage.sortOrder - secondImage.sortOrder,
         ),
     };
+  }
+
+  private getProductLogisticsReadiness(product: any) {
+    const packages = product.shippingProfile?.packages ?? [];
+    const packagesValid =
+      packages.length > 0 &&
+      packages.every((item: any) =>
+        [
+          item.quantity,
+          item.weightGrams,
+          item.lengthMillimeters,
+          item.widthMillimeters,
+          item.heightMillimeters,
+        ].every((value) => value > 0),
+      );
+    const primary = (product.warehouses ?? []).find(
+      (item: any) => item.isPrimary && item.isActive,
+    );
+    const warehouseReady = Boolean(
+      primary?.warehouse?.isActive && primary?.warehouse?.isConfigured,
+    );
+    const serviceReady = (product.deliveryServices ?? []).some(
+      (item: any) =>
+        item.isEnabled &&
+        item.deliveryService?.isActive &&
+        item.deliveryService?.provider?.isActive,
+    );
+    if (
+      product.shippingProfile &&
+      packagesValid &&
+      warehouseReady &&
+      serviceReady
+    )
+      return 'READY';
+    if (
+      product.shippingProfile ||
+      packages.length ||
+      product.warehouses?.length ||
+      product.deliveryServices?.length
+    )
+      return 'PARTIAL';
+    return 'NOT_CONFIGURED';
   }
 
   private mapCatalogCollection(

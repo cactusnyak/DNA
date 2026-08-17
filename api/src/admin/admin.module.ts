@@ -23,6 +23,8 @@ import { AdminUploadsController } from './admin-uploads.controller';
 import { AdminUploadsService } from './admin-uploads.service';
 import { AdminUsersController } from './admin-users.controller';
 import { AdminUsersService } from './admin-users.service';
+import { AdminLogisticsController } from './admin-logistics.controller';
+import { AdminLogisticsService } from './admin-logistics.service';
 
 @Module({
   imports: [PrismaModule, AuthModule, UsersModule, StorageModule],
@@ -37,6 +39,7 @@ import { AdminUsersService } from './admin-users.service';
     AdminAdCategoriesController,
     AdminAdsController,
     AdminUsersController,
+    AdminLogisticsController,
   ],
   providers: [
     AdminService,
@@ -47,6 +50,7 @@ import { AdminUsersService } from './admin-users.service';
     AdminOrdersService,
     AdminUploadsService,
     AdminUsersService,
+    AdminLogisticsService,
   ],
   exports: [AdminService, AdminUploadsService],
 })

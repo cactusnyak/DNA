@@ -9,6 +9,7 @@ import type {
   AdminMarketCategoryPayload,
   AdminProduct,
   AdminProductPayload,
+  AdminProductPackage,
   AdminUser,
   AdminUserRolePayload,
 } from '@/entities/admin';
@@ -42,6 +43,7 @@ export type AdminCrudFormValue =
   | File[]
   | string[]
   | ProductAddition[]
+  | AdminProductPackage[]
   | null;
 
 export type AdminCrudFormValues = Record<string, AdminCrudFormValue>;
@@ -56,6 +58,8 @@ export type AdminCrudFieldsProps = {
   values: AdminCrudFormValues;
   categories: AdminMarketCategory[];
   adCategories: AdminAdCategory[];
+  warehouses?: import('@/entities/admin').AdminWarehouse[];
+  deliveryProviders?: import('@/entities/admin').AdminDeliveryProvider[];
   record?: AdminCrudRecord;
   onValueChange: AdminCrudUpdateValue;
 };

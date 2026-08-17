@@ -33,6 +33,8 @@ type AdminCrudFormProps = {
   record?: AdminCrudRecord;
   categories: AdminMarketCategory[];
   adCategories: AdminAdCategory[];
+  warehouses?: import('@/entities/admin').AdminWarehouse[];
+  deliveryProviders?: import('@/entities/admin').AdminDeliveryProvider[];
   isPending?: boolean;
   onUploadImage: AdminImageUploader;
   onSubmit: (payload: AdminCrudPayload) => void | Promise<void>;
@@ -46,6 +48,8 @@ export function AdminCrudForm({
   record,
   categories,
   adCategories,
+  warehouses = [],
+  deliveryProviders = [],
   isPending = false,
   onUploadImage,
   onSubmit,
@@ -101,6 +105,8 @@ export function AdminCrudForm({
     values,
     categories,
     adCategories,
+    warehouses,
+    deliveryProviders,
     record,
     onValueChange: updateValue,
   };

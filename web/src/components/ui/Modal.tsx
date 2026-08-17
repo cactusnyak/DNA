@@ -3,6 +3,7 @@ import {
   type ReactNode,
   useEffect,
   useId,
+  useRef,
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,6 +20,7 @@ type ModalProps = {
   className?: string;
   bodyClassName?: string;
   onClose: () => void;
+  preventClose?: boolean;
 };
 
 const MODAL_ROOT_ID = 'app-modal-root';
@@ -26,8 +28,8 @@ const MODAL_ROOT_ID = 'app-modal-root';
 const modalSizeClassNames: Record<ModalSize, string> = {
   sm: 'max-w-md',
   md: 'max-w-xl',
-  lg: 'max-w-xl',
-  xl: 'max-w-xl',
+  lg: 'max-w-3xl',
+  xl: 'max-w-6xl',
 };
 
 export function Modal({
@@ -38,13 +40,21 @@ export function Modal({
   className,
   bodyClassName,
   onClose,
+  preventClose = false,
 }: ModalProps) {
   const titleId = useId();
-  const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
+  const [portalElement] = useState<HTMLElement | null>(() =>
+    typeof document === 'undefined'
+      ? null
+      : (document.getElementById(MODAL_ROOT_ID) ?? document.body),
+  );
+  const openerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    setPortalElement(document.getElementById(MODAL_ROOT_ID) ?? document.body);
-  }, []);
+    if (!isOpen) return;
+    openerRef.current = document.activeElement as HTMLElement | null;
+    return () => openerRef.current?.focus();
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -52,7 +62,7 @@ export function Modal({
     }
 
     function handleKeyDown(event: globalThis.KeyboardEvent) {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !preventClose) {
         onClose();
       }
     }
@@ -62,7 +72,7 @@ export function Modal({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, preventClose]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -94,7 +104,7 @@ export function Modal({
   return createPortal(
     <div
       className="pointer-events-auto fixed inset-0 z-[80] flex items-center justify-center bg-muted-foreground/50 p-4 backdrop-blur-sm"
-      onMouseDown={onClose}
+      onMouseDown={() => { if (!preventClose) onClose(); }}
     >
       <section
         role="dialog"
@@ -118,7 +128,7 @@ export function Modal({
             tabIndex={0}
             aria-label="Закрыть модальное окно"
             className="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            onClick={onClose}
+            onClick={() => { if (!preventClose) onClose(); }}
             onKeyDown={handleCloseKeyDown}
           >
             <X className="size-5" strokeWidth={1.5} />

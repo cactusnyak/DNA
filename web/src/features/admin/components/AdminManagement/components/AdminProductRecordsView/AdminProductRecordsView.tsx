@@ -158,6 +158,18 @@ export function AdminProductRecordsView({
             renderHighlightedText(product.category?.name ?? '', searchValue),
         },
         {
+          key: 'sku', title: 'SKU', width: 140, sortable: true, filter: { type: 'text' }, getValue: (product) => product.sku ?? '', render: (product) => product.sku ?? '—',
+        },
+        {
+          key: 'purchasePrice', title: 'Закупка', width: 140, align: 'right', sortable: true, getValue: (product) => product.purchasePrice ?? -1, render: (product) => product.purchasePrice == null ? '—' : formatPrice(product.purchasePrice),
+        },
+        {
+          key: 'logisticsReadiness', title: 'Логистика', width: 170, sortable: true, filter: { type: 'select', options: [{ value: 'Готов', label: 'Готов' }, { value: 'Частично', label: 'Частично' }, { value: 'Не настроен', label: 'Не настроен' }] }, getValue: (product) => product.logisticsReadiness === 'READY' ? 'Готов' : product.logisticsReadiness === 'PARTIAL' ? 'Частично' : 'Не настроен', render: (product) => <StatusBadge text={product.logisticsReadiness === 'READY' ? 'Готов' : product.logisticsReadiness === 'PARTIAL' ? 'Частично' : 'Не настроен'} variant={product.logisticsReadiness === 'READY' ? 'access' : product.logisticsReadiness === 'PARTIAL' ? 'warning' : 'muted'} />,
+        },
+        {
+          key: 'packages', title: 'Упаковки', width: 120, sortable: true, getValue: (product) => product.shippingProfile?.packages.length ?? 0, render: (product) => product.shippingProfile?.packages.length ?? 0,
+        },
+        {
           key: 'price',
           title: 'Цена',
           width: 160,

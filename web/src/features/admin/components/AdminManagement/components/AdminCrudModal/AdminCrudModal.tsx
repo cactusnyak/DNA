@@ -68,6 +68,8 @@ export function AdminCrudModal({
           record={editingRecord}
           categories={data.marketCategories}
           adCategories={data.adCategories}
+          warehouses={data.warehouses}
+          deliveryProviders={data.deliveryProviders}
           isPending={isCrudFormPending}
           onUploadImage={onUploadImage}
           onSubmit={onSubmit}

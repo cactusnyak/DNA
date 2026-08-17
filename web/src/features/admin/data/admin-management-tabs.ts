@@ -8,11 +8,14 @@ import {
   Megaphone,
   Tags,
   Users,
+  Warehouse,
+  Network,
+  PackageSearch,
 } from 'lucide-react';
 
 import type { AdminManagementTabId } from '../types/admin-management';
 
-export type AdminTabGroupId = 'market' | 'orders' | 'ads' | 'users';
+export type AdminTabGroupId = 'market' | 'logistics' | 'orders' | 'ads' | 'users';
 
 export type AdminManagementTab = {
   id: AdminManagementTabId;
@@ -22,6 +25,7 @@ export type AdminManagementTab = {
   description: string;
   createLabel?: string;
   icon: typeof FolderTree;
+  capabilities?: { create: boolean; edit: boolean; delete: boolean };
 };
 
 export const adminManagementTabs: AdminManagementTab[] = [
@@ -53,6 +57,43 @@ export const adminManagementTabs: AdminManagementTab[] = [
     icon: Layers3,
   },
   {
+    id: 'warehouses',
+    group: 'logistics',
+    groupLabel: 'Логистика',
+    title: 'Склады',
+    description: 'Точки отправления и конфигурация провайдеров.',
+    createLabel: 'Создать склад',
+    icon: Warehouse,
+    capabilities: { create: true, edit: true, delete: true },
+  },
+  {
+    id: 'delivery-providers',
+    group: 'logistics',
+    groupLabel: 'Логистика',
+    title: 'Провайдеры и сервисы',
+    description: 'Доступность интеграций и сервисных семейств.',
+    icon: Network,
+    capabilities: { create: false, edit: true, delete: false },
+  },
+  {
+    id: 'universal-delivery-quotes',
+    group: 'logistics',
+    groupLabel: 'Логистика',
+    title: 'Расчёты доставки',
+    description: 'Универсальные предложения внешних провайдеров.',
+    icon: Truck,
+    capabilities: { create: false, edit: false, delete: false },
+  },
+  {
+    id: 'shipments',
+    group: 'logistics',
+    groupLabel: 'Логистика',
+    title: 'Отправления',
+    description: 'Отправления, позиции и история статусов.',
+    icon: PackageSearch,
+    capabilities: { create: false, edit: false, delete: false },
+  },
+  {
     id: 'orders',
     group: 'orders',
     groupLabel: 'Заказы',
@@ -64,7 +105,7 @@ export const adminManagementTabs: AdminManagementTab[] = [
     id: 'delivery-quotes',
     group: 'orders',
     groupLabel: 'Заказы',
-    title: 'Расчёты доставки',
+    title: 'КГТ-расчёты доставки',
     description: 'Заявки на расчёт крупногабаритной доставки.',
     icon: Truck,
   },

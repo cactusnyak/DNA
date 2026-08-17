@@ -76,6 +76,11 @@ export type {
   AdminProduct,
   AdminProductAdditionType,
   AdminProductPayload,
+  AdminProductPackage,
+  AdminProductLogisticsPayload,
   AdminUser,
   AdminUserRolePayload,
 } from './types/admin-catalog';
+
+export * from './api/admin-logistics';
+export type * from './types/admin-logistics';

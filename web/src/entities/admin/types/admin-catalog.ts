@@ -7,6 +7,10 @@ import type { UserRole } from '@/entities/user';
 import type { Image } from '@/shared/types/image';
 import type { Location } from '@/shared/types/location';
 import type { ContentDescription } from '@/shared/types/content-description';
+import type { AdminDeliveryProvider, AdminWarehouse, LogisticsReadiness } from './admin-logistics';
+
+export type AdminProductPackage = { id?: string; sequence: number; name?: string | null; type: 'BOX' | 'PALLET' | 'ENVELOPE' | 'CRATE' | 'OTHER'; quantity: number; weightGrams: number; lengthMillimeters: number; widthMillimeters: number; heightMillimeters: number };
+export type AdminProductLogisticsPayload = { shippingProfile?: { isFragile: boolean; isStackable: boolean; ageRestricted: boolean; handlingNotes?: string }; packages: AdminProductPackage[]; warehouseIds: string[]; primaryWarehouseId?: string; deliveryServiceIds: string[] };
 
 export type AdminCatalogCollectionType = 'CATEGORY' | 'PRODUCT';
 
@@ -24,6 +28,12 @@ export type AdminProduct = Product & {
   deletedAt?: string | null;
   isOversized: boolean;
   isOversizedOverride: boolean | null;
+  sku?: string | null;
+  purchasePrice?: number | null;
+  shippingProfile?: ({ isFragile: boolean; isStackable: boolean; ageRestricted: boolean; handlingNotes?: string | null; packages: AdminProductPackage[] }) | null;
+  warehouses: Array<{ warehouseId: string; isPrimary: boolean; isActive: boolean; warehouse: AdminWarehouse }>;
+  deliveryServices: Array<{ deliveryServiceId: string; isEnabled: boolean; deliveryService: AdminDeliveryProvider['services'][number] & { provider: { id: string; code: string; name: string; isActive: boolean } } }>;
+  logisticsReadiness: LogisticsReadiness;
 };
 
 export type AdminAdCategory = AdCategory & {
@@ -146,6 +156,9 @@ export type AdminProductPayload = {
   location?: Location;
   isActive: boolean;
   isOversizedOverride: boolean | null;
+  sku?: string;
+  purchasePrice?: number | null;
+  logistics?: AdminProductLogisticsPayload;
 };
 
 export type AdminProductAdditionType = {

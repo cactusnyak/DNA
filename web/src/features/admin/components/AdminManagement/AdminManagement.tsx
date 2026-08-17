@@ -1,12 +1,28 @@
 import {
   useQuery,
   useQueryClient,
+  useMutation,
 } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import {
   getAdminCatalogData,
   getAdminReferrals,
   uploadAdminImage,
+  getAdminLogisticsConfiguration,
+  getAdminUniversalQuotes,
+  getAdminShipments,
+  createAdminWarehouse,
+  updateAdminWarehouse,
+  deleteAdminWarehouse,
+  updateAdminDeliveryProvider,
+  updateAdminDeliveryService,
+  getAdminUniversalQuote,
+  getAdminShipment,
+  type AdminWarehouse,
+  type AdminDeliveryProvider,
+  type AdminUniversalQuote,
+  type AdminShipment,
 } from '@/entities/admin';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
@@ -20,6 +36,10 @@ import { AdminCrudModal } from './components/AdminCrudModal';
 import { AdminDeliveryQuoteModal } from './components/AdminDeliveryQuoteModal';
 import { AdminManagementRecords } from './components/AdminManagementRecords';
 import { AdminRecordActions } from './components/AdminRecordActions';
+import { AdminLogisticsRecords } from './components/AdminLogisticsRecords';
+import { AdminLogisticsModal } from './components/AdminLogisticsModal';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
 import { useAdminCrudHandlers } from './hooks/use-admin-crud-handlers';
 import { useAdminManagementMutations } from './hooks/use-admin-management-mutations';
 import { useAdminManagementState } from './hooks/use-admin-management-state';
@@ -38,6 +58,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
   const queryClient = useQueryClient();
 
   const state = useAdminManagementState();
+  const [logisticsRecord, setLogisticsRecord] = useState<AdminWarehouse | AdminDeliveryProvider | AdminUniversalQuote | AdminShipment>();
+  const [isCreatingWarehouse, setIsCreatingWarehouse] = useState(false);
+  const [warehouseToDelete, setWarehouseToDelete] = useState<AdminWarehouse>();
 
   const {
     data: catalogData,
@@ -47,6 +70,9 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     queryKey: ['admin-catalog', accessToken],
     queryFn: () => getAdminCatalogData(accessToken) as Promise<Omit<AdminCatalogData, 'referrals'>>,
   });
+  const { data: logisticsConfiguration, isPending: isLogisticsPending, isError: isLogisticsError } = useQuery({ queryKey: ['admin-logistics-configuration', accessToken], queryFn: () => getAdminLogisticsConfiguration(accessToken) });
+  const { data: universalQuotes, isPending: areUniversalQuotesPending, isError: areUniversalQuotesError } = useQuery({ queryKey: ['admin-logistics-quotes', accessToken], queryFn: () => getAdminUniversalQuotes(accessToken) });
+  const { data: shipments, isPending: areShipmentsPending, isError: areShipmentsError } = useQuery({ queryKey: ['admin-logistics-shipments', accessToken], queryFn: () => getAdminShipments(accessToken) });
 
   const { data: referralsData = [] } = useQuery({
     queryKey: ['admin-referrals', accessToken],
@@ -66,11 +92,11 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
   });
 
   const data: AdminCatalogData | undefined = catalogData
-    ? { ...catalogData, referrals: referralsData, deliveryQuotes }
+    ? { ...catalogData, referrals: referralsData, deliveryQuotes, warehouses: logisticsConfiguration?.warehouses ?? [], deliveryProviders: logisticsConfiguration?.providers ?? [], universalDeliveryQuotes: universalQuotes?.items ?? [], shipments: shipments?.items ?? [] }
     : undefined;
 
-  const isPending = isCatalogPending || areDeliveryQuotesPending;
-  const isError = isCatalogError || areDeliveryQuotesError;
+  const isPending = isCatalogPending || areDeliveryQuotesPending || isLogisticsPending || areUniversalQuotesPending || areShipmentsPending;
+  const isError = isCatalogError || areDeliveryQuotesError || isLogisticsError || areUniversalQuotesError || areShipmentsError;
 
   function refreshAdminData() {
     queryClient.invalidateQueries({
@@ -88,6 +114,12 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
     accessToken,
     onSuccess: refreshAdminData,
   });
+  const refreshLogisticsConfiguration = () => queryClient.invalidateQueries({ queryKey: ['admin-logistics-configuration', accessToken] });
+  const warehouseMutation = useMutation({ mutationFn: (payload: Partial<AdminWarehouse>) => logisticsRecord && 'isConfigured' in logisticsRecord ? updateAdminWarehouse(accessToken, logisticsRecord.id, payload) : createAdminWarehouse(accessToken, payload), onSuccess: async () => { await refreshLogisticsConfiguration(); setLogisticsRecord(undefined); setIsCreatingWarehouse(false); queryClient.invalidateQueries({ queryKey: ['admin-catalog', accessToken] }); } });
+  const deleteWarehouseMutation = useMutation({ mutationFn: (id: string) => deleteAdminWarehouse(accessToken, id), onSuccess: async () => { await refreshLogisticsConfiguration(); setWarehouseToDelete(undefined); } });
+  const providerMutation = useMutation({ mutationFn: (provider: AdminDeliveryProvider) => updateAdminDeliveryProvider(accessToken, provider), onSuccess: refreshLogisticsConfiguration });
+  const serviceMutation = useMutation({ mutationFn: (params: { provider: AdminDeliveryProvider; serviceId: string; isActive: boolean }) => { const service = params.provider.services.find((item) => item.id === params.serviceId); if (!service) throw new Error('Service not found'); return updateAdminDeliveryService(accessToken, { ...service, isActive: params.isActive }); }, onSuccess: refreshLogisticsConfiguration });
+  const logisticsDetailQuery = useQuery({ queryKey: ['admin-logistics-detail', logisticsRecord?.id], enabled: Boolean(logisticsRecord && ('ownerType' in logisticsRecord || 'orderId' in logisticsRecord)), queryFn: () => { if (!logisticsRecord) throw new Error('Record not selected'); return 'orderId' in logisticsRecord ? getAdminShipment(accessToken, logisticsRecord.id) : getAdminUniversalQuote(accessToken, logisticsRecord.id); } });
 
   const filteredRecords = useFilteredAdminRecords(data, state.searchValue);
   const counts = getAdminManagementCounts(data);
@@ -126,6 +158,10 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
       users: [],
       referrals: [],
       deliveryQuotes: [],
+      warehouses: [],
+      deliveryProviders: [],
+      universalDeliveryQuotes: [],
+      shipments: [],
     },
     mutations,
     resetEditing: state.resetEditing,
@@ -232,13 +268,11 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         canUseTree={['market-categories', 'ad-categories'].includes(
           state.activeTabId,
         )}
-        canCreate={
-          !['orders', 'delivery-quotes', 'ads', 'users', 'referrals'].includes(state.activeTabId)
-        }
+        canCreate={activeTab?.capabilities?.create ?? !['orders', 'delivery-quotes', 'ads', 'users', 'referrals'].includes(state.activeTabId)}
         createLabel={activeTab?.createLabel}
         onSearchChange={state.setSearchValue}
         onViewModeChange={state.setViewMode}
-        onCreateClick={state.handleCreateClick}
+        onCreateClick={() => { if (state.activeTabId === 'warehouses') setIsCreatingWarehouse(true); else state.handleCreateClick(); }}
       />
 
       <AdminCrudModal
@@ -268,14 +302,16 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
         />
       )}
 
-      <AdminManagementRecords
+      {['warehouses', 'delivery-providers', 'universal-delivery-quotes', 'shipments'].includes(state.activeTabId) ? <AdminLogisticsRecords tabId={state.activeTabId} viewMode={state.viewMode} warehouses={filteredRecords.warehouses} providers={filteredRecords.deliveryProviders} quotes={filteredRecords.universalDeliveryQuotes} shipments={filteredRecords.shipments} onOpen={setLogisticsRecord} onDeleteWarehouse={setWarehouseToDelete} /> : <AdminManagementRecords
         activeTabId={state.activeTabId}
         viewMode={state.viewMode}
         searchValue={state.searchValue}
         records={filteredRecords}
         renderActions={renderActions}
         bulkActions={bulkActions}
-      />
+      />}
+      <AdminLogisticsModal key={logisticsRecord?.id ?? (isCreatingWarehouse ? 'new-warehouse' : 'closed')} record={logisticsRecord} details={logisticsDetailQuery.data} isCreatingWarehouse={isCreatingWarehouse} providers={data.deliveryProviders} isPending={warehouseMutation.isPending || providerMutation.isPending || serviceMutation.isPending} onClose={() => { setLogisticsRecord(undefined); setIsCreatingWarehouse(false); }} onSaveWarehouse={(payload) => warehouseMutation.mutate(payload)} onSaveProvider={(provider) => providerMutation.mutate(provider)} onSaveService={(provider, serviceId, isActive) => serviceMutation.mutate({ provider, serviceId, isActive })} />
+      <Modal isOpen={Boolean(warehouseToDelete)} title="Удалить склад?" size="sm" preventClose={deleteWarehouseMutation.isPending} onClose={() => setWarehouseToDelete(undefined)}><div className="space-y-5 p-6"><p className="text-sm text-muted-foreground">Неиспользуемый склад будет удалён. При наличии зависимостей склад будет только деактивирован.</p><div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setWarehouseToDelete(undefined)}>Отмена</Button><Button variant="destructive" disabled={deleteWarehouseMutation.isPending} onClick={() => warehouseToDelete && deleteWarehouseMutation.mutate(warehouseToDelete.id)}>Продолжить</Button></div></div></Modal>
     </section>
   );
 }
