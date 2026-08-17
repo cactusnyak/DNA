@@ -5,7 +5,7 @@ export const authorizationMethodItems: {
   label: string;
 }[] = [
   {
-    method: 'email',
+    method: 'email_password',
     label: 'Email и пароль',
   },
   {

@@ -226,7 +226,7 @@ https://stage.dna-platform.shop/api/health/ready
 
 Authentication methods are configured independently for login and registration.
 Use `email_otp` for passwordless email authentication, `otp` for phone OTP,
-`email` for the retained email-and-password flow, and `yandex` for OAuth. Email
+`email_password` for the retained email-and-password flow, and `yandex` for OAuth. Email
 OTP uses `EMAIL_DELIVERY_PROVIDER`, so production requires
 `EMAIL_DELIVERY_PROVIDER=resend`, `RESEND_API_KEY`, and `RESEND_FROM_EMAIL`.
 

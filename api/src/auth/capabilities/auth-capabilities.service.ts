@@ -172,7 +172,10 @@ export class AuthCapabilitiesService implements OnModuleInit {
       }
     }
 
-    if (methods.has(AuthMethod.EMAIL) || methods.has(AuthMethod.EMAIL_OTP)) {
+    if (
+      methods.has(AuthMethod.EMAIL_PASSWORD) ||
+      methods.has(AuthMethod.EMAIL_OTP)
+    ) {
       const provider = this.config.get<string>('EMAIL_DELIVERY_PROVIDER');
 
       if (provider === 'resend') {

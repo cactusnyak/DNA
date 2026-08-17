@@ -30,7 +30,8 @@ const GENERIC_RESET_MESSAGE = {
 };
 
 const GENERIC_VERIFICATION_MESSAGE = {
-  message: 'If an account with this email exists, a verification link has been sent',
+  message:
+    'If an account with this email exists, a verification link has been sent',
 };
 
 @Injectable()
@@ -49,7 +50,7 @@ export class EmailAuthService {
 
   async register(dto: RegisterEmailDto) {
     this.authCapabilities.assertEnabled(
-      AuthMethod.EMAIL,
+      AuthMethod.EMAIL_PASSWORD,
       AuthOperation.REGISTRATION,
     );
 
@@ -76,7 +77,10 @@ export class EmailAuthService {
   }
 
   async login(dto: LoginEmailDto) {
-    this.authCapabilities.assertEnabled(AuthMethod.EMAIL, AuthOperation.LOGIN);
+    this.authCapabilities.assertEnabled(
+      AuthMethod.EMAIL_PASSWORD,
+      AuthOperation.LOGIN,
+    );
 
     const email = normalizeEmail(dto.email);
     const user = await this.usersService.findByEmail(email);
@@ -206,10 +210,7 @@ export class EmailAuthService {
         ),
       });
 
-      const verificationUrl = this.buildFrontendUrl(
-        '/verify-email',
-        rawToken,
-      );
+      const verificationUrl = this.buildFrontendUrl('/verify-email', rawToken);
       await this.authEmailSender.sendEmailVerification(email, verificationUrl);
     } catch (error) {
       this.logger.warn(
@@ -225,11 +226,7 @@ export class EmailAuthService {
     return url.toString();
   }
 
-  private authResponse(user: {
-    id: string;
-    email?: string;
-    role: UserRole;
-  }) {
+  private authResponse(user: { id: string; email?: string; role: UserRole }) {
     return {
       user,
       accessToken: this.tokenService.signAccessToken({

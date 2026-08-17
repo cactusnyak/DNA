@@ -1,5 +1,5 @@
 export enum AuthMethod {
-  EMAIL = 'email',
+  EMAIL_PASSWORD = 'email_password',
   EMAIL_OTP = 'email_otp',
   OTP = 'otp',
   YANDEX = 'yandex',

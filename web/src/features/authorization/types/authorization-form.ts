@@ -1,6 +1,6 @@
 export type AuthorizationMode = 'login' | 'register';
 
-export type AuthorizationFormMethod = 'email' | 'email_otp' | 'otp';
+export type AuthorizationFormMethod = 'email_password' | 'email_otp' | 'otp';
 
 export type AuthorizationFormValue = {
   login: string;

@@ -49,7 +49,7 @@ describe('AuthCapabilitiesService', () => {
 
   it('rejects unknown auth methods', () => {
     const service = new AuthCapabilitiesService(
-      buildConfig({ AUTH_LOGIN_METHODS: 'email,unknown' }),
+      buildConfig({ AUTH_LOGIN_METHODS: 'email_password,unknown' }),
     );
 
     expect(() => service.onModuleInit()).toThrow(/unknown auth method/);
@@ -57,7 +57,7 @@ describe('AuthCapabilitiesService', () => {
 
   it('rejects duplicate auth methods', () => {
     const service = new AuthCapabilitiesService(
-      buildConfig({ AUTH_LOGIN_METHODS: 'email,email' }),
+      buildConfig({ AUTH_LOGIN_METHODS: 'email_password,email_password' }),
     );
 
     expect(() => service.onModuleInit()).toThrow(/duplicate auth method/);
@@ -67,7 +67,7 @@ describe('AuthCapabilitiesService', () => {
     const service = new AuthCapabilitiesService(
       buildConfig({
         AUTH_PRIMARY_LOGIN_METHOD: 'otp',
-        AUTH_LOGIN_METHODS: 'email,yandex',
+        AUTH_LOGIN_METHODS: 'email_password,yandex',
       }),
     );
 
