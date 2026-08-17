@@ -165,7 +165,11 @@ export function AuthorizationForm({
                 type="text"
                 inputMode="numeric"
                 label="Код подтверждения"
-                caption="Введите 6-значный код из письма или SMS"
+                caption={
+                  isEmailOtpMethod
+                    ? 'Введите 6-значный код из письма'
+                    : 'Введите 6-значный код из SMS'
+                }
                 value={value.otpCode}
                 placeholder="000000"
                 autoComplete="off"
