@@ -47,8 +47,8 @@ export function OversizedDeliveryModal({
       <p
         className={
           isReady
-            ? 'text-emerald-700 dark:text-emerald-300 text-xs'
-            : 'text-amber-700 dark:text-amber-300 text-xs'
+            ? 'text-success text-xs'
+            : 'text-warning text-xs'
         }
       >
         {stateLabel}

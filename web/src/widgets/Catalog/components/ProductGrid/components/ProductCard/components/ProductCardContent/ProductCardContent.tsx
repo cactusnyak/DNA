@@ -38,7 +38,9 @@ export function ProductCardContent({
 
       <div className="mt-2">
         <h3 className="line-clamp-2 font-semibold">{product.title}</h3>
-        {product.isOversized && <OversizedIndicator className="mt-2" />}
+        {product.isOversized && (
+          <OversizedIndicator className="mt-2" renderAsSpan />
+        )}
 
         {showAdditionsSummary && (product.additions?.length ?? 0) > 0 && (
           <div className="mt-2 text-xs text-muted-foreground">
