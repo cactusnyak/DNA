@@ -56,7 +56,8 @@ export function AuthorizationForm({
 }: AuthorizationFormProps) {
   const isRegisterMode = mode === 'register';
   const isEmailMethod = activeMethod === 'email';
-  const isOtpStep = activeMethod === 'otp' && step === 'otp';
+  const isEmailOtpMethod = activeMethod === 'email_otp';
+  const isOtpStep = !isEmailMethod && step === 'otp';
 
   const visibleOAuthProviderItems = oauthProviderItems.filter((item) =>
     availableOAuthProviders.includes(item.id),
@@ -190,11 +191,11 @@ export function AuthorizationForm({
               <FormInputField
                 name="login"
                 required
-                type={isEmailMethod ? 'email' : 'text'}
-                inputMode="email"
-                label={isEmailMethod ? 'Email' : 'Телефон'}
+                type={isEmailMethod || isEmailOtpMethod ? 'email' : 'text'}
+                inputMode={isEmailMethod || isEmailOtpMethod ? 'email' : 'tel'}
+                label={isEmailMethod || isEmailOtpMethod ? 'Email' : 'Телефон'}
                 value={value.login}
-                placeholder={isEmailMethod ? 'you@example.com' : '+7 900 000-00-00'}
+                placeholder={isEmailMethod || isEmailOtpMethod ? 'you@example.com' : '+7 900 000-00-00'}
                 autoComplete="off"
                 onChange={getInputChangeHandler('login')}
               />
@@ -265,7 +266,7 @@ export function AuthorizationForm({
               disabled={isPending}
               onClick={() => onModeChange(mode)}
             >
-              Изменить телефон
+              {isEmailOtpMethod ? 'Изменить email' : 'Изменить телефон'}
             </Button>
           </div>
         ) : (

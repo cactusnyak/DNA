@@ -9,6 +9,7 @@ import {
   buildEmailVerificationEmail,
   buildPasswordChangedEmail,
   buildPasswordResetEmail,
+  buildOtpCodeEmail,
 } from './templates/auth-email-templates';
 
 @Injectable()
@@ -19,7 +20,20 @@ export class AuthEmailSenderService {
   ) {}
 
   async sendEmailVerification(to: string, verificationUrl: string) {
-    const { subject, html, text } = buildEmailVerificationEmail(verificationUrl);
+    const { subject, html, text } =
+      buildEmailVerificationEmail(verificationUrl);
+
+    return this.provider.sendEmail({
+      to,
+      subject,
+      html,
+      text,
+      idempotencyKey: randomUUID(),
+    });
+  }
+
+  async sendOtpCode(to: string, code: string, expiresInSeconds: number) {
+    const { subject, html, text } = buildOtpCodeEmail(code, expiresInSeconds);
 
     return this.provider.sendEmail({
       to,

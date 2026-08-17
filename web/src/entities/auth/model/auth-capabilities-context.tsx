@@ -10,8 +10,8 @@ import {
 } from './auth-capabilities-context-value';
 
 const FALLBACK_AUTH_CONFIG: AuthConfig = {
-  login: { primaryMethod: 'otp', methods: ['otp'] },
-  registration: { primaryMethod: 'otp', methods: ['otp'] },
+  login: { primaryMethod: 'email_otp', methods: ['email_otp'] },
+  registration: { primaryMethod: 'email_otp', methods: ['email_otp'] },
 };
 
 export function AuthCapabilitiesProvider({ children }: PropsWithChildren) {

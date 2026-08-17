@@ -216,6 +216,28 @@ export function buildEmailVerificationEmail(verificationUrl: string) {
   };
 }
 
+export function buildOtpCodeEmail(code: string, expiresInSeconds: number) {
+  const subject = 'Код подтверждения DNA';
+  const expiresInMinutes = Math.max(1, Math.ceil(expiresInSeconds / 60));
+  const html = wrapHtml(
+    subject,
+    `
+      <p style="margin: 0; font-size: 15px; line-height: 24px; color: ${colors.foreground};">
+        Введите этот код, чтобы продолжить вход или регистрацию:
+      </p>
+      <p style="margin: 24px 0; font-size: 32px; font-weight: 700; line-height: 40px; letter-spacing: 0.18em; color: ${colors.primary};">
+        ${code}
+      </p>
+      <p style="margin: 0; font-size: 13px; line-height: 20px; color: ${colors.mutedForeground};">
+        Код действует ${expiresInMinutes} мин.
+      </p>
+    `,
+  );
+  const text = `Код подтверждения DNA: ${code}. Код действует ${expiresInMinutes} мин.`;
+
+  return { subject, html, text };
+}
+
 export function buildPasswordResetEmail(resetUrl: string) {
   const subject = 'Восстановление пароля DNA';
 

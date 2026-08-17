@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { NotificationsModule } from '../notifications/notifications.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UsersModule } from '../users/users.module';
+import { EmailModule } from '../email/email.module';
 
 import { AuthCapabilitiesModule } from './capabilities/auth-capabilities.module';
 import { OtpController } from './otp.controller';
@@ -16,11 +16,11 @@ import { TokenModule } from './token.module';
 
 @Module({
   imports: [
-    NotificationsModule,
     PrismaModule,
     UsersModule,
     TokenModule,
     AuthCapabilitiesModule,
+    EmailModule,
   ],
   controllers: [OtpController],
   providers: [

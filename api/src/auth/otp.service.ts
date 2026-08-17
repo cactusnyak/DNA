@@ -17,7 +17,7 @@ import {
 import type { UserRole } from '@prisma/client';
 
 import { SmsRuError } from '../integrations/sms-ru/sms-ru.errors';
-import { NotificationService } from '../notifications/notification.service';
+import { AuthEmailSenderService } from '../email/auth-email-sender.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 
@@ -37,25 +37,23 @@ export class OtpService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly notificationService: NotificationService,
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
     private readonly config: ConfigService,
     private readonly authCapabilities: AuthCapabilitiesService,
+    private readonly authEmailSender: AuthEmailSenderService,
     @Inject(OTP_DELIVERY_PROVIDER)
     private readonly deliveryProvider: OtpDeliveryProvider,
   ) {}
 
   async sendOtp(dto: SendOtpDto, clientIp?: string) {
     const purpose = this.parseMode(dto.mode);
-    this.authCapabilities.assertEnabled(
-      AuthMethod.OTP,
-      purpose === 'register'
-        ? AuthOperation.REGISTRATION
-        : AuthOperation.LOGIN,
-    );
     const { value: login, type } = this.parseLogin(
       this.required(dto.login, 'login'),
+    );
+    this.authCapabilities.assertEnabled(
+      type === 'email' ? AuthMethod.EMAIL_OTP : AuthMethod.OTP,
+      purpose === 'register' ? AuthOperation.REGISTRATION : AuthOperation.LOGIN,
     );
     const now = new Date();
     const ttlSeconds = this.config.getOrThrow<number>('OTP_CODE_TTL_SECONDS');
@@ -120,8 +118,15 @@ export class OtpService {
             expiresInSeconds: ttlSeconds,
           });
         } else {
-          await this.notificationService.sendOtpCode('email', login, code);
-          delivery = { provider: 'email' };
+          const result = await this.authEmailSender.sendOtpCode(
+            login,
+            code,
+            ttlSeconds,
+          );
+          delivery = {
+            provider: result.provider,
+            externalMessageId: result.externalMessageId,
+          };
         }
       } catch (error) {
         this.mapDeliveryError(error, type === 'phone' ? login : undefined);
@@ -180,13 +185,13 @@ export class OtpService {
 
   async verifyOtp(dto: VerifyOtpDto) {
     const purpose = this.parseMode(dto.mode);
-    this.authCapabilities.assertEnabled(
-      AuthMethod.OTP,
-      purpose === 'register'
-        ? AuthOperation.REGISTRATION
-        : AuthOperation.LOGIN,
+    const { value: login, type } = this.parseLogin(
+      this.required(dto.login, 'login'),
     );
-    const { value: login } = this.parseLogin(this.required(dto.login, 'login'));
+    this.authCapabilities.assertEnabled(
+      type === 'email' ? AuthMethod.EMAIL_OTP : AuthMethod.OTP,
+      purpose === 'register' ? AuthOperation.REGISTRATION : AuthOperation.LOGIN,
+    );
     const code = this.required(dto.code, 'code');
     const now = new Date();
     const maxAttempts = this.config.getOrThrow<number>(
@@ -247,6 +252,9 @@ export class OtpService {
         nickname,
         inviterReferralCode: this.optional(dto.inviterReferralCode),
       });
+      if (record.type === 'email') {
+        await this.usersService.markEmailVerified(user.id);
+      }
       return this.authResponse(user);
     }
     if (!existingUser)

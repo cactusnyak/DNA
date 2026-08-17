@@ -1,4 +1,4 @@
-export type AuthMethod = 'email' | 'otp' | 'yandex';
+export type AuthMethod = 'email' | 'email_otp' | 'otp' | 'yandex';
 
 export type AuthConfig = {
   login: {

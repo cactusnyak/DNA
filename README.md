@@ -224,6 +224,12 @@ https://stage.dna-platform.shop/api/health/ready
 
 ## SMS.RU OTP Rollout
 
+Authentication methods are configured independently for login and registration.
+Use `email_otp` for passwordless email authentication, `otp` for phone OTP,
+`email` for the retained email-and-password flow, and `yandex` for OAuth. Email
+OTP uses `EMAIL_DELIVERY_PROVIDER`, so production requires
+`EMAIL_DELIVERY_PROVIDER=resend`, `RESEND_API_KEY`, and `RESEND_FROM_EMAIL`.
+
 Local development uses `OTP_DELIVERY_PROVIDER=console`. Production phone delivery requires `OTP_DELIVERY_PROVIDER=sms_ru`, a strong `OTP_HASH_SECRET`, `SMS_RU_API_ID`, an approved `SMS_RU_SENDER_NAME`, and an operator-approved message matching `SMS_RU_OTP_MESSAGE_TEMPLATE`.
 
 Start with `SMS_RU_TEST_MODE=true`, run:
