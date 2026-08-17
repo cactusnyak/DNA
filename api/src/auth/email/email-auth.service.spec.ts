@@ -22,7 +22,9 @@ function buildConfig() {
     PASSWORD_RESET_MAX_REQUESTS_PER_EMAIL_PER_HOUR: 5,
   };
 
-  return { getOrThrow: (key: string) => values[key] } as unknown as ConfigService;
+  return {
+    getOrThrow: (key: string) => values[key],
+  } as unknown as ConfigService;
 }
 
 describe('EmailAuthService', () => {
@@ -136,7 +138,7 @@ describe('EmailAuthService', () => {
       });
 
       expect(assertEnabled).toHaveBeenCalledWith(
-        AuthMethod.EMAIL,
+        AuthMethod.EMAIL_PASSWORD,
         AuthOperation.REGISTRATION,
       );
       expect(createRegisteredUser).toHaveBeenCalledWith(

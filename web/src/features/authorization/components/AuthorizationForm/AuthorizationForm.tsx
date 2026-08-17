@@ -55,8 +55,9 @@ export function AuthorizationForm({
   onSubmitEmail,
 }: AuthorizationFormProps) {
   const isRegisterMode = mode === 'register';
-  const isEmailMethod = activeMethod === 'email';
-  const isOtpStep = activeMethod === 'otp' && step === 'otp';
+  const isEmailMethod = activeMethod === 'email_password';
+  const isEmailOtpMethod = activeMethod === 'email_otp';
+  const isOtpStep = !isEmailMethod && step === 'otp';
 
   const visibleOAuthProviderItems = oauthProviderItems.filter((item) =>
     availableOAuthProviders.includes(item.id),
@@ -164,7 +165,11 @@ export function AuthorizationForm({
                 type="text"
                 inputMode="numeric"
                 label="Код подтверждения"
-                caption="Введите 6-значный код из письма или SMS"
+                caption={
+                  isEmailOtpMethod
+                    ? 'Введите 6-значный код из письма'
+                    : 'Введите 6-значный код из SMS'
+                }
                 value={value.otpCode}
                 placeholder="000000"
                 autoComplete="off"
@@ -190,11 +195,15 @@ export function AuthorizationForm({
               <FormInputField
                 name="login"
                 required
-                type={isEmailMethod ? 'email' : 'text'}
-                inputMode="email"
-                label={isEmailMethod ? 'Email' : 'Телефон'}
+                type={isEmailMethod || isEmailOtpMethod ? 'email' : 'text'}
+                inputMode={isEmailMethod || isEmailOtpMethod ? 'email' : 'tel'}
+                label={isEmailMethod || isEmailOtpMethod ? 'Email' : 'Телефон'}
                 value={value.login}
-                placeholder={isEmailMethod ? 'you@example.com' : '+7 900 000-00-00'}
+                placeholder={
+                  isEmailMethod || isEmailOtpMethod
+                    ? 'you@example.com'
+                    : '+7 900 000-00-00'
+                }
                 autoComplete="off"
                 onChange={getInputChangeHandler('login')}
               />
@@ -205,9 +214,7 @@ export function AuthorizationForm({
                   required
                   type="password"
                   label="Пароль"
-                  caption={
-                    isRegisterMode ? 'Минимум 8 символов' : undefined
-                  }
+                  caption={isRegisterMode ? 'Минимум 8 символов' : undefined}
                   value={value.password}
                   placeholder="••••••••"
                   minLength={8}
@@ -228,11 +235,7 @@ export function AuthorizationForm({
           )}
         </div>
 
-        {errorMessage && (
-          <ErrorMessage>
-            {errorMessage}
-          </ErrorMessage>
-        )}
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
 
         {isOtpStep ? (
           <div className="flex flex-col gap-3">
@@ -265,7 +268,7 @@ export function AuthorizationForm({
               disabled={isPending}
               onClick={() => onModeChange(mode)}
             >
-              Изменить телефон
+              {isEmailOtpMethod ? 'Изменить email' : 'Изменить телефон'}
             </Button>
           </div>
         ) : (

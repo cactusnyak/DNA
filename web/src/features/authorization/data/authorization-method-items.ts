@@ -5,11 +5,15 @@ export const authorizationMethodItems: {
   label: string;
 }[] = [
   {
-    method: 'email',
-    label: 'Email',
+    method: 'email_password',
+    label: 'Email и пароль',
+  },
+  {
+    method: 'email_otp',
+    label: 'Email и код',
   },
   {
     method: 'otp',
-    label: 'По коду',
+    label: 'Телефон и код',
   },
 ];

@@ -5,10 +5,10 @@ import { AuthMethod, AuthOperation } from './auth-method.enum';
 
 function buildConfig(overrides: Record<string, unknown> = {}) {
   const values: Record<string, unknown> = {
-    AUTH_LOGIN_METHODS: 'email,otp,yandex',
-    AUTH_REGISTRATION_METHODS: 'email,yandex',
-    AUTH_PRIMARY_LOGIN_METHOD: 'email',
-    AUTH_PRIMARY_REGISTRATION_METHOD: 'email',
+    AUTH_LOGIN_METHODS: 'email_otp,otp,yandex',
+    AUTH_REGISTRATION_METHODS: 'email_otp,yandex',
+    AUTH_PRIMARY_LOGIN_METHOD: 'email_otp',
+    AUTH_PRIMARY_REGISTRATION_METHOD: 'email_otp',
     OTP_HASH_SECRET: 'a'.repeat(32),
     YANDEX_CLIENT_ID: 'client-id',
     YANDEX_CLIENT_SECRET: 'client-secret',
@@ -36,14 +36,20 @@ describe('AuthCapabilitiesService', () => {
     service.onModuleInit();
 
     expect(service.getPublicConfig()).toEqual({
-      login: { primaryMethod: 'email', methods: ['email', 'otp', 'yandex'] },
-      registration: { primaryMethod: 'email', methods: ['email', 'yandex'] },
+      login: {
+        primaryMethod: 'email_otp',
+        methods: ['email_otp', 'otp', 'yandex'],
+      },
+      registration: {
+        primaryMethod: 'email_otp',
+        methods: ['email_otp', 'yandex'],
+      },
     });
   });
 
   it('rejects unknown auth methods', () => {
     const service = new AuthCapabilitiesService(
-      buildConfig({ AUTH_LOGIN_METHODS: 'email,unknown' }),
+      buildConfig({ AUTH_LOGIN_METHODS: 'email_password,unknown' }),
     );
 
     expect(() => service.onModuleInit()).toThrow(/unknown auth method/);
@@ -51,7 +57,7 @@ describe('AuthCapabilitiesService', () => {
 
   it('rejects duplicate auth methods', () => {
     const service = new AuthCapabilitiesService(
-      buildConfig({ AUTH_LOGIN_METHODS: 'email,email' }),
+      buildConfig({ AUTH_LOGIN_METHODS: 'email_password,email_password' }),
     );
 
     expect(() => service.onModuleInit()).toThrow(/duplicate auth method/);
@@ -59,7 +65,10 @@ describe('AuthCapabilitiesService', () => {
 
   it('rejects a primary method that is not enabled', () => {
     const service = new AuthCapabilitiesService(
-      buildConfig({ AUTH_PRIMARY_LOGIN_METHOD: 'otp', AUTH_LOGIN_METHODS: 'email,yandex' }),
+      buildConfig({
+        AUTH_PRIMARY_LOGIN_METHOD: 'otp',
+        AUTH_LOGIN_METHODS: 'email_password,yandex',
+      }),
     );
 
     expect(() => service.onModuleInit()).toThrow(/must be included/);
@@ -86,7 +95,23 @@ describe('AuthCapabilitiesService', () => {
       buildConfig({ EMAIL_DELIVERY_PROVIDER: 'resend' }),
     );
 
-    expect(() => service.onModuleInit()).toThrow(/Resend is not fully configured/);
+    expect(() => service.onModuleInit()).toThrow(
+      /Resend is not fully configured/,
+    );
+  });
+
+  it('rejects email OTP enabled with resend provider missing credentials', () => {
+    const service = new AuthCapabilitiesService(
+      buildConfig({
+        EMAIL_DELIVERY_PROVIDER: 'resend',
+        AUTH_LOGIN_METHODS: 'email_otp',
+        AUTH_REGISTRATION_METHODS: 'email_otp',
+      }),
+    );
+
+    expect(() => service.onModuleInit()).toThrow(
+      /Resend is not fully configured/,
+    );
   });
 
   it('rejects console email provider in production', () => {
@@ -99,7 +124,7 @@ describe('AuthCapabilitiesService', () => {
 
   it('isEnabled/assertEnabled reflect configured methods per operation', () => {
     const service = new AuthCapabilitiesService(
-      buildConfig({ AUTH_REGISTRATION_METHODS: 'email' }),
+      buildConfig({ AUTH_REGISTRATION_METHODS: 'email_otp' }),
     );
     service.onModuleInit();
 

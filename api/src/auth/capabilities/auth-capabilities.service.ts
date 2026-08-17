@@ -6,7 +6,11 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { AuthMethod, AuthOperation, isOAuthAuthMethod } from './auth-method.enum';
+import {
+  AuthMethod,
+  AuthOperation,
+  isOAuthAuthMethod,
+} from './auth-method.enum';
 
 export type PublicAuthConfig = {
   login: {
@@ -75,7 +79,9 @@ export class AuthCapabilitiesService implements OnModuleInit {
 
   assertEnabled(method: AuthMethod, operation: AuthOperation): void {
     if (!this.isEnabled(method, operation)) {
-      throw new ForbiddenException('This authentication method is not available');
+      throw new ForbiddenException(
+        'This authentication method is not available',
+      );
     }
   }
 
@@ -145,7 +151,7 @@ export class AuthCapabilitiesService implements OnModuleInit {
     operation: AuthOperation,
     methods: Set<AuthMethod>,
   ) {
-    if (methods.has(AuthMethod.OTP)) {
+    if (methods.has(AuthMethod.OTP) || methods.has(AuthMethod.EMAIL_OTP)) {
       if (!this.config.get<string>('OTP_HASH_SECRET')) {
         throw new Error(
           `OTP is enabled for ${operation} but OTP_HASH_SECRET is not configured`,
@@ -166,7 +172,10 @@ export class AuthCapabilitiesService implements OnModuleInit {
       }
     }
 
-    if (methods.has(AuthMethod.EMAIL)) {
+    if (
+      methods.has(AuthMethod.EMAIL_PASSWORD) ||
+      methods.has(AuthMethod.EMAIL_OTP)
+    ) {
       const provider = this.config.get<string>('EMAIL_DELIVERY_PROVIDER');
 
       if (provider === 'resend') {

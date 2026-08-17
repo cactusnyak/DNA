@@ -140,10 +140,10 @@ import * as Joi from 'joi';
         TRUST_PROXY: Joi.boolean().default(false),
         HARD_DELETE_ORDERS_ENABLED: Joi.boolean().default(false),
 
-        AUTH_LOGIN_METHODS: Joi.string().default('email,otp,yandex'),
-        AUTH_REGISTRATION_METHODS: Joi.string().default('email,yandex'),
-        AUTH_PRIMARY_LOGIN_METHOD: Joi.string().default('email'),
-        AUTH_PRIMARY_REGISTRATION_METHOD: Joi.string().default('email'),
+        AUTH_LOGIN_METHODS: Joi.string().default('email_otp,otp,yandex'),
+        AUTH_REGISTRATION_METHODS: Joi.string().default('email_otp,yandex'),
+        AUTH_PRIMARY_LOGIN_METHOD: Joi.string().default('email_otp'),
+        AUTH_PRIMARY_REGISTRATION_METHOD: Joi.string().default('email_otp'),
 
         PASSWORD_HASH_SECRET_PEPPER: Joi.string().allow('').optional(),
         EMAIL_VERIFICATION_TOKEN_TTL_SECONDS: Joi.number()

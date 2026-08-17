@@ -14,10 +14,7 @@ import {
   useAuthStore,
   verifyOtp,
 } from '@/entities/auth';
-import {
-  syncFavourites,
-  useFavouriteStore,
-} from '@/entities/favourite';
+import { syncFavourites, useFavouriteStore } from '@/entities/favourite';
 
 import { AuthorizationForm } from './components/AuthorizationForm';
 import {
@@ -76,7 +73,9 @@ export function Authorization() {
     [authConfig, mode],
   );
 
-  function getDefaultMethod(forMode: AuthorizationMode): AuthorizationFormMethod {
+  function getDefaultMethod(
+    forMode: AuthorizationMode,
+  ): AuthorizationFormMethod {
     const operationConfig = authConfig[toAuthConfigOperation(forMode)];
     const methods = operationConfig.methods.filter(
       (item): item is AuthorizationFormMethod => item !== 'yandex',
@@ -191,7 +190,10 @@ export function Authorization() {
     },
   });
 
-  function handleEmailAuthSuccess(response: { accessToken: string; user: User }) {
+  function handleEmailAuthSuccess(response: {
+    accessToken: string;
+    user: User;
+  }) {
     setAccessToken(response.accessToken);
     queryClient.setQueryData(['current-user'], response.user);
 
@@ -216,7 +218,10 @@ export function Authorization() {
 
   useEffect(() => {
     if (resendSeconds <= 0) return;
-    const timeout = window.setTimeout(() => setResendSeconds((value) => Math.max(0, value - 1)), 1000);
+    const timeout = window.setTimeout(
+      () => setResendSeconds((value) => Math.max(0, value - 1)),
+      1000,
+    );
     return () => window.clearTimeout(timeout);
   }, [resendSeconds]);
 
@@ -282,7 +287,7 @@ export function Authorization() {
     }
   }
 
-  const isEmailMethod = activeMethod === 'email';
+  const isEmailMethod = activeMethod === 'email_password';
 
   const requestError =
     sendOtpMutation.error ||
@@ -290,17 +295,18 @@ export function Authorization() {
     registerEmailMutation.error ||
     loginEmailMutation.error ||
     oauthMutation.error;
-  const errorMessage = requestError instanceof HttpError && requestError.status === 429
-    ? 'Слишком много попыток. Подождите и попробуйте снова.'
-    : requestError instanceof HttpError && requestError.status >= 500
-      ? 'Сервис отправки временно недоступен. Попробуйте позже.'
-      : requestError instanceof HttpError && requestError.status === 409
-        ? 'Пользователь с такими данными уже зарегистрирован.'
-        : requestError instanceof HttpError && isEmailMethod
-          ? requestError.message
-          : requestError
-            ? 'Неверный или истёкший код либо данные не удалось подтвердить.'
-            : oauthError ?? undefined;
+  const errorMessage =
+    requestError instanceof HttpError && requestError.status === 429
+      ? 'Слишком много попыток. Подождите и попробуйте снова.'
+      : requestError instanceof HttpError && requestError.status >= 500
+        ? 'Сервис отправки временно недоступен. Попробуйте позже.'
+        : requestError instanceof HttpError && requestError.status === 409
+          ? 'Пользователь с такими данными уже зарегистрирован.'
+          : requestError instanceof HttpError && isEmailMethod
+            ? requestError.message
+            : requestError
+              ? 'Неверный или истёкший код либо данные не удалось подтвердить.'
+              : (oauthError ?? undefined);
 
   return (
     <AuthorizationForm
