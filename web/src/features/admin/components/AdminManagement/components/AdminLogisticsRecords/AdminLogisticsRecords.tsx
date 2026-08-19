@@ -1,3 +1,5 @@
+import { Eye, Trash2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import type { AdminDeliveryProvider, AdminShipment, AdminUniversalQuote, AdminWarehouse } from '@/entities/admin';
@@ -17,7 +19,7 @@ type Props = {
 };
 
 function Actions({ onOpen, canDelete, onDelete }: { onOpen: () => void; canDelete?: boolean; onDelete?: () => void }) {
-  return <div className="flex justify-end gap-2"><Button size="sm" variant="secondary" onClick={onOpen}>Открыть</Button>{canDelete && <Button size="sm" variant="destructive" onClick={onDelete}>Удалить</Button>}</div>;
+  return <div className="flex justify-end gap-2"><Button type="button" size="icon-sm" variant="secondary" aria-label="Открыть запись" title="Открыть запись" onClick={onOpen}><Eye className="size-3.5" strokeWidth={1.5} /></Button>{canDelete && <Button type="button" size="icon-sm" variant="destructive" aria-label="Удалить склад" title="Удалить склад" onClick={onDelete}><Trash2 className="size-3.5" strokeWidth={1.5} /></Button>}</div>;
 }
 
 export function AdminLogisticsRecords(props: Props) {
