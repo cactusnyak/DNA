@@ -1,6 +1,10 @@
 import { DeliveryServiceKind, WarehouseType } from '@prisma/client';
 
-import { seedLogisticsFoundation } from '../../prisma/seeds/shared/logistics-seed';
+import {
+  ensureYandexDeliveryReferenceData,
+  seedLogisticsFoundation,
+  YANDEX_SERVICES,
+} from '../../prisma/seeds/shared/logistics-seed';
 
 describe('seedLogisticsFoundation', () => {
   it('is repeatable and never creates product/service mappings', async () => {
@@ -54,5 +58,40 @@ describe('seedLogisticsFoundation', () => {
         kind: DeliveryServiceKind.EXPRESS,
       },
     });
+  });
+
+  it('force-activates exactly the four expected Yandex reference services', async () => {
+    const providerUpsert = jest.fn().mockResolvedValue({ id: 'yandex' });
+    const serviceUpsert = jest
+      .fn()
+      .mockImplementation(({ create }: any) => Promise.resolve(create));
+    const prisma = {
+      deliveryProvider: { upsert: providerUpsert },
+      deliveryService: { upsert: serviceUpsert },
+    };
+
+    await ensureYandexDeliveryReferenceData(prisma as never, {
+      forceActive: true,
+    });
+    await ensureYandexDeliveryReferenceData(prisma as never, {
+      forceActive: true,
+    });
+
+    expect(providerUpsert).toHaveBeenCalledTimes(2);
+    expect(providerUpsert.mock.calls[0][0].update).toEqual({
+      name: 'Яндекс Доставка',
+      isActive: true,
+    });
+    expect(serviceUpsert).toHaveBeenCalledTimes(8);
+    expect(
+      serviceUpsert.mock.calls
+        .slice(0, 4)
+        .map(([argument]) => argument.create.code),
+    ).toEqual(YANDEX_SERVICES.map((service) => service.code));
+    expect(
+      serviceUpsert.mock.calls.every(
+        ([argument]) => argument.update.isActive === true,
+      ),
+    ).toBe(true);
   });
 });

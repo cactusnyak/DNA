@@ -9,6 +9,12 @@ import {
 } from '@prisma/client';
 import { Pool } from 'pg';
 
+import {
+  ensureYandexDeliveryReferenceData,
+  YANDEX_DELIVERY_PROVIDER_CODE,
+  YANDEX_SERVICES,
+} from '../shared/logistics-seed.js';
+
 const CATEGORY_SLUG = 'logistig-test-category';
 const PRODUCT_SKU = 'LOGISTIG-TEST-001';
 const WAREHOUSE_CODE = 'logistig-test-warehouse';
@@ -46,6 +52,47 @@ async function seedLogistigTest() {
     await transaction.marketCategory.deleteMany();
     await transaction.warehouseProviderConfig.deleteMany();
     await transaction.warehouse.deleteMany();
+
+    const referenceData = await ensureYandexDeliveryReferenceData(transaction, {
+      forceActive: true,
+    });
+    const expectedServiceCodes = new Set(
+      YANDEX_SERVICES.map((service) => service.code),
+    );
+    const yandex = await transaction.deliveryProvider.findUnique({
+      where: { code: YANDEX_DELIVERY_PROVIDER_CODE },
+      include: {
+        services: {
+          where: { code: { in: [...expectedServiceCodes] } },
+        },
+      },
+    });
+    if (!yandex) {
+      throw new Error('YANDEX delivery provider was not created');
+    }
+    if (!yandex.isActive) {
+      throw new Error('YANDEX delivery provider is inactive after test seed');
+    }
+    const expectedServices = yandex.services.filter((service) =>
+      expectedServiceCodes.has(
+        service.code as (typeof YANDEX_SERVICES)[number]['code'],
+      ),
+    );
+    if (
+      expectedServices.length !== expectedServiceCodes.size ||
+      expectedServices.some(
+        (service) => service.providerId !== yandex.id || !service.isActive,
+      )
+    ) {
+      throw new Error(
+        'YANDEX delivery services are missing, inactive, or linked to another provider',
+      );
+    }
+    if (referenceData.id !== yandex.id) {
+      throw new Error(
+        'YANDEX reference data resolved to inconsistent provider',
+      );
+    }
 
     const categoryData = {
       name: 'Тест логистики',
@@ -161,26 +208,58 @@ async function seedLogistigTest() {
       },
     });
 
-    const yandex = await transaction.deliveryProvider.findUnique({
-      where: { code: 'YANDEX' },
-      include: { services: true },
+    const providerConfig = await transaction.warehouseProviderConfig.create({
+      data: {
+        warehouseId: warehouse.id,
+        deliveryProviderId: yandex.id,
+        externalLocationId: 'mock-station',
+        isEnabled: true,
+      },
     });
-    if (yandex) {
-      await transaction.warehouseProviderConfig.create({
-        data: {
-          warehouseId: warehouse.id,
-          deliveryProviderId: yandex.id,
-          externalLocationId: 'mock-station',
-          isEnabled: true,
+    await transaction.productDeliveryService.createMany({
+      data: expectedServices.map((service) => ({
+        productId: product.id,
+        deliveryServiceId: service.id,
+        isEnabled: true,
+      })),
+    });
+
+    const [savedProviderConfig, savedMappings] = await Promise.all([
+      transaction.warehouseProviderConfig.findUnique({
+        where: {
+          warehouseId_deliveryProviderId: {
+            warehouseId: warehouse.id,
+            deliveryProviderId: yandex.id,
+          },
         },
-      });
-      await transaction.productDeliveryService.createMany({
-        data: yandex.services.map((service) => ({
-          productId: product.id,
-          deliveryServiceId: service.id,
-          isEnabled: true,
-        })),
-      });
+      }),
+      transaction.productDeliveryService.findMany({
+        where: { productId: product.id },
+        include: { deliveryService: true },
+      }),
+    ]);
+    if (
+      !savedProviderConfig ||
+      savedProviderConfig.id !== providerConfig.id ||
+      !savedProviderConfig.isEnabled
+    ) {
+      throw new Error('YANDEX warehouse provider config was not enabled');
+    }
+    if (
+      savedMappings.length !== expectedServiceCodes.size ||
+      savedMappings.some(
+        (mapping) =>
+          !mapping.isEnabled ||
+          mapping.deliveryService.providerId !== yandex.id ||
+          !expectedServiceCodes.has(
+            mapping.deliveryService
+              .code as (typeof YANDEX_SERVICES)[number]['code'],
+          ),
+      )
+    ) {
+      throw new Error(
+        'Test product does not have all expected YANDEX delivery services',
+      );
     }
 
     return { category, product, warehouse };

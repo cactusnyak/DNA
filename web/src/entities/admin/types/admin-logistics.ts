@@ -1,10 +1,122 @@
-export type LogisticsReadiness = 'NOT_CONFIGURED' | 'PARTIAL' | 'READY';
-export type WarehouseType = 'OWN' | 'SELLER' | 'FULFILLMENT';
-export type AdminWarehouseProviderConfig = { id?: string; deliveryProviderId: string; externalLocationId?: string | null; isEnabled: boolean; deliveryProvider?: { id: string; code: string; name: string } };
-export type AdminWarehouse = { deletedAt?: null; id: string; code: string; name: string; type: WarehouseType; country?: string | null; region?: string | null; city?: string | null; street?: string | null; building?: string | null; postalCode?: string | null; fullAddress?: string | null; latitude?: number | null; longitude?: number | null; contactName?: string | null; contactPhone?: string | null; contactEmail?: string | null; timezone?: string | null; workingHours?: unknown; courierInstructions?: string | null; loadingAvailable: boolean; isActive: boolean; isConfigured: boolean; missingConfigurationFields: string[]; productsCount: number; primaryProductsCount: number; providerConfigsEnabledCount: number; providerConfigs: AdminWarehouseProviderConfig[]; createdAt: string; updatedAt: string };
-export type AdminDeliveryService = { id: string; providerId: string; code: string; name: string; kind: 'DOOR' | 'PICKUP' | 'EXPRESS' | 'CARGO' | 'MANUAL'; isActive: boolean; _count: { products: number } };
-export type AdminDeliveryProvider = { deletedAt?: null; id: string; code: string; name: string; isActive: boolean; fixedMarkup: number; services: AdminDeliveryService[]; _count: { warehouseConfigs: number } };
-export type AdminLogisticsConfiguration = { warehouses: AdminWarehouse[]; providers: AdminDeliveryProvider[] };
-export type AdminUniversalQuote = { deletedAt?: null; id: string; status: string; ownerType: 'USER' | 'GUEST'; ownerLabel: string; destinationSummary: string; deliveryProvider: { id: string; code: string; name: string }; deliveryService: { id: string; code: string; name: string }; originWarehouse: { id: string; code: string; name: string }; providerCost: number; customerCharge: number; subsidyAmount: number; markupAmount: number; currency: string; expiresAt: string; selectedAt?: string | null; createdAt: string; updatedAt: string };
-export type AdminShipment = { deletedAt?: null; id: string; orderId: string; status: string; destinationSummary: string; deliveryProvider: { id: string; code: string; name: string }; deliveryService: { id: string; code: string; name: string }; originWarehouse: { id: string; code: string; name: string }; providerOrderId?: string | null; trackingId?: string | null; trackingUrl?: string | null; providerCost: number; customerCharge: number; attemptCount: number; lastErrorCode?: string | null; itemsCount: number; createdAt: string; updatedAt: string };
-export type AdminPage<T> = { items: T[]; page: number; limit: number; total: number; totalPages: number };
+export type LogisticsReadiness = "NOT_CONFIGURED" | "PARTIAL" | "READY";
+export type WarehouseType = "OWN" | "SELLER" | "FULFILLMENT";
+export type AdminWarehouseProviderConfig = {
+  id?: string;
+  deliveryProviderId: string;
+  externalLocationId?: string | null;
+  isEnabled: boolean;
+  deliveryProvider?: { id: string; code: string; name: string };
+};
+export type AdminWarehouse = {
+  deletedAt?: null;
+  id: string;
+  code: string;
+  name: string;
+  type: WarehouseType;
+  country?: string | null;
+  region?: string | null;
+  city?: string | null;
+  street?: string | null;
+  building?: string | null;
+  postalCode?: string | null;
+  fullAddress?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  contactName?: string | null;
+  contactPhone?: string | null;
+  contactEmail?: string | null;
+  timezone?: string | null;
+  workingHours?: unknown;
+  courierInstructions?: string | null;
+  loadingAvailable: boolean;
+  isActive: boolean;
+  isConfigured: boolean;
+  missingConfigurationFields: string[];
+  productsCount: number;
+  primaryProductsCount: number;
+  providerConfigsEnabledCount: number;
+  providerConfigs: AdminWarehouseProviderConfig[];
+  createdAt: string;
+  updatedAt: string;
+};
+export type AdminDeliveryService = {
+  id: string;
+  providerId: string;
+  code: string;
+  name: string;
+  kind: "DOOR" | "PICKUP" | "EXPRESS" | "CARGO" | "MANUAL";
+  isActive: boolean;
+  _count: { products: number };
+};
+export type AdminDeliveryProvider = {
+  deletedAt?: null;
+  id: string;
+  code: string;
+  name: string;
+  isActive: boolean;
+  fixedMarkup: number;
+  services: AdminDeliveryService[];
+  _count: { warehouseConfigs: number };
+};
+export type AdminLogisticsConfiguration = {
+  warehouses: AdminWarehouse[];
+  providers: AdminDeliveryProvider[];
+};
+export type AdminUniversalQuote = {
+  deletedAt?: null;
+  id: string;
+  status: string;
+  ownerType: "USER" | "GUEST";
+  ownerLabel: string;
+  destinationSummary: string;
+  deliveryProvider: { id: string; code: string; name: string };
+  deliveryService: { id: string; code: string; name: string };
+  originWarehouse: { id: string; code: string; name: string };
+  providerCost: number;
+  customerCharge: number;
+  subsidyAmount: number;
+  markupAmount: number;
+  currency: string;
+  expiresAt: string;
+  selectedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+export type AdminShipment = {
+  deletedAt?: null;
+  id: string;
+  orderId: string;
+  status: string;
+  destinationSummary: string;
+  deliveryProvider: { id: string; code: string; name: string };
+  deliveryService: { id: string; code: string; name: string };
+  originWarehouse: { id: string; code: string; name: string };
+  providerOrderId?: string | null;
+  trackingId?: string | null;
+  trackingUrl?: string | null;
+  providerCost: number;
+  customerCharge: number;
+  attemptCount: number;
+  lastErrorCode?: string | null;
+  itemsCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+export type AdminPage<T> = {
+  items: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type AdminLogisticsRecord =
+  | { type: "warehouse"; warehouse: AdminWarehouse }
+  | { type: "provider"; provider: AdminDeliveryProvider }
+  | {
+      type: "service";
+      provider: AdminDeliveryProvider;
+      service: AdminDeliveryService;
+    }
+  | { type: "quote"; quote: AdminUniversalQuote }
+  | { type: "shipment"; shipment: AdminShipment };

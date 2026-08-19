@@ -1,18 +1,18 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps } from "react";
 
-import type { AdminCatalogCollection } from '@/entities/admin';
+import type { AdminCatalogCollection } from "@/entities/admin";
 
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from "@/components/ui/Modal";
 
-import { AdminCollectionItemsEditor } from '../../../AdminCollectionItemsEditor';
-import { AdminCrudForm } from '../../../AdminCrudForm';
-import { getCrudFormModalTitle } from '../../logic/get-crud-form-modal-title';
+import { AdminCollectionItemsEditor } from "../../../AdminCollectionItemsEditor";
+import { AdminCrudForm } from "../../../AdminCrudForm";
+import { getCrudFormModalTitle } from "../../logic/get-crud-form-modal-title";
 
-import type { AdminManagementTabId } from '../../../../types/admin-management';
+import type { AdminManagementTabId } from "../../../../types/admin-management";
 import type {
   AdminCatalogData,
   AdminCrudRecord,
-} from '../../types/admin-management-records';
+} from "../../types/admin-management-records";
 
 type AdminCrudModalProps = {
   isOpen: boolean;
@@ -22,8 +22,8 @@ type AdminCrudModalProps = {
   data: AdminCatalogData;
   isCrudFormPending?: boolean;
   isCollectionItemsPending?: boolean;
-  onUploadImage: ComponentProps<typeof AdminCrudForm>['onUploadImage'];
-  onSubmit: ComponentProps<typeof AdminCrudForm>['onSubmit'];
+  onUploadImage: ComponentProps<typeof AdminCrudForm>["onUploadImage"];
+  onSubmit: ComponentProps<typeof AdminCrudForm>["onSubmit"];
   onClose: () => void;
   onCollectionItemsSave: (
     collection: AdminCatalogCollection,
@@ -33,6 +33,8 @@ type AdminCrudModalProps = {
     collection: AdminCatalogCollection,
     title: string,
   ) => Promise<string | undefined>;
+  logisticsOptionsState: "loading" | "error" | "ready";
+  onRetryLogisticsOptions: () => void;
 };
 
 export function AdminCrudModal({
@@ -48,6 +50,8 @@ export function AdminCrudModal({
   onClose,
   onCollectionItemsSave,
   onQuickCreate,
+  logisticsOptionsState,
+  onRetryLogisticsOptions,
 }: AdminCrudModalProps) {
   return (
     <Modal
@@ -55,10 +59,10 @@ export function AdminCrudModal({
       title={getCrudFormModalTitle(activeTabId, editingRecord)}
       size={
         collectionEditingRecord
-          ? 'xl'
-          : activeTabId === 'orders' || activeTabId === 'users'
-            ? 'sm'
-            : 'lg'
+          ? "xl"
+          : activeTabId === "orders" || activeTabId === "users"
+            ? "sm"
+            : "lg"
       }
       onClose={onClose}
     >
@@ -70,6 +74,8 @@ export function AdminCrudModal({
           adCategories={data.adCategories}
           warehouses={data.warehouses}
           deliveryProviders={data.deliveryProviders}
+          logisticsOptionsState={logisticsOptionsState}
+          onRetryLogisticsOptions={onRetryLogisticsOptions}
           isPending={isCrudFormPending}
           onUploadImage={onUploadImage}
           onSubmit={onSubmit}

@@ -403,17 +403,25 @@ export class AdminLogisticsService {
     });
     if (providers.length !== providerIds.length)
       throw new BadRequestException('Unknown provider');
-    await tx.warehouseProviderConfig.deleteMany({ where: { warehouseId } });
     for (const [index, config] of configs.entries()) {
-      await tx.warehouseProviderConfig.create({
-        data: {
-          warehouseId,
-          deliveryProviderId: providerIds[index],
-          externalLocationId: this.input.getOptionalString(
-            config.externalLocationId,
-          ),
-          isEnabled: this.input.getBoolean(config.isEnabled, false),
+      const deliveryProviderId = providerIds[index];
+      const mutableData = {
+        externalLocationId: this.input.getOptionalString(
+          config.externalLocationId,
+        ),
+        isEnabled: this.input.getBoolean(config.isEnabled, false),
+      };
+      await tx.warehouseProviderConfig.upsert({
+        where: {
+          warehouseId_deliveryProviderId: {
+            warehouseId,
+            deliveryProviderId,
+          },
         },
+        create: { warehouseId, deliveryProviderId, ...mutableData },
+        // metadata is intentionally absent: admin edits must preserve the
+        // provider-private value already stored on the configuration.
+        update: mutableData,
       });
     }
   }
