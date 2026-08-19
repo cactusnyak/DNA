@@ -161,6 +161,28 @@ async function seedLogistigTest() {
       },
     });
 
+    const yandex = await transaction.deliveryProvider.findUnique({
+      where: { code: 'YANDEX' },
+      include: { services: true },
+    });
+    if (yandex) {
+      await transaction.warehouseProviderConfig.create({
+        data: {
+          warehouseId: warehouse.id,
+          deliveryProviderId: yandex.id,
+          externalLocationId: 'mock-station',
+          isEnabled: true,
+        },
+      });
+      await transaction.productDeliveryService.createMany({
+        data: yandex.services.map((service) => ({
+          productId: product.id,
+          deliveryServiceId: service.id,
+          isEnabled: true,
+        })),
+      });
+    }
+
     return { category, product, warehouse };
   });
 

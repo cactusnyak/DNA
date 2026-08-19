@@ -141,6 +141,10 @@ export class AdminLogisticsService {
           'Provider name is required',
         ),
         isActive: this.input.getBoolean(payload.isActive, true),
+        fixedMarkup: Math.max(
+          0,
+          Math.trunc(this.input.getNumber(payload.fixedMarkup, 0)),
+        ),
       },
     });
     await this.audit('LOGISTICS_PROVIDER_UPDATED', 'DeliveryProvider', id);

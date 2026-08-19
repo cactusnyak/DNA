@@ -55,7 +55,7 @@ export async function seedLogisticsFoundation(
 
   const yandex = await prisma.deliveryProvider.upsert({
     where: { code: 'YANDEX' },
-    create: { code: 'YANDEX', name: 'Яндекс Доставка', isActive: true },
+    create: { code: 'YANDEX', name: 'Яндекс Доставка', isActive: true, fixedMarkup: 0 },
     update: { name: 'Яндекс Доставка' },
   });
 
