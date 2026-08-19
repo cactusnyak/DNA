@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import {
   ArchiveX,
   ArrowDown,
@@ -20,6 +20,10 @@ import { getAdminTableFilterConfig } from './logic/get-admin-table-filter-config
 import { getAdminTableRangeFilterValue } from './logic/get-admin-table-range-filter-value';
 import { getDefaultColumnWidth } from './logic/get-default-column-width';
 import { useAdminRecordsTableState } from './logic/use-admin-records-table-state';
+import {
+  readAdminTableFiltersOpen,
+  writeAdminTableFiltersOpen,
+} from './logic/admin-table-filter-storage';
 import type {
   AdminRecordsTableProps,
   AdminTableColumn,
@@ -47,6 +51,7 @@ function renderSortIcon<TRecord>(
 }
 
 export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
+  tableKey,
   records,
   columns,
   getRecordKey,
@@ -54,11 +59,23 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
   emptyText,
   bulkActions,
   getSubRows,
+  autoExpandIds = [],
   disableSelection,
 }: AdminRecordsTableProps<TRecord>) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const filtersId = useId();
+  const [isFiltersOpen, setIsFiltersOpen] = useState(() =>
+    readAdminTableFiltersOpen(
+      tableKey,
+      typeof window === 'undefined' ? undefined : window.localStorage,
+    ),
+  );
+
+  useEffect(() => {
+    if (!autoExpandIds.length) return;
+    setExpandedIds((current) => new Set([...current, ...autoExpandIds]));
+  }, [autoExpandIds.join('|')]);
 
   const {
     sortState,
@@ -141,7 +158,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
     const isSelected = selectedIds.has(key);
     const subRows = getSubRows?.(record) ?? [];
     const hasChildren = subRows.length > 0;
-    const isExpanded = expandedIds.has(key);
+    const isExpanded = expandedIds.has(key) || (hasActiveFilters && hasChildren);
     const depthBg = !isDeleted && !isSelected ? getDepthBg(depth, hasChildren, isExpanded) : undefined;
 
     return [
@@ -169,6 +186,8 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
             {hasChildren ? (
               <button
                 type="button"
+                aria-label={isExpanded ? 'Свернуть дочерние строки' : 'Развернуть дочерние строки'}
+                aria-expanded={isExpanded}
                 className="inline-flex cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground"
                 onClick={() => toggleExpand(key)}
               >
@@ -213,7 +232,17 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
             <div className="flex flex-wrap items-center justify-between gap-3 h-[32px]">
               <button
                 type="button"
-                onClick={() => setIsFiltersOpen((prev) => !prev)}
+                aria-expanded={isFiltersOpen}
+                aria-controls={filtersId}
+                onClick={() => setIsFiltersOpen((previous) => {
+                  const next = !previous;
+                  writeAdminTableFiltersOpen(
+                    tableKey,
+                    next,
+                    typeof window === 'undefined' ? undefined : window.localStorage,
+                  );
+                  return next;
+                })}
                 className="group inline-flex items-center gap-1.5 text-left cursor-pointer"
               >
                 <p className="text-sm font-medium">Фильтры таблицы</p>
@@ -241,7 +270,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
             </div>
 
             {isFiltersOpen && (
-              <p className="text-xs text-muted-foreground">
+              <p id={filtersId} className="text-xs text-muted-foreground">
                 Показано {visibleRecords.length} из {records.length} записей.
               </p>
             )}

@@ -10,11 +10,41 @@ import type {
   AdminWarehouse,
 } from "@/entities/admin";
 import { formatPrice } from "@/shared/utils/format-price";
+import { AdminShortId } from "@/features/admin/components/AdminShortId";
+import {
+  getWarehouseTypeLabel,
+  WAREHOUSE_TYPE_OPTIONS,
+} from "@/features/admin/logic/warehouse-type-labels";
+import {
+  buildDeliveryProviderTree,
+  type DeliveryProviderTreeRecord,
+} from "@/features/admin/logic/delivery-provider-tree";
 import { AdminRecordsTable } from "../../../AdminRecordsTable";
 import type {
   AdminManagementTabId,
   AdminViewMode,
 } from "../../../../types/admin-management";
+
+function getQuoteStatusVariant(status: string) {
+  if (status === "SELECTED") return "access" as const;
+  if (status === "CANCELLED") return "destructive" as const;
+  if (status === "EXPIRED") return "muted" as const;
+  return "default" as const;
+}
+
+function getShipmentStatusVariant(status: string) {
+  if (status === "DELIVERED") return "access" as const;
+  if (
+    status === "BOOKING_FAILED" ||
+    status === "DELIVERY_FAILED" ||
+    status === "CANCELLED"
+  )
+    return "destructive" as const;
+  if (status === "MANUAL_REVIEW" || status === "RETURNING")
+    return "warning" as const;
+  if (status === "DRAFT" || status === "RETURNED") return "muted" as const;
+  return "default" as const;
+}
 
 type Props = {
   tabId: AdminManagementTabId;
@@ -25,28 +55,8 @@ type Props = {
   shipments: AdminShipment[];
   onOpen: (record: AdminLogisticsRecord) => void;
   onDeleteWarehouse: (warehouse: AdminWarehouse) => void;
+  searchValue: string;
 };
-
-type ProviderTableRecord =
-  | {
-      type: "provider";
-      id: string;
-      code: string;
-      name: string;
-      isActive: boolean;
-      deletedAt?: null;
-      provider: AdminDeliveryProvider;
-    }
-  | {
-      type: "service";
-      id: string;
-      code: string;
-      name: string;
-      isActive: boolean;
-      deletedAt?: null;
-      provider: AdminDeliveryProvider;
-      service: AdminDeliveryProvider["services"][number];
-    };
 
 function Actions({
   onOpen,
@@ -103,11 +113,12 @@ export function AdminLogisticsRecords(props: Props) {
                 <div>
                   <div className="font-medium">{warehouse.name}</div>
                   <div className="text-xs text-muted-foreground">
-                    {warehouse.code}
+                    {warehouse.code} · ID: {warehouse.id.slice(0, 8)}
                   </div>
                 </div>
                 <StatusBadge
                   text={warehouse.isActive ? "Активен" : "Отключён"}
+                  variant={warehouse.isActive ? "access" : "destructive"}
                 />
               </div>
               <Actions
@@ -122,6 +133,7 @@ export function AdminLogisticsRecords(props: Props) {
       );
     return (
       <AdminRecordsTable
+        tableKey="warehouses"
         records={props.warehouses}
         getRecordKey={(record) => record.id}
         emptyText="Склады не найдены."
@@ -134,6 +146,13 @@ export function AdminLogisticsRecords(props: Props) {
           />
         )}
         columns={[
+          {
+            key: "id",
+            title: "ID",
+            width: 100,
+            getValue: (record) => record.id,
+            render: (record) => <AdminShortId value={record.id} />,
+          },
           {
             key: "code",
             title: "Код",
@@ -156,13 +175,10 @@ export function AdminLogisticsRecords(props: Props) {
             sortable: true,
             filter: {
               type: "select",
-              options: ["OWN", "SELLER", "FULFILLMENT"].map((value) => ({
-                value,
-                label: value,
-              })),
+              options: WAREHOUSE_TYPE_OPTIONS,
             },
             getValue: (record) => record.type,
-            render: (record) => record.type,
+            render: (record) => getWarehouseTypeLabel(record.type),
           },
           {
             key: "address",
@@ -197,28 +213,8 @@ export function AdminLogisticsRecords(props: Props) {
   }
 
   if (props.tabId === "delivery-providers") {
-    const records: ProviderTableRecord[] = props.providers.flatMap(
-      (provider) => [
-        {
-          type: "provider" as const,
-          id: provider.id,
-          code: provider.code,
-          name: provider.name,
-          isActive: provider.isActive,
-          provider,
-        },
-        ...provider.services.map((service) => ({
-          type: "service" as const,
-          id: service.id,
-          code: service.code,
-          name: service.name,
-          isActive: service.isActive,
-          provider,
-          service,
-        })),
-      ],
-    );
-    const openRecord = (record: ProviderTableRecord) =>
+    const records = buildDeliveryProviderTree(props.providers);
+    const openRecord = (record: DeliveryProviderTreeRecord) =>
       record.type === "provider"
         ? props.onOpen({ type: "provider", provider: record.provider })
         : props.onOpen({
@@ -229,35 +225,54 @@ export function AdminLogisticsRecords(props: Props) {
     if (props.viewMode === "list")
       return (
         <div className="grid gap-3 md:grid-cols-2">
-          {records.map((record) => (
-            <article
-              key={`${record.type}:${record.id}`}
-              className="rounded-2xl border border-border/80 p-4"
-            >
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <div>
-                  <div className="font-medium">{record.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {record.type === "service" ? "Сервис · " : "Провайдер · "}
-                    {record.code}
+          {records
+            .flatMap((record) => [record, ...(record.children ?? [])])
+            .map((record) => (
+              <article
+                key={`${record.type}:${record.id}`}
+                className="rounded-2xl border border-border/80 p-4"
+              >
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-medium">{record.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {record.type === "service" ? "Сервис · " : "Провайдер · "}
+                      {record.code}
+                    </div>
                   </div>
+                  <StatusBadge
+                    text={record.isActive ? "Активен" : "Отключён"}
+                    variant={record.isActive ? "access" : "destructive"}
+                  />
                 </div>
-                <StatusBadge text={record.isActive ? "Активен" : "Отключён"} />
-              </div>
-              <Actions canEdit onOpen={() => openRecord(record)} />
-            </article>
-          ))}
+                <Actions canEdit onOpen={() => openRecord(record)} />
+              </article>
+            ))}
         </div>
       );
     return (
       <AdminRecordsTable
+        tableKey="delivery-providers"
         records={records}
         getRecordKey={(record) => `${record.type}:${record.id}`}
         emptyText="Провайдеры доставки не настроены."
         renderActions={(record) => (
           <Actions canEdit onOpen={() => openRecord(record)} />
         )}
+        getSubRows={(record) => record.children ?? []}
+        autoExpandIds={
+          props.searchValue.trim()
+            ? records.map((record) => `${record.type}:${record.id}`)
+            : []
+        }
         columns={[
+          {
+            key: "id",
+            title: "ID",
+            width: 100,
+            getValue: (record) => record.id,
+            render: (record) => <AdminShortId value={record.id} />,
+          },
           {
             key: "type",
             title: "Тип",
@@ -277,16 +292,24 @@ export function AdminLogisticsRecords(props: Props) {
             title: "Провайдер / сервис",
             sortable: true,
             filter: { type: "text" },
-            getValue: (record) => record.name,
-            render: (record) =>
-              record.type === "service" ? `↳ ${record.name}` : record.name,
+            getValue: (record) =>
+              record.type === "provider"
+                ? [
+                    record.name,
+                    ...record.children.map((child) => child.name),
+                  ].join(" ")
+                : record.name,
+            render: (record) => record.name,
           },
           {
             key: "active",
             title: "Статус",
             getValue: (record) => (record.isActive ? "Активен" : "Отключён"),
             render: (record) => (
-              <StatusBadge text={record.isActive ? "Активен" : "Отключён"} />
+              <StatusBadge
+                text={record.isActive ? "Активен" : "Отключён"}
+                variant={record.isActive ? "access" : "destructive"}
+              />
             ),
           },
         ]}
@@ -297,6 +320,7 @@ export function AdminLogisticsRecords(props: Props) {
   if (props.tabId === "universal-delivery-quotes")
     return (
       <AdminRecordsTable
+        tableKey="universal-delivery-quotes"
         records={props.quotes}
         getRecordKey={(record) => record.id}
         emptyText="Универсальных расчётов пока нет."
@@ -316,7 +340,12 @@ export function AdminLogisticsRecords(props: Props) {
             sortable: true,
             filter: { type: "text" },
             getValue: (record) => record.status,
-            render: (record) => <StatusBadge text={record.status} />,
+            render: (record) => (
+              <StatusBadge
+                text={record.status}
+                variant={getQuoteStatusVariant(record.status)}
+              />
+            ),
           },
           {
             key: "provider",
@@ -353,6 +382,7 @@ export function AdminLogisticsRecords(props: Props) {
 
   return (
     <AdminRecordsTable
+      tableKey="shipments"
       records={props.shipments}
       getRecordKey={(record) => record.id}
       emptyText="Отправлений пока нет."
@@ -381,9 +411,7 @@ export function AdminLogisticsRecords(props: Props) {
           render: (record) => (
             <StatusBadge
               text={record.status}
-              variant={
-                record.status === "MANUAL_REVIEW" ? "warning" : undefined
-              }
+              variant={getShipmentStatusVariant(record.status)}
             />
           ),
         },

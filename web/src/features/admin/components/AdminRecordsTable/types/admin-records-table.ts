@@ -74,6 +74,7 @@ export type AdminBulkAction = {
 };
 
 export type AdminRecordsTableProps<TRecord extends DeletedAwareRecord> = {
+  tableKey: string;
   records: TRecord[];
   columns: AdminTableColumn<TRecord>[];
   getRecordKey: (record: TRecord) => string;
@@ -81,5 +82,6 @@ export type AdminRecordsTableProps<TRecord extends DeletedAwareRecord> = {
   emptyText: ReactNode;
   bulkActions?: AdminBulkAction[];
   getSubRows?: (record: TRecord) => TRecord[];
+  autoExpandIds?: string[];
   disableSelection?: boolean;
 };

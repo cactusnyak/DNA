@@ -102,6 +102,7 @@ export function AdminProductRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="market-products"
       records={products}
       getRecordKey={(product) => product.id}
       emptyText="Продукты не найдены."

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Settings2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -16,6 +17,14 @@ import type {
   AdminLogisticsRecord,
   AdminWarehouse,
 } from "@/entities/admin";
+import {
+  parseWarehouseWorkingHours,
+  serializeWarehouseWorkingHours,
+  validateWorkingHoursDay,
+  WEEKDAYS,
+} from "@/features/admin/logic/warehouse-working-hours";
+import { WAREHOUSE_TYPE_OPTIONS } from "@/features/admin/logic/warehouse-type-labels";
+import { WarehouseWorkingHoursEditor } from "./WarehouseWorkingHoursEditor";
 
 type Props = {
   record?: AdminLogisticsRecord;
@@ -85,10 +94,19 @@ function WarehouseForm({
       providerConfigs: [],
     },
   );
-  const [workingHours, setWorkingHours] = useState(() =>
-    warehouse?.workingHours
-      ? JSON.stringify(warehouse.workingHours, null, 2)
-      : "",
+  const parsedWorkingHours = parseWarehouseWorkingHours(
+    warehouse?.workingHours,
+  );
+  const [workingHours, setWorkingHours] = useState(parsedWorkingHours.value);
+  const [workingHoursSourceError, setWorkingHoursSourceError] = useState(
+    parsedWorkingHours.error,
+  );
+  const [expandedProviderIds, setExpandedProviderIds] = useState<Set<string>>(
+    () =>
+      new Set(
+        warehouse?.providerConfigs.map((config) => config.deliveryProviderId) ??
+        [],
+      ),
   );
   const [formError, setFormError] = useState<string>();
   const set = (key: keyof AdminWarehouse, value: unknown) =>
@@ -96,23 +114,33 @@ function WarehouseForm({
 
   function submit() {
     setFormError(undefined);
-    let parsedWorkingHours: unknown = null;
-    if (workingHours.trim()) {
-      try {
-        parsedWorkingHours = JSON.parse(workingHours);
-      } catch {
-        setFormError("Рабочие часы должны быть корректным JSON-объектом.");
-        return;
-      }
+    if (workingHoursSourceError) {
+      setFormError(
+        "Исправьте расписание, чтобы заменить сохранённые некорректные данные.",
+      );
+      return;
     }
-    onSave({ ...draft, workingHours: parsedWorkingHours });
+    const invalidDay = WEEKDAYS.find(([key]) =>
+      validateWorkingHoursDay(workingHours[key]),
+    );
+    if (invalidDay) {
+      setFormError(`Проверьте рабочие часы: ${invalidDay[1]}.`);
+      return;
+    }
+    onSave({
+      ...draft,
+      workingHours: serializeWarehouseWorkingHours(
+        workingHours,
+        parsedWorkingHours.preservedFields,
+      ),
+    });
   }
 
   return (
     <Modal
       isOpen
       title={warehouse ? `Склад: ${warehouse.name}` : "Новый склад"}
-      size="xl"
+      size="lg"
       preventClose={isPending}
       onClose={onClose}
     >
@@ -141,11 +169,7 @@ function WarehouseForm({
           <FormSelectField
             label="Тип"
             value={draft.type ?? "OWN"}
-            options={[
-              { value: "OWN", label: "Собственный" },
-              { value: "SELLER", label: "Склад продавца" },
-              { value: "FULFILLMENT", label: "Fulfillment" },
-            ]}
+            options={WAREHOUSE_TYPE_OPTIONS}
             onValueChange={(value) => set("type", value)}
           />
           <FormInputField
@@ -241,13 +265,18 @@ function WarehouseForm({
             value={draft.timezone ?? ""}
             onChange={(event) => set("timezone", event.target.value)}
           />
-          <FormTextareaField
-            name="warehouse-working-hours"
-            label="Рабочие часы"
-            caption={'JSON-объект, например: {"monday":"09:00-18:00"}'}
-            rows={6}
+          {workingHoursSourceError && (
+            <div className="rounded-lg bg-warning/10 p-3 text-sm">
+              {workingHoursSourceError} Измените любой день, чтобы явно заменить
+              старое расписание безопасным форматом.
+            </div>
+          )}
+          <WarehouseWorkingHoursEditor
             value={workingHours}
-            onChange={(event) => setWorkingHours(event.target.value)}
+            onChange={(value) => {
+              setWorkingHours(value);
+              setWorkingHoursSourceError(undefined);
+            }}
           />
           <FormTextareaField
             name="warehouse-courier-instructions"
@@ -258,8 +287,8 @@ function WarehouseForm({
             onChange={(event) => set("courierInstructions", event.target.value)}
           />
 
-          <div className="rounded-xl border border-border/80 p-4">
-            <div className="mb-3 font-medium">Конфигурация провайдеров</div>
+          <section className="space-y-4 border-y border-border/80 px-4 py-6">
+            <h3 className="font-medium">Конфигурация провайдеров</h3>
             {providers.length === 0 && (
               <p className="text-sm text-muted-foreground">
                 Провайдеры доставки не настроены.
@@ -272,71 +301,117 @@ function WarehouseForm({
               return (
                 <div
                   key={provider.id}
-                  className={`space-y-3 border-t py-3 ${provider.isActive ? "" : "opacity-60"}`}
+                  className={`space-y-3 rounded-2xl p-4 shadow-card-lg ${provider.isActive ? "" : "opacity-70"}`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="font-medium">{provider.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {provider.code}
-                      </div>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate text-sm font-medium text-muted-foreground">
+                        {provider.name}
+                      </span>
                     </div>
-                    <StatusBadge
-                      text={
-                        provider.isActive ? "Активен" : "Провайдер отключён"
-                      }
-                    />
+
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <StatusBadge
+                        text={
+                          provider.isActive ? "Активен" : "Провайдер отключён"
+                        }
+                        variant={provider.isActive ? "access" : "destructive"}
+                      />
+                      <StatusBadge
+                        text={
+                          config?.isEnabled
+                            ? "Подключён"
+                            : config
+                              ? "Отключён для склада"
+                              : "Не настроен"
+                        }
+                        variant={config?.isEnabled ? "access" : "warning"}
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        aria-label={
+                          expandedProviderIds.has(provider.id)
+                            ? `Скрыть настройки ${provider.name}`
+                            : `Показать настройки ${provider.name}`
+                        }
+                        aria-expanded={expandedProviderIds.has(provider.id)}
+                        onClick={() =>
+                          setExpandedProviderIds((current) => {
+                            const next = new Set(current);
+                            if (next.has(provider.id)) next.delete(provider.id);
+                            else next.add(provider.id);
+                            return next;
+                          })
+                        }
+                      >
+                        <Settings2 className="size-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {config
-                      ? config.isEnabled
-                        ? "Конфигурация подключена к складу."
-                        : "Конфигурация существует, но отключена."
-                      : "Конфигурация для склада ещё не создана."}
-                  </p>
-                  <FormInputField
-                    name={`external-${provider.id}`}
-                    label="External location ID"
-                    caption={
-                      provider.code === "YANDEX"
-                        ? "Для production-доставки по России здесь хранится platform_station_id."
-                        : undefined
-                    }
-                    value={config?.externalLocationId ?? ""}
-                    onChange={(event) =>
-                      set("providerConfigs", [
-                        ...(draft.providerConfigs ?? []).filter(
-                          (value) => value.deliveryProviderId !== provider.id,
-                        ),
-                        {
-                          deliveryProviderId: provider.id,
-                          externalLocationId: event.target.value,
-                          isEnabled: config?.isEnabled ?? false,
-                        },
-                      ])
-                    }
-                  />
-                  <FormToggleField
-                    label="Включён для склада"
-                    checked={config?.isEnabled ?? false}
-                    disabled={!provider.isActive}
-                    onCheckedChange={(checked) =>
-                      set("providerConfigs", [
-                        ...(draft.providerConfigs ?? []).filter(
-                          (value) => value.deliveryProviderId !== provider.id,
-                        ),
-                        {
-                          deliveryProviderId: provider.id,
-                          externalLocationId: config?.externalLocationId,
-                          isEnabled: checked,
-                        },
-                      ])
-                    }
-                  />
+                  {expandedProviderIds.has(provider.id) && (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground">
+                        {config
+                          ? config.isEnabled
+                            ? "Конфигурация подключена к складу."
+                            : "Конфигурация существует, но отключена."
+                          : "Конфигурация для склада ещё не создана."}
+                      </p>
+                      {!provider.isActive && (
+                        <p className="rounded-lg bg-warning/10 p-3 text-xs">
+                          Провайдер отключён глобально. Включить его только для
+                          этого склада нельзя.
+                        </p>
+                      )}
+                      <FormInputField
+                        name={`external-${provider.id}`}
+                        label="External location ID"
+                        caption={
+                          provider.code === "YANDEX"
+                            ? "Для production-доставки по России здесь хранится platform_station_id."
+                            : undefined
+                        }
+                        value={config?.externalLocationId ?? ""}
+                        onChange={(event) =>
+                          set("providerConfigs", [
+                            ...(draft.providerConfigs ?? []).filter(
+                              (value) =>
+                                value.deliveryProviderId !== provider.id,
+                            ),
+                            {
+                              deliveryProviderId: provider.id,
+                              externalLocationId: event.target.value,
+                              isEnabled: config?.isEnabled ?? false,
+                            },
+                          ])
+                        }
+                      />
+                      <FormToggleField
+                        label="Включён для склада"
+                        checked={config?.isEnabled ?? false}
+                        disabled={!provider.isActive}
+                        onCheckedChange={(checked) =>
+                          set("providerConfigs", [
+                            ...(draft.providerConfigs ?? []).filter(
+                              (value) =>
+                                value.deliveryProviderId !== provider.id,
+                            ),
+                            {
+                              deliveryProviderId: provider.id,
+                              externalLocationId: config?.externalLocationId,
+                              isEnabled: checked,
+                            },
+                          ])
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
-          </div>
+          </section>
           {warehouse && !warehouse.isConfigured && (
             <div className="rounded-xl bg-warning/10 p-3 text-sm">
               Не хватает: {warehouse.missingConfigurationFields.join(", ")}
@@ -412,46 +487,47 @@ function ProviderForm({
       onClose={onClose}
     >
       <form
-        className="space-y-5 p-6"
+        className="flex min-h-0 flex-1 flex-col"
         onSubmit={(event) => {
           event.preventDefault();
           submit();
         }}
       >
-        <FormInputField
-          required
-          name="provider-name"
-          label="Название"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <FormInputField
-          name="provider-code"
-          label="Стабильный код"
-          value={provider.code}
-          disabled
-          onChange={() => undefined}
-        />
-        <FormInputField
-          required
-          name="provider-markup"
-          type="number"
-          min={0}
-          step={1}
-          label="Фиксированная наценка, ₽"
-          value={fixedMarkup}
-          onChange={(event) => setFixedMarkup(event.target.value)}
-        />
-        <FormToggleField
-          label="Провайдер активен"
-          checked={isActive}
-          onCheckedChange={setIsActive}
-        />
-        <StatusBadge text={isActive ? "Активен" : "Отключён"} />
-        {(formError || mutationError) && (
-          <ErrorMessage>{formError ?? mutationError}</ErrorMessage>
-        )}
-        <div className="flex justify-end gap-2">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-6">
+          <FormInputField
+            required
+            name="provider-name"
+            label="Название"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <FormInputField
+            name="provider-code"
+            label="Стабильный код"
+            value={provider.code}
+            disabled
+            onChange={() => undefined}
+          />
+          <FormInputField
+            required
+            name="provider-markup"
+            type="number"
+            min={0}
+            step={1}
+            label="Фиксированная наценка, ₽"
+            value={fixedMarkup}
+            onChange={(event) => setFixedMarkup(event.target.value)}
+          />
+          <FormToggleField
+            label="Провайдер активен"
+            checked={isActive}
+            onCheckedChange={setIsActive}
+          />
+          {(formError || mutationError) && (
+            <ErrorMessage>{formError ?? mutationError}</ErrorMessage>
+          )}
+        </div>
+        <div className="flex justify-end gap-2 border-t p-5">
           <Button type="button" variant="secondary" onClick={onClose}>
             Отмена
           </Button>
@@ -525,7 +601,10 @@ function ServiceForm({
           checked={isActive}
           onCheckedChange={setIsActive}
         />
-        <StatusBadge text={isActive ? "Активен" : "Отключён"} />
+        <StatusBadge
+          text={isActive ? "Активен" : "Отключён"}
+          variant={isActive ? "access" : "destructive"}
+        />
         {(formError || mutationError) && (
           <ErrorMessage>{formError ?? mutationError}</ErrorMessage>
         )}

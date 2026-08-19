@@ -15,6 +15,10 @@ import type { AdminCrudFieldsProps } from "../../types/admin-crud-form";
 import type { ProductAddition } from "@/entities/product";
 import { ProductAdditionsFields } from "../ProductAdditionsFields";
 import { LocationCrudFields } from "../LocationCrudFields";
+import {
+  buildDeliveryServiceOptions,
+  buildWarehouseOptions,
+} from "../../../../logic/product-logistics-options";
 
 function getStringArray(value: unknown) {
   return Array.isArray(value)
@@ -60,13 +64,7 @@ export function ProductCrudFields({
   const warehouseIds = getStringArray(values.warehouseIds);
   const serviceIds = getStringArray(values.deliveryServiceIds);
 
-  const warehouseOptions = warehouses.map((warehouse) => ({
-    value: warehouse.id,
-    label: `${warehouse.name} · ${warehouse.code}${
-      warehouse.isConfigured ? "" : " · не настроен"
-    }${warehouse.isActive ? "" : " · неактивен"}`,
-    disabled: !warehouse.isActive && !warehouseIds.includes(warehouse.id),
-  }));
+  const warehouseOptions = buildWarehouseOptions(warehouses, warehouseIds);
 
   const allServices = deliveryProviders.flatMap((provider) =>
     provider.services.map((service) => ({ provider, service })),
@@ -74,16 +72,9 @@ export function ProductCrudFields({
   const activeServices = allServices.filter(
     ({ provider, service }) => provider.isActive && service.isActive,
   );
-  const serviceOptions = deliveryProviders.flatMap((provider) =>
-    provider.services
-      .filter((service) => service.isActive || serviceIds.includes(service.id))
-      .map((service) => ({
-        value: service.id,
-        label: `${provider.name} · ${service.name} · ${service.kind}${provider.isActive && service.isActive ? "" : " · отключён"}`,
-        disabled:
-          (!provider.isActive || !service.isActive) &&
-          !serviceIds.includes(service.id),
-      })),
+  const serviceOptions = buildDeliveryServiceOptions(
+    deliveryProviders,
+    serviceIds,
   );
 
   const updatePackage = (

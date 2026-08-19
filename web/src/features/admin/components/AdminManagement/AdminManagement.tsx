@@ -535,6 +535,7 @@ export function AdminManagement({ accessToken }: AdminManagementProps) {
           providers={filteredRecords.deliveryProviders}
           quotes={filteredRecords.universalDeliveryQuotes}
           shipments={filteredRecords.shipments}
+          searchValue={state.searchValue}
           onOpen={openLogisticsRecord}
           onDeleteWarehouse={handleDeleteWarehouse}
         />
