@@ -76,6 +76,16 @@ type FormSelectFieldProps = FormFieldBaseProps & {
   onValueChange: (value: string) => void;
 };
 
+type FormMultiSelectFieldProps = FormFieldBaseProps & {
+  values: string[];
+  options: FormSelectOption[];
+  placeholder?: string;
+  disabled?: boolean;
+  selectClassName?: string;
+  dropdownClassName?: string;
+  onValuesChange: (values: string[]) => void;
+};
+
 type FormToggleFieldProps = FormFieldBaseProps & {
   checked: boolean;
   disabled?: boolean;
@@ -377,6 +387,103 @@ export function FormSelectField({
                   {isSelected && (
                     <Check className="size-4 shrink-0" strokeWidth={1.5} />
                   )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </FormFieldRoot>
+  );
+}
+
+export function FormMultiSelectField({
+  label,
+  caption,
+  required = false,
+  values,
+  options,
+  placeholder = 'Выберите значения',
+  disabled = false,
+  className,
+  selectClassName,
+  dropdownClassName,
+  onValuesChange,
+}: FormMultiSelectFieldProps) {
+  const listboxId = useId();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOptions = options.filter((option) => values.includes(option.value));
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleDocumentMouseDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setIsOpen(false);
+    }
+
+    document.addEventListener('mousedown', handleDocumentMouseDown);
+    return () => document.removeEventListener('mousedown', handleDocumentMouseDown);
+  }, [isOpen]);
+
+  function toggleOption(option: FormSelectOption) {
+    if (option.disabled) return;
+    onValuesChange(
+      values.includes(option.value)
+        ? values.filter((value) => value !== option.value)
+        : [...values, option.value],
+    );
+  }
+
+  return (
+    <FormFieldRoot label={label} caption={caption} required={required} className={className}>
+      <div ref={rootRef} className="relative">
+        <button
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-controls={listboxId}
+          aria-required={required}
+          className={[SELECT_TRIGGER_CLASS_NAME, selectClassName].filter(Boolean).join(' ')}
+          onClick={() => setIsOpen((currentValue) => !currentValue)}
+        >
+          <span className={['truncate', !selectedOptions.length && 'text-muted-foreground'].filter(Boolean).join(' ')}>
+            {selectedOptions.length
+              ? selectedOptions.map((option) => option.label).join(', ')
+              : placeholder}
+          </span>
+          <ChevronDown className={['size-4 shrink-0 text-muted-foreground', isOpen && 'rotate-180'].filter(Boolean).join(' ')} strokeWidth={1.5} />
+        </button>
+
+        {isOpen && (
+          <div
+            id={listboxId}
+            role="listbox"
+            aria-multiselectable="true"
+            className={[
+              'absolute left-0 right-0 top-full z-30 mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto rounded-lg border border-border/80 bg-popover p-1 text-sm shadow-lg',
+              dropdownClassName,
+            ].filter(Boolean).join(' ')}
+          >
+            {options.map((option) => {
+              const isSelected = values.includes(option.value);
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  disabled={option.disabled}
+                  className={[
+                    'flex w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-left',
+                    'hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50',
+                    isSelected && 'bg-muted text-foreground',
+                  ].filter(Boolean).join(' ')}
+                  onClick={() => toggleOption(option)}
+                >
+                  <span className="truncate">{option.label}</span>
+                  {isSelected && <Check className="size-4 shrink-0" strokeWidth={1.5} />}
                 </button>
               );
             })}

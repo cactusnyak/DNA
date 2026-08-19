@@ -1,13 +1,16 @@
+import { useState } from 'react';
+import { Settings2, X } from 'lucide-react';
+
 import {
   FormImageFilesField,
   FormInputField,
+  FormMultiSelectField,
   FormSelectField,
   FormTextareaField,
   FormToggleField,
 } from '@/components/ui/FormField';
 import { Button } from '@/components/ui/Button';
 import type { AdminProductPackage } from '@/entities/admin';
-
 import type { AdminCrudFieldsProps } from '../../types/admin-crud-form';
 import type { ProductAddition } from '@/entities/product';
 import { ProductAdditionsFields } from '../ProductAdditionsFields';
@@ -46,10 +49,77 @@ export function ProductCrudFields({
 
   const existingImageUrls = getStringArray(values.imageUrls);
   const imageFiles = getFileArray(values.imageFiles);
-  const packages = Array.isArray(values.packages) ? values.packages as AdminProductPackage[] : [];
+  const packages = Array.isArray(values.packages)
+    ? (values.packages as AdminProductPackage[])
+    : [];
+  const [visiblePackageIndex, setVisiblePackageIndex] = useState<number | null>(
+    packages.length ? packages.length - 1 : null,
+  );
   const warehouseIds = getStringArray(values.warehouseIds);
   const serviceIds = getStringArray(values.deliveryServiceIds);
-  const updatePackage = (index: number, patch: Partial<AdminProductPackage>) => onValueChange('packages', packages.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
+
+  const warehouseOptions = warehouses.map((warehouse) => ({
+    value: warehouse.id,
+    label: `${warehouse.name} · ${warehouse.code}${warehouse.isConfigured ? '' : ' · не настроен'
+      }${warehouse.isActive ? '' : ' · неактивен'}`,
+    disabled: !warehouse.isActive && !warehouseIds.includes(warehouse.id),
+  }));
+
+  const serviceOptions = deliveryProviders.flatMap((provider) =>
+    provider.services
+      .filter((service) => service.isActive || serviceIds.includes(service.id))
+      .map((service) => ({
+        value: service.id,
+        label: `${provider.name} · ${service.name} · ${service.kind}`,
+        disabled: !provider.isActive || !service.isActive,
+      }))
+  );
+
+  const updatePackage = (index: number, patch: Partial<AdminProductPackage>) => {
+    onValueChange(
+      'packages',
+      packages.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, ...patch } : item
+      )
+    );
+  };
+
+  const addPackage = () => {
+    setVisiblePackageIndex(packages.length);
+    onValueChange('packages', [
+      ...packages,
+      {
+        sequence: packages.length,
+        type: 'BOX',
+        quantity: 1,
+        weightGrams: 1,
+        lengthMillimeters: 1,
+        widthMillimeters: 1,
+        heightMillimeters: 1,
+      },
+    ]);
+  };
+
+  const removePackage = (index: number) => {
+    setVisiblePackageIndex((currentIndex) => {
+      if (currentIndex === null || currentIndex < index) return currentIndex;
+      if (currentIndex === index) return null;
+      return currentIndex - 1;
+    });
+    onValueChange(
+      'packages',
+      packages
+        .filter((_, itemIndex) => itemIndex !== index)
+        .map((value, sequence) => ({ ...value, sequence }))
+    );
+  };
+
+  const handleWarehouseChange = (nextWarehouseIds: string[]) => {
+    onValueChange('warehouseIds', nextWarehouseIds);
+    if (!nextWarehouseIds.includes(String(values.primaryWarehouseId ?? ''))) {
+      onValueChange('primaryWarehouseId', '');
+    }
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -61,15 +131,247 @@ export function ProductCrudFields({
         onChange={(event) => onValueChange('title', event.target.value)}
       />
 
-      <section className="space-y-5 rounded-2xl border border-border/80 p-5">
-        <div><h4 className="font-medium">Логистика</h4><p className="text-sm text-muted-foreground">Канонические единицы: граммы и миллиметры. Сервисы доступны только при настроенных упаковках и основном складе.</p></div>
-        <div className="space-y-4"><FormInputField name="sku" label="SKU" value={String(values.sku ?? '')} onChange={(event) => onValueChange('sku', event.target.value)} /><FormInputField name="purchasePrice" type="number" min={0} label="Закупочная стоимость, ₽" value={String(values.purchasePrice ?? '')} onChange={(event) => onValueChange('purchasePrice', event.target.value)} /></div>
-        <FormToggleField label="Использовать профиль перевозки" checked={Boolean(values.shippingProfileEnabled)} onCheckedChange={(value) => onValueChange('shippingProfileEnabled', value)} />
-        {Boolean(values.shippingProfileEnabled) && <div className="space-y-3"><FormToggleField label="Хрупкий" checked={Boolean(values.isFragile)} onCheckedChange={(value) => onValueChange('isFragile', value)} /><FormToggleField label="Штабелируемый" checked={Boolean(values.isStackable)} onCheckedChange={(value) => onValueChange('isStackable', value)} /><FormToggleField label="18+" checked={Boolean(values.ageRestricted)} onCheckedChange={(value) => onValueChange('ageRestricted', value)} /><FormTextareaField name="handlingNotes" label="Инструкции по обращению" value={String(values.handlingNotes ?? '')} onChange={(event) => onValueChange('handlingNotes', event.target.value)} /></div>}
-        <div className="space-y-3"><div className="flex items-center justify-between"><h5 className="text-sm font-medium">Упаковки одной единицы товара</h5><Button type="button" size="sm" variant="secondary" onClick={() => onValueChange('packages', [...packages, { sequence: packages.length, type: 'BOX', quantity: 1, weightGrams: 1, lengthMillimeters: 1, widthMillimeters: 1, heightMillimeters: 1 }])}>Добавить упаковку</Button></div>{packages.map((item, index) => <div key={item.id ?? index} className="space-y-3 rounded-xl bg-muted/30 p-4"><FormInputField name={`package-name-${index}`} label="Название" value={item.name ?? ''} onChange={(event) => updatePackage(index, { name: event.target.value })} /><FormSelectField label="Тип" value={item.type} options={['BOX','PALLET','ENVELOPE','CRATE','OTHER'].map((value) => ({ value, label: value }))} onValueChange={(value) => updatePackage(index, { type: value as AdminProductPackage['type'] })} /><FormInputField required min={1} type="number" name={`package-quantity-${index}`} label="Количество мест" value={String(item.quantity)} onChange={(event) => updatePackage(index, { quantity: Number(event.target.value) })} /><FormInputField required min={1} type="number" name={`package-weight-${index}`} label="Вес, г" value={String(item.weightGrams)} onChange={(event) => updatePackage(index, { weightGrams: Number(event.target.value) })} /><FormInputField required min={1} type="number" name={`package-length-${index}`} label="Длина, мм" value={String(item.lengthMillimeters)} onChange={(event) => updatePackage(index, { lengthMillimeters: Number(event.target.value) })} /><FormInputField required min={1} type="number" name={`package-width-${index}`} label="Ширина, мм" value={String(item.widthMillimeters)} onChange={(event) => updatePackage(index, { widthMillimeters: Number(event.target.value) })} /><FormInputField required min={1} type="number" name={`package-height-${index}`} label="Высота, мм" value={String(item.heightMillimeters)} onChange={(event) => updatePackage(index, { heightMillimeters: Number(event.target.value) })} /><Button type="button" variant="destructive" size="sm" onClick={() => onValueChange('packages', packages.filter((_, itemIndex) => itemIndex !== index).map((value, sequence) => ({ ...value, sequence })))}>Удалить</Button></div>)}</div>
-        <div className="space-y-3"><h5 className="text-sm font-medium">Склады</h5>{warehouses.map((warehouse) => { const selected = warehouseIds.includes(warehouse.id); return <div key={warehouse.id} className="space-y-3 rounded-xl border p-3"><div>{warehouse.name}<div className="text-xs text-muted-foreground">{warehouse.code} · {warehouse.isConfigured ? 'настроен' : 'не настроен'}{!warehouse.isActive ? ' · неактивен' : ''}</div></div><FormToggleField label="Использовать" checked={selected} disabled={!warehouse.isActive && !selected} onCheckedChange={(checked) => onValueChange('warehouseIds', checked ? [...warehouseIds, warehouse.id] : warehouseIds.filter((id) => id !== warehouse.id))} /><FormToggleField label="Основной" checked={values.primaryWarehouseId === warehouse.id} disabled={!selected || !warehouse.isActive} onCheckedChange={(checked) => onValueChange('primaryWarehouseId', checked ? warehouse.id : '')} /></div>; })}</div>
-        <div className="space-y-3"><h5 className="text-sm font-medium">Доступные сервисы</h5>{deliveryProviders.map((provider) => { const selectable = provider.services.filter((service) => service.isActive || serviceIds.includes(service.id)); const selectedCount = selectable.filter((service) => serviceIds.includes(service.id)).length; return <div key={provider.id} className="rounded-xl border p-3"><FormToggleField label={`${provider.name} (${selectedCount}/${selectable.length})`} checked={selectable.length > 0 && selectedCount === selectable.length} disabled={!provider.isActive} onCheckedChange={(checked) => onValueChange('deliveryServiceIds', checked ? Array.from(new Set([...serviceIds, ...selectable.filter((service) => service.isActive).map((service) => service.id)])) : serviceIds.filter((id) => !selectable.some((service) => service.id === id)))} /> <div className="mt-2 space-y-2">{selectable.map((service) => <FormToggleField key={service.id} label={`${service.name} · ${service.kind}`} checked={serviceIds.includes(service.id)} disabled={!service.isActive || !provider.isActive} onCheckedChange={(checked) => onValueChange('deliveryServiceIds', checked ? [...serviceIds, service.id] : serviceIds.filter((id) => id !== service.id))} />)}</div></div>; })}</div>
-      </section>
+      <div className="space-y-5">
+        <div className="space-y-4">
+          <FormInputField
+            name="sku"
+            label="SKU"
+            value={String(values.sku ?? '')}
+            onChange={(event) => onValueChange('sku', event.target.value)}
+          />
+          <FormInputField
+            name="purchasePrice"
+            type="number"
+            min={0}
+            label="Закупочная стоимость, ₽"
+            value={String(values.purchasePrice ?? '')}
+            onChange={(event) => onValueChange('purchasePrice', event.target.value)}
+          />
+        </div>
+
+        <FormToggleField
+          label="Использовать профиль перевозки"
+          checked={Boolean(values.shippingProfileEnabled)}
+          onCheckedChange={(value) =>
+            onValueChange('shippingProfileEnabled', value)
+          }
+        />
+
+        {Boolean(values.shippingProfileEnabled) && (
+          <div className="space-y-3">
+            <FormToggleField
+              label="Хрупкий"
+              checked={Boolean(values.isFragile)}
+              onCheckedChange={(value) => onValueChange('isFragile', value)}
+            />
+            <FormToggleField
+              label="Штабелируемый"
+              checked={Boolean(values.isStackable)}
+              onCheckedChange={(value) => onValueChange('isStackable', value)}
+            />
+            <FormToggleField
+              label="18+"
+              checked={Boolean(values.ageRestricted)}
+              onCheckedChange={(value) => onValueChange('ageRestricted', value)}
+            />
+            <FormTextareaField
+              name="handlingNotes"
+              label="Инструкции по обращению"
+              value={String(values.handlingNotes ?? '')}
+              onChange={(event) =>
+                onValueChange('handlingNotes', event.target.value)
+              }
+            />
+          </div>
+        )}
+
+        <div className="space-y-4 border-y border-border/80 my-6 px-4 py-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Упаковки одной единицы товара</h3>
+            <Button type="button" size="sm" variant="secondary" onClick={addPackage}>
+              Добавить упаковку
+            </Button>
+          </div>
+
+          {packages.map((item, index) => (
+            <div
+              key={item.id ?? index}
+              className="space-y-3 rounded-2xl p-4 shadow-card-lg"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-xs">
+                    {item.type}
+                  </span>
+                  <span
+                    className={`truncate text-sm font-medium ${item.name?.trim() ? '' : 'text-muted-foreground'}`}
+                  >
+                    {item.name?.trim() || `Упаковка ${index + 1}`}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label={
+                      visiblePackageIndex === index
+                        ? 'Скрыть настройки упаковки'
+                        : 'Показать настройки упаковки'
+                    }
+                    aria-expanded={visiblePackageIndex === index}
+                    onClick={() =>
+                      setVisiblePackageIndex((currentIndex) =>
+                        currentIndex === index ? null : index,
+                      )
+                    }
+                  >
+                    <Settings2 className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Удалить упаковку"
+                    onClick={() => removePackage(index)}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {visiblePackageIndex === index && (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+                  <FormInputField
+                name={`package-name-${index}`}
+                label="Название"
+                className="sm:col-span-2 lg:col-span-6"
+                value={item.name ?? ''}
+                onChange={(event) =>
+                  updatePackage(index, { name: event.target.value })
+                }
+              />
+
+                  <FormSelectField
+                label="Тип"
+                className="sm:col-span-2 lg:col-span-6"
+                value={item.type}
+                options={['BOX', 'PALLET', 'ENVELOPE', 'CRATE', 'OTHER'].map(
+                  (value) => ({ value, label: value })
+                )}
+                onValueChange={(value) =>
+                  updatePackage(index, {
+                    type: value as AdminProductPackage['type'],
+                  })
+                }
+              />
+
+                  <FormInputField
+                required
+                min={1}
+                type="number"
+                name={`package-quantity-${index}`}
+                label="Количество мест"
+                className="lg:col-span-2"
+                value={String(item.quantity)}
+                onChange={(event) =>
+                  updatePackage(index, { quantity: Number(event.target.value) })
+                }
+              />
+
+                  <FormInputField
+                required
+                min={1}
+                type="number"
+                name={`package-weight-${index}`}
+                label="Вес, г"
+                className="lg:col-span-2"
+                value={String(item.weightGrams)}
+                onChange={(event) =>
+                  updatePackage(index, { weightGrams: Number(event.target.value) })
+                }
+              />
+
+                  <FormInputField
+                required
+                min={1}
+                type="number"
+                name={`package-length-${index}`}
+                label="Длина, мм"
+                className="lg:col-span-2"
+                value={String(item.lengthMillimeters)}
+                onChange={(event) =>
+                  updatePackage(index, {
+                    lengthMillimeters: Number(event.target.value),
+                  })
+                }
+              />
+
+                  <FormInputField
+                required
+                min={1}
+                type="number"
+                name={`package-width-${index}`}
+                label="Ширина, мм"
+                className="lg:col-span-2"
+                value={String(item.widthMillimeters)}
+                onChange={(event) =>
+                  updatePackage(index, {
+                    widthMillimeters: Number(event.target.value),
+                  })
+                }
+              />
+
+                  <FormInputField
+                required
+                min={1}
+                type="number"
+                name={`package-height-${index}`}
+                label="Высота, мм"
+                className="lg:col-span-2"
+                value={String(item.heightMillimeters)}
+                onChange={(event) =>
+                  updatePackage(index, {
+                    heightMillimeters: Number(event.target.value),
+                  })
+                }
+              />
+
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <FormMultiSelectField
+          label="Склады"
+          values={warehouseIds}
+          options={warehouseOptions}
+          placeholder="Выберите склады"
+          onValuesChange={handleWarehouseChange}
+        />
+
+        <FormSelectField
+          label="Основной склад"
+          value={String(values.primaryWarehouseId ?? '')}
+          options={warehouseOptions.filter((option) =>
+            warehouseIds.includes(option.value)
+          )}
+          placeholder="Выберите основной склад"
+          disabled={!warehouseIds.length}
+          onValueChange={(value) => onValueChange('primaryWarehouseId', value)}
+        />
+
+        <FormMultiSelectField
+          label="Доступные сервисы"
+          caption="Сервисы доступны при настроенных упаковках и основном складе."
+          values={serviceIds}
+          options={serviceOptions}
+          placeholder="Выберите сервисы"
+          onValuesChange={(values) => onValueChange('deliveryServiceIds', values)}
+        />
+      </div>
 
       <FormInputField
         name="slug"
@@ -87,7 +389,21 @@ export function ProductCrudFields({
         onValueChange={(value) => onValueChange('categoryId', value)}
       />
 
-      <FormSelectField label="Крупногабаритность" caption={`При наследовании сейчас: ${categories.find((category) => category.id === values.categoryId)?.isOversized ? 'крупногабаритный' : 'обычный товар'}`} value={String(values.isOversizedOverride ?? 'inherit')} options={[{ value: 'inherit', label: 'Наследовать от категории' }, { value: 'oversized', label: 'Крупногабаритный' }, { value: 'regular', label: 'Обычный товар' }]} onValueChange={(value) => onValueChange('isOversizedOverride', value)} />
+      <FormSelectField
+        label="Крупногабаритность"
+        caption={`При наследовании сейчас: ${categories.find((category) => category.id === values.categoryId)
+          ?.isOversized
+          ? 'крупногабаритный'
+          : 'обычный товар'
+          }`}
+        value={String(values.isOversizedOverride ?? 'inherit')}
+        options={[
+          { value: 'inherit', label: 'Наследовать от категории' },
+          { value: 'oversized', label: 'Крупногабаритный' },
+          { value: 'regular', label: 'Обычный товар' },
+        ]}
+        onValueChange={(value) => onValueChange('isOversizedOverride', value)}
+      />
 
       <FormInputField
         name="price"
@@ -107,11 +423,7 @@ export function ProductCrudFields({
         onChange={(event) => onValueChange('description', event.target.value)}
       />
 
-      <LocationCrudFields
-        plain
-        values={values}
-        onValueChange={onValueChange}
-      />
+      <LocationCrudFields plain values={values} onValueChange={onValueChange} />
 
       <FormImageFilesField
         name="images"
