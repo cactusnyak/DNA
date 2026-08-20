@@ -140,7 +140,7 @@ function WarehouseForm({
     <Modal
       isOpen
       title={warehouse ? `Склад: ${warehouse.name}` : "Новый склад"}
-      size="lg"
+      size="sm"
       preventClose={isPending}
       onClose={onClose}
     >
@@ -482,7 +482,7 @@ function ProviderForm({
     <Modal
       isOpen
       title={`Провайдер: ${provider.code}`}
-      size="lg"
+      size="sm"
       preventClose={isPending}
       onClose={onClose}
     >
@@ -568,7 +568,7 @@ function ServiceForm({
     <Modal
       isOpen
       title={`Сервис: ${service.code}`}
-      size="lg"
+      size="sm"
       preventClose={isPending}
       onClose={onClose}
     >
@@ -675,7 +675,7 @@ export function AdminLogisticsModal({
             ? `Отправление ${item.id.slice(0, 8)}`
             : `Расчёт ${item.id.slice(0, 8)}`
         }
-        size="xl"
+        size="sm"
         onClose={onClose}
       >
         <div className="grid gap-4 overflow-y-auto p-6 md:grid-cols-2">
