@@ -25,6 +25,7 @@ export function getProfileDetailItems(
     { label: 'ФИО', value: getFullName(user) },
     { label: 'Email', value: user.email ?? 'Не указан' },
     { label: 'Телефон', value: user.phone ?? 'Не указан' },
+    { label: 'Актуальный адрес', value: user.currentAddress ?? 'Не указан' },
     { label: 'Реферальный код', value: user.referralCode ?? 'Не создан' },
     { label: 'Баланс', value: formatPrice(balanceValue), isAccent: true },
   ];

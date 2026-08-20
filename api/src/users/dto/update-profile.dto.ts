@@ -4,5 +4,6 @@ export type UpdateProfileDto = {
   lastName?: string;
   patronymic?: string;
   phone?: string;
+  currentAddress?: string | null;
   avatarId?: string | null;
 };

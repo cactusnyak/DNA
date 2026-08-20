@@ -302,6 +302,7 @@ export class UsersService {
       lastName?: string;
       patronymic?: string;
       phone?: string;
+      currentAddress?: string | null;
       avatarId?: string | null;
     },
   ) {
@@ -329,6 +330,10 @@ export class UsersService {
         lastName: data.lastName,
         patronymic: data.patronymic,
         phone: data.phone,
+        currentAddress:
+          data.currentAddress === undefined
+            ? undefined
+            : data.currentAddress?.trim() || null,
         avatarId: data.avatarId,
       },
       include: {
@@ -408,6 +413,7 @@ export class UsersService {
           lastName: 'Пользователь',
           patronymic: null,
           phone: null,
+          currentAddress: null,
           passwordHash: null,
           oauthProvider: null,
           oauthProviderId: null,
@@ -432,6 +438,7 @@ export class UsersService {
       updatedAt: user.updatedAt,
       patronymic: user.patronymic ?? undefined,
       phone: user.phone ?? undefined,
+      currentAddress: user.currentAddress ?? undefined,
       avatar: user.avatar ?? undefined,
       referralCode: user.referralCode ?? undefined,
       balance: user.balance

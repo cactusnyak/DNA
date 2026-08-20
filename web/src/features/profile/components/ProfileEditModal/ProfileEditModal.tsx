@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { FormInputField } from '@/components/ui/FormField';
+import { FormAddressField, FormInputField } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { User } from '@/entities/user';
+import { suggestDeliveryAddresses } from '@/entities/order-delivery';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 
 type ProfileEditModalProps = {
@@ -19,6 +20,7 @@ type ProfileEditModalProps = {
     lastName: string;
     patronymic: string;
     phone?: string;
+    currentAddress: string | null;
   }) => void;
 };
 
@@ -43,6 +45,9 @@ export function ProfileEditModal({
   const [lastName, setLastName] = useState(user.lastName ?? '');
   const [patronymic, setPatronymic] = useState(user.patronymic ?? '');
   const [phone, setPhone] = useState(user.phone ?? '');
+  const [currentAddress, setCurrentAddress] = useState(
+    user.currentAddress ?? '',
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -54,6 +59,7 @@ export function ProfileEditModal({
     setLastName(user.lastName ?? '');
     setPatronymic(user.patronymic ?? '');
     setPhone(user.phone ?? '');
+    setCurrentAddress(user.currentAddress ?? '');
   }, [isOpen, user]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -65,6 +71,7 @@ export function ProfileEditModal({
       lastName: lastName.trim(),
       patronymic: patronymic.trim(),
       phone: phone.trim() || undefined,
+      currentAddress: currentAddress.trim() || null,
     });
   }
 
@@ -115,6 +122,18 @@ export function ProfileEditModal({
             label="Телефон"
             value={phone}
             onChange={getInputChangeHandler(setPhone)}
+          />
+
+          <FormAddressField
+            name="currentAddress"
+            label="Актуальный адрес"
+            value={currentAddress}
+            placeholder="Начните вводить адрес"
+            loadSuggestions={suggestDeliveryAddresses}
+            onValueChange={setCurrentAddress}
+            onSuggestionSelect={(suggestion) =>
+              setCurrentAddress(suggestion.fullAddress)
+            }
           />
         </div>
 

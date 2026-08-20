@@ -270,12 +270,20 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
   const skipNextRequestRef = useRef(false);
   const [suggestions, setSuggestions] = useState<TSuggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const close = useCallback(() => setIsOpen(false), []);
 
   useEffect(() => {
     const requestId = ++requestIdRef.current;
+
+    if (!isFocused) {
+      setIsLoading(false);
+      close();
+      return;
+    }
+
     if (skipNextRequestRef.current) {
       skipNextRequestRef.current = false;
       return;
@@ -283,6 +291,9 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
 
     const query = value.trim();
     if (query.length < minQueryLength) {
+      setSuggestions([]);
+      setIsLoading(false);
+      close();
       return;
     }
 
@@ -305,7 +316,7 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
     }, 300);
 
     return () => window.clearTimeout(timer);
-  }, [close, loadSuggestions, minQueryLength, value]);
+  }, [close, isFocused, loadSuggestions, minQueryLength, value]);
 
   useEffect(() => {
     function handleDocumentMouseDown(event: MouseEvent) {
@@ -322,7 +333,16 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
       required={required}
       className={className}
     >
-      <div ref={rootRef} className="relative">
+      <div
+        ref={rootRef}
+        className="relative"
+        onFocusCapture={() => setIsFocused(true)}
+        onBlurCapture={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget)) return;
+          setIsFocused(false);
+          close();
+        }}
+      >
         <Input
           name={name}
           required={required}

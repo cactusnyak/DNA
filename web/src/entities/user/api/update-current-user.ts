@@ -8,6 +8,7 @@ export type UpdateCurrentUserPayload = {
   lastName?: string;
   patronymic?: string;
   phone?: string;
+  currentAddress?: string | null;
   avatarId?: string | null;
 };
 

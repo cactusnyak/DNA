@@ -146,9 +146,10 @@ model User {
   oauthProvider   String?
   oauthProviderId String?
 
-  patronymic   String?
-  phone        String?
-  referralCode String?
+  patronymic     String?
+  phone          String?
+  currentAddress String?
+  referralCode   String?
 
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])

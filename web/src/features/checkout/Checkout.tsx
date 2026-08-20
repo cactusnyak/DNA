@@ -62,6 +62,8 @@ function CheckoutContent({ accessToken, currentUser }: CheckoutContentProps) {
         checkoutPrefill?.customerName || currentUser?.firstName || '',
       customerPhone: checkoutPrefill?.customerPhone || currentUser?.phone || '',
       customerEmail: checkoutPrefill?.customerEmail || currentUser?.email || '',
+      deliveryAddress:
+        checkoutPrefill?.deliveryAddress || currentUser?.currentAddress || '',
     };
   });
   const [createdOrder, setCreatedOrder] = useState<Order>();
@@ -81,11 +83,17 @@ function CheckoutContent({ accessToken, currentUser }: CheckoutContentProps) {
       if (accessToken && currentUser) {
         const firstName = payload.customerName.trim();
         const phone = payload.customerPhone.trim();
+        const currentAddress =
+          payload.deliveryDestination?.fullAddress.trim() ??
+          payload.deliveryAddress.trim();
         const profileChanges = {
           ...(firstName !== (currentUser.firstName ?? '').trim()
             ? { firstName }
             : {}),
           ...(phone !== (currentUser.phone ?? '').trim() ? { phone } : {}),
+          ...(currentAddress !== (currentUser.currentAddress ?? '').trim()
+            ? { currentAddress }
+            : {}),
         };
 
         if (Object.keys(profileChanges).length > 0) {
