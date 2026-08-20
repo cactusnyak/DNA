@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unnecessary-type-assertion */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { OrderStatus, Prisma } from '@prisma/client';
 
@@ -15,9 +15,12 @@ import {
 import { DeliveryProviderRegistry } from './delivery-provider.registry';
 import { EffectiveShippingProfileResolver } from './effective-shipping-profile.resolver';
 import { createDeliveryFingerprint } from './utils/delivery-fingerprint';
+import { OrderDeliveryService } from './order-delivery.service';
+import type { ResolvedDeliveryGroup } from './delivery-group.resolver';
 
 type Owner = { userId?: string; guestSessionId?: string };
 type DestinationInput = DeliveryAddress & {
+  version: number;
   recipientName: string;
   recipientPhone: string;
   recipientEmail?: string;
@@ -30,110 +33,88 @@ export class DeliveryQuoteOrchestrator {
     private readonly prisma: PrismaService,
     private readonly registry: DeliveryProviderRegistry,
     private readonly profiles: EffectiveShippingProfileResolver,
+    private readonly delivery: OrderDeliveryService,
   ) {}
 
-  async calculate(orderId: string, raw: Record<string, unknown>, owner: Owner) {
-    const destination = this.parseDestination(raw);
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        items: {
-          include: {
-            product: {
-              include: {
-                category: true,
-                shippingProfile: {
-                  include: { packages: { orderBy: { sequence: 'asc' } } },
-                },
-                warehouses: {
-                  where: { isPrimary: true, isActive: true },
-                  include: {
-                    warehouse: { include: { providerConfigs: true } },
-                  },
-                },
-                deliveryServices: {
-                  where: { isEnabled: true },
-                  include: { deliveryService: { include: { provider: true } } },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    if (
-      !order ||
-      (order.userId
-        ? order.userId !== owner.userId
-        : !owner.guestSessionId ||
-          order.guestSessionId !== owner.guestSessionId)
-    )
-      throw new NotFoundException('Order not found');
+  async calculate(
+    orderId: string,
+    _raw: Record<string, unknown>,
+    owner: Owner,
+  ) {
+    const order = await this.delivery.getOwnedOrder(orderId, owner);
     if (order.status !== OrderStatus.AWAITING_PAYMENT)
       throw new DeliveryProviderError(
         'ORDER_NOT_QUOTABLE',
         'Для заказа в текущем статусе нельзя рассчитать доставку.',
       );
 
-    const grouped = new Map<string, any[]>();
-    for (const item of order.items) {
-      if (!item.product.deliveryServices.length) continue;
-      const primary = item.product.warehouses[0];
-      if (!primary)
-        throw new DeliveryProviderError(
-          'PRIMARY_WAREHOUSE_REQUIRED',
-          `Для товара «${item.productTitle ?? item.product.title}» не выбран основной склад.`,
-        );
-      if (!primary.warehouse.isActive || !primary.warehouse.isConfigured)
-        throw new DeliveryProviderError(
-          'WAREHOUSE_NOT_CONFIGURED',
-          `Склад товара «${item.productTitle ?? item.product.title}» не готов к доставке.`,
-        );
-      const key = primary.warehouseId;
-      grouped.set(key, [...(grouped.get(key) ?? []), { ...item, primary }]);
-    }
-    if (!grouped.size)
+    const destination = order.deliveryDestination as DestinationInput | null;
+    const resolution = this.delivery.resolve(order);
+    if (!destination && resolution.groups.length)
       throw new DeliveryProviderError(
-        'NO_DELIVERABLE_ITEMS',
-        'В заказе нет товаров с доступной доставкой.',
+        'DESTINATION_REQUIRED',
+        'Сначала подтвердите адрес доставки.',
       );
-
+    await this.prisma.deliveryQuote.updateMany({
+      where: { orderId, status: 'CREATED', expiresAt: { lte: new Date() } },
+      data: { status: 'EXPIRED', quoteKey: null },
+    });
     const groups: Array<Record<string, unknown>> = [];
-    for (const [warehouseId, items] of grouped)
-      groups.push(
-        await this.calculateGroup(
-          order,
-          warehouseId,
-          items,
-          destination,
-          owner,
-        ),
-      );
-    return { orderId, groups };
+    for (const group of resolution.groups) {
+      try {
+        groups.push(
+          await this.calculateGroup(order, group, destination!, owner),
+        );
+      } catch (error) {
+        groups.push({
+          groupKey: group.groupKey,
+          warehouse: group.warehouse,
+          orderItemIds: group.items.map((item) => item.id),
+          providers: [],
+          error: toUnavailableReason(error),
+        });
+      }
+    }
+    const allGroupsHaveOptions = groups.every((group) =>
+      (group.providers as Array<{ options?: unknown[] }>).some(
+        (provider) => (provider.options?.length ?? 0) > 0,
+      ),
+    );
+    return {
+      orderId,
+      groups,
+      unavailableItems: resolution.unavailableItems,
+      readiness:
+        resolution.unavailableItems.length ||
+        groups.some((group) => 'error' in group) ||
+        !allGroupsHaveOptions
+          ? 'BLOCKED'
+          : 'SELECTION_REQUIRED',
+      readyForSelection:
+        !resolution.unavailableItems.length &&
+        groups.every((group) => !('error' in group)) &&
+        allGroupsHaveOptions,
+    };
   }
 
   private async calculateGroup(
     order: any,
-    warehouseId: string,
-    items: any[],
+    group: ResolvedDeliveryGroup,
     destination: DestinationInput,
     owner: Owner,
   ) {
+    const items = group.items.map((groupItem) => {
+      const item = order.items.find((value: any) => value.id === groupItem.id);
+      const primary = item.product.warehouses.find(
+        (mapping: any) => mapping.warehouseId === group.warehouse.id,
+      );
+      return { ...item, primary };
+    });
     const warehouse = items[0].primary.warehouse;
-    const serviceSets = items.map(
-      (item) =>
-        new Set(
-          item.product.deliveryServices.map(
-            (mapping: any) => mapping.deliveryServiceId,
-          ),
-        ),
-    );
-    const commonServiceIds = [...serviceSets[0]].filter((id) =>
-      serviceSets.every((set) => set.has(id)),
-    );
     const mappings = items[0].product.deliveryServices.filter(
       (mapping: any) =>
-        commonServiceIds.includes(mapping.deliveryServiceId) &&
+        group.commonServiceIds.includes(mapping.deliveryServiceId) &&
+        mapping.isEnabled &&
         mapping.deliveryService.isActive &&
         mapping.deliveryService.provider.isActive,
     );
@@ -144,10 +125,7 @@ export class DeliveryQuoteOrchestrator {
         mapping,
       ]);
     const packages = items.flatMap((item) => this.profiles.resolve(item));
-    const groupKey = createDeliveryFingerprint({
-      warehouseId,
-      orderItemIds: items.map((item) => item.id).sort(),
-    }).slice(0, 24);
+    const groupKey = group.groupKey;
     const providers: Array<Record<string, unknown>> = [];
     for (const providerMappings of byProvider.values()) {
       const provider = providerMappings[0].deliveryService.provider;
@@ -161,9 +139,9 @@ export class DeliveryQuoteOrchestrator {
             'WAREHOUSE_PROVIDER_NOT_CONFIGURED',
             `Склад не подключён к провайдеру «${provider.name}».`,
           );
-        const serviceCodes = providerMappings.map(
-          (mapping: any) => mapping.deliveryService.code,
-        );
+        const serviceCodes = providerMappings
+          .map((mapping: any) => mapping.deliveryService.code)
+          .sort();
         const request = {
           correlationId: randomUUID(),
           groupKey,
@@ -189,15 +167,11 @@ export class DeliveryQuoteOrchestrator {
           packages,
           externalPickupPointId: destination.externalPickupPointId,
         };
-        const fingerprint = createDeliveryFingerprint({
-          version: 1,
-          orderId: order.id,
-          groupKey,
-          providerCode: provider.code,
-          serviceCodes,
-          destination,
-          packages,
-        });
+        const fingerprint = this.delivery.buildFingerprint(
+          order,
+          group,
+          provider.id,
+        );
         const reusable = await this.prisma.deliveryQuote.findMany({
           where: {
             orderId: order.id,
@@ -220,11 +194,29 @@ export class DeliveryQuoteOrchestrator {
               fingerprint,
               request,
               originWarehouse: warehouse,
+              destinationVersion: destination.version,
+              orderDeliveryVersion: order.deliveryVersion,
               options: await this.registry
                 .get(provider.code)
                 .calculateQuotes(request),
             });
-        providers.push({ code: provider.code, name: provider.name, options });
+        const publicOptions = options.filter(
+          (option) => option.fulfillmentType !== 'PICKUP',
+        );
+        providers.push({
+          code: provider.code,
+          name: provider.name,
+          options: publicOptions,
+          ...(publicOptions.length
+            ? {}
+            : {
+                unavailableReason: {
+                  code: 'PICKUP_SELECTION_NOT_AVAILABLE',
+                  message:
+                    'Доставка до пункта выдачи станет доступна после выбора ПВЗ.',
+                },
+              }),
+        });
       } catch (error) {
         providers.push({
           code: provider.code,
@@ -267,56 +259,67 @@ export class DeliveryQuoteOrchestrator {
             );
           const markup = Math.max(0, params.provider.fixedMarkup);
           const normalizedOption = this.serializeOption(option, markup);
-          const quote = await tx.deliveryQuote.create({
-            data: {
-              deliveryProviderId: params.provider.id,
-              deliveryServiceId: service.id,
-              userId: params.owner.userId,
-              guestSessionId: params.owner.userId
-                ? null
-                : params.owner.guestSessionId,
-              orderId: params.order.id,
-              groupKey: params.groupKey,
-              status: 'CREATED',
-              originWarehouseId: params.originWarehouse.id,
-              originSnapshot: {
-                version: 1,
-                warehouseCode: params.originWarehouse.code,
-                address: params.request.origin,
-                contact: {
-                  name: params.request.origin.contactName,
-                  phone: params.request.origin.contactPhone,
-                },
-                timezone: params.originWarehouse.timezone,
+          const quoteKey = createDeliveryFingerprint({
+            fingerprint: params.fingerprint,
+            serviceId: service.id,
+            providerOfferRef: option.providerOfferRef ?? option.title,
+          });
+          const data: Prisma.DeliveryQuoteUncheckedCreateInput = {
+            deliveryProviderId: params.provider.id,
+            deliveryServiceId: service.id,
+            userId: params.owner.userId,
+            guestSessionId: params.owner.userId
+              ? null
+              : params.owner.guestSessionId,
+            orderId: params.order.id,
+            groupKey: params.groupKey,
+            status: 'CREATED',
+            originWarehouseId: params.originWarehouse.id,
+            originSnapshot: {
+              version: 1,
+              warehouseCode: params.originWarehouse.code,
+              address: params.request.origin,
+              contact: {
+                name: params.request.origin.contactName,
+                phone: params.request.origin.contactPhone,
               },
-              destinationSnapshot: {
-                version: 1,
-                address: params.request.destination,
-                recipient: {
-                  name: params.request.destination.recipientName,
-                  phone: params.request.destination.recipientPhone,
-                  email: params.request.destination.recipientEmail,
-                },
-              },
-              cargoSnapshot: { version: 1, items: params.request.packages },
-              providerCost: option.providerCost,
-              customerCharge: option.providerCost + markup,
-              subsidyAmount: 0,
-              markupAmount: markup,
-              expiresAt: option.expiresAt,
-              providerQuoteId: option.providerOfferRef,
-              providerPayload: JSON.parse(
-                JSON.stringify({
-                  version: 1,
-                  contour: option.contour,
-                  mode: option.mode,
-                  rawProviderPrice: option.rawProviderPrice,
-                  offerPayload: option.privateProviderPayload ?? null,
-                  normalizedOption,
-                }),
-              ) as Prisma.InputJsonValue,
-              fingerprint: params.fingerprint,
+              timezone: params.originWarehouse.timezone,
             },
+            destinationSnapshot: {
+              version: 1,
+              address: params.request.destination,
+              recipient: {
+                name: params.request.destination.recipientName,
+                phone: params.request.destination.recipientPhone,
+                email: params.request.destination.recipientEmail,
+              },
+            },
+            cargoSnapshot: { version: 1, items: params.request.packages },
+            providerCost: option.providerCost,
+            customerCharge: option.providerCost + markup,
+            subsidyAmount: 0,
+            markupAmount: markup,
+            expiresAt: option.expiresAt,
+            providerQuoteId: option.providerOfferRef,
+            providerPayload: JSON.parse(
+              JSON.stringify({
+                version: 1,
+                contour: option.contour,
+                mode: option.mode,
+                rawProviderPrice: option.rawProviderPrice,
+                offerPayload: option.privateProviderPayload ?? null,
+                normalizedOption,
+              }),
+            ) as Prisma.InputJsonValue,
+            fingerprint: params.fingerprint,
+            quoteKey,
+            destinationVersion: params.destinationVersion,
+            orderDeliveryVersion: params.orderDeliveryVersion,
+          };
+          const quote = await tx.deliveryQuote.upsert({
+            where: { quoteKey },
+            create: data,
+            update: {},
           });
           return { quoteId: quote.id, ...normalizedOption };
         }),
@@ -330,8 +333,6 @@ export class DeliveryQuoteOrchestrator {
       title: option.title,
       description: option.description,
       fulfillmentType: option.fulfillmentType,
-      providerCost: option.providerCost,
-      markup,
       customerPrice: option.providerCost + markup,
       currency: option.currency,
       pickupInterval: option.pickupInterval,
@@ -343,45 +344,12 @@ export class DeliveryQuoteOrchestrator {
 
   private publicOptionFromQuote(quote: any) {
     const payload = quote.providerPayload as any;
-    return { quoteId: quote.id, ...payload.normalizedOption };
-  }
-
-  private parseDestination(body: Record<string, unknown>): DestinationInput {
-    const required = (key: string) => {
-      const value = body[key];
-      if (typeof value !== 'string' || !value.trim())
-        throw new DeliveryProviderError(
-          'DESTINATION_INCOMPLETE',
-          `Поле ${key} обязательно.`,
-        );
-      return value.trim();
-    };
-    const coordinate = (key: string) =>
-      body[key] == null || body[key] === '' ? undefined : Number(body[key]);
-    return {
-      country: required('country'),
-      region: typeof body.region === 'string' ? body.region.trim() : undefined,
-      city: required('city'),
-      street: typeof body.street === 'string' ? body.street.trim() : undefined,
-      building:
-        typeof body.building === 'string' ? body.building.trim() : undefined,
-      fullAddress: required('fullAddress'),
-      postalCode:
-        typeof body.postalCode === 'string'
-          ? body.postalCode.trim()
-          : undefined,
-      latitude: coordinate('latitude'),
-      longitude: coordinate('longitude'),
-      recipientName: required('recipientName'),
-      recipientPhone: required('recipientPhone'),
-      recipientEmail:
-        typeof body.recipientEmail === 'string'
-          ? body.recipientEmail.trim()
-          : undefined,
-      externalPickupPointId:
-        typeof body.externalPickupPointId === 'string'
-          ? body.externalPickupPointId.trim()
-          : undefined,
-    };
+    const {
+      providerCost: _providerCost,
+      markup: _markup,
+      pickupPoint: _pickupPoint,
+      ...publicOption
+    } = payload.normalizedOption;
+    return { quoteId: quote.id, ...publicOption };
   }
 }

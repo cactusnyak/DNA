@@ -35,7 +35,7 @@ export function OrderDetailsPage() {
 
   const orderQuery = useQuery({
     queryKey: ['my-order', orderId, accessToken],
-    queryFn: () => getOrder(accessToken, orderId),
+    queryFn: () => getOrder(orderId, accessToken),
     enabled: Boolean(accessToken && orderId),
   });
 

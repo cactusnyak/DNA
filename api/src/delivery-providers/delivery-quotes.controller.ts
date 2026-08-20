@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Body, Controller, Headers, Param, Post } from '@nestjs/common';
+import { Controller, Headers, Param, Post } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 
 import { AuthService } from '../auth/auth.service';
@@ -16,15 +16,18 @@ export class OrderDeliveryQuotesController {
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async calculate(
     @Param('orderId') orderId: string,
-    @Body() body: Record<string, unknown>,
     @Headers('authorization') authorization?: string,
     @Headers('x-guest-session-id') guestSessionId?: string,
   ) {
     const user =
       await this.auth.getOptionalMeFromAuthorizationHeader(authorization);
-    return this.orchestrator.calculate(orderId, body, {
-      userId: user?.id,
-      guestSessionId,
-    });
+    return this.orchestrator.calculate(
+      orderId,
+      {},
+      {
+        userId: user?.id,
+        guestSessionId,
+      },
+    );
   }
 }

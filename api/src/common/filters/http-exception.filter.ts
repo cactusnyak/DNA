@@ -36,9 +36,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       success: false,
       data: null,
       error: {
-        code: details?.error ?? HttpStatus[status],
+        code: details?.code ?? details?.error ?? HttpStatus[status],
         message,
         path: request.url,
+        ...(typeof details?.retriable === 'boolean'
+          ? { retriable: details.retriable }
+          : {}),
       },
     });
   }

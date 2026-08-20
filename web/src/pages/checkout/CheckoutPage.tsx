@@ -5,6 +5,7 @@ import { ContentCard } from '@/components/ui/ContentCard';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useAuthStore } from '@/entities/auth';
 import { getOrder } from '@/entities/order';
+import { useSessionStore } from '@/entities/session';
 import { Checkout } from '@/features/checkout';
 import { CheckoutPaymentState } from '@/features/checkout/components/CheckoutPaymentState/CheckoutPaymentState';
 
@@ -12,15 +13,16 @@ export function CheckoutPage() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId')?.trim() ?? '';
   const accessToken = useAuthStore((state) => state.accessToken) ?? '';
+  const guestSessionId = useSessionStore((state) => state.guestSessionId);
   const orderQuery = useQuery({
-    queryKey: ['my-order', orderId, accessToken],
-    queryFn: () => getOrder(accessToken, orderId),
-    enabled: Boolean(orderId && accessToken),
+    queryKey: ['my-order', orderId, accessToken, guestSessionId],
+    queryFn: () => getOrder(orderId, accessToken || undefined, accessToken ? undefined : guestSessionId),
+    enabled: Boolean(orderId && (accessToken || guestSessionId)),
   });
 
   if (orderId) {
-    if (!accessToken) {
-      return <ContentCard><ErrorMessage>Войдите в профиль, чтобы продолжить оплату заказа.</ErrorMessage><Link to="/authorization" className="mt-4 inline-block underline">Войти</Link></ContentCard>;
+    if (!accessToken && !guestSessionId) {
+      return <ContentCard><ErrorMessage>Сессия заказа не найдена. Войдите в профиль или начните новое оформление.</ErrorMessage><Link to="/authorization" className="mt-4 inline-block underline">Войти</Link></ContentCard>;
     }
     if (orderQuery.isPending) return <ContentCard>Загружаем заказ…</ContentCard>;
     if (orderQuery.isError || !orderQuery.data) {

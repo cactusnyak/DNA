@@ -12,6 +12,7 @@ import { useSessionStore } from '@/entities/session';
 import { OrderDetailsTable } from './components/OrderDetailsTable';
 import { OrderItemsList } from './components/OrderItemsList';
 import { PaymentActions } from './components/PaymentActions';
+import { DeliveryWidget } from '../DeliveryWidget';
 
 declare global {
   interface Window {
@@ -62,6 +63,7 @@ function loadCheckoutWidgetScript() {
 }
 
 export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
+  const [currentOrder, setCurrentOrder] = useState(order);
   const [stage, setStage] = useState<PaymentStage>('idle');
   const [confirmationToken, setConfirmationToken] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -72,7 +74,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   const initiateMutation = useMutation({
     mutationFn: () =>
       initiatePayment(
-        order.id,
+        currentOrder.id,
         accessToken ?? undefined,
         accessToken ? undefined : guestSessionId,
       ),
@@ -114,7 +116,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         widgetRef.current?.destroy();
         const widget = new window.YooMoneyCheckoutWidget({
           confirmation_token: confirmationToken,
-          return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
+          return_url: `${window.location.origin}/checkout/result?orderId=${currentOrder.id}`,
           error_callback: () => {
             if (cancelled) return;
             setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
@@ -134,7 +136,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     return () => {
       cancelled = true;
     };
-  }, [confirmationToken, order.id, stage]);
+  }, [confirmationToken, currentOrder.id, stage]);
 
   return (
     <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
@@ -146,13 +148,15 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         <h1 className="text-2xl font-semibold">Заказ ожидает оплаты</h1>
 
         <p className="text-sm text-muted-foreground">
-          Номер заказа: <span className="text-foreground">{order.id}</span>
+          Номер заказа: <span className="text-foreground">{currentOrder.id}</span>
         </p>
       </div>
 
-      <OrderDetailsTable order={order} />
+      <OrderDetailsTable order={currentOrder} />
 
-      <OrderItemsList items={order.items} />
+      <OrderItemsList items={currentOrder.items} />
+
+      <DeliveryWidget order={currentOrder} onOrderChange={setCurrentOrder} />
 
       {stage === 'error' && errorMessage && (
         <ErrorMessage>
@@ -176,12 +180,16 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
 
       <p className="text-xs text-muted-foreground">К заказу применяется <Link className="font-medium text-foreground underline underline-offset-2" to="/public-offer">Публичная оферта</Link>.</p>
 
-      {stage !== 'widget' && (
+      {stage !== 'widget' && currentOrder.delivery.readyForPayment && (
         <PaymentActions
           isPending={initiateMutation.isPending || stage === 'loading'}
           isRetry={stage === 'error'}
           onPay={() => initiateMutation.mutate()}
         />
+      )}
+
+      {!currentOrder.delivery.readyForPayment && (
+        <ErrorMessage>{currentOrder.delivery.blockingReasons[0] ?? 'Выберите доставку перед оплатой.'}</ErrorMessage>
       )}
     </section>
   );

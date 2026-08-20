@@ -3,8 +3,11 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { DeliveryProviderRegistry } from './delivery-provider.registry';
+import { DeliveryGroupResolver } from './delivery-group.resolver';
 import { DeliveryQuoteOrchestrator } from './delivery-quote.orchestrator';
 import { OrderDeliveryQuotesController } from './delivery-quotes.controller';
+import { OrderDeliveryController } from './order-delivery.controller';
+import { OrderDeliveryService } from './order-delivery.service';
 import { EffectiveShippingProfileResolver } from './effective-shipping-profile.resolver';
 import { YandexCargoClient } from './yandex/cargo/yandex-cargo.client';
 import { YandexDeliveryAdapter } from './yandex/yandex-delivery.adapter';
@@ -15,8 +18,10 @@ import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
 
 @Module({
   imports: [PrismaModule, AuthModule],
-  controllers: [OrderDeliveryQuotesController],
+  controllers: [OrderDeliveryQuotesController, OrderDeliveryController],
   providers: [
+    DeliveryGroupResolver,
+    OrderDeliveryService,
     DeliveryProviderRegistry,
     DeliveryQuoteOrchestrator,
     EffectiveShippingProfileResolver,
@@ -27,6 +32,10 @@ import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
     YandexRussiaClient,
     YandexDeliveryAdapter,
   ],
-  exports: [DeliveryProviderRegistry, DeliveryQuoteOrchestrator],
+  exports: [
+    DeliveryProviderRegistry,
+    DeliveryQuoteOrchestrator,
+    OrderDeliveryService,
+  ],
 })
 export class DeliveryProvidersModule {}

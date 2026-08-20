@@ -8,6 +8,7 @@ import {
 import { OrderStatus, OversizedDeliveryQuoteStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { OrderDeliveryService } from '../delivery-providers/order-delivery.service';
 import {
   resolveSelectedProductAdditions,
   type SelectedProductAddition,
@@ -28,7 +29,10 @@ type NormalizedOrderItem = {
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly orderDeliveryService: OrderDeliveryService,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto, userId?: string) {
     const customerName = this.getRequiredString(
@@ -220,7 +224,7 @@ export class OrdersService {
       include: this.getOrderInclude(),
     });
 
-    return this.mapOrder(order);
+    return this.mapOrderWithDelivery(order);
   }
 
   async findMyOrders(userId: string) {
@@ -234,7 +238,7 @@ export class OrdersService {
       },
     });
 
-    return orders.map((order) => this.mapOrder(order));
+    return Promise.all(orders.map((order) => this.mapOrderWithDelivery(order)));
   }
 
   async findById(orderId: string) {
@@ -249,7 +253,7 @@ export class OrdersService {
       throw new NotFoundException('Order not found');
     }
 
-    return this.mapOrder(order);
+    return this.mapOrderWithDelivery(order);
   }
 
   async findOwnedById(orderId: string, userId: string) {
@@ -258,7 +262,7 @@ export class OrdersService {
       include: this.getOrderInclude(),
     });
     if (!order) throw new NotFoundException('Order not found');
-    return this.mapOrder(order);
+    return this.mapOrderWithDelivery(order);
   }
 
   async rebuildOwnedOrder(orderId: string, userId: string) {
@@ -496,6 +500,13 @@ export class OrdersService {
         deliverySnapshot: item.deliverySnapshot ?? undefined,
         product: item.product ? this.mapOrderProduct(item.product) : undefined,
       })),
+    };
+  }
+
+  private async mapOrderWithDelivery(order: any) {
+    return {
+      ...this.mapOrder(order),
+      delivery: await this.orderDeliveryService.getState(order.id),
     };
   }
 
