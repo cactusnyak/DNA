@@ -15,12 +15,14 @@ import {
 import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
 
 import { AdminInputService } from './admin-input.service';
+import { OrderDeliveryInvalidationService } from '../delivery-providers/order-delivery-invalidation.service';
 
 @Injectable()
 export class AdminMarketCatalogService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly adminInputService: AdminInputService,
+    private readonly deliveryInvalidation?: OrderDeliveryInvalidationService,
   ) {}
 
   async createCategory(body: unknown) {
@@ -213,6 +215,9 @@ export class AdminMarketCatalogService {
         this.adminInputService.getImageUrls(payload),
       );
     }
+
+    if ('logistics' in payload)
+      await this.deliveryInvalidation?.invalidateAffected({ productId: id });
 
     return this.getAdminProductById(id);
   }

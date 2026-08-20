@@ -19,6 +19,7 @@ import {
   createCartConfigurationKey,
 } from '@/entities/product/lib/product-additions';
 import { HttpError } from '@/shared/api/http-client';
+import { formatDeliveryInterval } from '@/entities/order-delivery';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type Confirmation = 'merge' | 'remove';
@@ -129,6 +130,24 @@ export function OrderDetailsPage() {
         <dt className="text-muted-foreground">Адрес доставки</dt><dd>{order.deliveryAddress}</dd>
         <dt className="text-muted-foreground">Комментарий</dt><dd>{order.comment || '—'}</dd>
       </dl>
+
+      {order.delivery.selectedPlanId && (() => {
+        const plan = order.delivery.plans.find((candidate) => candidate.planId === order.delivery.selectedPlanId);
+        return plan ? (
+          <section className="mt-6 space-y-3 rounded-xl border border-border/80 p-4">
+            <div className="flex justify-between gap-3"><strong>{plan.title}</strong><span>{formatPrice(plan.customerPrice)}</span></div>
+            <p className="text-sm text-muted-foreground">{plan.shipmentCount > 1 ? `Ожидается отправлений: ${plan.shipmentCount}` : 'Одно отправление'}</p>
+            {plan.parts.map((part) => (
+              <div key={part.partId} className="text-sm">
+                <p>{part.provider.name} · {part.service.name}</p>
+                <p className="text-muted-foreground">{part.items.map((item) => `${item.title} × ${item.quantity}`).join(', ')}</p>
+                {part.deliveryInterval && <p className="text-muted-foreground">{formatDeliveryInterval(part.deliveryInterval)}</p>}
+              </div>
+            ))}
+            <p className="text-xs text-muted-foreground">{order.delivery.readyForPayment ? 'Доставка актуальна, заказ готов к оплате.' : order.delivery.blockingReasons[0] ?? 'Требуется обновить доставку.'}</p>
+          </section>
+        ) : null;
+      })()}
 
       <p className="mt-6 text-sm text-muted-foreground">При повторе применяются текущие цены и доступные параметры. Исходный заказ останется без изменений.</p>
       {error && <ErrorMessage className="mt-3" role="alert">{error}</ErrorMessage>}

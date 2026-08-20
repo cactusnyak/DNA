@@ -16,9 +16,36 @@ export type OrderDeliveryDestination = {
   version: number;
 };
 
+export type DeliveryInterval = { from: string; to: string };
+
+export type DeliveryPlan = {
+  planId: string;
+  title: string;
+  badges: Array<'RECOMMENDED' | 'CHEAPEST' | 'FASTEST'>;
+  customerPrice: number;
+  currency: 'RUB';
+  deliveryInterval?: DeliveryInterval;
+  shipmentCount: number;
+  expiresAt: string;
+  parts: Array<{
+    partId: string;
+    items: Array<{
+      orderItemId: string;
+      title: string;
+      quantity: number;
+      image?: unknown;
+    }>;
+    provider: { code: string; name: string };
+    service: {
+      code: string;
+      name: string;
+      fulfillmentType: 'DOOR' | 'PICKUP';
+    };
+    deliveryInterval?: DeliveryInterval;
+  }>;
+};
+
 export type DeliveryOption = {
-  quoteId: string;
-  serviceCode: string;
   title: string;
   description?: string;
   fulfillmentType: 'DOOR' | 'PICKUP';
@@ -29,27 +56,25 @@ export type DeliveryOption = {
   expiresAt: string;
 };
 
-export type DeliveryProviderOptions = {
-  code: string;
-  name: string;
-  options: DeliveryOption[];
-  unavailableReason?: { code: string; message: string; retriable?: boolean };
-};
-
-export type OrderDeliveryGroup = {
-  groupKey: string;
-  warehouse: { id: string; name: string };
-  items: Array<{ orderItemId: string; title: string; quantity: number }>;
-  providers: DeliveryProviderOptions[];
-  selectedQuote: DeliveryOption | null;
-  readiness: { status: 'QUOTE_REQUIRED' | 'SELECTION_REQUIRED' | 'SELECTED' };
-};
-
 export type OrderDeliveryState = {
-  status: 'ADDRESS_REQUIRED' | 'READY_FOR_QUOTE' | 'QUOTING' | 'SELECTION_REQUIRED' | 'READY_FOR_PAYMENT' | 'BLOCKED';
+  status:
+    | 'ADDRESS_REQUIRED'
+    | 'READY_FOR_QUOTE'
+    | 'QUOTING'
+    | 'SELECTION_REQUIRED'
+    | 'READY_FOR_PAYMENT'
+    | 'BLOCKED';
   destination: OrderDeliveryDestination | null;
-  groups: OrderDeliveryGroup[];
-  unavailableItems: Array<{ orderItemId: string; title: string; quantity: number; code: string; message: string }>;
+  plans: DeliveryPlan[];
+  selectedPlanId: string | null;
+  unavailableItems: Array<{
+    orderItemId: string;
+    title: string;
+    quantity: number;
+    code: string;
+    message: string;
+    retriable: boolean;
+  }>;
   pricing: {
     itemsSubtotal: number;
     oversizedDeliveryAmount: number;
@@ -63,5 +88,11 @@ export type OrderDeliveryState = {
   blockingReasons: string[];
 };
 
-export type DeliveryCredentials = { accessToken?: string; guestSessionId?: string };
-export type UpdateDestinationPayload = Omit<OrderDeliveryDestination, 'version'>;
+export type DeliveryCredentials = {
+  accessToken?: string;
+  guestSessionId?: string;
+};
+export type UpdateDestinationPayload = Omit<
+  OrderDeliveryDestination,
+  'version'
+>;

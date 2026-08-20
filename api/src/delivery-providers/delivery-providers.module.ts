@@ -4,6 +4,9 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { DeliveryProviderRegistry } from './delivery-provider.registry';
 import { DeliveryGroupResolver } from './delivery-group.resolver';
+import { DeliveryPlanBuilder } from './delivery-plan.builder';
+import { DeliveryLocationResolver } from './delivery-location.resolver';
+import { OrderDeliveryInvalidationService } from './order-delivery-invalidation.service';
 import { DeliveryQuoteOrchestrator } from './delivery-quote.orchestrator';
 import { OrderDeliveryQuotesController } from './delivery-quotes.controller';
 import { OrderDeliveryController } from './order-delivery.controller';
@@ -21,6 +24,9 @@ import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
   controllers: [OrderDeliveryQuotesController, OrderDeliveryController],
   providers: [
     DeliveryGroupResolver,
+    DeliveryPlanBuilder,
+    DeliveryLocationResolver,
+    OrderDeliveryInvalidationService,
     OrderDeliveryService,
     DeliveryProviderRegistry,
     DeliveryQuoteOrchestrator,
@@ -36,6 +42,7 @@ import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
     DeliveryProviderRegistry,
     DeliveryQuoteOrchestrator,
     OrderDeliveryService,
+    OrderDeliveryInvalidationService,
   ],
 })
 export class DeliveryProvidersModule {}

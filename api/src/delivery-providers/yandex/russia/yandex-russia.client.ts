@@ -7,20 +7,14 @@ import type {
 import { DeliveryProviderError } from '../../delivery-provider.error';
 import {
   millimetersToCentimeters,
-  normalizeKopecks,
-  normalizeRussianPhone,
+  normalizeDecimalRubles,
 } from '../../utils/logistics-units';
 import { YandexDeliveryConfig } from '../yandex-delivery.config';
 import { YandexHttpClient } from '../yandex-http.client';
 
-type RussiaOffer = {
-  id?: string;
-  offer_id?: string;
-  price?: number;
-  cost?: number;
-  delivery_interval?: { from?: string; to?: string };
-  title?: string;
-  description?: string;
+type RussiaPricingResponse = {
+  pricing_total?: string;
+  delivery_days?: number;
 };
 
 @Injectable()
@@ -50,51 +44,50 @@ export class YandexRussiaClient {
       path: '/api/b2b/platform/pricing-calculator',
       correlationId: request.correlationId,
       body: {
-        platform_station_id: stationId,
-        recipient: {
-          name: request.destination.recipientName,
-          phone: normalizeRussianPhone(request.destination.recipientPhone),
-          email: request.destination.recipientEmail,
-        },
-        destination: {
-          address: request.destination.fullAddress,
-          postal_code: request.destination.postalCode,
-        },
-        pickup_point_id: request.externalPickupPointId,
+        source: { platform_station_id: stationId },
+        destination: request.externalPickupPointId
+          ? { platform_station_id: request.externalPickupPointId }
+          : { address: request.destination.fullAddress },
+        tariff: request.externalPickupPointId ? 'self_pickup' : 'time_interval',
+        total_weight: request.packages.reduce(
+          (sum, item) => sum + item.weightGrams * item.quantity,
+          0,
+        ),
+        total_assessed_price: 0,
+        client_price: 0,
+        payment_method: 'already_paid',
         places: request.packages.map((item) => ({
-          external_id: `${item.orderItemId}:${item.packageSequence}`,
-          weight: item.weightGrams * item.quantity,
-          dimensions: {
-            length: millimetersToCentimeters(item.lengthMillimeters),
-            width: millimetersToCentimeters(item.widthMillimeters),
-            height: millimetersToCentimeters(item.heightMillimeters),
+          physical_dims: {
+            weight_gross: item.weightGrams * item.quantity,
+            dx: millimetersToCentimeters(item.lengthMillimeters),
+            dy: millimetersToCentimeters(item.widthMillimeters),
+            dz: millimetersToCentimeters(item.heightMillimeters),
           },
         })),
       },
     });
-    const offers = this.parseOffers(response);
+    const pricing = this.parsePricing(response);
     const pickup = Boolean(request.externalPickupPointId);
-    return offers.map((offer, index) => ({
-      serviceCode: pickup ? 'YANDEX_RUSSIA_PICKUP' : 'YANDEX_RUSSIA_DOOR',
-      title: offer.title || (pickup ? 'Доставка до ПВЗ' : 'Доставка до двери'),
-      description: offer.description,
-      fulfillmentType: pickup ? 'PICKUP' : 'DOOR',
-      providerCost: normalizeKopecks(offer.price ?? offer.cost),
-      currency: 'RUB',
-      deliveryInterval:
-        offer.delivery_interval?.from && offer.delivery_interval.to
-          ? {
-              from: offer.delivery_interval.from,
-              to: offer.delivery_interval.to,
-            }
+    return [
+      {
+        serviceCode: pickup ? 'YANDEX_RUSSIA_PICKUP' : 'YANDEX_RUSSIA_DOOR',
+        title: pickup ? 'Доставка до ПВЗ' : 'Доставка до двери',
+        description: pricing.delivery_days
+          ? `Ориентировочно ${pricing.delivery_days} дн.`
           : undefined,
-      expiresAt: new Date(Date.now() + this.config.quoteTtlSeconds * 1000),
-      providerOfferRef: offer.offer_id ?? offer.id ?? `russia:${index}`,
-      privateProviderPayload: offer,
-      rawProviderPrice: { kopecks: offer.price ?? offer.cost, currency: 'RUB' },
-      contour: 'russia',
-      mode: this.config.russiaMode,
-    }));
+        fulfillmentType: pickup ? 'PICKUP' : 'DOOR',
+        providerCost: normalizeDecimalRubles(
+          pricing.pricing_total?.replace(/\s*RUB\s*$/i, ''),
+        ),
+        currency: 'RUB',
+        expiresAt: new Date(Date.now() + this.config.quoteTtlSeconds * 1000),
+        providerOfferRef: `russia:${pricing.delivery_days ?? 'unknown'}:${pricing.pricing_total}`,
+        privateProviderPayload: pricing,
+        rawProviderPrice: { value: pricing.pricing_total, currency: 'RUB' },
+        contour: 'russia',
+        mode: this.config.russiaMode,
+      },
+    ];
   }
 
   async detectLocation(address: string, correlationId: string) {
@@ -104,7 +97,7 @@ export class YandexRussiaClient {
       token: this.config.russiaToken,
       path: '/api/b2b/platform/location/detect',
       correlationId,
-      body: { address },
+      body: { location: address },
     });
   }
 
@@ -123,26 +116,16 @@ export class YandexRussiaClient {
     });
   }
 
-  private parseOffers(value: unknown): RussiaOffer[] {
+  private parsePricing(value: unknown): RussiaPricingResponse {
     const record =
       value && typeof value === 'object'
-        ? (value as Record<string, unknown>)
+        ? (value as RussiaPricingResponse)
         : {};
-    const raw = Array.isArray(record.offers)
-      ? record.offers
-      : Array.isArray(record.pricing_options)
-        ? record.pricing_options
-        : [];
-    const offers = raw.filter((item): item is RussiaOffer =>
-      Boolean(
-        item && typeof item === 'object' && ('price' in item || 'cost' in item),
-      ),
-    );
-    if (!offers.length)
+    if (typeof record.pricing_total !== 'string')
       throw new DeliveryProviderError(
-        'NO_AVAILABLE_OFFERS',
-        'Яндекс не вернул доступных вариантов доставки.',
+        'MALFORMED_PROVIDER_RESPONSE',
+        'Яндекс вернул расчёт доставки в неизвестном формате.',
       );
-    return offers;
+    return record;
   }
 }

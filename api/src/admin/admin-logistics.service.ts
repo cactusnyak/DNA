@@ -13,6 +13,7 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminInputService } from './admin-input.service';
+import { OrderDeliveryInvalidationService } from '../delivery-providers/order-delivery-invalidation.service';
 
 const WAREHOUSE_REQUIRED_FIELDS = [
   'country',
@@ -40,6 +41,7 @@ export class AdminLogisticsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly input: AdminInputService,
+    private readonly deliveryInvalidation?: OrderDeliveryInvalidationService,
   ) {}
 
   async getConfiguration() {
@@ -85,6 +87,7 @@ export class AdminLogisticsService {
       await this.replaceWarehouseProviderConfigs(id, body, tx);
     });
     await this.audit('LOGISTICS_WAREHOUSE_UPDATED', 'Warehouse', id);
+    await this.deliveryInvalidation?.invalidateAffected({ warehouseId: id });
     return this.getWarehouse(id);
   }
 
@@ -110,6 +113,7 @@ export class AdminLogisticsService {
         data: { isActive: false },
       });
       await this.audit('LOGISTICS_WAREHOUSE_ARCHIVED', 'Warehouse', id);
+      await this.deliveryInvalidation?.invalidateAffected({ warehouseId: id });
       return { archived: true };
     }
     await this.prisma.warehouse.delete({ where: { id } });
@@ -132,7 +136,7 @@ export class AdminLogisticsService {
 
   async updateProvider(id: string, body: unknown) {
     const payload = this.input.getObjectBody(body);
-    await this.assertProviderExists(id);
+    const previous = await this.assertProviderExists(id);
     const result = await this.prisma.deliveryProvider.update({
       where: { id },
       data: {
@@ -148,6 +152,11 @@ export class AdminLogisticsService {
       },
     });
     await this.audit('LOGISTICS_PROVIDER_UPDATED', 'DeliveryProvider', id);
+    if (
+      previous.isActive !== result.isActive ||
+      previous.fixedMarkup !== result.fixedMarkup
+    )
+      await this.deliveryInvalidation?.invalidateAffected({ providerId: id });
     return result;
   }
 
@@ -168,6 +177,8 @@ export class AdminLogisticsService {
       },
     });
     await this.audit('LOGISTICS_SERVICE_UPDATED', 'DeliveryService', id);
+    if (service.isActive !== result.isActive)
+      await this.deliveryInvalidation?.invalidateAffected({ serviceId: id });
     return result;
   }
 
@@ -515,13 +526,12 @@ export class AdminLogisticsService {
   }
 
   private async assertProviderExists(id: string) {
-    if (
-      !(await this.prisma.deliveryProvider.findUnique({
-        where: { id },
-        select: { id: true },
-      }))
-    )
-      throw new NotFoundException('Delivery provider not found');
+    const provider = await this.prisma.deliveryProvider.findUnique({
+      where: { id },
+      select: { id: true, isActive: true, fixedMarkup: true },
+    });
+    if (!provider) throw new NotFoundException('Delivery provider not found');
+    return provider;
   }
 
   private audit(action: string, targetType: string, targetId: string) {

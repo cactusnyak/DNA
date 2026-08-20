@@ -4,6 +4,7 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { StorageModule } from '../storage/storage.module';
 import { UsersModule } from '../users/users.module';
+import { DeliveryProvidersModule } from '../delivery-providers/delivery-providers.module';
 
 import { AdminAdCategoriesController } from './admin-ad-categories.controller';
 import { AdminAdsController } from './admin-ads.controller';
@@ -27,7 +28,13 @@ import { AdminLogisticsController } from './admin-logistics.controller';
 import { AdminLogisticsService } from './admin-logistics.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, StorageModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    StorageModule,
+    DeliveryProvidersModule,
+  ],
   controllers: [
     AdminOverviewController,
     AdminUploadsController,

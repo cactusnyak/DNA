@@ -15,12 +15,18 @@ import {
   type ResolvedDeliveryGroup,
 } from './delivery-group.resolver';
 import type {
+  UpdateOrderDeliveryPlanDto,
   UpdateOrderDeliverySelectionsDto,
   UpdateOrderDestinationDto,
 } from './dto/order-delivery.dto';
 import { createDeliveryFingerprint } from './utils/delivery-fingerprint';
 import { normalizeRussianPhone } from './utils/logistics-units';
 import { calculateOrderPricing } from './order-delivery-pricing';
+import { OrderDeliveryInvalidationService } from './order-delivery-invalidation.service';
+import {
+  DeliveryPlanBuilder,
+  type DeliveryPlanGroup,
+} from './delivery-plan.builder';
 
 export type DeliveryOwner = { userId?: string; guestSessionId?: string };
 export type OrderDeliveryDestination = {
@@ -52,26 +58,32 @@ export class OrderDeliveryService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly resolver: DeliveryGroupResolver,
+    private readonly planBuilder: DeliveryPlanBuilder,
+    private readonly invalidation: OrderDeliveryInvalidationService,
   ) {}
 
   async getOwnedOrder(orderId: string, owner: DeliveryOwner) {
     const order = await this.loadOrder(this.prisma, orderId);
-    if (
-      !order ||
-      (order.userId
-        ? order.userId !== owner.userId
-        : !owner.guestSessionId ||
-          order.guestSessionId !== owner.guestSessionId)
-    )
+    if (!order || !this.isOwnedBy(order, owner))
       throw new NotFoundException('Order not found');
     return order;
   }
 
   async getState(orderId: string, owner?: DeliveryOwner) {
-    const order = owner
+    let order = owner
       ? await this.getOwnedOrder(orderId, owner)
       : await this.loadOrder(this.prisma, orderId);
     if (!order) throw new NotFoundException('Order not found');
+    if (
+      order.status === OrderStatus.AWAITING_PAYMENT &&
+      this.hasStaleSelections(order)
+    ) {
+      await this.invalidation.invalidateOrder(orderId);
+      order = owner
+        ? await this.getOwnedOrder(orderId, owner)
+        : await this.loadOrder(this.prisma, orderId);
+      if (!order) throw new NotFoundException('Order not found');
+    }
     return this.buildState(order);
   }
 
@@ -267,6 +279,114 @@ export class OrderDeliveryService {
     return this.getState(orderId, owner);
   }
 
+  async selectPlan(
+    orderId: string,
+    dto: UpdateOrderDeliveryPlanDto,
+    owner: DeliveryOwner,
+  ) {
+    await this.getState(orderId, owner);
+    await this.prisma.$transaction(
+      async (tx) => {
+        const order = await this.loadOrder(tx, orderId);
+        if (!order || !this.isOwnedBy(order, owner))
+          throw new NotFoundException('Order not found');
+        this.assertEditable(order);
+        this.assertNoActivePayment(order);
+        if (
+          dto.pricingVersion != null &&
+          dto.pricingVersion !== order.pricingVersion
+        )
+          throw new ConflictException('Delivery pricing version is stale');
+        const destination = this.destination(order.deliveryDestination);
+        if (!destination)
+          throw new DeliveryProviderError(
+            'DESTINATION_REQUIRED',
+            'Сначала подтвердите адрес доставки.',
+          );
+        const resolution = this.resolve(order);
+        const plans = this.buildPlans(order, resolution.groups, destination);
+        const plan = plans.find((candidate) => candidate.planId === dto.planId);
+        if (!plan)
+          throw new ConflictException(
+            'Вариант доставки устарел. Пересчитайте доставку.',
+          );
+        if (plan.selections.length !== resolution.groups.length)
+          throw new ConflictException('Delivery plan does not cover the order');
+
+        const quoteIds = plan.selections.map((selection) => selection.quoteId);
+        const quotes = await tx.deliveryQuote.findMany({
+          where: { id: { in: quoteIds } },
+          include: { deliveryProvider: true, deliveryService: true },
+        });
+        const quoteById = new Map(quotes.map((quote) => [quote.id, quote]));
+        const groupByKey = new Map(
+          resolution.groups.map((group) => [group.groupKey, group]),
+        );
+        const now = new Date();
+        for (const selection of plan.selections) {
+          const group = groupByKey.get(selection.groupKey);
+          const quote = quoteById.get(selection.quoteId);
+          if (
+            !group ||
+            !quote ||
+            quote.orderId !== orderId ||
+            quote.groupKey !== selection.groupKey ||
+            quote.expiresAt <= now ||
+            !['CREATED', 'SELECTED'].includes(quote.status) ||
+            quote.destinationVersion !== destination.version ||
+            quote.orderDeliveryVersion !== order.deliveryVersion ||
+            !quote.deliveryProvider.isActive ||
+            !quote.deliveryService.isActive ||
+            this.buildFingerprint(order, group, quote.deliveryProviderId) !==
+              quote.fingerprint
+          )
+            throw new ConflictException(
+              'Вариант доставки устарел. Пересчитайте доставку.',
+            );
+        }
+
+        const currentBundle = order.deliverySelections
+          .map((selection: any) => selection.deliveryQuoteId)
+          .sort()
+          .join(':');
+        const nextBundle = [...quoteIds].sort().join(':');
+        if (currentBundle === nextBundle) return;
+
+        await tx.orderDeliverySelection.deleteMany({ where: { orderId } });
+        await tx.orderDeliverySelection.createMany({
+          data: plan.selections.map((selection) => {
+            const quote = quoteById.get(selection.quoteId)!;
+            return {
+              orderId,
+              groupKey: selection.groupKey,
+              deliveryQuoteId: quote.id,
+              customerCharge: quote.customerCharge,
+              currency: quote.currency,
+              quoteFingerprint: quote.fingerprint,
+              destinationVersion: quote.destinationVersion,
+              orderDeliveryVersion: quote.orderDeliveryVersion,
+            };
+          }),
+        });
+        await tx.deliveryQuote.updateMany({
+          where: { orderId, status: 'SELECTED', id: { notIn: quoteIds } },
+          data: { status: 'CREATED', selectedAt: null },
+        });
+        await tx.deliveryQuote.updateMany({
+          where: { id: { in: quoteIds } },
+          data: { status: 'SELECTED', selectedAt: now },
+        });
+        await tx.order.update({
+          where: { id: orderId },
+          data: { pricingVersion: { increment: 1 } },
+        });
+        await this.reprice(tx, orderId);
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+    return this.getState(orderId, owner);
+  }
+
   async assertReadyForPayment(orderId: string, owner: DeliveryOwner) {
     const order = await this.getOwnedOrder(orderId, owner);
     const state = await this.buildState(order);
@@ -281,6 +401,10 @@ export class OrderDeliveryService {
   }
 
   async preparePayment(orderId: string, owner: DeliveryOwner) {
+    // Explicit lazy reconciliation before entering the payment transaction:
+    // expired/config-stale selections are removed and Order.totalAmount is
+    // repriced before the payment guard evaluates readiness.
+    await this.getState(orderId, owner);
     return this.prisma.$transaction(
       async (tx) => {
         const order = await this.loadOrder(tx, orderId);
@@ -388,6 +512,10 @@ export class OrderDeliveryService {
           latitude: this.number(fullWarehouse.latitude),
           longitude: this.number(fullWarehouse.longitude),
         },
+        quoteContact: {
+          name: fullWarehouse.contactName,
+          phone: fullWarehouse.contactPhone,
+        },
         providerConfig: {
           enabled: providerConfig?.isEnabled,
           externalLocationId: providerConfig?.externalLocationId,
@@ -463,89 +591,96 @@ export class OrderDeliveryService {
     );
   }
 
-  private async buildState(order: any) {
+  private buildPlans(
+    order: any,
+    groups: ResolvedDeliveryGroup[],
+    destination: OrderDeliveryDestination,
+  ) {
+    const now = new Date();
+    const planGroups: DeliveryPlanGroup[] = groups.map((group) => ({
+      groupKey: group.groupKey,
+      items: group.items.map((item) => ({
+        orderItemId: item.id,
+        title: item.title,
+        quantity: item.quantity,
+      })),
+      quotes: order.deliveryQuotes
+        .filter(
+          (quote: any) =>
+            quote.groupKey === group.groupKey &&
+            quote.expiresAt > now &&
+            ['CREATED', 'SELECTED'].includes(quote.status) &&
+            quote.destinationVersion === destination.version &&
+            quote.orderDeliveryVersion === order.deliveryVersion &&
+            quote.deliveryProvider.isActive &&
+            quote.deliveryService.isActive &&
+            this.isCurrentQuote(order, group, quote),
+        )
+        .map((quote: any) => {
+          const normalized =
+            (quote.providerPayload as any)?.normalizedOption ?? {};
+          return {
+            quoteId: quote.id,
+            provider: {
+              code: quote.deliveryProvider.code,
+              name: quote.deliveryProvider.name,
+            },
+            service: {
+              code: normalized.serviceCode ?? quote.deliveryService.code,
+              name: normalized.title ?? quote.deliveryService.name,
+              fulfillmentType:
+                normalized.fulfillmentType === 'PICKUP' ? 'PICKUP' : 'DOOR',
+            },
+            customerPrice: quote.customerCharge,
+            currency: quote.currency,
+            deliveryInterval: normalized.deliveryInterval,
+            expiresAt: quote.expiresAt.toISOString(),
+          };
+        }),
+    }));
+    return this.planBuilder.build({
+      groups: planGroups,
+      destinationVersion: destination.version,
+      deliveryVersion: order.deliveryVersion,
+      pricingVersion: order.pricingVersion,
+    });
+  }
+
+  private buildState(order: any) {
     const resolution = this.resolve(order);
     const destination = this.destination(order.deliveryDestination);
     const now = new Date();
-    const selections = new Map(
-      order.deliverySelections.map((selection: any) => [
-        selection.groupKey,
-        selection,
-      ]),
+    const plans = destination
+      ? this.buildPlans(order, resolution.groups, destination)
+      : [];
+    const selectedQuoteIds = order.deliverySelections
+      .filter((selection: any) =>
+        this.isCurrentSelection(
+          order,
+          resolution.groups,
+          destination,
+          selection,
+        ),
+      )
+      .map((selection: any) => selection.deliveryQuoteId)
+      .sort();
+    const selectedPlan = plans.find(
+      (plan) =>
+        plan.selections
+          .map((selection) => selection.quoteId)
+          .sort()
+          .join(':') === selectedQuoteIds.join(':'),
     );
-    const groups = resolution.groups.map((group) => {
-      const selected: any = selections.get(group.groupKey);
-      let currentSelected: any;
-      if (
-        selected &&
-        selected.deliveryQuote.expiresAt > now &&
-        selected.destinationVersion === destination?.version &&
-        selected.orderDeliveryVersion === order.deliveryVersion &&
-        selected.deliveryQuote.deliveryProvider.isActive &&
-        selected.deliveryQuote.deliveryService.isActive
-      ) {
-        try {
-          if (
-            this.buildFingerprint(
-              order,
-              group,
-              selected.deliveryQuote.deliveryProviderId,
-            ) === selected.quoteFingerprint
-          )
-            currentSelected = selected;
-        } catch {
-          currentSelected = undefined;
-        }
-      }
-      const quotes = order.deliveryQuotes.filter(
-        (quote: any) =>
-          quote.groupKey === group.groupKey &&
-          quote.expiresAt > now &&
-          ['CREATED', 'SELECTED'].includes(quote.status),
-      );
-      const providers = new Map<string, any>();
-      for (const quote of quotes) {
-        const provider = providers.get(quote.deliveryProviderId) ?? {
-          code: quote.deliveryProvider.code,
-          name: quote.deliveryProvider.name,
-          options: [],
-        };
-        const normalized =
-          (quote.providerPayload as any)?.normalizedOption ?? {};
-        if (normalized.fulfillmentType !== 'PICKUP')
-          provider.options.push(this.publicOption(quote, normalized));
-        providers.set(quote.deliveryProviderId, provider);
-      }
-      return {
-        groupKey: group.groupKey,
-        warehouse: group.warehouse,
-        items: group.items.map((item) => ({
-          orderItemId: item.id,
-          title: item.title,
-          quantity: item.quantity,
-        })),
-        providers: [...providers.values()],
-        selectedQuote: currentSelected
-          ? this.publicOption(
-              currentSelected.deliveryQuote,
-              (currentSelected.deliveryQuote.providerPayload as any)
-                ?.normalizedOption ?? {},
-            )
-          : null,
-        readiness: {
-          status: quotes.length
-            ? currentSelected
-              ? 'SELECTED'
-              : 'SELECTION_REQUIRED'
-            : 'QUOTE_REQUIRED',
-        },
-      };
-    });
     const calculatedPricing = calculateOrderPricing(
       order.items,
-      groups.flatMap((group) =>
-        group.selectedQuote ? [group.selectedQuote.customerPrice] : [],
-      ),
+      selectedPlan
+        ? selectedPlan.selections.map(
+            (selection) =>
+              order.deliveryQuotes.find(
+                (quote: any) => quote.id === selection.quoteId,
+              ).customerCharge,
+          )
+        : [],
     );
     const oversizedReady = order.items
       .filter((item: any) => item.isOversized)
@@ -556,20 +691,26 @@ export class OrderDeliveryService {
           item.deliveryQuote.confirmedDeliveryPrice === item.deliveryPrice &&
           (!item.deliveryQuote.expiresAt || item.deliveryQuote.expiresAt > now),
       );
-    const allSelected = groups.every((group) => group.selectedQuote);
+    const allSelected = resolution.groups.length === 0 || Boolean(selectedPlan);
     const readyForPayment =
       order.items.length > 0 &&
-      Boolean(destination || groups.length === 0) &&
+      Boolean(destination || resolution.groups.length === 0) &&
       !resolution.unavailableItems.length &&
       allSelected &&
       oversizedReady;
     const blockingReasons = [
-      ...(!destination && groups.length ? ['Подтвердите адрес доставки.'] : []),
+      ...(!destination && resolution.groups.length
+        ? ['Подтвердите адрес доставки.']
+        : []),
       ...(resolution.unavailableItems.length
         ? ['Для части товаров доставка недоступна.']
         : []),
       ...(!allSelected
-        ? ['Выберите способ доставки для каждого отправления.']
+        ? [
+            plans.length
+              ? 'Выберите вариант доставки заказа.'
+              : 'Рассчитайте доставку заказа.',
+          ]
         : []),
       ...(!oversizedReady
         ? ['Для крупногабаритных товаров требуется принятый расчёт доставки.']
@@ -581,14 +722,18 @@ export class OrderDeliveryService {
         ? 'READY_FOR_PAYMENT'
         : resolution.unavailableItems.length
           ? 'BLOCKED'
-          : !destination && groups.length
+          : !destination && resolution.groups.length
             ? 'ADDRESS_REQUIRED'
-            : groups.some((group) => !group.providers.length)
+            : !plans.length
               ? 'READY_FOR_QUOTE'
               : 'SELECTION_REQUIRED',
       destination: destination ?? null,
-      groups,
-      unavailableItems: resolution.unavailableItems,
+      plans: plans.map((plan) => this.planBuilder.toPublic(plan)),
+      selectedPlanId: selectedPlan?.planId ?? null,
+      unavailableItems: resolution.unavailableItems.map((item) => ({
+        ...item,
+        retriable: false,
+      })),
       pricing: {
         ...calculatedPricing,
         currency: 'RUB',
@@ -599,19 +744,48 @@ export class OrderDeliveryService {
     };
   }
 
-  private publicOption(quote: any, normalized: any) {
-    return {
-      quoteId: quote.id,
-      serviceCode: normalized.serviceCode ?? quote.deliveryService.code,
-      title: normalized.title ?? quote.deliveryService.name,
-      description: normalized.description,
-      fulfillmentType: normalized.fulfillmentType ?? 'DOOR',
-      customerPrice: quote.customerCharge,
-      currency: quote.currency,
-      pickupInterval: normalized.pickupInterval,
-      deliveryInterval: normalized.deliveryInterval,
-      expiresAt: quote.expiresAt.toISOString(),
-    };
+  private isCurrentQuote(order: any, group: ResolvedDeliveryGroup, quote: any) {
+    try {
+      return (
+        this.buildFingerprint(order, group, quote.deliveryProviderId) ===
+        quote.fingerprint
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  private isCurrentSelection(
+    order: any,
+    groups: ResolvedDeliveryGroup[],
+    destination: OrderDeliveryDestination | undefined,
+    selection: any,
+  ) {
+    const group = groups.find((value) => value.groupKey === selection.groupKey);
+    const quote = selection.deliveryQuote;
+    return Boolean(
+      destination &&
+      group &&
+      quote.expiresAt > new Date() &&
+      selection.destinationVersion === destination.version &&
+      selection.orderDeliveryVersion === order.deliveryVersion &&
+      quote.deliveryProvider.isActive &&
+      quote.deliveryService.isActive &&
+      this.isCurrentQuote(order, group, quote),
+    );
+  }
+
+  private hasStaleSelections(order: any) {
+    if (!order.deliverySelections.length) return false;
+    const groups = this.resolve(order).groups;
+    const destination = this.destination(order.deliveryDestination);
+    return (
+      order.deliverySelections.length !== groups.length ||
+      order.deliverySelections.some(
+        (selection: any) =>
+          !this.isCurrentSelection(order, groups, destination, selection),
+      )
+    );
   }
 
   private packages(order: any, group: ResolvedDeliveryGroup) {
@@ -713,5 +887,13 @@ export class OrderDeliveryService {
   }
   private number(value: any) {
     return value?.toNumber?.() ?? (value == null ? undefined : Number(value));
+  }
+
+  private isOwnedBy(order: any, owner: DeliveryOwner) {
+    return order.userId
+      ? order.userId === owner.userId
+      : Boolean(
+          owner.guestSessionId && order.guestSessionId === owner.guestSessionId,
+        );
   }
 }

@@ -50,6 +50,11 @@ export class UpdateOrderDeliverySelectionsDto {
   @IsOptional() @IsInt() @Min(1) pricingVersion?: number;
 }
 
+export class UpdateOrderDeliveryPlanDto {
+  @IsString() planId!: string;
+  @IsOptional() @IsInt() @Min(1) pricingVersion?: number;
+}
+
 export class ResolveDeliveryLocationDto {
   @IsString() query!: string;
 }

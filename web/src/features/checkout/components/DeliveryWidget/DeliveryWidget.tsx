@@ -11,7 +11,7 @@ import {
   formatDeliveryInterval,
   getQuoteTimeState,
   resolveDeliveryLocation,
-  updateOrderDeliverySelections,
+  updateOrderDeliveryPlan,
   updateOrderDestination,
 } from '@/entities/order-delivery';
 import { getOrder, type Order } from '@/entities/order';
@@ -20,14 +20,30 @@ import { formatPrice } from '@/shared/utils/format-price';
 
 type Props = { order: Order; onOrderChange: (order: Order) => void };
 
+const badgeLabels = {
+  RECOMMENDED: 'Рекомендуем',
+  CHEAPEST: 'Самая выгодная',
+  FASTEST: 'Самая быстрая',
+} as const;
+
 export function DeliveryWidget({ order, onOrderChange }: Props) {
   const accessToken = useAuthStore((state) => state.accessToken) ?? undefined;
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
-  const credentials = useMemo(() => ({ accessToken, guestSessionId: accessToken ? undefined : guestSessionId }), [accessToken, guestSessionId]);
-  const [country, setCountry] = useState(order.delivery.destination?.country ?? 'Россия');
+  const credentials = useMemo(
+    () => ({
+      accessToken,
+      guestSessionId: accessToken ? undefined : guestSessionId,
+    }),
+    [accessToken, guestSessionId],
+  );
+  const [country, setCountry] = useState(
+    order.delivery.destination?.country ?? 'Россия',
+  );
   const [city, setCity] = useState(order.delivery.destination?.city ?? '');
-  const [fullAddress, setFullAddress] = useState(order.delivery.destination?.fullAddress ?? order.deliveryAddress);
-  const [now, setNow] = useState(Date.now());
+  const [fullAddress, setFullAddress] = useState(
+    order.delivery.destination?.fullAddress ?? order.deliveryAddress,
+  );
+  const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string>();
 
   useEffect(() => {
@@ -36,7 +52,11 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
   }, []);
 
   const refresh = async () => {
-    const next = await getOrder(order.id, accessToken, accessToken ? undefined : guestSessionId);
+    const next = await getOrder(
+      order.id,
+      accessToken,
+      accessToken ? undefined : guestSessionId,
+    );
     onOrderChange(next);
     return next;
   };
@@ -44,19 +64,24 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
   const destinationMutation = useMutation({
     mutationFn: async () => {
       const resolved = await resolveDeliveryLocation(fullAddress);
-      await updateOrderDestination(order.id, {
-        ...resolved,
-        country: country.trim() || resolved.country,
-        city: city.trim() || resolved.city,
-        recipientName: order.customerName,
-        recipientPhone: order.customerPhone,
-        recipientEmail: order.customerEmail,
-      }, credentials);
+      await updateOrderDestination(
+        order.id,
+        {
+          ...resolved,
+          country: country.trim() || resolved.country,
+          city: city.trim() || resolved.city,
+          recipientName: order.customerName,
+          recipientPhone: order.customerPhone,
+          recipientEmail: order.customerEmail,
+        },
+        credentials,
+      );
       await calculateOrderDelivery(order.id, credentials);
       return refresh();
     },
     onSuccess: () => setError(undefined),
-    onError: () => setError('Не удалось подтвердить адрес и рассчитать доставку.'),
+    onError: () =>
+      setError('Не удалось подтвердить адрес и рассчитать доставку.'),
   });
 
   const quoteMutation = useMutation({
@@ -65,19 +90,20 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
       return refresh();
     },
     onSuccess: () => setError(undefined),
-    onError: () => setError('Не удалось рассчитать доставку. Попробуйте ещё раз.'),
+    onError: () =>
+      setError('Не удалось рассчитать доставку. Попробуйте ещё раз.'),
   });
 
   const selectionMutation = useMutation({
-    mutationFn: async ({ groupKey, quoteId }: { groupKey: string; quoteId: string }) => {
-      const selections = order.delivery.groups.flatMap((group) => {
-        const selected = group.groupKey === groupKey ? quoteId : group.selectedQuote?.quoteId;
-        return selected ? [{ groupKey: group.groupKey, quoteId: selected }] : [];
-      });
-      await updateOrderDeliverySelections(order.id, {
-        selections,
-        pricingVersion: order.delivery.pricing.version,
-      }, credentials);
+    mutationFn: async (planId: string) => {
+      await updateOrderDeliveryPlan(
+        order.id,
+        {
+          planId,
+          pricingVersion: order.delivery.pricing.version,
+        },
+        credentials,
+      );
       return refresh();
     },
     onSuccess: () => setError(undefined),
@@ -87,22 +113,42 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
     },
   });
 
-  const pending = destinationMutation.isPending || quoteMutation.isPending || selectionMutation.isPending;
-  const ordinaryGroups = order.delivery.groups;
-  if (!ordinaryGroups.length && !order.delivery.unavailableItems.length) return null;
+  const pending =
+    destinationMutation.isPending ||
+    quoteMutation.isPending ||
+    selectionMutation.isPending;
+  const hasOrdinaryDelivery = order.items.some((item) => !item.isOversized);
+  if (!hasOrdinaryDelivery) return null;
 
   return (
     <section className="space-y-5 rounded-2xl bg-card p-5 shadow-card-lg sm:p-6">
       <header className="space-y-1">
-        <h2 className="text-lg font-semibold">Доставка</h2>
-        <p className="text-sm text-muted-foreground">Подтвердите адрес и выберите вариант для каждого отправления.</p>
+        <h2 className="text-lg font-semibold">Автоматическая доставка</h2>
+        <p className="text-sm text-muted-foreground">
+          Подтвердите адрес и выберите один вариант доставки заказа.
+        </p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormInputField name="delivery-country" label="Страна" value={country} onChange={(event) => setCountry(event.target.value)} />
-        <FormInputField name="delivery-city" label="Город" value={city} onChange={(event) => setCity(event.target.value)} />
+        <FormInputField
+          name="delivery-country"
+          label="Страна"
+          value={country}
+          onChange={(event) => setCountry(event.target.value)}
+        />
+        <FormInputField
+          name="delivery-city"
+          label="Город"
+          value={city}
+          onChange={(event) => setCity(event.target.value)}
+        />
         <div className="sm:col-span-2">
-          <FormInputField name="delivery-address" label="Полный адрес" value={fullAddress} onChange={(event) => setFullAddress(event.target.value)} />
+          <FormInputField
+            name="delivery-address"
+            label="Полный адрес"
+            value={fullAddress}
+            onChange={(event) => setFullAddress(event.target.value)}
+          />
         </div>
       </div>
 
@@ -112,70 +158,127 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
         disabled={pending || !fullAddress.trim()}
         onClick={() => destinationMutation.mutate()}
       >
-        {destinationMutation.isPending ? 'Подтверждаем…' : order.delivery.destination ? 'Обновить адрес и пересчитать' : 'Подтвердить адрес и рассчитать'}
+        {destinationMutation.isPending
+          ? 'Подтверждаем…'
+          : order.delivery.destination
+            ? 'Обновить адрес и пересчитать'
+            : 'Подтвердить адрес и рассчитать'}
       </Button>
 
       {order.delivery.unavailableItems.map((item) => (
-        <ErrorMessage key={item.orderItemId}>{item.title}: {item.message}</ErrorMessage>
+        <ErrorMessage key={item.orderItemId}>
+          {item.title}: {item.message}
+        </ErrorMessage>
       ))}
 
-      {ordinaryGroups.map((group, index) => (
-        <article key={group.groupKey} className="space-y-4 rounded-2xl border border-border/80 p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="font-medium">Отправление {index + 1}</h3>
-              <p className="text-xs text-muted-foreground">{group.items.map((item) => `${item.title} × ${item.quantity}`).join(', ')}</p>
-            </div>
-            <StatusBadge
-              text={group.selectedQuote ? 'Выбрано' : group.providers.some((provider) => provider.options.length) ? 'Нужен выбор' : 'Нужен расчёт'}
-              variant={group.selectedQuote ? 'access' : 'warning'}
-            />
-          </div>
-
-          {group.providers.map((provider) => (
-            <div key={provider.code} className="space-y-2">
-              <div className="text-sm font-medium">{provider.name}</div>
-              {provider.unavailableReason && <p className="text-sm text-destructive">{provider.unavailableReason.message}</p>}
-              {provider.options.map((option) => {
-                const timeState = getQuoteTimeState(option.expiresAt, now);
-                const selected = group.selectedQuote?.quoteId === option.quoteId;
-                const interval = formatDeliveryInterval(option);
-                return (
-                  <label key={option.quoteId} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${selected ? 'border-primary bg-primary/5' : 'border-border/80'}`}>
-                    <input
-                      type="radio"
-                      name={`delivery-${group.groupKey}`}
-                      checked={selected}
-                      disabled={pending || timeState === 'expired' || option.fulfillmentType === 'PICKUP'}
-                      onChange={() => selectionMutation.mutate({ groupKey: group.groupKey, quoteId: option.quoteId })}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center justify-between gap-3">
-                        <span className="font-medium">{option.title}</span>
-                        <span className="font-semibold">{formatPrice(option.customerPrice)}</span>
-                      </span>
-                      {option.description && <span className="mt-1 block text-xs text-muted-foreground">{option.description}</span>}
-                      {interval && <span className="mt-1 block text-xs text-muted-foreground">{interval}</span>}
-                      <span className={`mt-1 block text-xs ${timeState === 'expired' ? 'text-destructive' : timeState === 'expiring' ? 'text-warning' : 'text-muted-foreground'}`}>
-                        {timeState === 'expired' ? 'Предложение истекло' : timeState === 'expiring' ? 'Предложение скоро истечёт' : 'Доставка до двери'}
-                      </span>
+      <div className="space-y-3">
+        {order.delivery.plans.map((plan) => {
+          const selected = order.delivery.selectedPlanId === plan.planId;
+          const timeState = getQuoteTimeState(plan.expiresAt, now);
+          return (
+            <label
+              key={plan.planId}
+              className={`block cursor-pointer rounded-2xl border p-4 ${selected ? 'border-primary bg-primary/5' : 'border-border/80'}`}
+            >
+              <span className="flex items-start gap-3">
+                <input
+                  type="radio"
+                  name="delivery-plan"
+                  checked={selected}
+                  disabled={pending || timeState === 'expired'}
+                  onChange={() => selectionMutation.mutate(plan.planId)}
+                />
+                <span className="min-w-0 flex-1 space-y-2">
+                  <span className="flex flex-wrap items-start justify-between gap-3">
+                    <span className="font-medium">{plan.title}</span>
+                    <span className="font-semibold">
+                      {formatPrice(plan.customerPrice)}
                     </span>
-                  </label>
-                );
-              })}
-            </div>
-          ))}
+                  </span>
+                  <span className="flex flex-wrap gap-2">
+                    {plan.badges.map((badge) => (
+                      <StatusBadge
+                        key={badge}
+                        text={badgeLabels[badge]}
+                        variant={badge === 'RECOMMENDED' ? 'access' : 'muted'}
+                      />
+                    ))}
+                  </span>
+                  {plan.deliveryInterval && (
+                    <span className="block text-xs text-muted-foreground">
+                      {formatDeliveryInterval(plan.deliveryInterval)}
+                    </span>
+                  )}
+                  {plan.shipmentCount > 1 && (
+                    <span className="block text-sm text-muted-foreground">
+                      Заказ может приехать несколькими отправлениями
+                    </span>
+                  )}
+                  {plan.shipmentCount > 1 && (
+                    <details className="text-sm">
+                      <summary className="cursor-pointer">
+                        Состав доставки
+                      </summary>
+                      <span className="mt-2 block space-y-3">
+                        {plan.parts.map((part, index) => (
+                          <span key={part.partId} className="block">
+                            <strong>
+                              Отправление {index + 1} из {plan.parts.length}
+                            </strong>
+                            <span className="block text-muted-foreground">
+                              {part.items
+                                .map(
+                                  (item) => `${item.title} × ${item.quantity}`,
+                                )
+                                .join(', ')}
+                            </span>
+                            <span className="block text-muted-foreground">
+                              {part.provider.name} · {part.service.name}
+                            </span>
+                            {part.deliveryInterval && (
+                              <span className="block text-muted-foreground">
+                                {formatDeliveryInterval(part.deliveryInterval)}
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </span>
+                    </details>
+                  )}
+                  <span
+                    className={`block text-xs ${timeState === 'expired' ? 'text-destructive' : timeState === 'expiring' ? 'text-warning' : 'text-muted-foreground'}`}
+                  >
+                    {timeState === 'expired'
+                      ? 'Вариант истёк — выполните новый расчёт'
+                      : timeState === 'expiring'
+                        ? 'Вариант скоро истечёт'
+                        : 'Доставка до двери'}
+                  </span>
+                </span>
+              </span>
+            </label>
+          );
+        })}
+      </div>
 
-          {!group.providers.some((provider) => provider.options.length) && (
-            <Button type="button" variant="secondary" disabled={pending || !order.delivery.destination} onClick={() => quoteMutation.mutate()}>
-              {quoteMutation.isPending ? 'Рассчитываем…' : 'Повторить расчёт'}
-            </Button>
-          )}
-        </article>
-      ))}
+      {!order.delivery.plans.length && order.delivery.destination && (
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={pending}
+          onClick={() => quoteMutation.mutate()}
+        >
+          {quoteMutation.isPending ? 'Рассчитываем…' : 'Повторить расчёт'}
+        </Button>
+      )}
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
-      {!order.delivery.readyForPayment && order.delivery.blockingReasons.map((reason) => <p key={reason} className="text-sm text-warning">{reason}</p>)}
+      {!order.delivery.readyForPayment &&
+        order.delivery.blockingReasons.map((reason) => (
+          <p key={reason} className="text-sm text-warning">
+            {reason}
+          </p>
+        ))}
     </section>
   );
 }

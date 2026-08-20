@@ -41,6 +41,7 @@ export class DeliveryQuoteOrchestrator {
     _raw: Record<string, unknown>,
     owner: Owner,
   ) {
+    await this.delivery.getState(orderId, owner);
     const order = await this.delivery.getOwnedOrder(orderId, owner);
     if (order.status !== OrderStatus.AWAITING_PAYMENT)
       throw new DeliveryProviderError(
@@ -75,26 +76,7 @@ export class DeliveryQuoteOrchestrator {
         });
       }
     }
-    const allGroupsHaveOptions = groups.every((group) =>
-      (group.providers as Array<{ options?: unknown[] }>).some(
-        (provider) => (provider.options?.length ?? 0) > 0,
-      ),
-    );
-    return {
-      orderId,
-      groups,
-      unavailableItems: resolution.unavailableItems,
-      readiness:
-        resolution.unavailableItems.length ||
-        groups.some((group) => 'error' in group) ||
-        !allGroupsHaveOptions
-          ? 'BLOCKED'
-          : 'SELECTION_REQUIRED',
-      readyForSelection:
-        !resolution.unavailableItems.length &&
-        groups.every((group) => !('error' in group)) &&
-        allGroupsHaveOptions,
-    };
+    return this.delivery.getState(orderId, owner);
   }
 
   private async calculateGroup(
@@ -296,7 +278,7 @@ export class DeliveryQuoteOrchestrator {
             },
             cargoSnapshot: { version: 1, items: params.request.packages },
             providerCost: option.providerCost,
-            customerCharge: option.providerCost + markup,
+            customerCharge: Math.ceil(option.providerCost) + markup,
             subsidyAmount: 0,
             markupAmount: markup,
             expiresAt: option.expiresAt,
@@ -333,7 +315,7 @@ export class DeliveryQuoteOrchestrator {
       title: option.title,
       description: option.description,
       fulfillmentType: option.fulfillmentType,
-      customerPrice: option.providerCost + markup,
+      customerPrice: Math.ceil(option.providerCost) + markup,
       currency: option.currency,
       pickupInterval: option.pickupInterval,
       deliveryInterval: option.deliveryInterval,
@@ -344,12 +326,10 @@ export class DeliveryQuoteOrchestrator {
 
   private publicOptionFromQuote(quote: any) {
     const payload = quote.providerPayload as any;
-    const {
-      providerCost: _providerCost,
-      markup: _markup,
-      pickupPoint: _pickupPoint,
-      ...publicOption
-    } = payload.normalizedOption;
+    const publicOption = { ...payload.normalizedOption };
+    delete publicOption.providerCost;
+    delete publicOption.markup;
+    delete publicOption.pickupPoint;
     return { quoteId: quote.id, ...publicOption };
   }
 }

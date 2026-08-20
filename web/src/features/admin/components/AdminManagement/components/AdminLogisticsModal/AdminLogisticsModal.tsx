@@ -514,7 +514,7 @@ function ProviderForm({
             type="number"
             min={0}
             step={1}
-            label="Фиксированная наценка, ₽"
+            label="Фиксированная надбавка за отправление, ₽"
             value={fixedMarkup}
             onChange={(event) => setFixedMarkup(event.target.value)}
           />
