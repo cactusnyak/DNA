@@ -47,8 +47,16 @@ export class OrderDeliveryController {
 
   @Post('delivery/locations/resolve')
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
-  resolveLocation(@Body() body: ResolveDeliveryLocationDto) {
-    return this.locations.resolve(body.query);
+  async resolveLocation(@Body() body: ResolveDeliveryLocationDto) {
+    const location = await this.locations.resolve(body.query);
+    return {
+      country: location.country,
+      city: location.city,
+      fullAddress: location.fullAddress,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      externalLocationId: location.externalLocationId,
+    };
   }
 
   @Post('delivery/locations/suggest')

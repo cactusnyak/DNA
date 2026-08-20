@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { OrderTotal } from '@/components/ui/OrderTotal';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
@@ -159,6 +160,8 @@ export function CheckoutPaymentState({
         order={currentOrder}
         onOrderChange={setCurrentOrder}
       />
+
+      <OrderTotal amount={currentOrder.delivery.pricing.totalAmount} />
 
       {stage === 'error' && errorMessage && (
         <ErrorMessage>

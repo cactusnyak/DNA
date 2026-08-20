@@ -1,4 +1,5 @@
 import type { Order } from '@/entities/order';
+import { formatPrice } from '@/shared/utils/format-price';
 
 import { getOrderDetailItems } from '../../data';
 import { OrderItemsList } from '../OrderItemsList';
@@ -9,17 +10,11 @@ type OrderDetailsTableProps = {
 
 export function OrderDetailsTable({ order }: OrderDetailsTableProps) {
   const detailItems = getOrderDetailItems(order);
-  const totalItem = detailItems.find(
-    (item) => item.label === 'Итого к оплате',
-  );
-  const orderInfoItems = detailItems.filter(
-    (item) => item.label !== 'Итого к оплате',
-  );
 
   return (
     <table className="w-full text-sm">
       <tbody>
-        {orderInfoItems.map((item) => (
+        {detailItems.map((item) => (
           <tr
             key={item.label}
             className="border-b border-border/80"
@@ -36,12 +31,12 @@ export function OrderDetailsTable({ order }: OrderDetailsTableProps) {
             <OrderItemsList items={order.items} />
           </td>
         </tr>
-        {totalItem && (
-          <tr>
-            <td className="py-3 text-muted-foreground">{totalItem.label}</td>
-            <td className="py-3">{totalItem.value}</td>
-          </tr>
-        )}
+        <tr>
+          <td className="py-3 text-muted-foreground">Сумма товаров</td>
+          <td className="py-3">
+            {formatPrice(order.delivery.pricing.itemsSubtotal)}
+          </td>
+        </tr>
       </tbody>
     </table>
   );

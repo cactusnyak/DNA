@@ -110,6 +110,16 @@ type FormToggleFieldProps = FormFieldBaseProps & {
   onCheckedChange: (checked: boolean) => void;
 };
 
+type FormRadioFieldProps = {
+  name: string;
+  value?: string;
+  checked: boolean;
+  disabled?: boolean;
+  ariaLabel?: string;
+  className?: string;
+  onCheckedChange: () => void;
+};
+
 type FormBooleanFieldProps = {
   label?: ReactNode;
   ariaLabel?: string;
@@ -662,6 +672,41 @@ export function FormToggleField({
       className={className}
       onCheckedChange={onCheckedChange}
     />
+  );
+}
+
+export function FormRadioField({
+  name,
+  value,
+  checked,
+  disabled = false,
+  ariaLabel,
+  className,
+  onCheckedChange,
+}: FormRadioFieldProps) {
+  return (
+    <span
+      className={[
+        'relative inline-flex size-4 shrink-0',
+        disabled && 'cursor-not-allowed opacity-50',
+        className,
+      ].filter(Boolean).join(' ')}
+    >
+      <input
+        type="radio"
+        name={name}
+        value={value}
+        checked={checked}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        className="peer absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
+        onChange={onCheckedChange}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none flex size-4 items-center justify-center rounded-full border border-border/80 bg-background after:size-2 after:rounded-full after:bg-primary after:opacity-0 peer-checked:border-primary peer-checked:after:opacity-100 peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50"
+      />
+    </span>
   );
 }
 

@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { ContentCard } from '@/components/ui/ContentCard';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { OrderTotal } from '@/components/ui/OrderTotal';
 import { useAuthStore } from '@/entities/auth';
 import { useCartStore, type CartStoreItem } from '@/entities/cart';
 import {
@@ -120,8 +121,12 @@ export function OrderDetailsPage() {
           createdAt={order.createdAt}
         />
         <OrderCustomerDetails customer={order} />
-        <OrderContents items={order.items} totalAmount={order.totalAmount} />
+        <OrderContents
+          items={order.items}
+          itemsSubtotal={order.delivery.pricing.itemsSubtotal}
+        />
         <OrderDeliveryDetails delivery={order.delivery} />
+        <OrderTotal amount={order.delivery.pricing.totalAmount} />
         <OrderActions
           order={order}
           error={error}

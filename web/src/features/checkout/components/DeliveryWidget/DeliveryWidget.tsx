@@ -2,11 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { StatusBadge } from '@/components/ui/StatusBadge';
+import { FormRadioField } from '@/components/ui/FormField';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useAuthStore } from '@/entities/auth';
 import {
   calculateOrderDelivery,
-  formatDeliveryInterval,
+  DeliveryPlanCard,
   getQuoteTimeState,
   resolveDeliveryLocation,
   updateOrderDeliveryPlan,
@@ -14,18 +15,11 @@ import {
 } from '@/entities/order-delivery';
 import { getOrder, type Order } from '@/entities/order';
 import { useSessionStore } from '@/entities/session';
-import { formatPrice } from '@/shared/utils/format-price';
 
 type Props = {
   order: Order;
   onOrderChange: (order: Order) => void;
 };
-
-const badgeLabels = {
-  RECOMMENDED: 'Рекомендуем',
-  CHEAPEST: 'Самая выгодная',
-  FASTEST: 'Самая быстрая',
-} as const;
 
 export function DeliveryWidget({
   order,
@@ -65,7 +59,12 @@ export function DeliveryWidget({
       await updateOrderDestination(
         order.id,
         {
-          ...resolved,
+          country: resolved.country,
+          city: resolved.city,
+          fullAddress: resolved.fullAddress,
+          latitude: resolved.latitude,
+          longitude: resolved.longitude,
+          externalLocationId: resolved.externalLocationId,
           recipientName: order.customerName,
           recipientPhone: order.customerPhone,
           recipientEmail: order.customerEmail,
@@ -92,7 +91,7 @@ export function DeliveryWidget({
 
   const selectionMutation = useMutation({
     mutationFn: async (planId: string) => {
-      await updateOrderDeliveryPlan(
+      const delivery = await updateOrderDeliveryPlan(
         order.id,
         {
           planId,
@@ -100,12 +99,16 @@ export function DeliveryWidget({
         },
         credentials,
       );
-      return refresh();
+      onOrderChange({
+        ...order,
+        delivery,
+        totalAmount: delivery.pricing.totalAmount,
+      });
+      return delivery;
     },
     onSuccess: () => setError(undefined),
     onError: () => {
-      setError('Не удалось сохранить выбор. Состояние заказа обновлено.');
-      void refresh();
+      setError('Не удалось сохранить выбранный вариант доставки.');
     },
   });
 
@@ -161,11 +164,12 @@ export function DeliveryWidget({
         </p>
       </header>
 
-      {(destinationMutation.isPending || quoteMutation.isPending) && (
-        <p className="text-sm text-muted-foreground">
-          Подтверждаем адрес и рассчитываем варианты доставки…
-        </p>
-      )}
+      {order.delivery.plans.length === 0 &&
+        (destinationMutation.isPending || quoteMutation.isPending) && (
+          <p className="text-sm text-muted-foreground">
+            Подтверждаем адрес и рассчитываем варианты доставки…
+          </p>
+        )}
 
       {order.delivery.unavailableItems.map((item) => (
         <ErrorMessage key={item.orderItemId}>
@@ -173,93 +177,39 @@ export function DeliveryWidget({
         </ErrorMessage>
       ))}
 
-      {order.delivery.plans.length > 0 && (
+      {order.delivery.plans.length > 0 && selectionMutation.isPending && (
+        <SkeletonLoader
+          layout="stack"
+          count={order.delivery.plans.length}
+          itemClassName="min-h-32"
+          ariaLabel="Сохраняем выбранный вариант доставки"
+        />
+      )}
+
+      {order.delivery.plans.length > 0 && !selectionMutation.isPending && (
         <div className="flex flex-col gap-3">
           {order.delivery.plans.map((plan) => {
             const selected = order.delivery.selectedPlanId === plan.planId;
             const timeState = getQuoteTimeState(plan.expiresAt, now);
             return (
-              <label
+              <DeliveryPlanCard
                 key={plan.planId}
-                className={`block cursor-pointer rounded-2xl border p-4 ${selected ? 'border-primary bg-primary/5' : 'border-border/80'}`}
-              >
-                <span className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    name="delivery-plan"
-                    checked={selected}
-                    disabled={pending || timeState === 'expired'}
-                    onChange={() => selectionMutation.mutate(plan.planId)}
-                  />
-                  <span className="flex min-w-0 flex-1 flex-col gap-2">
-                    <span className="flex flex-wrap items-start justify-between gap-3">
-                      <span className="font-medium">{plan.title}</span>
-                      <span className="font-semibold">
-                        {formatPrice(plan.customerPrice)}
-                      </span>
-                    </span>
-                    <span className="flex flex-wrap gap-2">
-                      {plan.badges.map((badge) => (
-                        <StatusBadge
-                          key={badge}
-                          text={badgeLabels[badge]}
-                          variant={badge === 'RECOMMENDED' ? 'access' : 'muted'}
-                        />
-                      ))}
-                    </span>
-                    {plan.deliveryInterval && (
-                      <span className="block text-xs text-muted-foreground">
-                        {formatDeliveryInterval(plan.deliveryInterval)}
-                      </span>
-                    )}
-                    {plan.shipmentCount > 1 && (
-                      <span className="block text-sm text-muted-foreground">
-                        Заказ может приехать несколькими отправлениями
-                      </span>
-                    )}
-                    {plan.shipmentCount > 1 && (
-                      <details className="flex flex-col gap-2 text-sm">
-                        <summary className="cursor-pointer">
-                          Состав доставки
-                        </summary>
-                        <span className="flex flex-col gap-3">
-                          {plan.parts.map((part, index) => (
-                            <span key={part.partId} className="block">
-                              <strong>
-                                Отправление {index + 1} из {plan.parts.length}
-                              </strong>
-                              <span className="block text-muted-foreground">
-                                {part.items
-                                  .map(
-                                    (item) => `${item.title} × ${item.quantity}`,
-                                  )
-                                  .join(', ')}
-                              </span>
-                              <span className="block text-muted-foreground">
-                                {part.provider.name} · {part.service.name}
-                              </span>
-                              {part.deliveryInterval && (
-                                <span className="block text-muted-foreground">
-                                  {formatDeliveryInterval(part.deliveryInterval)}
-                                </span>
-                              )}
-                            </span>
-                          ))}
-                        </span>
-                      </details>
-                    )}
-                    <span
-                      className={`block text-xs ${timeState === 'expired' ? 'text-destructive' : timeState === 'expiring' ? 'text-warning' : 'text-muted-foreground'}`}
-                    >
-                      {timeState === 'expired'
-                        ? 'Вариант истёк — выполните новый расчёт'
-                        : timeState === 'expiring'
-                          ? 'Вариант скоро истечёт'
-                          : 'Доставка до двери'}
-                    </span>
-                  </span>
-                </span>
-              </label>
+                plan={plan}
+                selected={selected}
+                now={now}
+                control={
+                    <FormRadioField
+                      name="delivery-plan"
+                      value={plan.planId}
+                      checked={selected}
+                      disabled={
+                        selectionMutation.isPending || timeState === 'expired'
+                      }
+                      ariaLabel={`Выбрать вариант доставки «${plan.title}»`}
+                      onCheckedChange={() => selectionMutation.mutate(plan.planId)}
+                    />
+                }
+              />
             );
           })}
         </div>
