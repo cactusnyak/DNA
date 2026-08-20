@@ -96,3 +96,10 @@ export type UpdateDestinationPayload = Omit<
   OrderDeliveryDestination,
   'version'
 >;
+
+export type AddressSuggestion = Omit<
+  UpdateDestinationPayload,
+  'recipientName' | 'recipientPhone' | 'recipientEmail'
+> & {
+  value: string;
+};

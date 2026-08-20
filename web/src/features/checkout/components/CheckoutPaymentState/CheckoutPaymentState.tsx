@@ -61,7 +61,9 @@ function loadCheckoutWidgetScript() {
   });
 }
 
-export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
+export function CheckoutPaymentState({
+  order,
+}: CheckoutPaymentStateProps) {
   const [currentOrder, setCurrentOrder] = useState(order);
   const [stage, setStage] = useState<PaymentStage>('idle');
   const [confirmationToken, setConfirmationToken] = useState<string>();
@@ -153,7 +155,10 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
 
       <OrderDetailsTable order={currentOrder} />
 
-      <DeliveryWidget order={currentOrder} onOrderChange={setCurrentOrder} />
+      <DeliveryWidget
+        order={currentOrder}
+        onOrderChange={setCurrentOrder}
+      />
 
       {stage === 'error' && errorMessage && (
         <ErrorMessage>

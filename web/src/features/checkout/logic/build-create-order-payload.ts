@@ -21,6 +21,7 @@ export function buildCreateOrderPayload({
     customerPhone: formValue.customerPhone.trim(),
     customerEmail: formValue.customerEmail.trim(),
     deliveryAddress: formValue.deliveryAddress.trim(),
+    deliveryDestination: formValue.deliveryDestination,
     items: items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,

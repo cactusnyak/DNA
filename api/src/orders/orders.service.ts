@@ -5,7 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { OrderStatus, OversizedDeliveryQuoteStatus } from '@prisma/client';
+import {
+  OrderStatus,
+  OversizedDeliveryQuoteStatus,
+  Prisma,
+} from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { OrderDeliveryService } from '../delivery-providers/order-delivery.service';
@@ -13,6 +17,7 @@ import {
   resolveSelectedProductAdditions,
   type SelectedProductAddition,
 } from '../products/product-additions';
+import { normalizeRussianPhone } from '../delivery-providers/utils/logistics-units';
 
 import type {
   CreateOrderDto,
@@ -45,7 +50,7 @@ export class OrdersService {
       'customerPhone',
     );
 
-    const deliveryAddress = this.getRequiredString(
+    let deliveryAddress = this.getRequiredString(
       createOrderDto.deliveryAddress,
       'deliveryAddress',
     );
@@ -57,10 +62,50 @@ export class OrdersService {
     if (!/^\S+@\S+\.\S+$/.test(customerEmail)) {
       throw new BadRequestException('customerEmail must be a valid email');
     }
-    const comment = this.getOptionalString(createOrderDto.comment);
     const guestSessionId = this.getOptionalString(
       createOrderDto.guestSessionId,
     );
+    const deliveryDestination = createOrderDto.deliveryDestination
+      ? {
+          country: this.getRequiredString(
+            createOrderDto.deliveryDestination.country,
+            'deliveryDestination.country',
+          ),
+          region: this.getOptionalString(
+            createOrderDto.deliveryDestination.region,
+          ),
+          city: this.getRequiredString(
+            createOrderDto.deliveryDestination.city,
+            'deliveryDestination.city',
+          ),
+          street: this.getOptionalString(
+            createOrderDto.deliveryDestination.street,
+          ),
+          building: this.getOptionalString(
+            createOrderDto.deliveryDestination.building,
+          ),
+          apartment: this.getOptionalString(
+            createOrderDto.deliveryDestination.apartment,
+          ),
+          postalCode: this.getOptionalString(
+            createOrderDto.deliveryDestination.postalCode,
+          ),
+          fullAddress: this.getRequiredString(
+            createOrderDto.deliveryDestination.fullAddress,
+            'deliveryDestination.fullAddress',
+          ),
+          latitude: createOrderDto.deliveryDestination.latitude,
+          longitude: createOrderDto.deliveryDestination.longitude,
+          externalLocationId: this.getOptionalString(
+            createOrderDto.deliveryDestination.externalLocationId,
+          ),
+          recipientName: customerName,
+          recipientPhone: `+${normalizeRussianPhone(customerPhone)}`,
+          recipientEmail: customerEmail,
+          version: 1,
+        }
+      : undefined;
+    if (deliveryDestination) deliveryAddress = deliveryDestination.fullAddress;
 
     const normalizedItems = this.getNormalizedItems(createOrderDto.items);
     const productIds = Array.from(
@@ -199,7 +244,7 @@ export class OrdersService {
         customerPhone,
         customerEmail,
         deliveryAddress,
-        comment,
+        deliveryDestination: deliveryDestination as Prisma.InputJsonValue,
         status: OrderStatus.AWAITING_PAYMENT,
         totalAmount,
         items: {
@@ -314,7 +359,6 @@ export class OrdersService {
         customerPhone: order.customerPhone,
         customerEmail: order.customerEmail ?? '',
         deliveryAddress: order.deliveryAddress,
-        comment: order.comment ?? '',
       },
       items,
       requiresNewDeliveryQuote: order.items.some(
@@ -465,7 +509,6 @@ export class OrdersService {
       customerPhone: order.customerPhone,
       customerEmail: order.customerEmail ?? undefined,
       deliveryAddress: order.deliveryAddress,
-      comment: order.comment ?? undefined,
       status: order.status,
       capabilities: {
         canContinue:

@@ -58,3 +58,7 @@ export class UpdateOrderDeliveryPlanDto {
 export class ResolveDeliveryLocationDto {
   @IsString() query!: string;
 }
+
+export class SuggestDeliveryAddressDto {
+  @IsString() query!: string;
+}

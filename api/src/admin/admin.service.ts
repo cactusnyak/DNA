@@ -348,7 +348,6 @@ export class AdminService {
       customerPhone: order.customerPhone,
       customerEmail: order.customerEmail ?? undefined,
       deliveryAddress: order.deliveryAddress,
-      comment: order.comment ?? undefined,
       status: order.status,
       totalAmount: order.totalAmount,
       archivedAt: order.archivedAt ?? undefined,

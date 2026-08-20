@@ -1,7 +1,8 @@
 import type { ChangeEvent, FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { FormInputField } from '@/components/ui/FormField';
+import { FormAddressField, FormInputField } from '@/components/ui/FormField';
+import { suggestDeliveryAddresses } from '@/entities/order-delivery';
 
 import type { CheckoutFormValue } from '../../types/checkout-form';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
@@ -76,12 +77,23 @@ export function CheckoutCustomerForm({
             onChange={getInputChangeHandler('customerEmail')}
           />
 
-          <FormInputField
+          <FormAddressField
             name="deliveryAddress"
             required
             label="Адрес доставки"
             value={value.deliveryAddress}
-            onChange={getInputChangeHandler('deliveryAddress')}
+            placeholder="Начните вводить адрес"
+            loadSuggestions={suggestDeliveryAddresses}
+            onValueChange={(deliveryAddress) => onChange({
+              ...value,
+              deliveryAddress,
+              deliveryDestination: undefined,
+            })}
+            onSuggestionSelect={(deliveryDestination) => onChange({
+              ...value,
+              deliveryAddress: deliveryDestination.value,
+              deliveryDestination,
+            })}
           />
         </div>
 

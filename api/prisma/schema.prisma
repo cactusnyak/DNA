@@ -405,7 +405,6 @@ model Order {
   customerEmail       String?
   deliveryAddress     String
   deliveryDestination Json?   @db.JsonB
-  comment             String?
 
   status            OrderStatus @default(CREATED)
   totalAmount       Int

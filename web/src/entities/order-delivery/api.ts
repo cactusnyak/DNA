@@ -2,9 +2,16 @@ import { httpClient } from '@/shared/api/http-client';
 import type { Order } from '@/entities/order';
 import type {
   DeliveryCredentials,
+  AddressSuggestion,
   OrderDeliveryState,
   UpdateDestinationPayload,
 } from './types';
+
+export const suggestDeliveryAddresses = (query: string) =>
+  httpClient<AddressSuggestion[], { query: string }>(
+    '/delivery/locations/suggest',
+    { method: 'POST', body: { query } },
+  );
 
 const headers = ({ accessToken, guestSessionId }: DeliveryCredentials) => ({
   ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

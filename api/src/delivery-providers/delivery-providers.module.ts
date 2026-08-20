@@ -18,6 +18,7 @@ import { YandexDeliveryConfig } from './yandex/yandex-delivery.config';
 import { YandexHttpClient } from './yandex/yandex-http.client';
 import { YandexMockClient } from './yandex/yandex-mock.client';
 import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
+import { AddressSuggestionsService } from './address-suggestions.service';
 
 @Module({
   imports: [PrismaModule, AuthModule],
@@ -26,6 +27,7 @@ import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
     DeliveryGroupResolver,
     DeliveryPlanBuilder,
     DeliveryLocationResolver,
+    AddressSuggestionsService,
     OrderDeliveryInvalidationService,
     OrderDeliveryService,
     DeliveryProviderRegistry,

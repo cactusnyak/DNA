@@ -4,6 +4,7 @@ import {
   type HTMLInputTypeAttribute,
   type KeyboardEvent,
   type ReactNode,
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -59,6 +60,23 @@ type FormTextareaFieldProps = FormFieldBaseProps & {
   textareaClassName?: string;
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 };
+
+export type FormAddressSuggestion = {
+  value: string;
+  fullAddress: string;
+};
+
+type FormAddressFieldProps<TSuggestion extends FormAddressSuggestion> =
+  FormFieldBaseProps & {
+    name: string;
+    value: string;
+    placeholder?: string;
+    disabled?: boolean;
+    minQueryLength?: number;
+    loadSuggestions: (query: string) => Promise<TSuggestion[]>;
+    onValueChange: (value: string) => void;
+    onSuggestionSelect: (suggestion: TSuggestion) => void;
+  };
 
 export type FormSelectOption = {
   value: string;
@@ -218,6 +236,136 @@ export function FormInputField({
         className={inputClassName}
         onChange={onChange}
       />
+    </FormFieldRoot>
+  );
+}
+
+export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
+  name,
+  label,
+  caption,
+  required = false,
+  value,
+  placeholder,
+  disabled = false,
+  minQueryLength = 3,
+  className,
+  loadSuggestions,
+  onValueChange,
+  onSuggestionSelect,
+}: FormAddressFieldProps<TSuggestion>) {
+  const listboxId = useId();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const requestIdRef = useRef(0);
+  const skipNextRequestRef = useRef(false);
+  const [suggestions, setSuggestions] = useState<TSuggestion[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const close = useCallback(() => setIsOpen(false), []);
+
+  useEffect(() => {
+    const requestId = ++requestIdRef.current;
+    if (skipNextRequestRef.current) {
+      skipNextRequestRef.current = false;
+      return;
+    }
+
+    const query = value.trim();
+    if (query.length < minQueryLength) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsLoading(true);
+      void loadSuggestions(query)
+        .then((nextSuggestions) => {
+          if (requestId !== requestIdRef.current) return;
+          setSuggestions(nextSuggestions);
+          setIsOpen(nextSuggestions.length > 0);
+        })
+        .catch(() => {
+          if (requestId !== requestIdRef.current) return;
+          setSuggestions([]);
+          close();
+        })
+        .finally(() => {
+          if (requestId === requestIdRef.current) setIsLoading(false);
+        });
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [close, loadSuggestions, minQueryLength, value]);
+
+  useEffect(() => {
+    function handleDocumentMouseDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) close();
+    }
+    document.addEventListener('mousedown', handleDocumentMouseDown);
+    return () => document.removeEventListener('mousedown', handleDocumentMouseDown);
+  }, [close]);
+
+  return (
+    <FormFieldRoot
+      label={label}
+      caption={caption}
+      required={required}
+      className={className}
+    >
+      <div ref={rootRef} className="relative">
+        <Input
+          name={name}
+          required={required}
+          disabled={disabled}
+          value={value}
+          placeholder={placeholder}
+          autoComplete="off"
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={isOpen}
+          onChange={(event) => {
+            requestIdRef.current += 1;
+            setSuggestions([]);
+            setIsLoading(false);
+            close();
+            onValueChange(event.target.value);
+          }}
+          onFocus={() => suggestions.length > 0 && setIsOpen(true)}
+          onKeyDown={(event) => event.key === 'Escape' && close()}
+        />
+        {isOpen && (
+          <div
+            id={listboxId}
+            role="listbox"
+            className="absolute left-0 right-0 top-full z-30 mt-2 flex max-h-72 flex-col gap-1 overflow-y-auto rounded-lg border border-border/80 bg-popover p-1 text-sm shadow-lg"
+          >
+            {suggestions.map((suggestion) => (
+              <button
+                key={`${suggestion.fullAddress}:${suggestion.value}`}
+                type="button"
+                role="option"
+                aria-selected={false}
+                className="cursor-pointer rounded-md px-3 py-2 text-left hover:bg-muted"
+                onClick={() => {
+                  skipNextRequestRef.current = true;
+                  requestIdRef.current += 1;
+                  setSuggestions([]);
+                  setIsLoading(false);
+                  onSuggestionSelect(suggestion);
+                  close();
+                }}
+              >
+                {suggestion.value}
+              </button>
+            ))}
+          </div>
+        )}
+        {isLoading && (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
+            Ищем…
+          </span>
+        )}
+      </div>
     </FormFieldRoot>
   );
 }

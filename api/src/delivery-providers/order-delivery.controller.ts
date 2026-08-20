@@ -4,11 +4,13 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from '../auth/auth.service';
 import {
   ResolveDeliveryLocationDto,
+  SuggestDeliveryAddressDto,
   UpdateOrderDeliveryPlanDto,
   UpdateOrderDestinationDto,
 } from './dto/order-delivery.dto';
 import { OrderDeliveryService } from './order-delivery.service';
 import { DeliveryLocationResolver } from './delivery-location.resolver';
+import { AddressSuggestionsService } from './address-suggestions.service';
 
 @Controller()
 export class OrderDeliveryController {
@@ -16,6 +18,7 @@ export class OrderDeliveryController {
     private readonly delivery: OrderDeliveryService,
     private readonly auth: AuthService,
     private readonly locations: DeliveryLocationResolver,
+    private readonly addressSuggestions: AddressSuggestionsService,
   ) {}
 
   @Put('orders/:orderId/delivery/destination')
@@ -46,6 +49,12 @@ export class OrderDeliveryController {
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   resolveLocation(@Body() body: ResolveDeliveryLocationDto) {
     return this.locations.resolve(body.query);
+  }
+
+  @Post('delivery/locations/suggest')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  suggestAddress(@Body() body: SuggestDeliveryAddressDto) {
+    return this.addressSuggestions.suggest(body.query);
   }
 
   private async owner(authorization?: string, guestSessionId?: string) {
