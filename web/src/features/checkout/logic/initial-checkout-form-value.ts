@@ -5,5 +5,4 @@ export const initialCheckoutFormValue: CheckoutFormValue = {
   customerPhone: '',
   customerEmail: '',
   deliveryAddress: '',
-  comment: '',
 };

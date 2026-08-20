@@ -10,7 +10,6 @@ import { initiatePayment, type Order } from '@/entities/order';
 import { useSessionStore } from '@/entities/session';
 
 import { OrderDetailsTable } from './components/OrderDetailsTable';
-import { OrderItemsList } from './components/OrderItemsList';
 import { PaymentActions } from './components/PaymentActions';
 import { DeliveryWidget } from '../DeliveryWidget';
 
@@ -153,8 +152,6 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       </div>
 
       <OrderDetailsTable order={currentOrder} />
-
-      <OrderItemsList items={currentOrder.items} />
 
       <DeliveryWidget order={currentOrder} onOrderChange={setCurrentOrder} />
 

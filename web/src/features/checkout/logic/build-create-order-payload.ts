@@ -10,12 +10,6 @@ type BuildCreateOrderPayloadParams = {
   guestSessionId: string;
 };
 
-function normalizeOptionalString(value: string) {
-  const normalizedValue = value.trim();
-
-  return normalizedValue || undefined;
-}
-
 export function buildCreateOrderPayload({
   formValue,
   items,
@@ -27,7 +21,6 @@ export function buildCreateOrderPayload({
     customerPhone: formValue.customerPhone.trim(),
     customerEmail: formValue.customerEmail.trim(),
     deliveryAddress: formValue.deliveryAddress.trim(),
-    comment: normalizeOptionalString(formValue.comment),
     items: items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,

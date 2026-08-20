@@ -3,5 +3,4 @@ export type CheckoutFormValue = {
   customerPhone: string;
   customerEmail: string;
   deliveryAddress: string;
-  comment: string;
 };

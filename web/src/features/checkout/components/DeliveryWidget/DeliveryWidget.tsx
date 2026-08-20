@@ -121,9 +121,9 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
   if (!hasOrdinaryDelivery) return null;
 
   return (
-    <section className="space-y-5 rounded-2xl bg-card p-5 shadow-card-lg sm:p-6">
-      <header className="space-y-1">
-        <h2 className="text-lg font-semibold">Автоматическая доставка</h2>
+    <section className="flex flex-col gap-5 rounded-2xl bg-card p-5 shadow-card-lg sm:p-6">
+      <header className="flex flex-col gap-1">
+        <h2 className="text-lg font-semibold">Доставка</h2>
         <p className="text-sm text-muted-foreground">
           Подтвердите адрес и выберите один вариант доставки заказа.
         </p>
@@ -132,12 +132,14 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
       <div className="grid gap-4 sm:grid-cols-2">
         <FormInputField
           name="delivery-country"
+          required
           label="Страна"
           value={country}
           onChange={(event) => setCountry(event.target.value)}
         />
         <FormInputField
           name="delivery-city"
+          required
           label="Город"
           value={city}
           onChange={(event) => setCity(event.target.value)}
@@ -145,6 +147,7 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
         <div className="sm:col-span-2">
           <FormInputField
             name="delivery-address"
+            required
             label="Полный адрес"
             value={fullAddress}
             onChange={(event) => setFullAddress(event.target.value)}
@@ -155,7 +158,9 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
       <Button
         type="button"
         variant="secondary"
-        disabled={pending || !fullAddress.trim()}
+        disabled={
+          pending || !country.trim() || !city.trim() || !fullAddress.trim()
+        }
         onClick={() => destinationMutation.mutate()}
       >
         {destinationMutation.isPending
@@ -171,11 +176,12 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
         </ErrorMessage>
       ))}
 
-      <div className="space-y-3">
-        {order.delivery.plans.map((plan) => {
-          const selected = order.delivery.selectedPlanId === plan.planId;
-          const timeState = getQuoteTimeState(plan.expiresAt, now);
-          return (
+      {order.delivery.plans.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {order.delivery.plans.map((plan) => {
+            const selected = order.delivery.selectedPlanId === plan.planId;
+            const timeState = getQuoteTimeState(plan.expiresAt, now);
+            return (
             <label
               key={plan.planId}
               className={`block cursor-pointer rounded-2xl border p-4 ${selected ? 'border-primary bg-primary/5' : 'border-border/80'}`}
@@ -188,7 +194,7 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
                   disabled={pending || timeState === 'expired'}
                   onChange={() => selectionMutation.mutate(plan.planId)}
                 />
-                <span className="min-w-0 flex-1 space-y-2">
+                <span className="flex min-w-0 flex-1 flex-col gap-2">
                   <span className="flex flex-wrap items-start justify-between gap-3">
                     <span className="font-medium">{plan.title}</span>
                     <span className="font-semibold">
@@ -215,11 +221,11 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
                     </span>
                   )}
                   {plan.shipmentCount > 1 && (
-                    <details className="text-sm">
+                    <details className="flex flex-col gap-2 text-sm">
                       <summary className="cursor-pointer">
                         Состав доставки
                       </summary>
-                      <span className="mt-2 block space-y-3">
+                      <span className="flex flex-col gap-3">
                         {plan.parts.map((part, index) => (
                           <span key={part.partId} className="block">
                             <strong>
@@ -257,9 +263,10 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
                 </span>
               </span>
             </label>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {!order.delivery.plans.length && order.delivery.destination && (
         <Button
@@ -273,12 +280,6 @@ export function DeliveryWidget({ order, onOrderChange }: Props) {
       )}
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
-      {!order.delivery.readyForPayment &&
-        order.delivery.blockingReasons.map((reason) => (
-          <p key={reason} className="text-sm text-warning">
-            {reason}
-          </p>
-        ))}
     </section>
   );
 }
