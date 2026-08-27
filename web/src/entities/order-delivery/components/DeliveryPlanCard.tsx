@@ -5,6 +5,7 @@ import { formatPrice } from '@/shared/utils/format-price';
 
 import { formatDeliveryInterval, getQuoteTimeState } from '../logic';
 import type { DeliveryPlan } from '../types';
+import { DeliveryPlanShipments } from './DeliveryPlanShipments';
 
 type DeliveryPlanCardProps = {
   plan: DeliveryPlan;
@@ -29,6 +30,14 @@ export function DeliveryPlanCard({
 }: DeliveryPlanCardProps) {
   const [renderedAt] = useState(() => Date.now());
   const timeState = getQuoteTimeState(plan.expiresAt, now ?? renderedAt);
+  const providerNames = [
+    ...new Map(
+      plan.parts.map((part) => [part.provider.code, part.provider.name]),
+    ).values(),
+  ];
+  const isMixedProviderPlan = providerNames.length > 1;
+  const hasMultipleShipments = plan.parts.length > 1;
+  const title = providerNames.length ? providerNames.join(', ') : plan.title;
   const className = [
     'block rounded-2xl p-4',
     control && 'cursor-pointer',
@@ -41,11 +50,14 @@ export function DeliveryPlanCard({
       {control && <div className="flex pt-1">{control}</div>}
       <div className="flex flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <span className="font-medium">{plan.title}</span>
+          <span className="font-medium">{title}</span>
           <span className="font-semibold text-primary">{formatPrice(plan.customerPrice)}</span>
         </div>
         <div className="flex flex-1 flex-col gap-2">
           <span className="flex flex-wrap gap-2">
+            {isMixedProviderPlan && (
+              <StatusBadge text="Смешанный" variant="warning" />
+            )}
             {plan.badges.map((badge) => (
               <StatusBadge
                 key={badge}
@@ -59,37 +71,13 @@ export function DeliveryPlanCard({
               {formatDeliveryInterval(plan.deliveryInterval)}
             </span>
           )}
-          {plan.shipmentCount > 1 && (
+          {hasMultipleShipments && (
             <span className="block text-sm text-muted-foreground">
               Заказ может приехать несколькими отправлениями
             </span>
           )}
-          {plan.shipmentCount > 1 && (
-            <details className="flex flex-col gap-2 text-sm">
-              <summary className="cursor-pointer">Состав доставки</summary>
-              <span className="flex flex-col gap-3">
-                {plan.parts.map((part, index) => (
-                  <span key={part.partId} className="block">
-                    <strong>
-                      Отправление {index + 1} из {plan.parts.length}
-                    </strong>
-                    <span className="block text-muted-foreground">
-                      {part.items
-                        .map((item) => `${item.title} × ${item.quantity}`)
-                        .join(', ')}
-                    </span>
-                    <span className="block text-muted-foreground">
-                      {part.provider.name} · {part.service.name}
-                    </span>
-                    {part.deliveryInterval && (
-                      <span className="block text-muted-foreground">
-                        {formatDeliveryInterval(part.deliveryInterval)}
-                      </span>
-                    )}
-                  </span>
-                ))}
-              </span>
-            </details>
+          {hasMultipleShipments && (
+            <DeliveryPlanShipments parts={plan.parts} />
           )}
           <span
             className={`block text-xs ${timeState === 'expired' ? 'text-destructive' : timeState === 'expiring' ? 'text-warning' : 'text-muted-foreground'}`}
