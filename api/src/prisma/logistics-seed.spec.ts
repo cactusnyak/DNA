@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access */
 import { DeliveryServiceKind, WarehouseType } from '@prisma/client';
 
 import {
+  CDEK_SERVICES,
+  ensureCdekDeliveryReferenceData,
   ensureYandexDeliveryReferenceData,
   seedLogisticsFoundation,
   YANDEX_SERVICES,
@@ -37,8 +40,8 @@ describe('seedLogisticsFoundation', () => {
       },
       update: { name: 'Личный склад', type: WarehouseType.OWN },
     });
-    expect(providerUpsert).toHaveBeenCalledTimes(2);
-    expect(serviceUpsert).toHaveBeenCalledTimes(8);
+    expect(providerUpsert).toHaveBeenCalledTimes(4);
+    expect(serviceUpsert).toHaveBeenCalledTimes(12);
     expect(serviceUpsert).toHaveBeenNthCalledWith(1, {
       where: {
         providerId_code: {
@@ -58,6 +61,31 @@ describe('seedLogisticsFoundation', () => {
         kind: DeliveryServiceKind.EXPRESS,
       },
     });
+  });
+
+  it('keeps CDEK pickup inactive while activating courier reference data', async () => {
+    const providerUpsert = jest.fn().mockResolvedValue({ id: 'cdek' });
+    const serviceUpsert = jest.fn().mockResolvedValue({});
+    const prisma = {
+      deliveryProvider: { upsert: providerUpsert },
+      deliveryService: { upsert: serviceUpsert },
+    };
+
+    await ensureCdekDeliveryReferenceData(prisma as never, {
+      forceActive: true,
+    });
+
+    expect(serviceUpsert).toHaveBeenCalledTimes(CDEK_SERVICES.length);
+    expect(
+      serviceUpsert.mock.calls.map(([argument]) => argument.create),
+    ).toEqual(
+      CDEK_SERVICES.map((service) => ({ providerId: 'cdek', ...service })),
+    );
+    expect(
+      serviceUpsert.mock.calls.find(
+        ([argument]) => argument.create.code === 'CDEK_PICKUP',
+      )?.[0].update.isActive,
+    ).toBe(false);
   });
 
   it('force-activates exactly the four expected Yandex reference services', async () => {

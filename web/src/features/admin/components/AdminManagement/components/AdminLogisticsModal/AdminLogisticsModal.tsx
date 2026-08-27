@@ -371,6 +371,8 @@ function WarehouseForm({
                         caption={
                           provider.code === "YANDEX"
                             ? "Для production-доставки по России здесь хранится platform_station_id."
+                            : provider.code === "CDEK"
+                              ? "Для склада с CDEK_PVZ-origin код пункта отправления хранится в защищённой provider metadata; для door-origin это поле оставьте пустым."
                             : undefined
                         }
                         value={config?.externalLocationId ?? ""}

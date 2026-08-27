@@ -7,6 +7,9 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 
 import {
+  CDEK_DELIVERY_PROVIDER_CODE,
+  CDEK_SERVICES,
+  ensureCdekDeliveryReferenceData,
   ensureYandexDeliveryReferenceData,
   YANDEX_DELIVERY_PROVIDER_CODE,
   YANDEX_SERVICES,
@@ -43,6 +46,11 @@ async function assertSafeLocalTarget() {
     'YANDEX_DELIVERY_LIVE_MUTATIONS_ENABLED',
     'false',
   );
+  const cdekMode = environmentValue('CDEK_DELIVERY_MODE', 'unset');
+  const cdekMutations = environmentValue(
+    'CDEK_DELIVERY_LIVE_MUTATIONS_ENABLED',
+    'false',
+  );
   const [productCount, warehouseCount] = await Promise.all([
     prisma.product.count(),
     prisma.warehouse.count(),
@@ -56,6 +64,7 @@ async function assertSafeLocalTarget() {
   console.log(`  isLocal: ${isLocal}`);
   console.log(`  NODE_ENV: ${nodeEnvironment}`);
   console.log(`  Yandex modes: express=${expressMode}, russia=${russiaMode}`);
+  console.log(`  CDEK mode: ${cdekMode}`);
   console.log(`  live mutations enabled: ${liveMutations}`);
   console.log(`  current Product count: ${productCount}`);
   console.log(`  current Warehouse count: ${warehouseCount}`);
@@ -69,8 +78,11 @@ async function assertSafeLocalTarget() {
       `NODE_ENV is ${nodeEnvironment}`,
     expressMode !== 'mock' && `YANDEX_EXPRESS_MODE is ${expressMode}`,
     russiaMode !== 'mock' && `YANDEX_RUSSIA_MODE is ${russiaMode}`,
+    cdekMode !== 'mock' && `CDEK_DELIVERY_MODE is ${cdekMode}`,
     liveMutations.toLowerCase() !== 'false' &&
       `YANDEX_DELIVERY_LIVE_MUTATIONS_ENABLED is ${liveMutations}`,
+    cdekMutations.toLowerCase() !== 'false' &&
+      `CDEK_DELIVERY_LIVE_MUTATIONS_ENABLED is ${cdekMutations}`,
   ].filter(Boolean);
   if (blockers.length)
     throw new Error(`Unsafe destructive seed target: ${blockers.join('; ')}`);
@@ -127,12 +139,19 @@ async function seedLogistigTest() {
     const yandex = await ensureYandexDeliveryReferenceData(transaction, {
       forceActive: true,
     });
+    const cdek = await ensureCdekDeliveryReferenceData(transaction, {
+      forceActive: true,
+    });
     await transaction.deliveryProvider.update({
       where: { id: yandex.id },
       data: { fixedMarkup: LOGISTICS_UI_MARKUP },
     });
+    await transaction.deliveryProvider.update({
+      where: { id: cdek.id },
+      data: { fixedMarkup: LOGISTICS_UI_MARKUP },
+    });
     const services = await transaction.deliveryService.findMany({
-      where: { providerId: yandex.id },
+      where: { providerId: { in: [yandex.id, cdek.id] } },
     });
     const serviceByCode = new Map(
       services.map((service) => [service.code, service]),
@@ -167,6 +186,14 @@ async function seedLogistigTest() {
           deliveryProviderId: yandex.id,
           externalLocationId: definition.externalLocationId,
           isEnabled: true,
+        },
+      });
+      await transaction.warehouseProviderConfig.create({
+        data: {
+          warehouseId: warehouse.id,
+          deliveryProviderId: cdek.id,
+          isEnabled: true,
+          metadata: { originMode: 'DOOR' },
         },
       });
     }
@@ -209,7 +236,7 @@ async function seedLogistigTest() {
         await transaction.productDeliveryService.createMany({
           data: serviceCodes.map((code) => {
             const service = serviceByCode.get(code);
-            if (!service) throw new Error(`Missing Yandex service ${code}`);
+            if (!service) throw new Error(`Missing delivery service ${code}`);
             return {
               productId: product.id,
               deliveryServiceId: service.id,
@@ -243,36 +270,43 @@ async function validateSeed() {
     throw new Error(`Logistig test seed validation failed: ${message}`);
   };
   if (
-    providers.length !== 1 ||
-    providers[0].code !== YANDEX_DELIVERY_PROVIDER_CODE
+    providers.length !== 2 ||
+    !providers.some(({ code }) => code === YANDEX_DELIVERY_PROVIDER_CODE) ||
+    !providers.some(({ code }) => code === CDEK_DELIVERY_PROVIDER_CODE)
   )
-    fail('expected exactly one YANDEX provider');
+    fail('expected exactly one YANDEX and one CDEK provider');
   if (
-    !providers[0].isActive ||
-    providers[0].fixedMarkup !== LOGISTICS_UI_MARKUP
+    providers.some(
+      (provider) =>
+        !provider.isActive || provider.fixedMarkup !== LOGISTICS_UI_MARKUP,
+    )
   )
-    fail('YANDEX provider is inactive or has an unexpected markup');
-  const expectedCodes = [...YANDEX_SERVICES.map(({ code }) => code)].sort();
+    fail('provider is inactive or has an unexpected markup');
+  const expectedCodes = [
+    ...YANDEX_SERVICES.map(({ code }) => code),
+    ...CDEK_SERVICES.map(({ code }) => code),
+  ].sort();
   if (
-    services.length !== 4 ||
-    services.some(
-      (service) => !service.isActive || service.provider.code !== 'YANDEX',
-    ) ||
+    services.length !== expectedCodes.length ||
+    services.find(({ code }) => code === 'CDEK_PICKUP')?.isActive !== false ||
+    services
+      .filter(({ code }) => code !== 'CDEK_PICKUP')
+      .some((service) => !service.isActive) ||
     services
       .map(({ code }) => code)
       .sort()
       .join(',') !== expectedCodes.join(',')
   )
-    fail('expected exactly four active Yandex services');
-  if (warehouses.length !== 3 || configs.length !== 3)
-    fail('expected three warehouses and three provider configs');
+    fail('unexpected delivery service reference data');
+  if (warehouses.length !== 3 || configs.length !== 6)
+    fail('expected three warehouses and six provider configs');
   if (
     warehouses.some(
       (warehouse) =>
         !warehouse.isActive ||
         !warehouse.isConfigured ||
-        warehouse.providerConfigs.length !== 1 ||
-        !warehouse.providerConfigs[0].isEnabled,
+        warehouse.providerConfigs.length !== 2 ||
+        warehouse.providerConfigs.some((config) => !config.isEnabled),
     )
   )
     fail('warehouse configuration is incomplete');
@@ -336,6 +370,14 @@ async function validateSeed() {
       fail(`service mapping mismatch for ${definition.slug}`);
     if (actualServices.includes('YANDEX_RUSSIA_PICKUP'))
       fail(`unexpected pickup mapping for ${definition.slug}`);
+    if (actualServices.includes('CDEK_PICKUP'))
+      fail(`unexpected CDEK pickup mapping for ${definition.slug}`);
+    if (
+      (definition.isOversized ||
+        definition.slug === 'logistics-ui-unavailable') &&
+      actualServices.some((code) => code.startsWith('CDEK_'))
+    )
+      fail(`unexpected CDEK mapping for ${definition.slug}`);
     if (
       product.images.length !== 1 ||
       product.images[0].image.url !== LOGISTICS_UI_IMAGE_URL
@@ -354,9 +396,7 @@ async function validateSeed() {
     `  oversized products: ${products.filter((product) => product.isOversizedOverride).length}`,
   );
   console.log(`  total products: ${products.length}`);
-  console.log(
-    `  fixed markup: ${providers[0].fixedMarkup} RUB per technical group`,
-  );
+  console.log(`  fixed markup: ${LOGISTICS_UI_MARKUP} RUB per technical group`);
 }
 
 seedLogistigTest()

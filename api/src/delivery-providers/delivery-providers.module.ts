@@ -19,6 +19,11 @@ import { YandexHttpClient } from './yandex/yandex-http.client';
 import { YandexMockClient } from './yandex/yandex-mock.client';
 import { YandexRussiaClient } from './yandex/russia/yandex-russia.client';
 import { AddressSuggestionsService } from './address-suggestions.service';
+import { CdekDeliveryAdapter } from './cdek/cdek-delivery.adapter';
+import { CdekDeliveryConfig } from './cdek/cdek-delivery.config';
+import { CdekHttpClient } from './cdek/cdek-http.client';
+import { CdekMockClient } from './cdek/cdek-mock.client';
+import { CdekOAuthClient } from './cdek/cdek-oauth.client';
 
 @Module({
   imports: [PrismaModule, AuthModule],
@@ -39,6 +44,11 @@ import { AddressSuggestionsService } from './address-suggestions.service';
     YandexCargoClient,
     YandexRussiaClient,
     YandexDeliveryAdapter,
+    CdekDeliveryConfig,
+    CdekOAuthClient,
+    CdekHttpClient,
+    CdekMockClient,
+    CdekDeliveryAdapter,
   ],
   exports: [
     DeliveryProviderRegistry,

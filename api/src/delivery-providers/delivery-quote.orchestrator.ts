@@ -130,6 +130,7 @@ export class DeliveryQuoteOrchestrator {
           serviceCodes,
           warehouseExternalLocationId:
             providerConfig.externalLocationId ?? undefined,
+          warehouseProviderMetadata: providerConfig.metadata ?? undefined,
           origin: {
             country: warehouse.country,
             region: warehouse.region ?? undefined,

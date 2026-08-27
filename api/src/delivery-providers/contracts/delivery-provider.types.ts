@@ -40,6 +40,7 @@ export type DeliveryQuoteRequest = {
   groupKey: string;
   serviceCodes: string[];
   warehouseExternalLocationId?: string;
+  warehouseProviderMetadata?: unknown;
   origin: DeliveryAddress & { contactName: string; contactPhone: string };
   destination: DeliveryAddress & {
     recipientName: string;

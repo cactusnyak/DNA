@@ -86,7 +86,8 @@ export type LogisticsServiceCode =
   | 'YANDEX_EXPRESS'
   | 'YANDEX_CARGO'
   | 'YANDEX_RUSSIA_DOOR'
-  | 'YANDEX_RUSSIA_PICKUP';
+  | 'YANDEX_RUSSIA_PICKUP'
+  | 'CDEK_COURIER';
 type LogisticsUiProduct = {
   slug: string;
   sku: string;
@@ -110,7 +111,7 @@ export const LOGISTICS_UI_PRODUCTS = [
     price: 10_100,
     purchasePrice: 6_000,
     warehouseCode: 'logistics-ui-origin-a',
-    serviceCodes: ['YANDEX_EXPRESS', 'YANDEX_CARGO'],
+    serviceCodes: ['YANDEX_EXPRESS', 'YANDEX_CARGO', 'CDEK_COURIER'],
     isOversized: false,
     weightGrams: 2_100,
     lengthMillimeters: 400,
@@ -134,11 +135,11 @@ export const LOGISTICS_UI_PRODUCTS = [
   {
     slug: 'logistics-ui-service-c',
     sku: 'LOGISTICS-UI-003',
-    title: 'Логистика: Только доставка по России',
+    title: 'Логистика: Только СДЭК курьер',
     price: 14_300,
     purchasePrice: 8_000,
     warehouseCode: 'logistics-ui-origin-a',
-    serviceCodes: ['YANDEX_RUSSIA_DOOR'],
+    serviceCodes: ['CDEK_COURIER'],
     isOversized: false,
     weightGrams: 4_300,
     lengthMillimeters: 600,
@@ -152,7 +153,7 @@ export const LOGISTICS_UI_PRODUCTS = [
     price: 16_400,
     purchasePrice: 9_000,
     warehouseCode: 'logistics-ui-origin-b',
-    serviceCodes: ['YANDEX_CARGO'],
+    serviceCodes: ['YANDEX_CARGO', 'CDEK_COURIER'],
     isOversized: false,
     weightGrams: 5_400,
     lengthMillimeters: 700,
@@ -166,7 +167,7 @@ export const LOGISTICS_UI_PRODUCTS = [
     price: 18_500,
     purchasePrice: 10_000,
     warehouseCode: 'logistics-ui-origin-a-clone',
-    serviceCodes: ['YANDEX_CARGO'],
+    serviceCodes: ['YANDEX_CARGO', 'CDEK_COURIER'],
     isOversized: false,
     weightGrams: 6_500,
     lengthMillimeters: 800,

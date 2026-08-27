@@ -45,11 +45,15 @@ describe('logistig-test seed matrix', () => {
       ]),
     );
     expect(services).toEqual({
-      'logistics-ui-service-ab': ['YANDEX_EXPRESS', 'YANDEX_CARGO'],
+      'logistics-ui-service-ab': [
+        'YANDEX_EXPRESS',
+        'YANDEX_CARGO',
+        'CDEK_COURIER',
+      ],
       'logistics-ui-service-b': ['YANDEX_CARGO'],
-      'logistics-ui-service-c': ['YANDEX_RUSSIA_DOOR'],
-      'logistics-ui-origin-b-cargo': ['YANDEX_CARGO'],
-      'logistics-ui-origin-clone-cargo': ['YANDEX_CARGO'],
+      'logistics-ui-service-c': ['CDEK_COURIER'],
+      'logistics-ui-origin-b-cargo': ['YANDEX_CARGO', 'CDEK_COURIER'],
+      'logistics-ui-origin-clone-cargo': ['YANDEX_CARGO', 'CDEK_COURIER'],
       'logistics-ui-oversized': [],
       'logistics-ui-unavailable': [],
     });
@@ -63,6 +67,16 @@ describe('logistig-test seed matrix', () => {
         ({ serviceCodes }) => !serviceCodes.includes('YANDEX_RUSSIA_PICKUP'),
       ),
     ).toBe(true);
+    expect(
+      LOGISTICS_UI_PRODUCTS.every(
+        ({ serviceCodes }) => !serviceCodes.includes('CDEK_PICKUP'),
+      ),
+    ).toBe(true);
+    expect(
+      LOGISTICS_UI_PRODUCTS.find(
+        ({ slug }) => slug === 'logistics-ui-oversized',
+      )?.serviceCodes,
+    ).toEqual([]);
     expect(LOGISTICS_UI_MARKUP).toBe(100);
   });
 });
