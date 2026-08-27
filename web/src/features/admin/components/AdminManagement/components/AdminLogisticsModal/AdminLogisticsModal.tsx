@@ -54,7 +54,7 @@ function DetailValue({ value }: { value: unknown }) {
     );
   if (typeof value === "object")
     return (
-      <dl className="space-y-1">
+      <dl className="flex flex-col gap-1">
         {Object.entries(value).map(([key, nested]) => (
           <div
             key={key}
@@ -483,7 +483,7 @@ function ProviderForm({
   return (
     <Modal
       isOpen
-      title={`Провайдер: ${provider.code}`}
+      title={provider.name}
       size="sm"
       preventClose={isPending}
       onClose={onClose}
@@ -544,14 +544,12 @@ function ProviderForm({
 
 function ServiceForm({
   service,
-  provider,
   isPending,
   mutationError,
   onClose,
   onSave,
 }: {
   service: AdminDeliveryService;
-  provider: AdminDeliveryProvider;
   isPending: boolean;
   mutationError?: string;
   onClose: () => void;
@@ -581,9 +579,6 @@ function ServiceForm({
           submit();
         }}
       >
-        <div className="text-sm text-muted-foreground">
-          Провайдер: {provider.name} · {provider.code}
-        </div>
         <FormInputField
           required
           name="service-name"
@@ -602,10 +597,6 @@ function ServiceForm({
           label="Сервис активен"
           checked={isActive}
           onCheckedChange={setIsActive}
-        />
-        <StatusBadge
-          text={isActive ? "Активен" : "Отключён"}
-          variant={isActive ? "access" : "destructive"}
         />
         {(formError || mutationError) && (
           <ErrorMessage>{formError ?? mutationError}</ErrorMessage>
@@ -659,7 +650,6 @@ export function AdminLogisticsModal({
   if (record?.type === "service")
     return (
       <ServiceForm
-        provider={record.provider}
         service={record.service}
         isPending={isPending}
         mutationError={mutationError}
