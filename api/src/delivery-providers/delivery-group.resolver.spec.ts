@@ -86,4 +86,50 @@ describe('DeliveryGroupResolver', () => {
       'missing',
     ]);
   });
+
+  it('partitions the primary logistics UI seed scenario into four parts', () => {
+    const result = resolver.resolve('order', 1, [
+      item('product-1', 'origin-a', ['express', 'cargo']),
+      item('product-2', 'origin-a', ['cargo']),
+      item('product-3', 'origin-a', ['russia-door']),
+      item('product-4', 'origin-b', ['cargo']),
+      item('product-5', 'origin-a-clone', ['cargo']),
+      item('product-6', 'origin-a', [], true),
+    ]);
+
+    expect(result.unavailableItems).toEqual([]);
+    expect(result.groups).toHaveLength(4);
+    expect(
+      result.groups
+        .map((group) => ({
+          warehouseId: group.warehouse.id,
+          itemIds: group.items.map(({ id }) => id),
+          commonServiceIds: group.commonServiceIds,
+        }))
+        .sort((first, second) =>
+          first.itemIds.join(',').localeCompare(second.itemIds.join(',')),
+        ),
+    ).toEqual([
+      {
+        warehouseId: 'origin-a',
+        itemIds: ['product-1', 'product-2'],
+        commonServiceIds: ['cargo'],
+      },
+      {
+        warehouseId: 'origin-a',
+        itemIds: ['product-3'],
+        commonServiceIds: ['russia-door'],
+      },
+      {
+        warehouseId: 'origin-b',
+        itemIds: ['product-4'],
+        commonServiceIds: ['cargo'],
+      },
+      {
+        warehouseId: 'origin-a-clone',
+        itemIds: ['product-5'],
+        commonServiceIds: ['cargo'],
+      },
+    ]);
+  });
 });
