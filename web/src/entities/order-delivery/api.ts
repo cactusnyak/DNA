@@ -59,7 +59,7 @@ export const calculateOrderDelivery = (
 
 export const updateOrderDeliveryPlan = (
   orderId: string,
-  body: { planId: string; pricingVersion: number },
+  body: { planId: string | null; pricingVersion: number },
   credentials: DeliveryCredentials,
 ) =>
   httpClient<OrderDeliveryState, typeof body>(

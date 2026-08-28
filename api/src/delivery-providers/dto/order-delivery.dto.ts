@@ -8,6 +8,7 @@ import {
   IsString,
   Max,
   Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
@@ -51,7 +52,9 @@ export class UpdateOrderDeliverySelectionsDto {
 }
 
 export class UpdateOrderDeliveryPlanDto {
-  @IsString() planId!: string;
+  @ValidateIf((_object, value) => value !== null)
+  @IsString()
+  planId!: string | null;
   @IsOptional() @IsInt() @Min(1) pricingVersion?: number;
 }
 

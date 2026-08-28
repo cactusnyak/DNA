@@ -111,13 +111,16 @@ type FormToggleFieldProps = FormFieldBaseProps & {
 };
 
 type FormRadioFieldProps = {
-  name: string;
-  value?: string;
   checked: boolean;
   disabled?: boolean;
   ariaLabel?: string;
   className?: string;
-  onCheckedChange: () => void;
+  onCheckedChange: (checked: boolean) => void;
+};
+
+type FormNativeRadioFieldProps = FormRadioFieldProps & {
+  name: string;
+  value?: string;
 };
 
 type FormBooleanFieldProps = {
@@ -128,7 +131,9 @@ type FormBooleanFieldProps = {
   checked: boolean;
   disabled?: boolean;
   indeterminate?: boolean;
-  variant?: 'checkbox' | 'toggle';
+  variant?: 'checkbox' | 'radio-checkbox' | 'radio' | 'toggle';
+  name?: string;
+  value?: string;
   className?: string;
   onCheckedChange: (checked: boolean) => void;
 };
@@ -696,8 +701,6 @@ export function FormToggleField({
 }
 
 export function FormRadioField({
-  name,
-  value,
   checked,
   disabled = false,
   ariaLabel,
@@ -705,28 +708,37 @@ export function FormRadioField({
   onCheckedChange,
 }: FormRadioFieldProps) {
   return (
-    <span
-      className={[
-        'relative inline-flex size-4 shrink-0',
-        disabled && 'cursor-not-allowed opacity-50',
-        className,
-      ].filter(Boolean).join(' ')}
-    >
-      <input
-        type="radio"
-        name={name}
-        value={value}
-        checked={checked}
-        disabled={disabled}
-        aria-label={ariaLabel}
-        className="peer absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
-        onChange={onCheckedChange}
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none flex size-4 items-center justify-center rounded-full border border-border/80 bg-background after:size-2 after:rounded-full after:bg-primary after:opacity-0 peer-checked:border-primary peer-checked:after:opacity-100 peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50"
-      />
-    </span>
+    <FormBooleanField
+      variant="radio-checkbox"
+      checked={checked}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+      className={className}
+      onCheckedChange={onCheckedChange}
+    />
+  );
+}
+
+export function FormNativeRadioField({
+  name,
+  value,
+  checked,
+  disabled = false,
+  ariaLabel,
+  className,
+  onCheckedChange,
+}: FormNativeRadioFieldProps) {
+  return (
+    <FormBooleanField
+      variant="radio"
+      name={name}
+      value={value}
+      checked={checked}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+      className={className}
+      onCheckedChange={onCheckedChange}
+    />
   );
 }
 
@@ -739,9 +751,58 @@ export function FormBooleanField({
   disabled = false,
   indeterminate = false,
   variant = 'checkbox',
+  name,
+  value,
   className,
   onCheckedChange,
 }: FormBooleanFieldProps) {
+  if (variant === 'radio') {
+    if (!name) {
+      throw new Error('FormBooleanField with variant="radio" requires name');
+    }
+
+    const control = (
+      <span
+        className={[
+          'relative inline-flex size-4 shrink-0',
+          disabled && 'cursor-not-allowed opacity-50',
+          !label && className,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <input
+          type="radio"
+          name={name}
+          value={value}
+          checked={checked}
+          required={required}
+          disabled={disabled}
+          aria-label={ariaLabel}
+          className="peer absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
+          onChange={() => onCheckedChange(true)}
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none flex size-4 items-center justify-center rounded-full border border-border/80 bg-background after:size-2 after:rounded-full after:bg-primary after:opacity-0 peer-checked:border-primary peer-checked:after:opacity-100 peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50"
+        />
+      </span>
+    );
+
+    if (!label) return control;
+
+    return (
+      <FormFieldRoot
+        label={label}
+        caption={caption}
+        required={required}
+        className={className}
+      >
+        {control}
+      </FormFieldRoot>
+    );
+  }
+
   const control = (
     <button
       type="button"
@@ -753,8 +814,15 @@ export function FormBooleanField({
       className={[
         variant === 'toggle'
           ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border/80 bg-background px-3 py-2 text-left text-sm hover:border-ring'
-          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border/80 bg-background text-primary-foreground',
-        variant === 'checkbox' && (checked || indeterminate) && 'border-primary bg-primary',
+          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center border border-border/80 bg-background',
+        variant === 'radio-checkbox' ? 'rounded-full' : 'rounded',
+        variant === 'checkbox' && 'text-primary-foreground',
+        variant === 'checkbox' &&
+          (checked || indeterminate) &&
+          'border-primary bg-primary',
+        variant === 'radio-checkbox' &&
+          checked &&
+          'border-primary after:size-2 after:rounded-full after:bg-primary',
         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
         !label && className,
@@ -781,7 +849,7 @@ export function FormBooleanField({
             />
           </span>
         </>
-      ) : (
+      ) : variant === 'radio-checkbox' ? null : (
         indeterminate ? (
           <span
             aria-hidden="true"

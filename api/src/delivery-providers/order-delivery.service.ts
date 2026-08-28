@@ -297,6 +297,23 @@ export class OrderDeliveryService {
           dto.pricingVersion !== order.pricingVersion
         )
           throw new ConflictException('Delivery pricing version is stale');
+
+        if (dto.planId === null) {
+          if (order.deliverySelections.length === 0) return;
+
+          await tx.orderDeliverySelection.deleteMany({ where: { orderId } });
+          await tx.deliveryQuote.updateMany({
+            where: { orderId, status: 'SELECTED' },
+            data: { status: 'CREATED', selectedAt: null },
+          });
+          await tx.order.update({
+            where: { id: orderId },
+            data: { pricingVersion: { increment: 1 } },
+          });
+          await this.reprice(tx, orderId);
+          return;
+        }
+
         const destination = this.destination(order.deliveryDestination);
         if (!destination)
           throw new DeliveryProviderError(

@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { FormRadioField } from '@/components/ui/FormField';
-import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useAuthStore } from '@/entities/auth';
 import {
   calculateOrderDelivery,
@@ -37,6 +36,7 @@ export function DeliveryWidget({
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string>();
   const automaticRequestRef = useRef<string | undefined>(undefined);
+  const expiredRequestRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
@@ -90,7 +90,7 @@ export function DeliveryWidget({
   });
 
   const selectionMutation = useMutation({
-    mutationFn: async (planId: string) => {
+    mutationFn: async (planId: string | null) => {
       const delivery = await updateOrderDeliveryPlan(
         order.id,
         {
@@ -106,6 +106,7 @@ export function DeliveryWidget({
       });
       return delivery;
     },
+    onMutate: () => setError(undefined),
     onSuccess: () => setError(undefined),
     onError: () => {
       setError('Не удалось сохранить выбранный вариант доставки.');
@@ -117,6 +118,11 @@ export function DeliveryWidget({
     quoteMutation.isPending ||
     selectionMutation.isPending;
   const hasOrdinaryDelivery = order.items.some((item) => !item.isOversized);
+  const expiredPlansKey = order.delivery.plans
+    .filter((plan) => getQuoteTimeState(plan.expiresAt, now) === 'expired')
+    .map((plan) => `${plan.planId}:${plan.expiresAt}`)
+    .sort()
+    .join('|');
 
   useEffect(() => {
     if (
@@ -153,6 +159,19 @@ export function DeliveryWidget({
     quoteMutation,
   ]);
 
+  useEffect(() => {
+    if (!expiredPlansKey || pending || quoteMutation.isError) return;
+    if (expiredRequestRef.current === expiredPlansKey) return;
+
+    expiredRequestRef.current = expiredPlansKey;
+    quoteMutation.mutate();
+  }, [expiredPlansKey, pending, quoteMutation]);
+
+  const refreshExpiredPlans = () => {
+    expiredRequestRef.current = undefined;
+    quoteMutation.mutate();
+  };
+
   if (!hasOrdinaryDelivery) return null;
 
   return (
@@ -177,16 +196,7 @@ export function DeliveryWidget({
         </ErrorMessage>
       ))}
 
-      {order.delivery.plans.length > 0 && selectionMutation.isPending && (
-        <SkeletonLoader
-          layout="stack"
-          count={order.delivery.plans.length}
-          itemClassName="min-h-32"
-          ariaLabel="Сохраняем выбранный вариант доставки"
-        />
-      )}
-
-      {order.delivery.plans.length > 0 && !selectionMutation.isPending && (
+      {order.delivery.plans.length > 0 && (
         <div className="flex flex-col gap-3">
           {order.delivery.plans.map((plan) => {
             const selected = order.delivery.selectedPlanId === plan.planId;
@@ -197,17 +207,23 @@ export function DeliveryWidget({
                 plan={plan}
                 selected={selected}
                 now={now}
+                onRefresh={refreshExpiredPlans}
+                isRefreshing={quoteMutation.isPending}
                 control={
-                    <FormRadioField
-                      name="delivery-plan"
-                      value={plan.planId}
-                      checked={selected}
-                      disabled={
-                        selectionMutation.isPending || timeState === 'expired'
-                      }
-                      ariaLabel={`Выбрать вариант доставки «${plan.title}»`}
-                      onCheckedChange={() => selectionMutation.mutate(plan.planId)}
-                    />
+                  <FormRadioField
+                    checked={selected}
+                    disabled={
+                      selectionMutation.isPending || timeState === 'expired'
+                    }
+                    ariaLabel={
+                      selected
+                        ? `Отменить выбор варианта доставки «${plan.title}»`
+                        : `Выбрать вариант доставки «${plan.title}»`
+                    }
+                    onCheckedChange={(checked) =>
+                      selectionMutation.mutate(checked ? plan.planId : null)
+                    }
+                  />
                 }
               />
             );

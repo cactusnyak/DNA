@@ -158,4 +158,39 @@ describe('OrderDeliveryService.selectPlan', () => {
     expect(tx.orderDeliverySelection.deleteMany).not.toHaveBeenCalled();
     expect(tx.order.update).not.toHaveBeenCalled();
   });
+
+  it('clears the selected bundle and recalculates pricing', async () => {
+    const { service, tx } = setup({
+      ...baseOrder,
+      deliverySelections: [{ deliveryQuoteId: 'quote-1' }],
+    });
+
+    await service.selectPlan(
+      'order-1',
+      { planId: null, pricingVersion: 2 },
+      { userId: 'user-1' },
+    );
+
+    expect(tx.orderDeliverySelection.deleteMany).toHaveBeenCalledWith({
+      where: { orderId: 'order-1' },
+    });
+    expect(tx.deliveryQuote.updateMany).toHaveBeenCalledWith({
+      where: { orderId: 'order-1', status: 'SELECTED' },
+      data: { status: 'CREATED', selectedAt: null },
+    });
+    expect(tx.order.update).toHaveBeenCalledWith({
+      where: { id: 'order-1' },
+      data: { pricingVersion: { increment: 1 } },
+    });
+  });
+
+  it('is idempotent when clearing an empty selection', async () => {
+    const { service, tx } = setup();
+
+    await service.selectPlan('order-1', { planId: null }, { userId: 'user-1' });
+
+    expect(tx.orderDeliverySelection.deleteMany).not.toHaveBeenCalled();
+    expect(tx.deliveryQuote.updateMany).not.toHaveBeenCalled();
+    expect(tx.order.update).not.toHaveBeenCalled();
+  });
 });

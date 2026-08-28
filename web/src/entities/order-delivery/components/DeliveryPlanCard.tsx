@@ -12,6 +12,8 @@ type DeliveryPlanCardProps = {
   bordered?: boolean;
   control?: ReactNode;
   now?: number;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 };
 
 export function DeliveryPlanCard({
@@ -20,6 +22,8 @@ export function DeliveryPlanCard({
   bordered = true,
   control,
   now,
+  onRefresh,
+  isRefreshing = false,
 }: DeliveryPlanCardProps) {
   const [renderedAt] = useState(() => Date.now());
   const timeState = getQuoteTimeState(plan.expiresAt, now ?? renderedAt);
@@ -51,7 +55,12 @@ export function DeliveryPlanCard({
             badges={plan.badges}
             isMixedProviderPlan={providerNames.length > 1}
           />
-          <DeliveryPlanDetails plan={plan} timeState={timeState} />
+          <DeliveryPlanDetails
+            plan={plan}
+            timeState={timeState}
+            onRefresh={onRefresh}
+            isRefreshing={isRefreshing}
+          />
         </div>
 
       </div>
