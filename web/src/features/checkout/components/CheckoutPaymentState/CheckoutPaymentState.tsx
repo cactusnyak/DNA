@@ -141,8 +141,8 @@ export function CheckoutPaymentState({
   }, [confirmationToken, currentOrder.id, stage]);
 
   return (
-    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
-      <div className="space-y-2">
+    <section className="mx-auto flex max-w-2xl flex-col gap-6 rounded-2xl bg-card p-8 shadow-card-xl">
+      <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">
           Заказ создан
         </p>
@@ -154,14 +154,38 @@ export function CheckoutPaymentState({
         </p>
       </div>
 
-      <OrderDetailsTable order={currentOrder} />
+      <div className="flex flex-col gap-6">
+        <OrderDetailsTable order={currentOrder} />
 
-      <DeliveryWidget
-        order={currentOrder}
-        onOrderChange={setCurrentOrder}
-      />
+        <DeliveryWidget
+          order={currentOrder}
+          onOrderChange={setCurrentOrder}
+        />
+      </div>
 
-      <OrderTotal amount={currentOrder.delivery.pricing.totalAmount} />
+      <div className="flex flex-col gap-3 pt-4 border-t border-primary/8">
+        <OrderTotal amount={currentOrder.delivery.pricing.totalAmount} />
+
+        <div className="flex flex-col gap-3">
+          {stage !== 'widget' && (
+            <p className="text-sm text-muted-foreground">
+              После оплаты мы автоматически проверим её статус. Не закрывайте
+              страницу банка до завершения операции.
+            </p>
+          )}
+
+          <p className="text-sm text-muted-foreground">
+            К заказу применяется{' '}
+            <Link
+              className="font-medium text-foreground underline underline-offset-2"
+              to="/public-offer"
+            >
+              Публичная оферта
+            </Link>
+            .
+          </p>
+        </div>
+      </div>
 
       {stage === 'error' && errorMessage && (
         <ErrorMessage>
@@ -170,32 +194,28 @@ export function CheckoutPaymentState({
       )}
 
       {(stage === 'loading' || stage === 'widget') && (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div id={WIDGET_CONTAINER_ID} className="min-h-[300px]" />
           <LegalFormNotice kind="order" />
         </div>
       )}
 
-      {stage !== 'widget' && (
-        <p className="text-sm text-muted-foreground">
-          После оплаты мы автоматически проверим её статус. Не закрывайте
-          страницу банка до завершения операции.
-        </p>
-      )}
+      <div>
+        {stage !== 'widget' && currentOrder.delivery.readyForPayment && (
+          <PaymentActions
+            isPending={initiateMutation.isPending || stage === 'loading'}
+            isRetry={stage === 'error'}
+            onPay={() => initiateMutation.mutate()}
+          />
+        )}
 
-      <p className="text-xs text-muted-foreground">К заказу применяется <Link className="font-medium text-foreground underline underline-offset-2" to="/public-offer">Публичная оферта</Link>.</p>
-
-      {stage !== 'widget' && currentOrder.delivery.readyForPayment && (
-        <PaymentActions
-          isPending={initiateMutation.isPending || stage === 'loading'}
-          isRetry={stage === 'error'}
-          onPay={() => initiateMutation.mutate()}
-        />
-      )}
-
-      {!currentOrder.delivery.readyForPayment && (
-        <ErrorMessage>{currentOrder.delivery.blockingReasons[0] ?? 'Выберите доставку перед оплатой.'}</ErrorMessage>
-      )}
+        {!currentOrder.delivery.readyForPayment && (
+          <ErrorMessage>
+            {currentOrder.delivery.blockingReasons[0] ??
+              'Выберите доставку перед оплатой.'}
+          </ErrorMessage>
+        )}
+      </div>
     </section>
   );
 }

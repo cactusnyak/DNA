@@ -29,12 +29,14 @@ export function CheckoutPage() {
     if (!accessToken && !guestSessionId) {
       return (
         <ContentCard>
-          <ErrorMessage>
-            Сессия заказа не найдена. Войдите в профиль или начните новое оформление.
-          </ErrorMessage>
-          <Link to="/authorization" className="mt-4 inline-block underline">
-            Войти
-          </Link>
+          <div className="flex flex-col items-start gap-4">
+            <ErrorMessage>
+              Сессия заказа не найдена. Войдите в профиль или начните новое оформление.
+            </ErrorMessage>
+            <Link to="/authorization" className="underline">
+              Войти
+            </Link>
+          </div>
         </ContentCard>
       );
     }
@@ -46,10 +48,12 @@ export function CheckoutPage() {
     if (orderQuery.isError || !orderQuery.data) {
       return (
         <ContentCard>
-          <ErrorMessage>Заказ не найден или недоступен.</ErrorMessage>
-          <Link to="/profile" className="mt-4 inline-block underline">
-            Вернуться в профиль
-          </Link>
+          <div className="flex flex-col items-start gap-4">
+            <ErrorMessage>Заказ не найден или недоступен.</ErrorMessage>
+            <Link to="/profile" className="underline">
+              Вернуться в профиль
+            </Link>
+          </div>
         </ContentCard>
       );
     }
@@ -57,10 +61,12 @@ export function CheckoutPage() {
     if (orderQuery.data.status !== 'AWAITING_PAYMENT') {
       return (
         <ContentCard>
-          <p>Этот заказ больше не ожидает оплаты.</p>
-          <Link to={`/orders/${orderId}`} className="mt-4 inline-block underline">
-            Открыть заказ
-          </Link>
+          <div className="flex flex-col items-start gap-4">
+            <p>Этот заказ больше не ожидает оплаты.</p>
+            <Link to={`/orders/${orderId}`} className="underline">
+              Открыть заказ
+            </Link>
+          </div>
         </ContentCard>
       );
     }

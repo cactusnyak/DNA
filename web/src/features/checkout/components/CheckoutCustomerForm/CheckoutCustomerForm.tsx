@@ -39,9 +39,9 @@ export function CheckoutCustomerForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
       <section className="flex flex-col gap-6 rounded-2xl shadow-card-lg bg-card p-5 sm:p-6">
-        <div className="space-y-1.5">
+        <div className="flex flex-col gap-1.5">
           <h2 className="text-lg font-semibold">Контактные данные</h2>
 
           <p className="text-sm leading-6 text-muted-foreground">

@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/Button';
 
 export function CheckoutEmptyState() {
   return (
-    <section className="mx-auto max-w-xl space-y-4 rounded-2xl border border-border/80 bg-card p-8 text-center">
-      <div className="space-y-2">
+    <section className="mx-auto flex max-w-xl flex-col gap-4 rounded-2xl border border-border/80 bg-card p-8 text-center">
+      <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Оформлять пока нечего</h1>
 
         <p className="text-sm text-muted-foreground">

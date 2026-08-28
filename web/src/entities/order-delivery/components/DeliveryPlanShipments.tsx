@@ -50,7 +50,7 @@ export function DeliveryPlanShipments({ parts }: DeliveryPlanShipmentsProps) {
               className="min-w-0 space-y-3 rounded-lg border border-border/60 bg-background p-3"
             >
               <header className="flex min-w-0 flex-wrap items-center justify-between gap-2">
-                <span className="font-medium">
+                <span className="font-medium text-sm">
                   Отправление {index + 1} из {parts.length}
                 </span>
                 <StatusBadge text={part.provider.name} />
