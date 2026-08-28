@@ -1,7 +1,6 @@
 import { useId, useState } from 'react';
 import { ChevronDown, Clock3, Package, Truck } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 
 import { formatDeliveryInterval } from '../logic';
@@ -16,12 +15,10 @@ export function DeliveryPlanShipments({ parts }: DeliveryPlanShipmentsProps) {
   const contentId = useId();
 
   return (
-    <div className="min-w-0 max-w-full overflow-hidden rounded-lg border border-border/70">
-      <Button
+    <div className="min-w-0 max-w-full">
+      <button
         type="button"
-        variant="ghost"
-        size="sm"
-        className="h-auto w-full justify-between rounded-none px-3 py-2 text-left"
+        className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:text-primary focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring"
         aria-expanded={isOpen}
         aria-controls={contentId}
         onClick={(event) => {
@@ -34,18 +31,18 @@ export function DeliveryPlanShipments({ parts }: DeliveryPlanShipmentsProps) {
         <ChevronDown
           className={[
             'size-4 text-muted-foreground transition-transform',
-            isOpen && 'rotate-180',
+            !isOpen && '-rotate-90',
           ]
             .filter(Boolean)
             .join(' ')}
           strokeWidth={1.5}
         />
-      </Button>
+      </button>
 
       {isOpen && (
         <div
           id={contentId}
-          className="flex min-w-0 flex-col gap-2 border-t border-border/70 bg-muted/15 p-2"
+          className="mt-2 flex min-w-0 flex-col gap-2 rounded-lg bg-muted/15 p-2"
         >
           {parts.map((part, index) => (
             <article

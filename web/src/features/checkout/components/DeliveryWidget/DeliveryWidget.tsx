@@ -156,7 +156,7 @@ export function DeliveryWidget({
   if (!hasOrdinaryDelivery) return null;
 
   return (
-    <section className="flex flex-col gap-5 rounded-2xl bg-card p-5 shadow-card-lg sm:p-6">
+    <section className="flex flex-col gap-5 rounded-2xl bg-card">
       <header className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold">Доставка</h2>
         <p className="text-sm text-muted-foreground">
