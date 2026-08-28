@@ -51,10 +51,13 @@ body {
   --color-warning: var(--warning);
   --color-dangerous: var(--dangerous);
   --color-destructive: var(--destructive);
+  --color-emphasis: var(--emphasis);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+  --color-status-badge-muted-foreground: var(--status-badge-muted-foreground);
+  --color-status-badge-muted: var(--status-badge-muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -141,6 +144,13 @@ body {
   --muted-foreground: color-mix(in srgb,
       var(--primary) 30%,
       #757575);
+  --status-badge-muted-foreground: color-mix(in srgb,
+      color-mix(in srgb, var(--primary) 20%, #50505a) 72%,
+      transparent);
+  --status-badge-muted: color-mix(in srgb,
+      color-mix(in srgb, var(--primary) 3%, #f4f3f5) 47%,
+      transparent);
+  --emphasis: color-mix(in srgb, var(--primary) 68%, #4d4d62);
 
   --accent: color-mix(in srgb, var(--primary) 10%, #ffffff);
   --accent-foreground: color-mix(in srgb,
@@ -234,6 +244,13 @@ body {
   --muted-foreground: color-mix(in srgb,
       var(--primary) 8%,
       #aaaab6);
+  --status-badge-muted-foreground: color-mix(in srgb,
+      color-mix(in srgb, var(--primary) 18%, #f0eff5) 82%,
+      transparent);
+  --status-badge-muted: color-mix(in srgb,
+      color-mix(in srgb, var(--primary) 12%, #2a2933) 70%,
+      transparent);
+  --emphasis: color-mix(in srgb, var(--primary) 72%, #eeeef7);
 
   --accent: color-mix(in srgb, var(--primary) 20%, #292934);
   --accent-foreground: color-mix(in srgb,

@@ -20,7 +20,7 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
             to={`/market/product/${product?.slug ?? item.productId}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-3 rounded-lg bg-primary/3 p-2 transition-colors hover:bg-primary/5"
+            className="flex items-start gap-3 rounded-xl bg-primary/3 p-2 transition-colors hover:bg-primary/5"
           >
             <span className="size-12 shrink-0 overflow-hidden rounded-md bg-muted">
               {image ? (

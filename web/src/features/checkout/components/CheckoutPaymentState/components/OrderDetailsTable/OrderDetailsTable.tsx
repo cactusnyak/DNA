@@ -12,7 +12,7 @@ export function OrderDetailsTable({ order }: OrderDetailsTableProps) {
   const detailItems = getOrderDetailItems(order);
 
   return (
-    <table className="w-full text-sm">
+    <table className="w-full text-sm [&_td]:align-top">
       <tbody>
         {detailItems.map((item) => (
           <tr
