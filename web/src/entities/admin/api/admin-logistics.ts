@@ -1,0 +1,13 @@
+import { httpClient } from '@/shared/api/http-client';
+import type { AdminDeliveryProvider, AdminLogisticsConfiguration, AdminPage, AdminShipment, AdminUniversalQuote, AdminWarehouse } from '../types/admin-logistics';
+const headers = (token: string) => ({ Authorization: `Bearer ${token}` });
+export const getAdminLogisticsConfiguration = (token: string) => httpClient<AdminLogisticsConfiguration>('/admin/logistics/configuration', { headers: headers(token) });
+export const getAdminUniversalQuotes = (token: string) => httpClient<AdminPage<AdminUniversalQuote>>('/admin/logistics/quotes?limit=50', { headers: headers(token) });
+export const getAdminShipments = (token: string) => httpClient<AdminPage<AdminShipment>>('/admin/logistics/shipments?limit=50', { headers: headers(token) });
+export const getAdminUniversalQuote = (token: string, id: string) => httpClient<Record<string, unknown>>(`/admin/logistics/quotes/${id}`, { headers: headers(token) });
+export const getAdminShipment = (token: string, id: string) => httpClient<Record<string, unknown>>(`/admin/logistics/shipments/${id}`, { headers: headers(token) });
+export const createAdminWarehouse = (token: string, payload: Partial<AdminWarehouse>) => httpClient<AdminWarehouse, Partial<AdminWarehouse>>('/admin/logistics/warehouses', { method: 'POST', headers: headers(token), body: payload });
+export const updateAdminWarehouse = (token: string, id: string, payload: Partial<AdminWarehouse>) => httpClient<AdminWarehouse, Partial<AdminWarehouse>>(`/admin/logistics/warehouses/${id}`, { method: 'PATCH', headers: headers(token), body: payload });
+export const deleteAdminWarehouse = (token: string, id: string) => httpClient<{ deleted?: boolean; archived?: boolean }>(`/admin/logistics/warehouses/${id}`, { method: 'DELETE', headers: headers(token) });
+export const updateAdminDeliveryProvider = (token: string, provider: AdminDeliveryProvider) => httpClient(`/admin/logistics/providers/${provider.id}`, { method: 'PATCH', headers: headers(token), body: { name: provider.name, isActive: provider.isActive, fixedMarkup: provider.fixedMarkup } });
+export const updateAdminDeliveryService = (token: string, service: AdminDeliveryProvider['services'][number]) => httpClient(`/admin/logistics/services/${service.id}`, { method: 'PATCH', headers: headers(token), body: { name: service.name, isActive: service.isActive } });

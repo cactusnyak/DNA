@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
@@ -13,10 +14,10 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 import { OrderStatus, PaymentAttemptStatus, Prisma } from '@prisma/client';
-import { randomUUID } from 'node:crypto';
 
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { OrderDeliveryService } from '../delivery-providers/order-delivery.service';
 
 import { PaymentsService } from './payments.service';
 import type {
@@ -34,6 +35,9 @@ const ORDER_FOR_PAYMENT_INCLUDE = {
       deliveryQuote: true,
     },
   },
+  deliverySelections: {
+    include: { deliveryQuote: { include: { deliveryService: true } } },
+  },
 } satisfies Prisma.OrderInclude;
 
 type OrderForPayment = Prisma.OrderGetPayload<{
@@ -48,6 +52,7 @@ export class PaymentsController {
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly orderDeliveryService: OrderDeliveryService,
   ) {}
 
   @Post('orders/:orderId/payment')
@@ -56,7 +61,7 @@ export class PaymentsController {
     @Headers('authorization') authorizationHeader?: string,
     @Headers('x-guest-session-id') guestSessionId?: string,
   ) {
-    const order = await this.getAccessibleOrder(
+    let order = await this.getAccessibleOrder(
       orderId,
       authorizationHeader,
       guestSessionId,
@@ -67,6 +72,8 @@ export class PaymentsController {
         `Cannot initiate payment for order with status ${order.status}`,
       );
     }
+
+    const owner = await this.getOwner(authorizationHeader, guestSessionId);
 
     const invalidOversizedItem = order.items.find(
       (item) =>
@@ -91,42 +98,32 @@ export class PaymentsController {
       );
     }
 
-    let attempt = await this.prismaService.paymentAttempt.findUnique({
-      where: { activeOrderId: order.id },
-    });
-
-    if (!attempt) {
-      try {
-        attempt = await this.prismaService.paymentAttempt.create({
-          data: {
-            orderId: order.id,
-            activeOrderId: order.id,
-            idempotenceKey: randomUUID(),
-            amount: order.totalAmount,
-          },
-        });
-      } catch (error) {
-        if (
-          !(error instanceof Prisma.PrismaClientKnownRequestError) ||
-          error.code !== 'P2002'
-        ) {
-          throw error;
-        }
-        attempt = await this.prismaService.paymentAttempt.findUnique({
-          where: { activeOrderId: order.id },
-        });
-      }
+    const attempt = await this.orderDeliveryService.preparePayment(
+      order.id,
+      owner,
+    );
+    order = await this.getAccessibleOrder(
+      orderId,
+      authorizationHeader,
+      guestSessionId,
+    );
+    if (!order.customerEmail) {
+      throw new BadRequestException(
+        'Customer email is required to issue a receipt',
+      );
     }
 
-    if (!attempt) {
-      throw new BadRequestException('Could not create a payment attempt');
+    if (attempt.amount !== order.totalAmount) {
+      throw new ConflictException(
+        'Сумма заказа изменилась после начала оплаты. Повторите оплату после обновления заказа.',
+      );
     }
 
     const payment = attempt.providerPaymentId
       ? await this.paymentsService.getPayment(attempt.providerPaymentId)
       : await this.paymentsService.createPayment({
           orderId: order.id,
-          amountRubles: order.totalAmount,
+          amountRubles: attempt.amount,
           description: `Заказ №${order.id.slice(0, 8)}`,
           returnUrl: this.getReturnUrl(order.id),
           customerEmail: order.customerEmail,
@@ -291,6 +288,25 @@ export class PaymentsController {
       }
     }
 
+    for (const selection of order.deliverySelections) {
+      if (selection.customerCharge <= 0) continue;
+      items.push({
+        description:
+          `Доставка: ${selection.deliveryQuote.deliveryService.name}`.slice(
+            0,
+            128,
+          ),
+        quantity: '1.000',
+        amount: {
+          value: selection.customerCharge.toFixed(2),
+          currency: 'RUB',
+        },
+        vat_code: vatCode,
+        payment_mode: 'full_payment',
+        payment_subject: 'service',
+      });
+    }
+
     if (items.length > 80) {
       throw new BadRequestException(
         'Order has too many receipt positions (maximum is 80)',
@@ -376,6 +392,27 @@ export class PaymentsController {
       canceled: PaymentAttemptStatus.CANCELED,
     };
     return statuses[status];
+  }
+
+  private async getOwner(
+    authorizationHeader?: string,
+    guestSessionId?: string,
+  ) {
+    const user: unknown =
+      await this.authService.getOptionalMeFromAuthorizationHeader(
+        authorizationHeader,
+      );
+    const userId =
+      user &&
+      typeof user === 'object' &&
+      'id' in user &&
+      typeof user.id === 'string'
+        ? user.id
+        : undefined;
+    return {
+      userId,
+      guestSessionId: userId ? undefined : guestSessionId,
+    };
   }
 
   private toPaymentResponse(payment: YookassaPayment) {

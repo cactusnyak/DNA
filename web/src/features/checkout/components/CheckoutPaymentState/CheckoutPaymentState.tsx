@@ -4,14 +4,15 @@ import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { OrderTotal } from '@/components/ui/OrderTotal';
 import { LegalFormNotice } from '@/shared/legal/LegalFormNotice';
 import { useAuthStore } from '@/entities/auth';
 import { initiatePayment, type Order } from '@/entities/order';
 import { useSessionStore } from '@/entities/session';
 
 import { OrderDetailsTable } from './components/OrderDetailsTable';
-import { OrderItemsList } from './components/OrderItemsList';
 import { PaymentActions } from './components/PaymentActions';
+import { DeliveryWidget } from '../DeliveryWidget';
 
 declare global {
   interface Window {
@@ -61,7 +62,10 @@ function loadCheckoutWidgetScript() {
   });
 }
 
-export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
+export function CheckoutPaymentState({
+  order,
+}: CheckoutPaymentStateProps) {
+  const [currentOrder, setCurrentOrder] = useState(order);
   const [stage, setStage] = useState<PaymentStage>('idle');
   const [confirmationToken, setConfirmationToken] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -72,7 +76,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
   const initiateMutation = useMutation({
     mutationFn: () =>
       initiatePayment(
-        order.id,
+        currentOrder.id,
         accessToken ?? undefined,
         accessToken ? undefined : guestSessionId,
       ),
@@ -114,7 +118,7 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         widgetRef.current?.destroy();
         const widget = new window.YooMoneyCheckoutWidget({
           confirmation_token: confirmationToken,
-          return_url: `${window.location.origin}/checkout/result?orderId=${order.id}`,
+          return_url: `${window.location.origin}/checkout/result?orderId=${currentOrder.id}`,
           error_callback: () => {
             if (cancelled) return;
             setErrorMessage('Не удалось открыть форму оплаты. Попробуйте позже.');
@@ -134,11 +138,11 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
     return () => {
       cancelled = true;
     };
-  }, [confirmationToken, order.id, stage]);
+  }, [confirmationToken, currentOrder.id, stage]);
 
   return (
-    <section className="mx-auto max-w-2xl space-y-6 rounded-2xl shadow-card-xl bg-card p-8">
-      <div className="space-y-2">
+    <section className="mx-auto flex max-w-2xl flex-col gap-6 rounded-2xl bg-card p-8 shadow-card-xl">
+      <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">
           Заказ создан
         </p>
@@ -146,13 +150,42 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
         <h1 className="text-2xl font-semibold">Заказ ожидает оплаты</h1>
 
         <p className="text-sm text-muted-foreground">
-          Номер заказа: <span className="text-foreground">{order.id}</span>
+          Номер заказа: <span className="text-foreground">{currentOrder.id}</span>
         </p>
       </div>
 
-      <OrderDetailsTable order={order} />
+      <div className="flex flex-col gap-6">
+        <OrderDetailsTable order={currentOrder} />
 
-      <OrderItemsList items={order.items} />
+        <DeliveryWidget
+          order={currentOrder}
+          onOrderChange={setCurrentOrder}
+        />
+      </div>
+
+      <div className="flex flex-col gap-3 pt-4 border-t border-primary/8">
+        <OrderTotal amount={currentOrder.delivery.pricing.totalAmount} />
+
+        <div className="flex flex-col gap-3">
+          {stage !== 'widget' && (
+            <p className="text-sm text-muted-foreground">
+              После оплаты мы автоматически проверим её статус. Не закрывайте
+              страницу банка до завершения операции.
+            </p>
+          )}
+
+          <p className="text-sm text-muted-foreground">
+            К заказу применяется{' '}
+            <Link
+              className="font-medium text-foreground underline underline-offset-2"
+              to="/public-offer"
+            >
+              Публичная оферта
+            </Link>
+            .
+          </p>
+        </div>
+      </div>
 
       {stage === 'error' && errorMessage && (
         <ErrorMessage>
@@ -161,28 +194,28 @@ export function CheckoutPaymentState({ order }: CheckoutPaymentStateProps) {
       )}
 
       {(stage === 'loading' || stage === 'widget') && (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div id={WIDGET_CONTAINER_ID} className="min-h-[300px]" />
           <LegalFormNotice kind="order" />
         </div>
       )}
 
-      {stage !== 'widget' && (
-        <p className="text-sm text-muted-foreground">
-          После оплаты мы автоматически проверим её статус. Не закрывайте
-          страницу банка до завершения операции.
-        </p>
-      )}
+      <div>
+        {stage !== 'widget' && currentOrder.delivery.readyForPayment && (
+          <PaymentActions
+            isPending={initiateMutation.isPending || stage === 'loading'}
+            isRetry={stage === 'error'}
+            onPay={() => initiateMutation.mutate()}
+          />
+        )}
 
-      <p className="text-xs text-muted-foreground">К заказу применяется <Link className="font-medium text-foreground underline underline-offset-2" to="/public-offer">Публичная оферта</Link>.</p>
-
-      {stage !== 'widget' && (
-        <PaymentActions
-          isPending={initiateMutation.isPending || stage === 'loading'}
-          isRetry={stage === 'error'}
-          onPay={() => initiateMutation.mutate()}
-        />
-      )}
+        {!currentOrder.delivery.readyForPayment && (
+          <ErrorMessage>
+            {currentOrder.delivery.blockingReasons[0] ??
+              'Выберите доставку перед оплатой.'}
+          </ErrorMessage>
+        )}
+      </div>
     </section>
   );
 }

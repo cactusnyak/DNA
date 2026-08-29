@@ -70,6 +70,7 @@ export function AdminUserRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="users"
       records={users}
       getRecordKey={(user) => user.id}
       emptyText="Пользователи не найдены."

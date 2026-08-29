@@ -1,4 +1,3 @@
-
 export type SkeletonVariant = 'block' | 'text' | 'card';
 export type SkeletonLayout = 'single' | 'grid' | 'stack' | 'inline';
 

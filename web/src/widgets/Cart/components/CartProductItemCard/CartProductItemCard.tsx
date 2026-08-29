@@ -65,7 +65,6 @@ export function CartProductItemCard({
       href={`/market/product/${product.slug}`}
       imageUrl={image?.url}
       imageAlt={image?.alt ?? product.title}
-      placeholderText="Нет изображения"
       title={product.title}
       category={
         <div className="flex min-w-0 flex-col gap-3 break-words text-xs text-muted-foreground sm:text-sm">

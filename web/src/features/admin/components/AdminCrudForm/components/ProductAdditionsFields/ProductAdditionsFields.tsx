@@ -74,12 +74,7 @@ export function ProductAdditionsFields({ value, onChange }: Props) {
 
   return (
     <section className="space-y-4 border-y border-border/80 my-6 px-4 py-6">
-      <div>
-        <h3 className="font-medium">Дополнения</h3>
-        <p className="text-sm text-muted-foreground">
-          Настройте опции, доступные покупателю на странице товара.
-        </p>
-      </div>
+      <h3 className="font-medium">Дополнения</h3>
 
       <div className='flex flex-col gap-2'>
         {value.map((addition, index) => (

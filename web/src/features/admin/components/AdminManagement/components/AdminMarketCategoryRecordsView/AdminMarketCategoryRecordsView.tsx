@@ -82,6 +82,7 @@ export function AdminMarketCategoryRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="market-categories"
       records={tree}
       getRecordKey={(category) => category.id}
       emptyText="Категории маркета не найдены."

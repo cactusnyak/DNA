@@ -9,6 +9,7 @@ export { getPaymentStatus } from './api/get-payment-status';
 export type { PaymentStatusResponse } from './api/get-payment-status';
 export type { InitiatePaymentResponse } from './api/initiate-payment';
 export { formatOrderStatus } from './utils/format-order-status';
+export { OrderItemsList } from './components/OrderItemsList';
 
 export type { CreateOrderPayload } from './types/create-order-payload';
 export type { OrderCustomer } from './types/order-customer';

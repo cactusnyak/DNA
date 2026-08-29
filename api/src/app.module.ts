@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
 import { DeliveryQuotesModule } from './delivery-quotes/delivery-quotes.module';
+import { DeliveryProvidersModule } from './delivery-providers/delivery-providers.module';
 import { FeedModule } from './feed/feed.module';
 import { HealthModule } from './health/health.module';
 import { MarketModule } from './market/market.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule,
     DeliveryQuotesModule,
+    DeliveryProvidersModule,
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60_000, limit: 100 }],
     }),

@@ -113,6 +113,8 @@ export async function buildAdminCrudPayload({
       ),
       categoryId: String(values.categoryId ?? ''),
       price: Number(values.price ?? 0),
+      sku: String(values.sku ?? '').trim() || undefined,
+      purchasePrice: String(values.purchasePrice ?? '').trim() === '' ? null : Number(values.purchasePrice),
       location: getLocation(values),
       imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       additions: Array.isArray(values.additions)
@@ -120,6 +122,18 @@ export async function buildAdminCrudPayload({
         : [],
       isActive: Boolean(values.isActive),
       isOversizedOverride: values.isOversizedOverride === 'inherit' ? null : values.isOversizedOverride === 'oversized',
+      logistics: {
+        shippingProfile: values.shippingProfileEnabled ? {
+          isFragile: Boolean(values.isFragile),
+          isStackable: Boolean(values.isStackable),
+          ageRestricted: Boolean(values.ageRestricted),
+          handlingNotes: String(values.handlingNotes ?? '').trim() || undefined,
+        } : undefined,
+        packages: Array.isArray(values.packages) ? values.packages as import('@/entities/admin').AdminProductPackage[] : [],
+        warehouseIds: Array.isArray(values.warehouseIds) ? values.warehouseIds.filter((value): value is string => typeof value === 'string') : [],
+        primaryWarehouseId: String(values.primaryWarehouseId ?? '').trim() || undefined,
+        deliveryServiceIds: Array.isArray(values.deliveryServiceIds) ? values.deliveryServiceIds.filter((value): value is string => typeof value === 'string') : [],
+      },
     };
   }
 

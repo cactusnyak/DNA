@@ -60,7 +60,7 @@ export function CheckoutResultPage() {
         iconClassName={config.color}
         title={config.title}
         description={
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <p>
               {query.isError
                 ? 'Не удалось проверить платёж. Обновите страницу через несколько секунд.'

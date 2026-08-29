@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CatalogCollectionType } from '@prisma/client';
+import { CatalogCollectionType, PackageType, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { locationToJson } from '../common/location';
@@ -15,12 +15,43 @@ import {
 import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
 
 import { AdminInputService } from './admin-input.service';
+import { OrderDeliveryInvalidationService } from '../delivery-providers/order-delivery-invalidation.service';
+
+const ADMIN_PRODUCT_INCLUDE = {
+  category: {
+    include: { image: true, _count: { select: { products: true } } },
+  },
+  images: { include: { image: true } },
+  shippingProfile: {
+    include: { packages: { orderBy: { sequence: 'asc' as const } } },
+  },
+  warehouses: { include: { warehouse: true } },
+  deliveryServices: {
+    include: { deliveryService: { include: { provider: true } } },
+  },
+} satisfies Prisma.ProductInclude;
+
+type AdminProductRecord = Prisma.ProductGetPayload<{
+  include: typeof ADMIN_PRODUCT_INCLUDE;
+}>;
+
+type AdminProductViewRecord = Omit<
+  AdminProductRecord,
+  'shippingProfile' | 'warehouses' | 'deliveryServices'
+> &
+  Partial<
+    Pick<
+      AdminProductRecord,
+      'shippingProfile' | 'warehouses' | 'deliveryServices'
+    >
+  >;
 
 @Injectable()
 export class AdminMarketCatalogService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly adminInputService: AdminInputService,
+    private readonly deliveryInvalidation?: OrderDeliveryInvalidationService,
   ) {}
 
   async createCategory(body: unknown) {
@@ -121,6 +152,7 @@ export class AdminMarketCatalogService {
     );
 
     await this.getCategoryOrThrow(categoryId);
+    await this.assertUniqueSku(payload.sku);
 
     const product = await this.prismaService.product.create({
       data: {
@@ -133,6 +165,11 @@ export class AdminMarketCatalogService {
         categoryId,
         description: contentDescriptionToJson(payload.description),
         price: this.adminInputService.getNumber(payload.price, 0),
+        sku: this.adminInputService.getOptionalString(payload.sku),
+        purchasePrice: this.getOptionalNonnegativeInteger(
+          payload.purchasePrice,
+          'Purchase price',
+        ),
         location: locationToJson(payload.location),
         additions: productAdditionsToJson(
           normalizeProductAdditions(payload.additions),
@@ -148,6 +185,7 @@ export class AdminMarketCatalogService {
       product.id,
       this.adminInputService.getImageUrls(payload),
     );
+    await this.replaceProductLogistics(product.id, payload);
 
     return this.getAdminProductById(product.id);
   }
@@ -166,29 +204,38 @@ export class AdminMarketCatalogService {
     );
 
     await this.getCategoryOrThrow(categoryId);
+    await this.assertUniqueSku(payload.sku, id);
 
-    await this.prismaService.product.update({
-      where: { id },
-      data: {
-        title,
-        slug: await this.adminInputService.getUniqueSlug({
-          entity: 'product',
-          value: payload.slug,
-          fallback: title,
-          exceptId: id,
-        }),
-        categoryId,
-        description: contentDescriptionToJson(payload.description),
-        price: this.adminInputService.getNumber(payload.price, 0),
-        location: locationToJson(payload.location),
-        additions: productAdditionsToJson(
-          normalizeProductAdditions(payload.additions),
-        ),
-        isActive: this.adminInputService.getBoolean(payload.isActive, true),
-        isOversizedOverride: this.getNullableBoolean(
-          payload.isOversizedOverride,
-        ),
-      },
+    await this.prismaService.$transaction(async (transaction) => {
+      await transaction.product.update({
+        where: { id },
+        data: {
+          title,
+          slug: await this.adminInputService.getUniqueSlug({
+            entity: 'product',
+            value: payload.slug,
+            fallback: title,
+            exceptId: id,
+          }),
+          categoryId,
+          description: contentDescriptionToJson(payload.description),
+          price: this.adminInputService.getNumber(payload.price, 0),
+          sku: this.adminInputService.getOptionalString(payload.sku),
+          purchasePrice: this.getOptionalNonnegativeInteger(
+            payload.purchasePrice,
+            'Purchase price',
+          ),
+          location: locationToJson(payload.location),
+          additions: productAdditionsToJson(
+            normalizeProductAdditions(payload.additions),
+          ),
+          isActive: this.adminInputService.getBoolean(payload.isActive, true),
+          isOversizedOverride: this.getNullableBoolean(
+            payload.isOversizedOverride,
+          ),
+        },
+      });
+      await this.replaceProductLogistics(id, payload, transaction);
     });
 
     if ('imageUrls' in payload) {
@@ -197,6 +244,9 @@ export class AdminMarketCatalogService {
         this.adminInputService.getImageUrls(payload),
       );
     }
+
+    if ('logistics' in payload)
+      await this.deliveryInvalidation?.invalidateAffected({ productId: id });
 
     return this.getAdminProductById(id);
   }
@@ -458,10 +508,7 @@ export class AdminMarketCatalogService {
     const categoryById = new Map(categories.map((item) => [item.id, item]));
     const product = await this.prismaService.product.findUnique({
       where: { id },
-      include: {
-        category: { include: this.categoryInclude },
-        images: { include: { image: true } },
-      },
+      include: ADMIN_PRODUCT_INCLUDE,
     });
 
     if (!product) {
@@ -575,14 +622,27 @@ export class AdminMarketCatalogService {
   }
 
   private async assertProductCanBeHardDeleted(id: string) {
-    const [orderItemsCount, cartItemsCount, collectionProductsCount] =
-      await Promise.all([
-        this.prismaService.orderItem.count({ where: { productId: id } }),
-        this.prismaService.cartItem.count({ where: { productId: id } }),
-        this.prismaService.catalogCollectionProduct.count({
-          where: { productId: id },
-        }),
-      ]);
+    const [
+      orderItemsCount,
+      cartItemsCount,
+      collectionProductsCount,
+      warehouseCount,
+      serviceCount,
+      shippingProfileCount,
+    ] = await Promise.all([
+      this.prismaService.orderItem.count({ where: { productId: id } }),
+      this.prismaService.cartItem.count({ where: { productId: id } }),
+      this.prismaService.catalogCollectionProduct.count({
+        where: { productId: id },
+      }),
+      this.prismaService.productWarehouse.count({ where: { productId: id } }),
+      this.prismaService.productDeliveryService.count({
+        where: { productId: id },
+      }),
+      this.prismaService.productShippingProfile.count({
+        where: { productId: id },
+      }),
+    ]);
     const blockers: string[] = [];
 
     if (orderItemsCount > 0) blockers.push('продукт есть в заказах');
@@ -590,6 +650,8 @@ export class AdminMarketCatalogService {
       blockers.push('продукт есть в корзинах пользователей');
     if (collectionProductsCount > 0)
       blockers.push('продукт используется в подборках');
+    if (warehouseCount > 0 || serviceCount > 0 || shippingProfileCount > 0)
+      blockers.push('настроены логистические связи');
 
     if (blockers.length) {
       throw new BadRequestException(
@@ -731,7 +793,10 @@ export class AdminMarketCatalogService {
     return image.id;
   }
 
-  private mapProduct(product: any, categoryById: Map<string, any>) {
+  private mapProduct(
+    product: AdminProductViewRecord,
+    categoryById: Map<string, any>,
+  ) {
     return {
       id: product.id,
       categoryId: product.categoryId,
@@ -742,6 +807,8 @@ export class AdminMarketCatalogService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      sku: product.sku,
+      purchasePrice: product.purchasePrice,
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
       isOversizedOverride: product.isOversizedOverride,
@@ -753,13 +820,269 @@ export class AdminMarketCatalogService {
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
+      shippingProfile: product.shippingProfile,
+      warehouses: product.warehouses ?? [],
+      deliveryServices: product.deliveryServices ?? [],
+      logisticsReadiness: this.getProductLogisticsReadiness(product),
       images: (product.images ?? [])
-        .map((productImage: any) => productImage.image)
+        .map((productImage) => productImage.image)
         .sort(
-          (firstImage: any, secondImage: any) =>
+          (firstImage, secondImage) =>
             firstImage.sortOrder - secondImage.sortOrder,
         ),
     };
+  }
+
+  private async replaceProductLogistics(
+    productId: string,
+    payload: Record<string, unknown>,
+    tx: Prisma.TransactionClient | PrismaService = this.prismaService,
+  ) {
+    if (!('logistics' in payload)) return;
+    const logistics = this.adminInputService.getObjectBody(payload.logistics);
+    const packagesInput = Array.isArray(logistics.packages)
+      ? logistics.packages
+      : [];
+    const warehouseIds = Array.isArray(logistics.warehouseIds)
+      ? logistics.warehouseIds.filter(
+          (value): value is string =>
+            typeof value === 'string' && Boolean(value),
+        )
+      : [];
+    const serviceIds = Array.isArray(logistics.deliveryServiceIds)
+      ? logistics.deliveryServiceIds.filter(
+          (value): value is string =>
+            typeof value === 'string' && Boolean(value),
+        )
+      : [];
+    const primaryWarehouseId = this.adminInputService.getOptionalString(
+      logistics.primaryWarehouseId,
+    );
+    if (
+      new Set(warehouseIds).size !== warehouseIds.length ||
+      new Set(serviceIds).size !== serviceIds.length
+    ) {
+      throw new BadRequestException('Duplicate logistics relation');
+    }
+    if (primaryWarehouseId && !warehouseIds.includes(primaryWarehouseId)) {
+      throw new BadRequestException('Primary warehouse must be selected');
+    }
+    const [warehouses, services] = await Promise.all([
+      tx.warehouse.findMany({ where: { id: { in: warehouseIds } } }),
+      tx.deliveryService.findMany({
+        where: { id: { in: serviceIds } },
+        include: { provider: true },
+      }),
+    ]);
+    if (warehouses.length !== warehouseIds.length)
+      throw new BadRequestException('Unknown warehouse');
+    if (services.length !== serviceIds.length)
+      throw new BadRequestException('Unknown delivery service');
+    if (
+      primaryWarehouseId &&
+      !warehouses.find((item) => item.id === primaryWarehouseId)?.isActive
+    ) {
+      throw new BadRequestException('Primary warehouse must be active');
+    }
+    if (services.some((item) => !item.isActive || !item.provider.isActive)) {
+      throw new BadRequestException(
+        'Inactive delivery service cannot be enabled',
+      );
+    }
+    const packages = packagesInput.map((value, sequence) => {
+      const item = this.adminInputService.getObjectBody(value);
+      const type = Object.values(PackageType).includes(item.type as PackageType)
+        ? (item.type as PackageType)
+        : PackageType.BOX;
+      return {
+        sequence,
+        name: this.adminInputService.getOptionalString(item.name),
+        type,
+        quantity: this.getPositiveInteger(item.quantity, 'Package quantity'),
+        weightGrams: this.getPositiveInteger(
+          item.weightGrams,
+          'Package weight',
+        ),
+        lengthMillimeters: this.getPositiveInteger(
+          item.lengthMillimeters,
+          'Package length',
+        ),
+        widthMillimeters: this.getPositiveInteger(
+          item.widthMillimeters,
+          'Package width',
+        ),
+        heightMillimeters: this.getPositiveInteger(
+          item.heightMillimeters,
+          'Package height',
+        ),
+      };
+    });
+    if (serviceIds.length) {
+      const primary = warehouses.find((item) => item.id === primaryWarehouseId);
+      if (!packages.length || !primary?.isConfigured) {
+        throw new BadRequestException(
+          'Delivery services require valid packages and a configured primary warehouse',
+        );
+      }
+    }
+    await tx.productDeliveryService.deleteMany({ where: { productId } });
+    await tx.productWarehouse.deleteMany({ where: { productId } });
+    const currentProfile = await tx.productShippingProfile.findUnique({
+      where: { productId },
+    });
+    if (currentProfile)
+      await tx.productPackageProfile.deleteMany({
+        where: { shippingProfileId: currentProfile.id },
+      });
+    const shouldHaveProfile =
+      Boolean(logistics.shippingProfile) || packages.length > 0;
+    if (shouldHaveProfile) {
+      const profileInput = this.adminInputService.getObjectBody(
+        logistics.shippingProfile,
+      );
+      const profile = await tx.productShippingProfile.upsert({
+        where: { productId },
+        create: {
+          productId,
+          isFragile: this.adminInputService.getBoolean(
+            profileInput.isFragile,
+            false,
+          ),
+          isStackable: this.adminInputService.getBoolean(
+            profileInput.isStackable,
+            true,
+          ),
+          ageRestricted: this.adminInputService.getBoolean(
+            profileInput.ageRestricted,
+            false,
+          ),
+          handlingNotes: this.adminInputService.getOptionalString(
+            profileInput.handlingNotes,
+          ),
+        },
+        update: {
+          isFragile: this.adminInputService.getBoolean(
+            profileInput.isFragile,
+            false,
+          ),
+          isStackable: this.adminInputService.getBoolean(
+            profileInput.isStackable,
+            true,
+          ),
+          ageRestricted: this.adminInputService.getBoolean(
+            profileInput.ageRestricted,
+            false,
+          ),
+          handlingNotes: this.adminInputService.getOptionalString(
+            profileInput.handlingNotes,
+          ),
+        },
+      });
+      for (const item of packages)
+        await tx.productPackageProfile.create({
+          data: { ...item, shippingProfileId: profile.id },
+        });
+    } else if (currentProfile) {
+      await tx.productShippingProfile.delete({
+        where: { id: currentProfile.id },
+      });
+    }
+    for (const warehouseId of warehouseIds)
+      await tx.productWarehouse.create({
+        data: {
+          productId,
+          warehouseId,
+          isPrimary: warehouseId === primaryWarehouseId,
+          isActive: true,
+        },
+      });
+    for (const deliveryServiceId of serviceIds)
+      await tx.productDeliveryService.create({
+        data: { productId, deliveryServiceId, isEnabled: true },
+      });
+    await tx.auditEvent.create({
+      data: {
+        action: 'PRODUCT_LOGISTICS_UPDATED',
+        targetType: 'Product',
+        targetId: productId,
+        metadata: {
+          packagesCount: packages.length,
+          warehousesCount: warehouseIds.length,
+          servicesCount: serviceIds.length,
+        },
+      },
+    });
+  }
+
+  private getPositiveInteger(value: unknown, label: string) {
+    const parsed = Math.trunc(
+      this.adminInputService.getNumber(value, Number.NaN),
+    );
+    if (!Number.isSafeInteger(parsed) || parsed <= 0)
+      throw new BadRequestException(`${label} must be positive`);
+    return parsed;
+  }
+
+  private async assertUniqueSku(value: unknown, exceptId?: string) {
+    const sku = this.adminInputService.getOptionalString(value);
+    if (!sku) return;
+    const existing = await this.prismaService.product.findFirst({
+      where: { sku, id: exceptId ? { not: exceptId } : undefined },
+      select: { id: true },
+    });
+    if (existing) throw new BadRequestException('SKU already exists');
+  }
+
+  private getOptionalNonnegativeInteger(value: unknown, label: string) {
+    if (value == null || value === '') return null;
+    const parsed = Math.trunc(
+      this.adminInputService.getNumber(value, Number.NaN),
+    );
+    if (!Number.isSafeInteger(parsed) || parsed < 0)
+      throw new BadRequestException(`${label} must be nonnegative`);
+    return parsed;
+  }
+
+  private getProductLogisticsReadiness(product: AdminProductViewRecord) {
+    const packages = product.shippingProfile?.packages ?? [];
+    const packagesValid =
+      packages.length > 0 &&
+      packages.every((item) =>
+        [
+          item.quantity,
+          item.weightGrams,
+          item.lengthMillimeters,
+          item.widthMillimeters,
+          item.heightMillimeters,
+        ].every((value) => value > 0),
+      );
+    const primary = (product.warehouses ?? []).find(
+      (item) => item.isPrimary && item.isActive,
+    );
+    const warehouseReady = Boolean(
+      primary?.warehouse?.isActive && primary?.warehouse?.isConfigured,
+    );
+    const serviceReady = (product.deliveryServices ?? []).some(
+      (item) =>
+        item.isEnabled &&
+        item.deliveryService?.isActive &&
+        item.deliveryService?.provider?.isActive,
+    );
+    if (
+      product.shippingProfile &&
+      packagesValid &&
+      warehouseReady &&
+      serviceReady
+    )
+      return 'READY';
+    if (
+      product.shippingProfile ||
+      packages.length ||
+      product.warehouses?.length ||
+      product.deliveryServices?.length
+    )
+      return 'PARTIAL';
+    return 'NOT_CONFIGURED';
   }
 
   private mapMarketCategory(category: any, categoryById: Map<string, any>) {

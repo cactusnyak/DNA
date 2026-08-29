@@ -71,6 +71,7 @@ export function AdminAdRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="ads"
       records={ads}
       getRecordKey={(ad) => ad.id}
       emptyText="Объявления не найдены."

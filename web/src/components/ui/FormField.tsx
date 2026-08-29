@@ -4,6 +4,7 @@ import {
   type HTMLInputTypeAttribute,
   type KeyboardEvent,
   type ReactNode,
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -60,6 +61,23 @@ type FormTextareaFieldProps = FormFieldBaseProps & {
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
+export type FormAddressSuggestion = {
+  value: string;
+  fullAddress: string;
+};
+
+type FormAddressFieldProps<TSuggestion extends FormAddressSuggestion> =
+  FormFieldBaseProps & {
+    name: string;
+    value: string;
+    placeholder?: string;
+    disabled?: boolean;
+    minQueryLength?: number;
+    loadSuggestions: (query: string) => Promise<TSuggestion[]>;
+    onValueChange: (value: string) => void;
+    onSuggestionSelect: (suggestion: TSuggestion) => void;
+  };
+
 export type FormSelectOption = {
   value: string;
   label: ReactNode;
@@ -76,10 +94,33 @@ type FormSelectFieldProps = FormFieldBaseProps & {
   onValueChange: (value: string) => void;
 };
 
+type FormMultiSelectFieldProps = FormFieldBaseProps & {
+  values: string[];
+  options: FormSelectOption[];
+  placeholder?: string;
+  disabled?: boolean;
+  selectClassName?: string;
+  dropdownClassName?: string;
+  onValuesChange: (values: string[]) => void;
+};
+
 type FormToggleFieldProps = FormFieldBaseProps & {
   checked: boolean;
   disabled?: boolean;
   onCheckedChange: (checked: boolean) => void;
+};
+
+type FormRadioFieldProps = {
+  checked: boolean;
+  disabled?: boolean;
+  ariaLabel?: string;
+  className?: string;
+  onCheckedChange: (checked: boolean) => void;
+};
+
+type FormNativeRadioFieldProps = FormRadioFieldProps & {
+  name: string;
+  value?: string;
 };
 
 type FormBooleanFieldProps = {
@@ -90,7 +131,9 @@ type FormBooleanFieldProps = {
   checked: boolean;
   disabled?: boolean;
   indeterminate?: boolean;
-  variant?: 'checkbox' | 'toggle';
+  variant?: 'checkbox' | 'radio-checkbox' | 'radio' | 'toggle';
+  name?: string;
+  value?: string;
   className?: string;
   onCheckedChange: (checked: boolean) => void;
 };
@@ -162,6 +205,22 @@ function formatFileSize(size: number) {
   return `${(size / 1024 / 1024).toFixed(1)} МБ`;
 }
 
+function ObjectUrlImage({
+  file,
+  ...imageProps
+}: { file: File } & Omit<ComponentProps<'img'>, 'src'>) {
+  const [objectUrl] = useState(() => URL.createObjectURL(file));
+
+  useEffect(
+    () => () => {
+      URL.revokeObjectURL(objectUrl);
+    },
+    [objectUrl],
+  );
+
+  return <img {...imageProps} src={objectUrl} />;
+}
+
 export function FormInputField({
   name,
   label,
@@ -208,6 +267,147 @@ export function FormInputField({
         className={inputClassName}
         onChange={onChange}
       />
+    </FormFieldRoot>
+  );
+}
+
+export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
+  name,
+  label,
+  caption,
+  required = false,
+  value,
+  placeholder,
+  disabled = false,
+  minQueryLength = 3,
+  className,
+  loadSuggestions,
+  onValueChange,
+  onSuggestionSelect,
+}: FormAddressFieldProps<TSuggestion>) {
+  const listboxId = useId();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const requestIdRef = useRef(0);
+  const skipNextRequestRef = useRef(false);
+  const [suggestions, setSuggestions] = useState<TSuggestion[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const close = useCallback(() => setIsOpen(false), []);
+  const query = value.trim();
+  const canLoadSuggestions = isFocused && query.length >= minQueryLength;
+  const isSuggestionsOpen = canLoadSuggestions && isOpen;
+
+  useEffect(() => {
+    const requestId = ++requestIdRef.current;
+
+    if (!canLoadSuggestions) return;
+
+    if (skipNextRequestRef.current) {
+      skipNextRequestRef.current = false;
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsLoading(true);
+      void loadSuggestions(query)
+        .then((nextSuggestions) => {
+          if (requestId !== requestIdRef.current) return;
+          setSuggestions(nextSuggestions);
+          setIsOpen(nextSuggestions.length > 0);
+        })
+        .catch(() => {
+          if (requestId !== requestIdRef.current) return;
+          setSuggestions([]);
+          close();
+        })
+        .finally(() => {
+          if (requestId === requestIdRef.current) setIsLoading(false);
+        });
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [canLoadSuggestions, close, loadSuggestions, query]);
+
+  useEffect(() => {
+    function handleDocumentMouseDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) close();
+    }
+    document.addEventListener('mousedown', handleDocumentMouseDown);
+    return () => document.removeEventListener('mousedown', handleDocumentMouseDown);
+  }, [close]);
+
+  return (
+    <FormFieldRoot
+      label={label}
+      caption={caption}
+      required={required}
+      className={className}
+    >
+      <div
+        ref={rootRef}
+        className="relative"
+        onFocusCapture={() => setIsFocused(true)}
+        onBlurCapture={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget)) return;
+          setIsFocused(false);
+          close();
+        }}
+      >
+        <Input
+          name={name}
+          required={required}
+          disabled={disabled}
+          value={value}
+          placeholder={placeholder}
+          autoComplete="off"
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={isSuggestionsOpen}
+          onChange={(event) => {
+            requestIdRef.current += 1;
+            setSuggestions([]);
+            setIsLoading(false);
+            close();
+            onValueChange(event.target.value);
+          }}
+          onFocus={() => suggestions.length > 0 && setIsOpen(true)}
+          onKeyDown={(event) => event.key === 'Escape' && close()}
+        />
+        {isSuggestionsOpen && (
+          <div
+            id={listboxId}
+            role="listbox"
+            className="absolute left-0 right-0 top-full z-30 mt-2 flex max-h-72 flex-col gap-1 overflow-y-auto rounded-lg border border-border/80 bg-popover p-1 text-sm shadow-lg"
+          >
+            {suggestions.map((suggestion) => (
+              <button
+                key={`${suggestion.fullAddress}:${suggestion.value}`}
+                type="button"
+                role="option"
+                aria-selected={false}
+                className="cursor-pointer rounded-md px-3 py-2 text-left hover:bg-muted"
+                onClick={() => {
+                  skipNextRequestRef.current = true;
+                  requestIdRef.current += 1;
+                  setSuggestions([]);
+                  setIsLoading(false);
+                  onSuggestionSelect(suggestion);
+                  close();
+                }}
+              >
+                {suggestion.value}
+              </button>
+            ))}
+          </div>
+        )}
+        {canLoadSuggestions && isLoading && (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
+            Ищем…
+          </span>
+        )}
+      </div>
     </FormFieldRoot>
   );
 }
@@ -387,6 +587,103 @@ export function FormSelectField({
   );
 }
 
+export function FormMultiSelectField({
+  label,
+  caption,
+  required = false,
+  values,
+  options,
+  placeholder = 'Выберите значения',
+  disabled = false,
+  className,
+  selectClassName,
+  dropdownClassName,
+  onValuesChange,
+}: FormMultiSelectFieldProps) {
+  const listboxId = useId();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOptions = options.filter((option) => values.includes(option.value));
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleDocumentMouseDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setIsOpen(false);
+    }
+
+    document.addEventListener('mousedown', handleDocumentMouseDown);
+    return () => document.removeEventListener('mousedown', handleDocumentMouseDown);
+  }, [isOpen]);
+
+  function toggleOption(option: FormSelectOption) {
+    if (option.disabled) return;
+    onValuesChange(
+      values.includes(option.value)
+        ? values.filter((value) => value !== option.value)
+        : [...values, option.value],
+    );
+  }
+
+  return (
+    <FormFieldRoot label={label} caption={caption} required={required} className={className}>
+      <div ref={rootRef} className="relative">
+        <button
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-controls={listboxId}
+          aria-required={required}
+          className={[SELECT_TRIGGER_CLASS_NAME, selectClassName].filter(Boolean).join(' ')}
+          onClick={() => setIsOpen((currentValue) => !currentValue)}
+        >
+          <span className={['truncate', !selectedOptions.length && 'text-muted-foreground'].filter(Boolean).join(' ')}>
+            {selectedOptions.length
+              ? selectedOptions.map((option) => option.label).join(', ')
+              : placeholder}
+          </span>
+          <ChevronDown className={['size-4 shrink-0 text-muted-foreground', isOpen && 'rotate-180'].filter(Boolean).join(' ')} strokeWidth={1.5} />
+        </button>
+
+        {isOpen && (
+          <div
+            id={listboxId}
+            role="listbox"
+            aria-multiselectable="true"
+            className={[
+              'absolute left-0 right-0 top-full z-30 mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto rounded-lg border border-border/80 bg-popover p-1 text-sm shadow-lg',
+              dropdownClassName,
+            ].filter(Boolean).join(' ')}
+          >
+            {options.map((option) => {
+              const isSelected = values.includes(option.value);
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  disabled={option.disabled}
+                  className={[
+                    'flex w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-left',
+                    'hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50',
+                    isSelected && 'bg-muted text-foreground',
+                  ].filter(Boolean).join(' ')}
+                  onClick={() => toggleOption(option)}
+                >
+                  <span className="truncate">{option.label}</span>
+                  {isSelected && <Check className="size-4 shrink-0" strokeWidth={1.5} />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </FormFieldRoot>
+  );
+}
+
 export function FormToggleField({
   label,
   caption,
@@ -410,6 +707,48 @@ export function FormToggleField({
   );
 }
 
+export function FormRadioField({
+  checked,
+  disabled = false,
+  ariaLabel,
+  className,
+  onCheckedChange,
+}: FormRadioFieldProps) {
+  return (
+    <FormBooleanField
+      variant="radio-checkbox"
+      checked={checked}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+      className={className}
+      onCheckedChange={onCheckedChange}
+    />
+  );
+}
+
+export function FormNativeRadioField({
+  name,
+  value,
+  checked,
+  disabled = false,
+  ariaLabel,
+  className,
+  onCheckedChange,
+}: FormNativeRadioFieldProps) {
+  return (
+    <FormBooleanField
+      variant="radio"
+      name={name}
+      value={value}
+      checked={checked}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+      className={className}
+      onCheckedChange={onCheckedChange}
+    />
+  );
+}
+
 export function FormBooleanField({
   label,
   ariaLabel,
@@ -419,9 +758,58 @@ export function FormBooleanField({
   disabled = false,
   indeterminate = false,
   variant = 'checkbox',
+  name,
+  value,
   className,
   onCheckedChange,
 }: FormBooleanFieldProps) {
+  if (variant === 'radio') {
+    if (!name) {
+      throw new Error('FormBooleanField with variant="radio" requires name');
+    }
+
+    const control = (
+      <span
+        className={[
+          'relative inline-flex size-4 shrink-0',
+          disabled && 'cursor-not-allowed opacity-50',
+          !label && className,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <input
+          type="radio"
+          name={name}
+          value={value}
+          checked={checked}
+          required={required}
+          disabled={disabled}
+          aria-label={ariaLabel}
+          className="peer absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
+          onChange={() => onCheckedChange(true)}
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none flex size-4 items-center justify-center rounded-full border border-border/80 bg-background after:size-2 after:rounded-full after:bg-primary after:opacity-0 peer-checked:border-primary peer-checked:after:opacity-100 peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50"
+        />
+      </span>
+    );
+
+    if (!label) return control;
+
+    return (
+      <FormFieldRoot
+        label={label}
+        caption={caption}
+        required={required}
+        className={className}
+      >
+        {control}
+      </FormFieldRoot>
+    );
+  }
+
   const control = (
     <button
       type="button"
@@ -433,8 +821,15 @@ export function FormBooleanField({
       className={[
         variant === 'toggle'
           ? 'flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border/80 bg-background px-3 py-2 text-left text-sm hover:border-ring'
-          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border border-border/80 bg-background text-primary-foreground',
-        variant === 'checkbox' && (checked || indeterminate) && 'border-primary bg-primary',
+          : 'inline-flex size-4 shrink-0 cursor-pointer items-center justify-center border border-border/80 bg-background',
+        variant === 'radio-checkbox' ? 'rounded-full' : 'rounded',
+        variant === 'checkbox' && 'text-primary-foreground',
+        variant === 'checkbox' &&
+          (checked || indeterminate) &&
+          'border-primary bg-primary',
+        variant === 'radio-checkbox' &&
+          checked &&
+          'border-primary after:size-2 after:rounded-full after:bg-primary',
         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
         !label && className,
@@ -461,7 +856,7 @@ export function FormBooleanField({
             />
           </span>
         </>
-      ) : (
+      ) : variant === 'radio-checkbox' ? null : (
         indeterminate ? (
           <span
             aria-hidden="true"
@@ -504,24 +899,7 @@ export function FormImageFileField({
   onPreviewUrlClear,
 }: FormImageFileFieldProps) {
   const inputId = useId();
-  const [filePreviewUrl, setFilePreviewUrl] = useState<string>();
-
-  useEffect(() => {
-    if (!file) {
-      setFilePreviewUrl(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    setFilePreviewUrl(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
-
-  const activePreviewUrl = filePreviewUrl ?? previewUrl;
-  const hasPreview = Boolean(activePreviewUrl);
+  const hasPreview = Boolean(file || previewUrl);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     onFileChange(event.target.files?.[0] ?? null);
@@ -547,11 +925,20 @@ export function FormImageFileField({
         {hasPreview && (
           <div className="overflow-hidden rounded-xl border border-border/80 bg-muted/30">
             <div className="relative aspect-video bg-muted">
-              <img
-                src={activePreviewUrl}
-                alt="Предпросмотр изображения"
-                className="h-full w-full object-cover"
-              />
+              {file ? (
+                <ObjectUrlImage
+                  key={`${file.name}-${file.size}-${file.lastModified}`}
+                  file={file}
+                  alt="Предпросмотр изображения"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt="Предпросмотр изображения"
+                  className="h-full w-full object-cover"
+                />
+              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/80 px-3 py-2">
@@ -633,16 +1020,6 @@ export function FormImageFilesField({
   onExistingImageUrlsChange,
 }: FormImageFilesFieldProps) {
   const inputId = useId();
-  const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
-
-  useEffect(() => {
-    const objectUrls = files.map((file) => URL.createObjectURL(file));
-    setFilePreviewUrls(objectUrls);
-
-    return () => {
-      objectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
-    };
-  }, [files]);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedFiles = Array.from(event.target.files ?? []);
@@ -711,8 +1088,9 @@ export function FormImageFilesField({
                 className="overflow-hidden rounded-xl border border-border/80 bg-muted/30"
               >
                 <div className="relative aspect-video bg-muted">
-                  <img
-                    src={filePreviewUrls[index]}
+                  <ObjectUrlImage
+                    key={`${file.name}-${file.size}-${file.lastModified}`}
+                    file={file}
                     alt="Новое изображение продукта"
                     className="h-full w-full object-cover"
                   />

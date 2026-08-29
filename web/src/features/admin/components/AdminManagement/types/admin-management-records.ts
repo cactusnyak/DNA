@@ -9,6 +9,7 @@ import type {
 } from '@/entities/admin';
 import type { Order } from '@/entities/order';
 import type { DeliveryQuote } from '@/entities/delivery-quote';
+import type { AdminDeliveryProvider, AdminShipment, AdminUniversalQuote, AdminWarehouse } from '@/entities/admin';
 
 export type AdminDeliveryQuote = DeliveryQuote & {
   deletedAt?: null;
@@ -31,6 +32,7 @@ export type AdminCrudRecord =
   | AdminUser;
 
 export type EditableRecord = AdminCrudRecord | AdminDeliveryQuote;
+export type LogisticsRecord = AdminWarehouse | AdminDeliveryProvider | AdminUniversalQuote | AdminShipment;
 
 export type AdminCatalogData = {
   marketCategories: AdminMarketCategory[];
@@ -42,6 +44,10 @@ export type AdminCatalogData = {
   ads: AdminAd[];
   users: AdminUser[];
   referrals: AdminReferralUser[];
+  warehouses: AdminWarehouse[];
+  deliveryProviders: AdminDeliveryProvider[];
+  universalDeliveryQuotes: AdminUniversalQuote[];
+  shipments: AdminShipment[];
 };
 
 export type FilteredAdminRecords = AdminCatalogData;

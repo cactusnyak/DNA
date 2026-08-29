@@ -63,6 +63,7 @@ export function AdminDeliveryQuoteRecordsView({
 
   return (
     <AdminRecordsTable<AdminDeliveryQuote>
+      tableKey="oversized-delivery-quotes"
       records={quotes}
       getRecordKey={(quote) => quote.id}
       emptyText="Заявки на расчёт доставки не найдены."

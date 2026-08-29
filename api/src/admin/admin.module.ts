@@ -4,6 +4,7 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { StorageModule } from '../storage/storage.module';
 import { UsersModule } from '../users/users.module';
+import { DeliveryProvidersModule } from '../delivery-providers/delivery-providers.module';
 
 import { AdminAdCategoriesController } from './admin-ad-categories.controller';
 import { AdminAdsController } from './admin-ads.controller';
@@ -23,9 +24,17 @@ import { AdminUploadsController } from './admin-uploads.controller';
 import { AdminUploadsService } from './admin-uploads.service';
 import { AdminUsersController } from './admin-users.controller';
 import { AdminUsersService } from './admin-users.service';
+import { AdminLogisticsController } from './admin-logistics.controller';
+import { AdminLogisticsService } from './admin-logistics.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, StorageModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    StorageModule,
+    DeliveryProvidersModule,
+  ],
   controllers: [
     AdminOverviewController,
     AdminUploadsController,
@@ -37,6 +46,7 @@ import { AdminUsersService } from './admin-users.service';
     AdminAdCategoriesController,
     AdminAdsController,
     AdminUsersController,
+    AdminLogisticsController,
   ],
   providers: [
     AdminService,
@@ -47,6 +57,7 @@ import { AdminUsersService } from './admin-users.service';
     AdminOrdersService,
     AdminUploadsService,
     AdminUsersService,
+    AdminLogisticsService,
   ],
   exports: [AdminService, AdminUploadsService],
 })

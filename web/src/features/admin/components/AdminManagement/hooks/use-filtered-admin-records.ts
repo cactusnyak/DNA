@@ -129,6 +129,10 @@ export function useFilteredAdminRecords(
       ]),
     [data?.referrals, searchValue],
   );
+  const filteredWarehouses = useMemo(() => filterAdminRecords(data?.warehouses ?? [], searchValue, (item) => [item.code, item.name, item.city ?? undefined, item.region ?? undefined, item.fullAddress ?? undefined]), [data?.warehouses, searchValue]);
+  const filteredProviders = useMemo(() => filterAdminRecords(data?.deliveryProviders ?? [], searchValue, (item) => [item.code, item.name, ...item.services.flatMap((service) => [service.code, service.name])]), [data?.deliveryProviders, searchValue]);
+  const filteredUniversalQuotes = useMemo(() => filterAdminRecords(data?.universalDeliveryQuotes ?? [], searchValue, (item) => [item.id, item.status, item.destinationSummary, item.deliveryProvider.name, item.deliveryService.name]), [data?.universalDeliveryQuotes, searchValue]);
+  const filteredShipments = useMemo(() => filterAdminRecords(data?.shipments ?? [], searchValue, (item) => [item.id, item.orderId, item.status, item.providerOrderId ?? undefined, item.trackingId ?? undefined, item.destinationSummary]), [data?.shipments, searchValue]);
 
   return {
     marketCategories: filteredMarketCategories,
@@ -140,5 +144,9 @@ export function useFilteredAdminRecords(
     ads: filteredAds,
     users: filteredUsers,
     referrals: filteredReferrals,
+    warehouses: filteredWarehouses,
+    deliveryProviders: filteredProviders,
+    universalDeliveryQuotes: filteredUniversalQuotes,
+    shipments: filteredShipments,
   };
 }

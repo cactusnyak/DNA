@@ -41,7 +41,7 @@ export function Gallery({ images, title }: GalleryProps) {
   if (!activeImage) {
     return (
       <div className="flex aspect-[4/3] w-full max-w-2xl items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-        Нет изображения
+        Нет фото
       </div>
     );
   }

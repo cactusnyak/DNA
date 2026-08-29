@@ -59,6 +59,7 @@ export function Profile() {
       lastName: string;
       patronymic: string;
       phone?: string;
+      currentAddress: string | null;
     }) =>
       updateCurrentUser(accessToken ?? '', {
         nickname: value.nickname,
@@ -66,6 +67,7 @@ export function Profile() {
         lastName: value.lastName || undefined,
         patronymic: value.patronymic || undefined,
         phone: value.phone || undefined,
+        currentAddress: value.currentAddress,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
@@ -158,6 +160,7 @@ export function Profile() {
       />
 
       <ProfileEditModal
+        key={`${user.id}:${isEditModalOpen}`}
         user={user}
         isOpen={isEditModalOpen}
         isPending={updateProfileMutation.isPending}

@@ -13,6 +13,18 @@ export type CreateOrderDto = {
   customerPhone?: string;
   customerEmail?: string;
   deliveryAddress?: string;
-  comment?: string;
+  deliveryDestination?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    street?: string;
+    building?: string;
+    apartment?: string;
+    postalCode?: string;
+    fullAddress?: string;
+    latitude?: number;
+    longitude?: number;
+    externalLocationId?: string;
+  };
   items?: CreateOrderItemDto[];
 };
