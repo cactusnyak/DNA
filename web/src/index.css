@@ -66,6 +66,7 @@ body {
   --color-favourite: var(--favourite);
   --color-mobile-navigation-active: var(--mobile-navigation-active);
   --color-logo: var(--logo-color);
+  --color-logo-background: var(--logo-background);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -108,6 +109,7 @@ body {
 
   --page: color-mix(in srgb, var(--primary) 1%, #ffffff);
   --logo-color: color-mix(in srgb, var(--primary) 50%, #000000);
+  --logo-background: color-mix(in srgb, var(--primary) 40%, #000000);
 
   --shadow-color: color-mix(in srgb, var(--primary) 3%, transparent);
   --shadow-color-strong: color-mix(in srgb,

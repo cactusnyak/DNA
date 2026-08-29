@@ -188,7 +188,7 @@ function linkStatus(link) {
   if (/^\/legal(?:\/|$)/.test(link)) return ['БИТАЯ / СТРАНИЦА НЕ СОЗДАНА', 'маршрут /legal отсутствует в router.tsx'];
   if (link === 'mailto:hello@dna.local') return ['ЗАГЛУШКА', 'технический домен .local'];
   if (link === 'tel:+70000000000') return ['ЗАГЛУШКА', 'нулевой тестовый номер'];
-  if (link === '/favicon.svg') return ['РАБОЧАЯ', 'файл существует в web/public'];
+  if (link === '/favicon.png') return ['РАБОЧАЯ', 'файл существует в web/public'];
   if (/^https?:/.test(link)) return [link.includes('${') ? 'ВНЕШНЯЯ ДИНАМИЧЕСКАЯ' : 'ВНЕШНЯЯ', 'адрес формируется из данных; доступность зависит от внешнего ресурса'];
   if (/^(mailto:|tel:)/.test(link)) return ['КОНТАКТНАЯ', 'формат ссылки корректен'];
   const sample = link
