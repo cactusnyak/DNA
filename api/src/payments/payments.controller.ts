@@ -398,13 +398,20 @@ export class PaymentsController {
     authorizationHeader?: string,
     guestSessionId?: string,
   ) {
-    const user =
+    const user: unknown =
       await this.authService.getOptionalMeFromAuthorizationHeader(
         authorizationHeader,
       );
+    const userId =
+      user &&
+      typeof user === 'object' &&
+      'id' in user &&
+      typeof user.id === 'string'
+        ? user.id
+        : undefined;
     return {
-      userId: user?.id,
-      guestSessionId: user ? undefined : guestSessionId,
+      userId,
+      guestSessionId: userId ? undefined : guestSessionId,
     };
   }
 

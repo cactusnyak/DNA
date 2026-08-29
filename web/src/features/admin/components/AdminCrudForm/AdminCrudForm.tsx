@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FormToggleField } from "@/components/ui/FormField";
@@ -62,11 +62,6 @@ export function AdminCrudForm({
   const [values, setValues] = useState(initialValues);
   const [submitError, setSubmitError] = useState<string>();
   const [isUploadingImages, setIsUploadingImages] = useState(false);
-
-  useEffect(() => {
-    setValues(initialValues);
-    setSubmitError(undefined);
-  }, [initialValues]);
 
   const updateValue: AdminCrudUpdateValue = (field, value) => {
     setValues((currentValues) => ({

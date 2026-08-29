@@ -438,7 +438,7 @@ export class UsersService {
       updatedAt: user.updatedAt,
       patronymic: user.patronymic ?? undefined,
       phone: user.phone ?? undefined,
-      currentAddress: user.currentAddress ?? undefined,
+      currentAddress: this.getCurrentAddress(user),
       avatar: user.avatar ?? undefined,
       referralCode: user.referralCode ?? undefined,
       balance: user.balance
@@ -448,6 +448,14 @@ export class UsersService {
           }
         : undefined,
     };
+  }
+
+  private getCurrentAddress(user: unknown) {
+    if (!user || typeof user !== 'object' || !('currentAddress' in user))
+      return undefined;
+    return typeof user.currentAddress === 'string'
+      ? user.currentAddress
+      : undefined;
   }
 
   private async getInviterByReferralCode(inviterReferralCode?: string) {

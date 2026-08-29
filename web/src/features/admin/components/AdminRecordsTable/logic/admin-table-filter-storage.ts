@@ -24,5 +24,7 @@ export function writeAdminTableFiltersOpen(
       `${ADMIN_TABLE_FILTER_STORAGE_PREFIX}${tableKey}`,
       isOpen ? "open" : "closed",
     );
-  } catch { }
+  } catch {
+    // Storage can be unavailable in privacy mode; persistence is optional.
+  }
 }

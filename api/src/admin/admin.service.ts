@@ -1,8 +1,25 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeProductAdditions } from '../products/product-additions';
 import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
+
+const ADMIN_PRODUCT_INCLUDE = {
+  category: { include: { image: true } },
+  images: { include: { image: true } },
+  shippingProfile: {
+    include: { packages: { orderBy: { sequence: 'asc' as const } } },
+  },
+  warehouses: { include: { warehouse: true } },
+  deliveryServices: {
+    include: { deliveryService: { include: { provider: true } } },
+  },
+} satisfies Prisma.ProductInclude;
+
+type AdminProductRecord = Prisma.ProductGetPayload<{
+  include: typeof ADMIN_PRODUCT_INCLUDE;
+}>;
 
 @Injectable()
 export class AdminService {
@@ -34,25 +51,7 @@ export class AdminService {
 
     const [products, collections, orders] = await Promise.all([
       this.prismaService.product.findMany({
-        include: {
-          category: {
-            include: {
-              image: true,
-            },
-          },
-          images: {
-            include: {
-              image: true,
-            },
-          },
-          shippingProfile: {
-            include: { packages: { orderBy: { sequence: 'asc' } } },
-          },
-          warehouses: { include: { warehouse: true } },
-          deliveryServices: {
-            include: { deliveryService: { include: { provider: true } } },
-          },
-        },
+        include: ADMIN_PRODUCT_INCLUDE,
         orderBy: {
           createdAt: 'desc',
         },
@@ -236,7 +235,10 @@ export class AdminService {
     };
   }
 
-  private mapProduct(product: any, categoryById: Map<string, any>) {
+  private mapProduct(
+    product: AdminProductRecord,
+    categoryById: Map<string, any>,
+  ) {
     return {
       id: product.id,
       categoryId: product.categoryId,
@@ -265,19 +267,19 @@ export class AdminService {
       deliveryServices: product.deliveryServices ?? [],
       logisticsReadiness: this.getProductLogisticsReadiness(product),
       images: (product.images ?? [])
-        .map((productImage: any) => productImage.image)
+        .map((productImage) => productImage.image)
         .sort(
-          (firstImage: any, secondImage: any) =>
+          (firstImage, secondImage) =>
             firstImage.sortOrder - secondImage.sortOrder,
         ),
     };
   }
 
-  private getProductLogisticsReadiness(product: any) {
+  private getProductLogisticsReadiness(product: AdminProductRecord) {
     const packages = product.shippingProfile?.packages ?? [];
     const packagesValid =
       packages.length > 0 &&
-      packages.every((item: any) =>
+      packages.every((item) =>
         [
           item.quantity,
           item.weightGrams,
@@ -286,14 +288,14 @@ export class AdminService {
           item.heightMillimeters,
         ].every((value) => value > 0),
       );
-    const primary = (product.warehouses ?? []).find(
-      (item: any) => item.isPrimary && item.isActive,
+    const primary = product.warehouses.find(
+      (item) => item.isPrimary && item.isActive,
     );
     const warehouseReady = Boolean(
       primary?.warehouse?.isActive && primary?.warehouse?.isConfigured,
     );
-    const serviceReady = (product.deliveryServices ?? []).some(
-      (item: any) =>
+    const serviceReady = product.deliveryServices.some(
+      (item) =>
         item.isEnabled &&
         item.deliveryService?.isActive &&
         item.deliveryService?.provider?.isActive,

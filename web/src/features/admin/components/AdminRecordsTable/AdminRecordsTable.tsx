@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import {
   ArchiveX,
   ArrowDown,
@@ -64,6 +64,7 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
 }: AdminRecordsTableProps<TRecord>) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const autoExpandedIds = useMemo(() => new Set(autoExpandIds), [autoExpandIds]);
   const filtersId = useId();
   const [isFiltersOpen, setIsFiltersOpen] = useState(() =>
     readAdminTableFiltersOpen(
@@ -71,11 +72,6 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
       typeof window === 'undefined' ? undefined : window.localStorage,
     ),
   );
-
-  useEffect(() => {
-    if (!autoExpandIds.length) return;
-    setExpandedIds((current) => new Set([...current, ...autoExpandIds]));
-  }, [autoExpandIds.join('|')]);
 
   const {
     sortState,
@@ -158,7 +154,10 @@ export function AdminRecordsTable<TRecord extends DeletedAwareRecord>({
     const isSelected = selectedIds.has(key);
     const subRows = getSubRows?.(record) ?? [];
     const hasChildren = subRows.length > 0;
-    const isExpanded = expandedIds.has(key) || (hasActiveFilters && hasChildren);
+    const isExpanded =
+      expandedIds.has(key) ||
+      autoExpandedIds.has(key) ||
+      (hasActiveFilters && hasChildren);
     const depthBg = !isDeleted && !isSelected ? getDepthBg(depth, hasChildren, isExpanded) : undefined;
 
     return [

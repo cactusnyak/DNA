@@ -66,11 +66,18 @@ export class OrderDeliveryController {
   }
 
   private async owner(authorization?: string, guestSessionId?: string) {
-    const user =
+    const user: unknown =
       await this.auth.getOptionalMeFromAuthorizationHeader(authorization);
+    const userId =
+      user &&
+      typeof user === 'object' &&
+      'id' in user &&
+      typeof user.id === 'string'
+        ? user.id
+        : undefined;
     return {
-      userId: user?.id,
-      guestSessionId: user ? undefined : guestSessionId,
+      userId,
+      guestSessionId: userId ? undefined : guestSessionId,
     };
   }
 }

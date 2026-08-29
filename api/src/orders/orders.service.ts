@@ -546,7 +546,14 @@ export class OrdersService {
     };
   }
 
-  private async mapOrderWithDelivery(order: any) {
+  private async mapOrderWithDelivery(order: unknown) {
+    if (
+      !order ||
+      typeof order !== 'object' ||
+      !('id' in order) ||
+      typeof order.id !== 'string'
+    )
+      throw new Error('Order identifier is missing');
     return {
       ...this.mapOrder(order),
       delivery: await this.orderDeliveryService.getState(order.id),

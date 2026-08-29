@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
@@ -48,19 +48,6 @@ export function ProfileEditModal({
   const [currentAddress, setCurrentAddress] = useState(
     user.currentAddress ?? '',
   );
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    setNickname(user.nickname);
-    setFirstName(user.firstName ?? '');
-    setLastName(user.lastName ?? '');
-    setPatronymic(user.patronymic ?? '');
-    setPhone(user.phone ?? '');
-    setCurrentAddress(user.currentAddress ?? '');
-  }, [isOpen, user]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

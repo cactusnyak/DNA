@@ -88,8 +88,11 @@ export function parseWarehouseWorkingHours(
       };
     parsed[key] = day;
   }
-  const { version: _version, days: _days, ...sourceFields } = source;
-  const preservedFields = { ...sourceFields };
+  const preservedFields = Object.fromEntries(
+    Object.entries(source).filter(
+      ([key]) => key !== "version" && key !== "days",
+    ),
+  );
   for (const [key] of WEEKDAYS) delete preservedFields[key];
   return { value: parsed, preservedFields };
 }

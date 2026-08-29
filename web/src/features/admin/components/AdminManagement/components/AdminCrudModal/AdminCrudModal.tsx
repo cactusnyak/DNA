@@ -62,6 +62,7 @@ export function AdminCrudModal({
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <AdminCrudForm
+          key={`${activeTabId}:${editingRecord?.id ?? "new"}:${isOpen}`}
           tabId={activeTabId}
           record={editingRecord}
           categories={data.marketCategories}

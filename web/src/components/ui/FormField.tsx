@@ -205,6 +205,22 @@ function formatFileSize(size: number) {
   return `${(size / 1024 / 1024).toFixed(1)} МБ`;
 }
 
+function ObjectUrlImage({
+  file,
+  ...imageProps
+}: { file: File } & Omit<ComponentProps<'img'>, 'src'>) {
+  const [objectUrl] = useState(() => URL.createObjectURL(file));
+
+  useEffect(
+    () => () => {
+      URL.revokeObjectURL(objectUrl);
+    },
+    [objectUrl],
+  );
+
+  return <img {...imageProps} src={objectUrl} />;
+}
+
 export function FormInputField({
   name,
   label,
@@ -279,26 +295,17 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
   const [isLoading, setIsLoading] = useState(false);
 
   const close = useCallback(() => setIsOpen(false), []);
+  const query = value.trim();
+  const canLoadSuggestions = isFocused && query.length >= minQueryLength;
+  const isSuggestionsOpen = canLoadSuggestions && isOpen;
 
   useEffect(() => {
     const requestId = ++requestIdRef.current;
 
-    if (!isFocused) {
-      setIsLoading(false);
-      close();
-      return;
-    }
+    if (!canLoadSuggestions) return;
 
     if (skipNextRequestRef.current) {
       skipNextRequestRef.current = false;
-      return;
-    }
-
-    const query = value.trim();
-    if (query.length < minQueryLength) {
-      setSuggestions([]);
-      setIsLoading(false);
-      close();
       return;
     }
 
@@ -321,7 +328,7 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
     }, 300);
 
     return () => window.clearTimeout(timer);
-  }, [close, isFocused, loadSuggestions, minQueryLength, value]);
+  }, [canLoadSuggestions, close, loadSuggestions, query]);
 
   useEffect(() => {
     function handleDocumentMouseDown(event: MouseEvent) {
@@ -357,7 +364,7 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
           autoComplete="off"
           aria-autocomplete="list"
           aria-controls={listboxId}
-          aria-expanded={isOpen}
+          aria-expanded={isSuggestionsOpen}
           onChange={(event) => {
             requestIdRef.current += 1;
             setSuggestions([]);
@@ -368,7 +375,7 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
           onFocus={() => suggestions.length > 0 && setIsOpen(true)}
           onKeyDown={(event) => event.key === 'Escape' && close()}
         />
-        {isOpen && (
+        {isSuggestionsOpen && (
           <div
             id={listboxId}
             role="listbox"
@@ -395,7 +402,7 @@ export function FormAddressField<TSuggestion extends FormAddressSuggestion>({
             ))}
           </div>
         )}
-        {isLoading && (
+        {canLoadSuggestions && isLoading && (
           <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
             Ищем…
           </span>
@@ -892,24 +899,7 @@ export function FormImageFileField({
   onPreviewUrlClear,
 }: FormImageFileFieldProps) {
   const inputId = useId();
-  const [filePreviewUrl, setFilePreviewUrl] = useState<string>();
-
-  useEffect(() => {
-    if (!file) {
-      setFilePreviewUrl(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    setFilePreviewUrl(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
-
-  const activePreviewUrl = filePreviewUrl ?? previewUrl;
-  const hasPreview = Boolean(activePreviewUrl);
+  const hasPreview = Boolean(file || previewUrl);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     onFileChange(event.target.files?.[0] ?? null);
@@ -935,11 +925,20 @@ export function FormImageFileField({
         {hasPreview && (
           <div className="overflow-hidden rounded-xl border border-border/80 bg-muted/30">
             <div className="relative aspect-video bg-muted">
-              <img
-                src={activePreviewUrl}
-                alt="Предпросмотр изображения"
-                className="h-full w-full object-cover"
-              />
+              {file ? (
+                <ObjectUrlImage
+                  key={`${file.name}-${file.size}-${file.lastModified}`}
+                  file={file}
+                  alt="Предпросмотр изображения"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt="Предпросмотр изображения"
+                  className="h-full w-full object-cover"
+                />
+              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/80 px-3 py-2">
@@ -1021,16 +1020,6 @@ export function FormImageFilesField({
   onExistingImageUrlsChange,
 }: FormImageFilesFieldProps) {
   const inputId = useId();
-  const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
-
-  useEffect(() => {
-    const objectUrls = files.map((file) => URL.createObjectURL(file));
-    setFilePreviewUrls(objectUrls);
-
-    return () => {
-      objectUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
-    };
-  }, [files]);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedFiles = Array.from(event.target.files ?? []);
@@ -1099,8 +1088,9 @@ export function FormImageFilesField({
                 className="overflow-hidden rounded-xl border border-border/80 bg-muted/30"
               >
                 <div className="relative aspect-video bg-muted">
-                  <img
-                    src={filePreviewUrls[index]}
+                  <ObjectUrlImage
+                    key={`${file.name}-${file.size}-${file.lastModified}`}
+                    file={file}
                     alt="Новое изображение продукта"
                     className="h-full w-full object-cover"
                   />

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
   ConflictException,
@@ -52,6 +51,51 @@ const ACTIVE_PAYMENT_STATUSES: PaymentAttemptStatus[] = [
   PaymentAttemptStatus.PENDING,
   PaymentAttemptStatus.WAITING_FOR_CAPTURE,
 ];
+
+const ORDER_DELIVERY_INCLUDE = {
+  paymentAttempts: true,
+  deliverySelections: {
+    include: {
+      deliveryQuote: {
+        include: { deliveryProvider: true, deliveryService: true },
+      },
+    },
+  },
+  deliveryQuotes: {
+    include: { deliveryProvider: true, deliveryService: true },
+  },
+  items: {
+    include: {
+      deliveryQuote: true,
+      product: {
+        include: {
+          shippingProfile: {
+            include: { packages: { orderBy: { sequence: 'asc' as const } } },
+          },
+          warehouses: {
+            include: {
+              warehouse: { include: { providerConfigs: true } },
+            },
+          },
+          deliveryServices: {
+            include: { deliveryService: { include: { provider: true } } },
+          },
+        },
+      },
+    },
+  },
+} satisfies Prisma.OrderInclude;
+
+type OrderDeliveryRecord = Prisma.OrderGetPayload<{
+  include: typeof ORDER_DELIVERY_INCLUDE;
+}>;
+
+type NormalizedQuoteOption = {
+  serviceCode?: string;
+  title?: string;
+  fulfillmentType?: string;
+  deliveryInterval?: { from: string; to: string };
+};
 
 @Injectable()
 export class OrderDeliveryService {
@@ -138,7 +182,7 @@ export class OrderDeliveryService {
               deliveryDestination: {
                 ...normalizedBase,
                 version: (currentDestination?.version ?? 0) + 1,
-              } as Prisma.InputJsonValue,
+              },
               deliveryAddress: normalizedBase.fullAddress,
               deliveryVersion: { increment: 1 },
               pricingVersion: { increment: 1 },
@@ -363,7 +407,7 @@ export class OrderDeliveryService {
         }
 
         const currentBundle = order.deliverySelections
-          .map((selection: any) => selection.deliveryQuoteId)
+          .map((selection) => selection.deliveryQuoteId)
           .sort()
           .join(':');
         const nextBundle = [...quoteIds].sort().join(':');
@@ -406,7 +450,7 @@ export class OrderDeliveryService {
 
   async assertReadyForPayment(orderId: string, owner: DeliveryOwner) {
     const order = await this.getOwnedOrder(orderId, owner);
-    const state = await this.buildState(order);
+    const state = this.buildState(order);
     if (!state.readyForPayment)
       throw new BadRequestException(
         state.blockingReasons[0] ?? 'Выберите доставку перед оплатой.',
@@ -434,7 +478,7 @@ export class OrderDeliveryService {
         )
           throw new NotFoundException('Order not found');
         this.assertEditable(order);
-        const state = await this.buildState(order);
+        const state = this.buildState(order);
         if (!state.readyForPayment)
           throw new BadRequestException(
             state.blockingReasons[0] ?? 'Выберите доставку перед оплатой.',
@@ -443,7 +487,7 @@ export class OrderDeliveryService {
           throw new ConflictException('Order total is stale');
 
         const existing = order.paymentAttempts.find(
-          (attempt: any) => attempt.activeOrderId === order.id,
+          (attempt) => attempt.activeOrderId === order.id,
         );
         if (existing) {
           if (existing.amount !== order.totalAmount)
@@ -466,29 +510,29 @@ export class OrderDeliveryService {
   }
 
   buildFingerprint(
-    order: any,
+    order: OrderDeliveryRecord,
     group: ResolvedDeliveryGroup,
     providerId: string,
   ) {
     const destination = this.destination(order.deliveryDestination)!;
     const warehouse = group.items[0].warehouse!;
     const sourceItem = order.items.find(
-      (item: any) => item.id === group.items[0].id,
-    );
+      (item) => item.id === group.items[0].id,
+    )!;
     const fullWarehouse = sourceItem.product.warehouses.find(
-      (mapping: any) => mapping.warehouseId === warehouse.id,
-    ).warehouse;
+      (mapping) => mapping.warehouseId === warehouse.id,
+    )!.warehouse;
     const provider = sourceItem.product.deliveryServices
-      .map((mapping: any) => mapping.deliveryService.provider)
-      .find((value: any) => value.id === providerId);
+      .map((mapping) => mapping.deliveryService.provider)
+      .find((value) => value.id === providerId);
     const providerConfig = fullWarehouse.providerConfigs.find(
-      (config: any) => config.deliveryProviderId === providerId,
+      (config) => config.deliveryProviderId === providerId,
     );
     const serviceCodes = group.commonServiceIds
       .map((id) => {
         for (const item of order.items) {
           const mapping = item.product.deliveryServices.find(
-            (value: any) => value.deliveryServiceId === id,
+            (value) => value.deliveryServiceId === id,
           );
           if (mapping) return mapping.deliveryService.code;
         }
@@ -496,9 +540,9 @@ export class OrderDeliveryService {
       })
       .filter((code) =>
         group.items.every((item) => {
-          const record = order.items.find((value: any) => value.id === item.id);
+          const record = order.items.find((value) => value.id === item.id)!;
           return record.product.deliveryServices.some(
-            (mapping: any) =>
+            (mapping) =>
               mapping.deliveryService.code === code &&
               mapping.deliveryService.providerId === providerId,
           );
@@ -542,26 +586,26 @@ export class OrderDeliveryService {
     });
   }
 
-  resolve(order: any) {
+  resolve(order: OrderDeliveryRecord) {
     return this.resolver.resolve(
       order.id,
       order.deliveryVersion,
-      order.items.map((item: any) => {
+      order.items.map((item) => {
         const primary = item.product.warehouses.find(
-          (mapping: any) => mapping.isPrimary && mapping.isActive,
+          (mapping) => mapping.isPrimary && mapping.isActive,
         );
         const warehouse = primary?.warehouse;
         const enabledMappings = item.product.deliveryServices.filter(
-          (mapping: any) => mapping.isEnabled,
+          (mapping) => mapping.isEnabled,
         );
         const activeMappings = enabledMappings.filter(
-          (mapping: any) =>
+          (mapping) =>
             mapping.deliveryService.isActive &&
             mapping.deliveryService.provider.isActive,
         );
-        const configuredMappings = activeMappings.filter((mapping: any) =>
+        const configuredMappings = activeMappings.filter((mapping) =>
           warehouse?.providerConfigs.some(
-            (config: any) =>
+            (config) =>
               config.deliveryProviderId ===
                 mapping.deliveryService.providerId && config.isEnabled,
           ),
@@ -569,7 +613,7 @@ export class OrderDeliveryService {
         const packages = item.product.shippingProfile?.packages ?? [];
         const validPackages =
           packages.length > 0 &&
-          packages.every((profile: any) =>
+          packages.every((profile) =>
             [
               profile.quantity,
               profile.weightGrams,
@@ -594,10 +638,10 @@ export class OrderDeliveryService {
           hasShippingProfile: Boolean(item.product.shippingProfile),
           hasValidPackages: validPackages,
           serviceIds: configuredMappings
-            .map((mapping: any) => mapping.deliveryServiceId)
+            .map((mapping) => mapping.deliveryServiceId)
             .sort(),
           serviceIssue: enabledMappings.some(
-            (mapping: any) => !mapping.deliveryService.provider.isActive,
+            (mapping) => !mapping.deliveryService.provider.isActive,
           )
             ? ('PROVIDER_DISABLED' as const)
             : activeMappings.length && !configuredMappings.length
@@ -609,7 +653,7 @@ export class OrderDeliveryService {
   }
 
   private buildPlans(
-    order: any,
+    order: OrderDeliveryRecord,
     groups: ResolvedDeliveryGroup[],
     destination: OrderDeliveryDestination,
   ) {
@@ -623,7 +667,7 @@ export class OrderDeliveryService {
       })),
       quotes: order.deliveryQuotes
         .filter(
-          (quote: any) =>
+          (quote) =>
             quote.groupKey === group.groupKey &&
             quote.expiresAt > now &&
             ['CREATED', 'SELECTED'].includes(quote.status) &&
@@ -633,9 +677,8 @@ export class OrderDeliveryService {
             quote.deliveryService.isActive &&
             this.isCurrentQuote(order, group, quote),
         )
-        .map((quote: any) => {
-          const normalized =
-            (quote.providerPayload as any)?.normalizedOption ?? {};
+        .map((quote) => {
+          const normalized = this.normalizedQuoteOption(quote.providerPayload);
           return {
             quoteId: quote.id,
             provider: {
@@ -663,7 +706,7 @@ export class OrderDeliveryService {
     });
   }
 
-  private buildState(order: any) {
+  private buildState(order: OrderDeliveryRecord) {
     const resolution = this.resolve(order);
     const destination = this.destination(order.deliveryDestination);
     const now = new Date();
@@ -671,7 +714,7 @@ export class OrderDeliveryService {
       ? this.buildPlans(order, resolution.groups, destination)
       : [];
     const selectedQuoteIds = order.deliverySelections
-      .filter((selection: any) =>
+      .filter((selection) =>
         this.isCurrentSelection(
           order,
           resolution.groups,
@@ -679,7 +722,7 @@ export class OrderDeliveryService {
           selection,
         ),
       )
-      .map((selection: any) => selection.deliveryQuoteId)
+      .map((selection) => selection.deliveryQuoteId)
       .sort();
     const selectedPlan = plans.find(
       (plan) =>
@@ -694,15 +737,15 @@ export class OrderDeliveryService {
         ? selectedPlan.selections.map(
             (selection) =>
               order.deliveryQuotes.find(
-                (quote: any) => quote.id === selection.quoteId,
-              ).customerCharge,
+                (quote) => quote.id === selection.quoteId,
+              )!.customerCharge,
           )
         : [],
     );
     const oversizedReady = order.items
-      .filter((item: any) => item.isOversized)
+      .filter((item) => item.isOversized)
       .every(
-        (item: any) =>
+        (item) =>
           item.deliveryQuote &&
           item.deliveryQuote.status === 'ACCEPTED' &&
           item.deliveryQuote.confirmedDeliveryPrice === item.deliveryPrice &&
@@ -761,7 +804,11 @@ export class OrderDeliveryService {
     };
   }
 
-  private isCurrentQuote(order: any, group: ResolvedDeliveryGroup, quote: any) {
+  private isCurrentQuote(
+    order: OrderDeliveryRecord,
+    group: ResolvedDeliveryGroup,
+    quote: OrderDeliveryRecord['deliveryQuotes'][number],
+  ) {
     try {
       return (
         this.buildFingerprint(order, group, quote.deliveryProviderId) ===
@@ -773,10 +820,10 @@ export class OrderDeliveryService {
   }
 
   private isCurrentSelection(
-    order: any,
+    order: OrderDeliveryRecord,
     groups: ResolvedDeliveryGroup[],
     destination: OrderDeliveryDestination | undefined,
-    selection: any,
+    selection: OrderDeliveryRecord['deliverySelections'][number],
   ) {
     const group = groups.find((value) => value.groupKey === selection.groupKey);
     const quote = selection.deliveryQuote;
@@ -792,23 +839,23 @@ export class OrderDeliveryService {
     );
   }
 
-  private hasStaleSelections(order: any) {
+  private hasStaleSelections(order: OrderDeliveryRecord) {
     if (!order.deliverySelections.length) return false;
     const groups = this.resolve(order).groups;
     const destination = this.destination(order.deliveryDestination);
     return (
       order.deliverySelections.length !== groups.length ||
       order.deliverySelections.some(
-        (selection: any) =>
+        (selection) =>
           !this.isCurrentSelection(order, groups, destination, selection),
       )
     );
   }
 
-  private packages(order: any, group: ResolvedDeliveryGroup) {
+  private packages(order: OrderDeliveryRecord, group: ResolvedDeliveryGroup) {
     return group.items.flatMap((groupItem) => {
-      const item = order.items.find((value: any) => value.id === groupItem.id);
-      return item.product.shippingProfile.packages.map((profile: any) => ({
+      const item = order.items.find((value) => value.id === groupItem.id)!;
+      return item.product.shippingProfile!.packages.map((profile) => ({
         orderItemId: item.id,
         productId: item.productId,
         sku: item.product.sku,
@@ -823,55 +870,53 @@ export class OrderDeliveryService {
     });
   }
 
-  private async reprice(tx: any, orderId: string) {
+  private async reprice(tx: Prisma.TransactionClient, orderId: string) {
     const [items, selections] = await Promise.all([
       tx.orderItem.findMany({ where: { orderId } }),
       tx.orderDeliverySelection.findMany({ where: { orderId } }),
     ]);
     const totalAmount = calculateOrderPricing(
       items,
-      selections.map((selection: any) => selection.customerCharge),
+      selections.map((selection) => selection.customerCharge),
     ).totalAmount;
     await tx.order.update({ where: { id: orderId }, data: { totalAmount } });
   }
 
-  private loadOrder(client: any, orderId: string) {
+  private loadOrder(
+    client: PrismaService | Prisma.TransactionClient,
+    orderId: string,
+  ): Promise<OrderDeliveryRecord | null> {
     return client.order.findUnique({
       where: { id: orderId },
-      include: {
-        paymentAttempts: true,
-        deliverySelections: {
-          include: {
-            deliveryQuote: {
-              include: { deliveryProvider: true, deliveryService: true },
-            },
-          },
-        },
-        deliveryQuotes: {
-          include: { deliveryProvider: true, deliveryService: true },
-        },
-        items: {
-          include: {
-            deliveryQuote: true,
-            product: {
-              include: {
-                shippingProfile: {
-                  include: { packages: { orderBy: { sequence: 'asc' } } },
-                },
-                warehouses: {
-                  include: {
-                    warehouse: { include: { providerConfigs: true } },
-                  },
-                },
-                deliveryServices: {
-                  include: { deliveryService: { include: { provider: true } } },
-                },
-              },
-            },
-          },
-        },
-      },
+      include: ORDER_DELIVERY_INCLUDE,
     });
+  }
+
+  private normalizedQuoteOption(
+    value: Prisma.JsonValue,
+  ): NormalizedQuoteOption {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+    const option = value.normalizedOption;
+    if (!option || typeof option !== 'object' || Array.isArray(option))
+      return {};
+    const interval = option.deliveryInterval;
+    return {
+      serviceCode:
+        typeof option.serviceCode === 'string' ? option.serviceCode : undefined,
+      title: typeof option.title === 'string' ? option.title : undefined,
+      fulfillmentType:
+        typeof option.fulfillmentType === 'string'
+          ? option.fulfillmentType
+          : undefined,
+      deliveryInterval:
+        interval &&
+        typeof interval === 'object' &&
+        !Array.isArray(interval) &&
+        typeof interval.from === 'string' &&
+        typeof interval.to === 'string'
+          ? { from: interval.from, to: interval.to }
+          : undefined,
+    };
   }
 
   private destination(value: unknown): OrderDeliveryDestination | undefined {
@@ -879,13 +924,13 @@ export class OrderDeliveryService {
       ? (value as OrderDeliveryDestination)
       : undefined;
   }
-  private assertEditable(order: any) {
+  private assertEditable(order: OrderDeliveryRecord) {
     if (order.status !== OrderStatus.AWAITING_PAYMENT)
       throw new BadRequestException('Order is not editable');
   }
-  private assertNoActivePayment(order: any) {
+  private assertNoActivePayment(order: OrderDeliveryRecord) {
     if (
-      order.paymentAttempts.some((attempt: any) =>
+      order.paymentAttempts.some((attempt) =>
         ACTIVE_PAYMENT_STATUSES.includes(attempt.status),
       )
     )
@@ -902,11 +947,11 @@ export class OrderDeliveryService {
   private optional(value?: string) {
     return value?.trim() || undefined;
   }
-  private number(value: any) {
-    return value?.toNumber?.() ?? (value == null ? undefined : Number(value));
+  private number(value: Prisma.Decimal | number | null | undefined) {
+    return value == null ? undefined : Number(value);
   }
 
-  private isOwnedBy(order: any, owner: DeliveryOwner) {
+  private isOwnedBy(order: OrderDeliveryRecord, owner: DeliveryOwner) {
     return order.userId
       ? order.userId === owner.userId
       : Boolean(

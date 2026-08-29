@@ -123,7 +123,7 @@ export async function buildAdminCrudPayload({
       isActive: Boolean(values.isActive),
       isOversizedOverride: values.isOversizedOverride === 'inherit' ? null : values.isOversizedOverride === 'oversized',
       logistics: {
-        shippingProfile: Boolean(values.shippingProfileEnabled) ? {
+        shippingProfile: values.shippingProfileEnabled ? {
           isFragile: Boolean(values.isFragile),
           isStackable: Boolean(values.isStackable),
           ageRestricted: Boolean(values.ageRestricted),

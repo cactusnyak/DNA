@@ -160,6 +160,7 @@ export function Profile() {
       />
 
       <ProfileEditModal
+        key={`${user.id}:${isEditModalOpen}`}
         user={user}
         isOpen={isEditModalOpen}
         isPending={updateProfileMutation.isPending}
