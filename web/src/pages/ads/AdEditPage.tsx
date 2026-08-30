@@ -5,7 +5,7 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SectionHeader } from '@/components/ui/Section';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import {
-  getAd,
+  getMyAd,
   updateAd,
   uploadAdImage,
   type UpdateAdPayload,
@@ -25,8 +25,8 @@ export function AdEditPage() {
     isError,
   } = useQuery({
     queryKey: ['ad', adId],
-    queryFn: () => getAd(adId ?? ''),
-    enabled: Boolean(adId),
+    queryFn: () => getMyAd(accessToken ?? '', adId ?? ''),
+    enabled: Boolean(accessToken && adId),
   });
 
   const updateMutation = useMutation({
@@ -69,7 +69,7 @@ export function AdEditPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-8 md:rounded-3xl md:bg-page md:p-5 md:shadow-card-2xl lg:p-8 xl:p-10 ">
       <SectionHeader
         title="Редактирование объявления"
         description="Обновите информацию об объявлении."

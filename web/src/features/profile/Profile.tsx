@@ -23,6 +23,7 @@ import { ProfileEditModal } from './components/ProfileEditModal/ProfileEditModal
 import { ProfileOrdersCard } from './components/ProfileOrdersCard';
 import { ProfileSessionErrorState } from './components/ProfileSessionErrorState';
 import { ProfileUnauthorizedState } from './components/ProfileUnauthorizedState';
+import { BalanceHistory } from './components/BalanceHistory';
 
 export function Profile() {
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -59,6 +60,7 @@ export function Profile() {
       lastName: string;
       patronymic: string;
       phone?: string;
+      currentAddress: string | null;
     }) =>
       updateCurrentUser(accessToken ?? '', {
         nickname: value.nickname,
@@ -66,6 +68,7 @@ export function Profile() {
         lastName: value.lastName || undefined,
         patronymic: value.patronymic || undefined,
         phone: value.phone || undefined,
+        currentAddress: value.currentAddress,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
@@ -156,8 +159,10 @@ export function Profile() {
         isPending={isOrdersPending}
         isError={isOrdersError}
       />
+      <BalanceHistory accessToken={accessToken} />
 
       <ProfileEditModal
+        key={`${user.id}:${isEditModalOpen}`}
         user={user}
         isOpen={isEditModalOpen}
         isPending={updateProfileMutation.isPending}

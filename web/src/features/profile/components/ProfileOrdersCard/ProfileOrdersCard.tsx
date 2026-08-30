@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 
+import { Button } from '@/components/ui/Button';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
+import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/StatusBadge';
 import {
   formatOrderStatus,
   type Order,
+  type OrderStatus,
 } from '@/entities/order';
 import { formatPrice } from '@/shared/utils/format-price';
 import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
@@ -41,6 +44,13 @@ function getOrderItemsLabel(order: Order) {
   }
 
   return `${totalQuantity} товаров`;
+}
+
+function getOrderStatusVariant(status: OrderStatus): StatusBadgeVariant {
+  if (status === 'AWAITING_PAYMENT') return 'warning';
+  if (status === 'DELIVERED' || status === 'CASHBACK_ACCRUED') return 'access';
+  if (status === 'CANCELLED') return 'destructive';
+  return 'default';
 }
 
 function ProfileOrdersMessage({
@@ -144,9 +154,9 @@ export function ProfileOrdersCard({
           >
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
               <div>
-                <Link className="text-sm font-semibold underline-offset-4 hover:underline" to={`/orders/${order.id}`}>
+                <h3 className="text-sm font-semibold">
                   Заказ № {order.id.slice(0, 8)}
-                </Link>
+                </h3>
 
                 <p className="mt-1 text-xs text-muted-foreground">
                   {formatOrderDate(order.createdAt)} · {getOrderItemsLabel(order)}
@@ -158,9 +168,11 @@ export function ProfileOrdersCard({
                   {formatPrice(order.totalAmount)}
                 </p>
 
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatOrderStatus(order.status)}
-                </p>
+                <StatusBadge
+                  className="mt-1 sm:ml-auto"
+                  text={formatOrderStatus(order.status)}
+                  variant={getOrderStatusVariant(order.status)}
+                />
               </div>
             </div>
 
@@ -183,14 +195,19 @@ export function ProfileOrdersCard({
               ))}
             </div>
 
-            {order.capabilities.canContinue && (
-              <Link
-                className="mt-4 inline-flex text-sm font-semibold underline-offset-4 hover:underline"
-                to={order.status === 'AWAITING_PAYMENT' ? `/checkout?orderId=${order.id}` : `/orders/${order.id}`}
-              >
-                {order.status === 'AWAITING_PAYMENT' ? 'Перейти к оплате' : 'Продолжить оформление'}
-              </Link>
-            )}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {order.capabilities.canContinue && (
+                <Button asChild variant="accent" size="sm">
+                  <Link to={order.status === 'AWAITING_PAYMENT' ? `/checkout?orderId=${order.id}` : `/orders/${order.id}`}>
+                    {order.status === 'AWAITING_PAYMENT' ? 'Перейти к оплате' : 'Продолжить оформление'}
+                  </Link>
+                </Button>
+              )}
+
+              <Button asChild variant="secondary" size="sm">
+                <Link to={`/orders/${order.id}`}>Посмотреть заказ</Link>
+              </Button>
+            </div>
           </article>
         ))}
       </div>

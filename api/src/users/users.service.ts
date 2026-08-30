@@ -223,37 +223,43 @@ export class UsersService {
     );
 
     try {
-      const user = await this.prismaService.user.create({
-        data: {
-          email: params.email,
-          passwordHash: params.passwordHash,
-          nickname: params.nickname,
-          nicknameSuffix: params.nicknameSuffix,
-          firstName: params.firstName,
-          lastName: params.lastName,
-          patronymic: params.patronymic,
-          phone: params.phone,
-          oauthProvider: params.oauthProvider,
-          oauthProviderId: params.oauthProviderId,
-          referralCode: params.referralCode,
-          balance: {
-            create: {
-              value: 0,
+      const user = await this.prismaService.$transaction(async (tx) => {
+        const createdUser = await tx.user.create({
+          data: {
+            email: params.email,
+            passwordHash: params.passwordHash,
+            nickname: params.nickname,
+            nicknameSuffix: params.nicknameSuffix,
+            firstName: params.firstName,
+            lastName: params.lastName,
+            patronymic: params.patronymic,
+            phone: params.phone,
+            oauthProvider: params.oauthProvider,
+            oauthProviderId: params.oauthProviderId,
+            referralCode: params.referralCode,
+            balance: {
+              create: {
+                value: 0,
+              },
             },
           },
-        },
-        include: {
-          avatar: true,
-          balance: true,
-        },
-      });
-
-      if (inviter) {
-        await this.createReferral({
-          invitedUserId: user.id,
-          inviterUserId: inviter.id,
+          include: {
+            avatar: true,
+            balance: true,
+          },
         });
-      }
+
+        if (inviter) {
+          await this.createReferral(
+            {
+              invitedUserId: createdUser.id,
+              inviterUserId: inviter.id,
+            },
+            tx,
+          );
+        }
+        return createdUser;
+      });
 
       return this.mapPublicUser(user);
     } catch (error) {
@@ -302,6 +308,7 @@ export class UsersService {
       lastName?: string;
       patronymic?: string;
       phone?: string;
+      currentAddress?: string | null;
       avatarId?: string | null;
     },
   ) {
@@ -329,6 +336,10 @@ export class UsersService {
         lastName: data.lastName,
         patronymic: data.patronymic,
         phone: data.phone,
+        currentAddress:
+          data.currentAddress === undefined
+            ? undefined
+            : data.currentAddress?.trim() || null,
         avatarId: data.avatarId,
       },
       include: {
@@ -408,6 +419,7 @@ export class UsersService {
           lastName: 'Пользователь',
           patronymic: null,
           phone: null,
+          currentAddress: null,
           passwordHash: null,
           oauthProvider: null,
           oauthProviderId: null,
@@ -432,15 +444,27 @@ export class UsersService {
       updatedAt: user.updatedAt,
       patronymic: user.patronymic ?? undefined,
       phone: user.phone ?? undefined,
+      currentAddress: this.getCurrentAddress(user),
       avatar: user.avatar ?? undefined,
       referralCode: user.referralCode ?? undefined,
       balance: user.balance
         ? {
             value: user.balance.value,
+            pendingRewardValue: user.balance.pendingRewardValue,
+            spendingHoldValue: user.balance.spendingHoldValue,
+            debtValue: user.balance.debtValue,
             currency: user.balance.currency,
           }
         : undefined,
     };
+  }
+
+  private getCurrentAddress(user: unknown) {
+    if (!user || typeof user !== 'object' || !('currentAddress' in user))
+      return undefined;
+    return typeof user.currentAddress === 'string'
+      ? user.currentAddress
+      : undefined;
   }
 
   private async getInviterByReferralCode(inviterReferralCode?: string) {
@@ -464,15 +488,18 @@ export class UsersService {
     return inviter;
   }
 
-  private async createReferral(params: {
-    invitedUserId: string;
-    inviterUserId: string;
-  }) {
+  private async createReferral(
+    params: {
+      invitedUserId: string;
+      inviterUserId: string;
+    },
+    client: Prisma.TransactionClient | PrismaService = this.prismaService,
+  ) {
     if (params.inviterUserId === params.invitedUserId) {
       throw new BadRequestException('User cannot invite himself');
     }
 
-    const existingReferral = await this.prismaService.referral.findUnique({
+    const existingReferral = await client.referral.findUnique({
       where: {
         invitedUserId: params.invitedUserId,
       },
@@ -482,7 +509,7 @@ export class UsersService {
       return;
     }
 
-    const referralLevel = await this.prismaService.referralLevel.upsert({
+    const referralLevel = await client.referralLevel.upsert({
       where: {
         grade: 1,
       },
@@ -493,7 +520,7 @@ export class UsersService {
       },
     });
 
-    await this.prismaService.referral.create({
+    await client.referral.create({
       data: {
         inviterUserId: params.inviterUserId,
         invitedUserId: params.invitedUserId,

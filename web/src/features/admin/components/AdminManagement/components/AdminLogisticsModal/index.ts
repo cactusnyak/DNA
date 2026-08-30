@@ -1,0 +1,1 @@
+export { AdminLogisticsModal } from './AdminLogisticsModal';

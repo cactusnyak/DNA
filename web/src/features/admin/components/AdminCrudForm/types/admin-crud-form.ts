@@ -9,13 +9,14 @@ import type {
   AdminMarketCategoryPayload,
   AdminProduct,
   AdminProductPayload,
+  AdminProductPackage,
   AdminUser,
   AdminUserRolePayload,
-} from '@/entities/admin';
-import type { Order, OrderStatus } from '@/entities/order';
-import type { ProductAddition } from '@/entities/product';
+} from "@/entities/admin";
+import type { Order, OrderStatus } from "@/entities/order";
+import type { ProductAddition } from "@/entities/product";
 
-import type { AdminManagementTabId } from '../../../types/admin-management';
+import type { AdminManagementTabId } from "../../../types/admin-management";
 
 export type AdminCrudRecord =
   | AdminMarketCategory
@@ -42,6 +43,8 @@ export type AdminCrudFormValue =
   | File[]
   | string[]
   | ProductAddition[]
+  | AdminProductPackage[]
+  | Array<{ depth: number; shareBasisPoints: number }>
   | null;
 
 export type AdminCrudFormValues = Record<string, AdminCrudFormValue>;
@@ -56,6 +59,10 @@ export type AdminCrudFieldsProps = {
   values: AdminCrudFormValues;
   categories: AdminMarketCategory[];
   adCategories: AdminAdCategory[];
+  warehouses?: import("@/entities/admin").AdminWarehouse[];
+  deliveryProviders?: import("@/entities/admin").AdminDeliveryProvider[];
+  logisticsOptionsState?: "loading" | "error" | "ready";
+  onRetryLogisticsOptions?: () => void;
   record?: AdminCrudRecord;
   onValueChange: AdminCrudUpdateValue;
 };

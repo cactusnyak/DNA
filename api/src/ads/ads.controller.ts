@@ -54,11 +54,21 @@ export class AdsController {
 
   @Get('my')
   async findMyAds(@Headers('authorization') authorizationHeader?: string) {
-    const user = await this.authService.getMeFromAuthorizationHeader(
-      authorizationHeader,
-    );
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
 
     return this.adsService.findMyAds(user.id);
+  }
+
+  @Get('my/:adId')
+  async findMyAd(
+    @Param('adId') adId: string,
+    @Headers('authorization') authorizationHeader?: string,
+  ) {
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
+
+    return this.adsService.findOwnedById(adId, user.id);
   }
 
   @Get()
@@ -84,9 +94,8 @@ export class AdsController {
     @Body() body: CreateAdDto,
     @Headers('authorization') authorizationHeader?: string,
   ) {
-    const user = await this.authService.getMeFromAuthorizationHeader(
-      authorizationHeader,
-    );
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
 
     return this.adsService.create(user.id, body);
   }
@@ -97,9 +106,8 @@ export class AdsController {
     @Body() body: UpdateAdDto,
     @Headers('authorization') authorizationHeader?: string,
   ) {
-    const user = await this.authService.getMeFromAuthorizationHeader(
-      authorizationHeader,
-    );
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
 
     return this.adsService.update(adId, user.id, body);
   }
@@ -110,9 +118,8 @@ export class AdsController {
     @Param('adId') adId: string,
     @Headers('authorization') authorizationHeader?: string,
   ) {
-    const user = await this.authService.getMeFromAuthorizationHeader(
-      authorizationHeader,
-    );
+    const user =
+      await this.authService.getMeFromAuthorizationHeader(authorizationHeader);
 
     await this.adsService.softDelete(adId, user.id);
   }

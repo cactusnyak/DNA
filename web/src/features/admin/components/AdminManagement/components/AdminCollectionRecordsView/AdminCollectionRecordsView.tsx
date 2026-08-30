@@ -88,6 +88,7 @@ export function AdminCollectionRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="collections"
       records={collections}
       getRecordKey={(collection) => collection.id}
       emptyText="Подборки не найдены."

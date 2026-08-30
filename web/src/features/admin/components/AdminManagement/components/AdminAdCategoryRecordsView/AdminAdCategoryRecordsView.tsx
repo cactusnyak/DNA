@@ -78,6 +78,7 @@ export function AdminAdCategoryRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="ad-categories"
       records={tree}
       getRecordKey={(category) => category.id}
       emptyText="Категории объявлений не найдены."

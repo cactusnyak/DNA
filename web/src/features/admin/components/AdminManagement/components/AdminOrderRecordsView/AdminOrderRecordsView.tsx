@@ -61,6 +61,7 @@ export function AdminOrderRecordsView({
 
   return (
     <AdminRecordsTable<AdminOrderRecord>
+      tableKey="orders"
       records={orders}
       getRecordKey={(order) => order.id}
       emptyText="Заказы не найдены."

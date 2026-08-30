@@ -40,6 +40,7 @@ export function AdminReferralRecordsView({
 
   return (
     <AdminRecordsTable
+      tableKey="referrals"
       records={referrals}
       getRecordKey={(user) => user.id}
       emptyText="Рефералы не найдены."

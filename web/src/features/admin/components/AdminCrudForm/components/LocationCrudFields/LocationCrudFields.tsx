@@ -15,14 +15,11 @@ export function LocationCrudFields({
   onValueChange,
 }: LocationCrudFieldsProps) {
   return (
-    <fieldset className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card p-5">
-      <legend className="px-1 text-sm font-medium">Геопозиция</legend>
-
+    <>
       <FormInputField
         name="locationName"
-        label="Название точки"
-        caption="Оставьте весь блок пустым, если геопозиция не нужна."
-        placeholder="Например, Талдом"
+        label="Геопозиция"
+        caption="Оставьте геопозицию и координаты пустыми, если они не нужны."
         value={String(values.locationName ?? '')}
         onChange={(event) => onValueChange('locationName', event.target.value)}
       />
@@ -36,7 +33,6 @@ export function LocationCrudFields({
           max={90}
           step={0.000001}
           label="Широта"
-          placeholder="56.7308"
           value={String(values.locationLatitude ?? '')}
           onChange={(event) =>
             onValueChange('locationLatitude', event.target.value)
@@ -51,13 +47,12 @@ export function LocationCrudFields({
           max={180}
           step={0.000001}
           label="Долгота"
-          placeholder="37.5276"
           value={String(values.locationLongitude ?? '')}
           onChange={(event) =>
             onValueChange('locationLongitude', event.target.value)
           }
         />
       </div>
-    </fieldset>
+    </>
   );
 }

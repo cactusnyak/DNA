@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import LogoMain from '@/assets/logos/dna/logo-main.svg?react';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 
 type HeaderLogoProps = {
   onClick?: () => void;
@@ -9,10 +9,7 @@ type HeaderLogoProps = {
 export function HeaderLogo({ onClick }: HeaderLogoProps) {
   return (
     <Link to="/" onClick={onClick} className="flex shrink-0 items-center">
-      <LogoMain
-        className="h-5 w-auto [&_path]:fill-logo md:h-6"
-        aria-label="DNA"
-      />
+      <BrandLogo />
     </Link>
   );
 }

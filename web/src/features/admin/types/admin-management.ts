@@ -7,6 +7,10 @@ export type AdminManagementTabId =
   | 'ad-categories'
   | 'ads'
   | 'users'
-  | 'referrals';
+  | 'referrals'
+  | 'warehouses'
+  | 'delivery-providers'
+  | 'universal-delivery-quotes'
+  | 'shipments';
 
 export type AdminViewMode = 'table' | 'list' | 'tree';

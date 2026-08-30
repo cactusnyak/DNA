@@ -1,6 +1,7 @@
 import type { OrderCustomer } from './order-customer';
 import type { OrderItem } from './order-item';
 import type { OrderStatus } from './order-status';
+import type { OrderDeliveryState } from '@/entities/order-delivery/types';
 
 export type Order = OrderCustomer & {
   id: string;
@@ -15,6 +16,9 @@ export type Order = OrderCustomer & {
   };
   items: OrderItem[];
   totalAmount: number;
+  bonusDiscount: number;
+  externalPaymentAmount: number;
+  delivery: OrderDeliveryState;
   createdAt: string;
   updatedAt: string;
 };

@@ -33,7 +33,7 @@ export function AdCreatePage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-8 md:rounded-3xl md:bg-page md:p-5 md:shadow-card-2xl lg:p-8 xl:p-10 ">
       <SectionHeader
         title="Новое объявление"
         description="Заполните информацию о товаре или услуге. После сохранения объявление появится в разделе «Мои объявления»."

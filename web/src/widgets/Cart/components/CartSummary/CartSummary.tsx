@@ -63,13 +63,6 @@ export function CartSummary({
               </p>
             </div>
 
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 text-sm">
-              <span className="text-muted-foreground">Доставка</span>
-              <span className="text-right text-muted-foreground">
-                Не подключена
-              </span>
-            </div>
-
             <Button asChild variant="accent" size="lg" className="w-full">
               <Link to="/checkout">Оформить заказ Маркета</Link>
             </Button>

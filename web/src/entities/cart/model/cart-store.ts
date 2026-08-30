@@ -28,7 +28,6 @@ export type CheckoutPrefill = {
   customerPhone: string;
   customerEmail: string;
   deliveryAddress: string;
-  comment: string;
 };
 
 type CartStore = {

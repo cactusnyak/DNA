@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { WalletCards } from 'lucide-react';
 
 import type { Balance } from '@/entities/balance';
-import { Button } from '@/components/ui/Button';
 import { formatPrice } from '@/shared/utils/format-price';
 
 type BalanceCardProps = {
@@ -34,25 +33,7 @@ export function BalanceCard({
             <WalletCards className="size-3.5" />
             {label}
           </div>
-          <div className="flex gap-0.5">
-            <Button
-              className="h-fit flex-1 rounded-l-full rounded-r-[3px] border-white/20 bg-page/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
-              onClick={() =>
-                window.alert('Функция пополнения баланса находится в разработке')
-              }
-            >
-              Пополнить
-            </Button>
-
-            <Button
-              className="h-fit flex-1 rounded-l-[3px] rounded-r-full border-white/20 bg-page/10 px-2.5 py-1 text-xs text-white hover:bg-black/20 hover:text-white"
-              onClick={() =>
-                window.alert('Функция вывода средств находится в разработке')
-              }
-            >
-              Вывести
-            </Button>
-          </div>
+          <span className="px-3 text-xs">Только для покупок в DNA</span>
         </div>
 
         <p className="balance-amount-gradient mt-5 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
@@ -62,6 +43,21 @@ export function BalanceCard({
         <p className="mt-4 text-sm font-semibold tracking-widest text-indigo-100/55">
           {balance?.currency ?? 'RUB'}
         </p>
+        <dl className="mt-5 grid gap-2 text-sm sm:grid-cols-2">
+          <div className="rounded-xl bg-white/8 p-3">
+            <dt className="text-indigo-100/65">Зарезервировано</dt>
+            <dd className="mt-1 font-semibold">{formatPrice(balance?.pendingRewardValue ?? 0)}</dd>
+          </div>
+          <div className="rounded-xl bg-white/8 p-3">
+            <dt className="text-indigo-100/65">В заказах</dt>
+            <dd className="mt-1 font-semibold">{formatPrice(balance?.spendingHoldValue ?? 0)}</dd>
+          </div>
+        </dl>
+        {(balance?.debtValue ?? 0) > 0 && (
+          <p className="mt-3 rounded-xl bg-dangerous/20 p-3 text-sm">
+            Бонусный долг: {formatPrice(balance?.debtValue ?? 0)}. Использование бонусов временно недоступно.
+          </p>
+        )}
       </div>
     </section>
   );

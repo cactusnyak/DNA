@@ -139,6 +139,65 @@ import * as Joi from 'joi';
           .optional(),
         TRUST_PROXY: Joi.boolean().default(false),
         HARD_DELETE_ORDERS_ENABLED: Joi.boolean().default(false),
+        YANDEX_DELIVERY_ENABLED: Joi.boolean().default(false),
+        YANDEX_DELIVERY_TIMEOUT_MS: Joi.number()
+          .integer()
+          .min(500)
+          .max(30000)
+          .default(5000),
+        YANDEX_DELIVERY_QUOTE_TTL_SECONDS: Joi.number()
+          .integer()
+          .min(60)
+          .max(3600)
+          .default(600),
+        YANDEX_DELIVERY_LIVE_MUTATIONS_ENABLED: Joi.boolean().default(false),
+        YANDEX_DELIVERY_TOKEN: Joi.string().allow('').optional(),
+        YANDEX_EXPRESS_ENABLED: Joi.boolean().default(true),
+        YANDEX_EXPRESS_MODE: Joi.string()
+          .valid('mock', 'manager_test', 'production')
+          .default('mock'),
+        YANDEX_EXPRESS_BASE_URL: Joi.string()
+          .uri({ scheme: ['https'] })
+          .default('https://b2b.taxi.yandex.net'),
+        YANDEX_EXPRESS_TOKEN: Joi.string().allow('').optional(),
+        YANDEX_RUSSIA_ENABLED: Joi.boolean().default(true),
+        YANDEX_RUSSIA_MODE: Joi.string()
+          .valid('mock', 'sandbox', 'production')
+          .default('mock'),
+        YANDEX_RUSSIA_BASE_URL: Joi.string()
+          .uri({ scheme: ['https'] })
+          .default('https://b2b.taxi.tst.yandex.net'),
+        YANDEX_RUSSIA_TOKEN: Joi.string().allow('').optional(),
+        YANDEX_RUSSIA_STATION_ID: Joi.string().allow('').optional(),
+        CDEK_DELIVERY_ENABLED: Joi.boolean().default(false),
+        CDEK_DELIVERY_MODE: Joi.string()
+          .valid('mock', 'test', 'live')
+          .default('mock'),
+        CDEK_DELIVERY_TIMEOUT_MS: Joi.number()
+          .integer()
+          .min(500)
+          .max(30000)
+          .default(10000),
+        CDEK_DELIVERY_TOKEN_REFRESH_SKEW_SECONDS: Joi.number()
+          .integer()
+          .min(0)
+          .max(900)
+          .default(60),
+        CDEK_DELIVERY_QUOTE_TTL_SECONDS: Joi.number()
+          .integer()
+          .min(60)
+          .max(3600)
+          .default(600),
+        CDEK_DELIVERY_TEST_BASE_URL: Joi.string()
+          .uri({ scheme: ['https'] })
+          .default('https://api.edu.cdek.ru'),
+        CDEK_DELIVERY_PRODUCTION_BASE_URL: Joi.string()
+          .uri({ scheme: ['https'] })
+          .default('https://api.cdek.ru'),
+        CDEK_DELIVERY_ACCOUNT: Joi.string().allow('').optional(),
+        CDEK_DELIVERY_SECURE_PASSWORD: Joi.string().allow('').optional(),
+        CDEK_DELIVERY_LIVE_MUTATIONS_ENABLED: Joi.boolean().default(false),
+        DADATA_API_KEY: Joi.string().allow('').optional(),
 
         AUTH_LOGIN_METHODS: Joi.string().default('email_otp,otp,yandex'),
         AUTH_REGISTRATION_METHODS: Joi.string().default('email_otp,yandex'),

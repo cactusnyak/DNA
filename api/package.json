@@ -30,10 +30,13 @@
     "seed:production": "tsx prisma/seeds/production/seed.ts",
     "seed:production:images": "tsx prisma/seeds/production/seed.ts --images-only",
     "seed:validate": "tsx prisma/seeds/dev/seed.ts --validate-only",
+    "seed:logistig-test": "tsx prisma/seeds/logistig-test/seed.ts",
     "sms-ru:check": "tsx scripts/sms-ru.ts check",
     "sms-ru:callback:list": "tsx scripts/sms-ru.ts callback:list",
     "sms-ru:callback:add": "tsx scripts/sms-ru.ts callback:add",
-    "sms-ru:callback:delete": "tsx scripts/sms-ru.ts callback:delete"
+    "sms-ru:callback:delete": "tsx scripts/sms-ru.ts callback:delete",
+    "yandex-delivery:smoke": "tsx scripts/yandex-delivery-smoke.ts",
+    "cdek-delivery:smoke": "tsx scripts/cdek-delivery-smoke.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1090.0",

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { SectionHeader } from '@/components/ui/Section';
 import { ContentCard } from '@/components/ui/ContentCard';
-import { useAuthStore } from '@/entities/auth';
+import { getCurrentUser, useAuthStore } from '@/entities/auth';
 import { useCartStore } from '@/entities/cart';
 import { isQuoteReady } from '@/entities/delivery-quote';
 import {
@@ -13,6 +13,7 @@ import {
   type Order,
 } from '@/entities/order';
 import { useSessionStore } from '@/entities/session';
+import { updateCurrentUser, type User } from '@/entities/user';
 
 import { CheckoutCustomerForm } from './components/CheckoutCustomerForm';
 import { CheckoutEmptyState } from './components/CheckoutEmptyState';
@@ -25,13 +26,47 @@ import { isCheckoutFormValid } from './logic/is-checkout-form-valid';
 import type { CheckoutFormValue } from './types/checkout-form';
 
 export function Checkout() {
-  const checkoutPrefill = useCartStore((state) => state.checkoutPrefill);
-  const [formValue, setFormValue] = useState<CheckoutFormValue>(
-    checkoutPrefill ?? initialCheckoutFormValue,
-  );
-  const [createdOrder, setCreatedOrder] = useState<Order>();
-
   const accessToken = useAuthStore((state) => state.accessToken);
+  const currentUserQuery = useQuery({
+    queryKey: ['current-user'],
+    queryFn: getCurrentUser,
+    enabled: Boolean(accessToken),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (accessToken && currentUserQuery.isPending) {
+    return <ContentCard>Загружаем контактные данные…</ContentCard>;
+  }
+
+  return (
+    <CheckoutContent
+      accessToken={accessToken}
+      currentUser={accessToken ? currentUserQuery.data : undefined}
+    />
+  );
+}
+
+type CheckoutContentProps = {
+  accessToken?: string;
+  currentUser?: User;
+};
+
+function CheckoutContent({ accessToken, currentUser }: CheckoutContentProps) {
+  const queryClient = useQueryClient();
+  const checkoutPrefill = useCartStore((state) => state.checkoutPrefill);
+  const [formValue, setFormValue] = useState<CheckoutFormValue>(() => {
+    return {
+      ...initialCheckoutFormValue,
+      ...checkoutPrefill,
+      customerName:
+        checkoutPrefill?.customerName || currentUser?.firstName || '',
+      customerPhone: checkoutPrefill?.customerPhone || currentUser?.phone || '',
+      customerEmail: checkoutPrefill?.customerEmail || currentUser?.email || '',
+      deliveryAddress:
+        checkoutPrefill?.deliveryAddress || currentUser?.currentAddress || '',
+    };
+  });
+  const [createdOrder, setCreatedOrder] = useState<Order>();
 
   const items = useCartStore((state) => state.items);
   const totalAmount = useCartStore((state) => state.getTotalAmount());
@@ -44,7 +79,32 @@ export function Checkout() {
   const guestSessionId = useSessionStore((state) => state.guestSessionId);
 
   const createOrderMutation = useMutation({
-    mutationFn: (payload: CreateOrderPayload) => {
+    mutationFn: async (payload: CreateOrderPayload) => {
+      if (accessToken && currentUser) {
+        const firstName = payload.customerName.trim();
+        const phone = payload.customerPhone.trim();
+        const currentAddress =
+          payload.deliveryDestination?.fullAddress.trim() ??
+          payload.deliveryAddress.trim();
+        const profileChanges = {
+          ...(firstName !== (currentUser.firstName ?? '').trim()
+            ? { firstName }
+            : {}),
+          ...(phone !== (currentUser.phone ?? '').trim() ? { phone } : {}),
+          ...(currentAddress !== (currentUser.currentAddress ?? '').trim()
+            ? { currentAddress }
+            : {}),
+        };
+
+        if (Object.keys(profileChanges).length > 0) {
+          const updatedUser = await updateCurrentUser(
+            accessToken,
+            profileChanges,
+          );
+          queryClient.setQueryData(['current-user'], updatedUser);
+        }
+      }
+
       return createOrder(payload, accessToken);
     },
     onSuccess: (order) => {

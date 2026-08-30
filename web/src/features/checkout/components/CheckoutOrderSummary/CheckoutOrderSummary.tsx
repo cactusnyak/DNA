@@ -31,8 +31,8 @@ export function CheckoutOrderSummary({
   );
 
   return (
-    <aside className="overflow-hidden rounded-2xl bg-page shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
-      <div className="p-5">
+    <aside className="flex flex-col gap-5 overflow-hidden rounded-2xl bg-page shadow-card-2xl lg:sticky lg:top-28 lg:self-start">
+      <div className="flex flex-col gap-5 p-5">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Ваш заказ</h2>
 
@@ -44,7 +44,7 @@ export function CheckoutOrderSummary({
           </Link>
         </div>
 
-        <div className="mt-5 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {items.map((item) => {
             const image = item.product.images[0];
             const itemKey = item.configurationKey ?? item.product.id;
@@ -69,20 +69,22 @@ export function CheckoutOrderSummary({
                   )}
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <Link
-                    to={`/market/product/${item.product.slug}`}
-                    className="line-clamp-2 text-sm font-medium underline-offset-4 hover:underline"
-                  >
-                    {item.product.title}
-                  </Link>
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <div className="flex flex-col gap-1">
+                    <Link
+                      to={`/market/product/${item.product.slug}`}
+                      className="line-clamp-2 text-sm font-medium underline-offset-4 hover:underline"
+                    >
+                      {item.product.title}
+                    </Link>
 
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {item.quantity} × {formatPrice(item.configuredUnitPrice)}
-                  </p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.quantity} × {formatPrice(item.configuredUnitPrice)}
+                    </p>
+                  </div>
 
                   {item.product.isOversized && (
-                    <div className="mt-2 flex flex-col gap-1">
+                    <div className="flex flex-col gap-1">
                       <OversizedIndicator />
 
                       <OversizedDeliveryModal
@@ -114,7 +116,7 @@ export function CheckoutOrderSummary({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 border-t border-border/80 p-5">
+      <div className="flex flex-col gap-3 border-t border-border/80 p-5">
         <div className="flex items-center justify-between gap-4 text-sm">
           <span className="text-muted-foreground">Товары</span>
           <span>{formatPrice(productsAmount)}</span>

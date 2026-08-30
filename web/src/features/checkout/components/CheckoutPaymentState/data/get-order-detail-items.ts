@@ -1,11 +1,8 @@
 import type { Order } from '@/entities/order';
-import { formatPrice } from '@/shared/utils/format-price';
 
 export type OrderDetailItem = {
   label: string;
   value: string;
-  startsSection?: boolean;
-  endsSection?: boolean;
 };
 
 const orderDateFormatter = new Intl.DateTimeFormat('ru-RU', {
@@ -17,31 +14,26 @@ export function getOrderDetailItems(order: Order): OrderDetailItem[] {
     {
       label: 'Дата заказа',
       value: orderDateFormatter.format(new Date(order.createdAt)),
-      endsSection: true,
-    },
-    {
-      label: 'Сумма к оплате',
-      value: formatPrice(order.totalAmount),
-      endsSection: true,
     },
     {
       label: 'Статус',
       value: 'Ожидает оплаты',
     },
     {
-      label: 'Получатель',
-      value: `${order.customerName}, ${order.customerPhone}`,
-      startsSection: true,
+      label: 'Имя',
+      value: order.customerName,
+    },
+    {
+      label: 'Телефон',
+      value: order.customerPhone,
     },
     {
       label: 'Доставка',
-      value: order.deliveryAddress,
-      startsSection: true,
+      value: order.delivery.destination?.fullAddress ?? order.deliveryAddress,
     },
     {
       label: 'Продавец и получатель оплаты',
       value: 'ИП Филатов Денис Романович',
-      startsSection: true,
     },
   ];
 }

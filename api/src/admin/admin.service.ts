@@ -1,8 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeProductAdditions } from '../products/product-additions';
 import { resolveEffectiveOversizedStatus } from '../products/oversized-status';
+
+const ADMIN_PRODUCT_INCLUDE = {
+  category: { include: { image: true } },
+  images: { include: { image: true } },
+  shippingProfile: {
+    include: { packages: { orderBy: { sequence: 'asc' as const } } },
+  },
+  warehouses: { include: { warehouse: true } },
+  deliveryServices: {
+    include: { deliveryService: { include: { provider: true } } },
+  },
+  rewardShares: {
+    include: { level: true },
+    orderBy: { depth: 'asc' as const },
+  },
+} satisfies Prisma.ProductInclude;
+
+type AdminProductRecord = Prisma.ProductGetPayload<{
+  include: typeof ADMIN_PRODUCT_INCLUDE;
+}>;
 
 @Injectable()
 export class AdminService {
@@ -34,18 +55,7 @@ export class AdminService {
 
     const [products, collections, orders] = await Promise.all([
       this.prismaService.product.findMany({
-        include: {
-          category: {
-            include: {
-              image: true,
-            },
-          },
-          images: {
-            include: {
-              image: true,
-            },
-          },
-        },
+        include: ADMIN_PRODUCT_INCLUDE,
         orderBy: {
           createdAt: 'desc',
         },
@@ -229,7 +239,10 @@ export class AdminService {
     };
   }
 
-  private mapProduct(product: any, categoryById: Map<string, any>) {
+  private mapProduct(
+    product: AdminProductRecord,
+    categoryById: Map<string, any>,
+  ) {
     return {
       id: product.id,
       categoryId: product.categoryId,
@@ -240,6 +253,14 @@ export class AdminService {
       slug: product.slug,
       description: product.description,
       price: product.price,
+      sku: product.sku,
+      purchasePrice: product.purchasePrice,
+      rewardEnabled: product.rewardEnabled,
+      rewardShares: product.rewardShares,
+      rewardConfigVersion: Math.max(
+        1,
+        ...product.rewardShares.map((share) => share.level?.configVersion ?? 1),
+      ),
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
       isOversizedOverride: product.isOversizedOverride,
@@ -251,13 +272,59 @@ export class AdminService {
       deletedAt: product.deletedAt,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
+      shippingProfile: product.shippingProfile,
+      warehouses: product.warehouses ?? [],
+      deliveryServices: product.deliveryServices ?? [],
+      logisticsReadiness: this.getProductLogisticsReadiness(product),
       images: (product.images ?? [])
-        .map((productImage: any) => productImage.image)
+        .map((productImage) => productImage.image)
         .sort(
-          (firstImage: any, secondImage: any) =>
+          (firstImage, secondImage) =>
             firstImage.sortOrder - secondImage.sortOrder,
         ),
     };
+  }
+
+  private getProductLogisticsReadiness(product: AdminProductRecord) {
+    const packages = product.shippingProfile?.packages ?? [];
+    const packagesValid =
+      packages.length > 0 &&
+      packages.every((item) =>
+        [
+          item.quantity,
+          item.weightGrams,
+          item.lengthMillimeters,
+          item.widthMillimeters,
+          item.heightMillimeters,
+        ].every((value) => value > 0),
+      );
+    const primary = product.warehouses.find(
+      (item) => item.isPrimary && item.isActive,
+    );
+    const warehouseReady = Boolean(
+      primary?.warehouse?.isActive && primary?.warehouse?.isConfigured,
+    );
+    const serviceReady = product.deliveryServices.some(
+      (item) =>
+        item.isEnabled &&
+        item.deliveryService?.isActive &&
+        item.deliveryService?.provider?.isActive,
+    );
+    if (
+      product.shippingProfile &&
+      packagesValid &&
+      warehouseReady &&
+      serviceReady
+    )
+      return 'READY';
+    if (
+      product.shippingProfile ||
+      packages.length ||
+      product.warehouses?.length ||
+      product.deliveryServices?.length
+    )
+      return 'PARTIAL';
+    return 'NOT_CONFIGURED';
   }
 
   private mapCatalogCollection(
@@ -293,7 +360,6 @@ export class AdminService {
       customerPhone: order.customerPhone,
       customerEmail: order.customerEmail ?? undefined,
       deliveryAddress: order.deliveryAddress,
-      comment: order.comment ?? undefined,
       status: order.status,
       totalAmount: order.totalAmount,
       archivedAt: order.archivedAt ?? undefined,

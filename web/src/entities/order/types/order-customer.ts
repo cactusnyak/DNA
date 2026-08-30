@@ -3,5 +3,4 @@ export type OrderCustomer = {
   customerPhone: string;
   customerEmail: string;
   deliveryAddress: string;
-  comment?: string;
 };

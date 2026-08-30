@@ -12,5 +12,9 @@ export function getAdminManagementCounts(data?: AdminCatalogData) {
     ads: data?.ads.length ?? 0,
     users: data?.users.length ?? 0,
     referrals: data?.referrals.length ?? 0,
+    warehouses: data?.warehouses.length ?? 0,
+    'delivery-providers': data?.deliveryProviders.length ?? 0,
+    'universal-delivery-quotes': data?.universalDeliveryQuotes.length ?? 0,
+    shipments: data?.shipments.length ?? 0,
   } satisfies Record<AdminManagementTabId, number>;
 }

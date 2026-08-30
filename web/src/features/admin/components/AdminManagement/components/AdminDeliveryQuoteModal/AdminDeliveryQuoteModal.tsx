@@ -80,7 +80,7 @@ export function AdminDeliveryQuoteModal({ accessToken, isOpen, quote, onClose }:
     <Modal
       isOpen={isOpen}
       title={`Заявка на расчёт крупногабаритной доставки №${quote.id.slice(0, 8)}`}
-      size="lg"
+      size="sm"
       onClose={onClose}
     >
       <form className="flex max-h-full min-h-0 flex-1 flex-col overflow-hidden">

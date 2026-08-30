@@ -15,6 +15,7 @@ export type User = {
   updatedAt: string;
   patronymic?: string;
   phone?: string;
+  currentAddress?: string;
   avatar?: Image;
   referralCode?: string;
   balance?: Balance;

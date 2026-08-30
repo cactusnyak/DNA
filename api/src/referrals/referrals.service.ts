@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-const REFERRAL_TREE_MAX_DEPTH = 4;
-
 type ReferralWithInvitedUser = {
   inviterUserId: string;
   invitedUserId: string;
@@ -22,38 +20,43 @@ export class ReferralsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getReferralTree(userId: string) {
-    const referrals = await this.prismaService.referral.findMany({
-      include: {
-        invited: {
-          select: {
-            id: true,
-            nickname: true,
-            nicknameSuffix: true,
-            referralCode: true,
-            deletedAt: true,
+    const [referrals, levels] = await Promise.all([
+      this.prismaService.referral.findMany({
+        include: {
+          invited: {
+            select: {
+              id: true,
+              nickname: true,
+              nicknameSuffix: true,
+              referralCode: true,
+              deletedAt: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prismaService.rewardProgramLevel.findMany({
+        where: { isActive: true },
+        orderBy: { depth: 'asc' },
+      }),
+    ]);
+    const maxDepth = Math.max(0, ...levels.map((level) => level.depth));
 
-    const referralsByInviterUserId = this.groupReferralsByInviterUserId(
-      referrals,
-    );
+    const referralsByInviterUserId =
+      this.groupReferralsByInviterUserId(referrals);
 
     return this.buildReferralTree({
       inviterUserId: userId,
       referralsByInviterUserId,
       level: 1,
       visitedUserIds: new Set([userId]),
+      maxDepth,
     });
   }
 
-  private groupReferralsByInviterUserId(
-    referrals: ReferralWithInvitedUser[],
-  ) {
+  private groupReferralsByInviterUserId(referrals: ReferralWithInvitedUser[]) {
     const referralsByInviterUserId = new Map<
       string,
       ReferralWithInvitedUser[]
@@ -77,15 +80,17 @@ export class ReferralsService {
     referralsByInviterUserId: Map<string, ReferralWithInvitedUser[]>;
     level: number;
     visitedUserIds: Set<string>;
+    maxDepth: number;
   }): unknown[] {
     const {
       inviterUserId,
       referralsByInviterUserId,
       level,
       visitedUserIds,
+      maxDepth,
     } = params;
 
-    if (level > REFERRAL_TREE_MAX_DEPTH) {
+    if (level > maxDepth) {
       return [];
     }
 
@@ -109,7 +114,7 @@ export class ReferralsService {
             : referral.invited.nicknameSuffix,
           referralCode: isInvitedUserDeleted
             ? undefined
-            : referral.invited.referralCode ?? undefined,
+            : (referral.invited.referralCode ?? undefined),
           level,
           invitedAt: referral.createdAt,
           children: this.buildReferralTree({
@@ -117,6 +122,7 @@ export class ReferralsService {
             referralsByInviterUserId,
             level: level + 1,
             visitedUserIds: nextVisitedUserIds,
+            maxDepth,
           }),
         };
       });

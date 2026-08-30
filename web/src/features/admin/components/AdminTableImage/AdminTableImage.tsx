@@ -19,7 +19,7 @@ export function AdminTableImage({ src, alt }: AdminTableImageProps) {
   return (
     <div
       className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground"
-      aria-label={`Нет изображения: ${alt}`}
+      aria-label={`Нет фото: ${alt}`}
     >
       <ImageIcon className="size-4" aria-hidden="true" />
     </div>

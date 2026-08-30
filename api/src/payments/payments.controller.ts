@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
@@ -13,10 +14,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 import { OrderStatus, PaymentAttemptStatus, Prisma } from '@prisma/client';
-import { randomUUID } from 'node:crypto';
 
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { OrderDeliveryService } from '../delivery-providers/order-delivery.service';
+import { RewardsService } from '../rewards/rewards.service';
 
 import { PaymentsService } from './payments.service';
 import type {
@@ -34,6 +36,9 @@ const ORDER_FOR_PAYMENT_INCLUDE = {
       deliveryQuote: true,
     },
   },
+  deliverySelections: {
+    include: { deliveryQuote: { include: { deliveryService: true } } },
+  },
 } satisfies Prisma.OrderInclude;
 
 type OrderForPayment = Prisma.OrderGetPayload<{
@@ -48,6 +53,8 @@ export class PaymentsController {
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly orderDeliveryService: OrderDeliveryService,
+    private readonly rewardsService: RewardsService,
   ) {}
 
   @Post('orders/:orderId/payment')
@@ -56,7 +63,8 @@ export class PaymentsController {
     @Headers('authorization') authorizationHeader?: string,
     @Headers('x-guest-session-id') guestSessionId?: string,
   ) {
-    const order = await this.getAccessibleOrder(
+    await this.rewardsService.releaseExpiredSpendingHold(orderId);
+    let order = await this.getAccessibleOrder(
       orderId,
       authorizationHeader,
       guestSessionId,
@@ -67,6 +75,8 @@ export class PaymentsController {
         `Cannot initiate payment for order with status ${order.status}`,
       );
     }
+
+    const owner = await this.getOwner(authorizationHeader, guestSessionId);
 
     const invalidOversizedItem = order.items.find(
       (item) =>
@@ -91,42 +101,32 @@ export class PaymentsController {
       );
     }
 
-    let attempt = await this.prismaService.paymentAttempt.findUnique({
-      where: { activeOrderId: order.id },
-    });
-
-    if (!attempt) {
-      try {
-        attempt = await this.prismaService.paymentAttempt.create({
-          data: {
-            orderId: order.id,
-            activeOrderId: order.id,
-            idempotenceKey: randomUUID(),
-            amount: order.totalAmount,
-          },
-        });
-      } catch (error) {
-        if (
-          !(error instanceof Prisma.PrismaClientKnownRequestError) ||
-          error.code !== 'P2002'
-        ) {
-          throw error;
-        }
-        attempt = await this.prismaService.paymentAttempt.findUnique({
-          where: { activeOrderId: order.id },
-        });
-      }
+    const attempt = await this.orderDeliveryService.preparePayment(
+      order.id,
+      owner,
+    );
+    order = await this.getAccessibleOrder(
+      orderId,
+      authorizationHeader,
+      guestSessionId,
+    );
+    if (!order.customerEmail) {
+      throw new BadRequestException(
+        'Customer email is required to issue a receipt',
+      );
     }
 
-    if (!attempt) {
-      throw new BadRequestException('Could not create a payment attempt');
+    if (attempt.amount !== order.externalPaymentAmount) {
+      throw new ConflictException(
+        'Сумма заказа изменилась после начала оплаты. Повторите оплату после обновления заказа.',
+      );
     }
 
     const payment = attempt.providerPaymentId
       ? await this.paymentsService.getPayment(attempt.providerPaymentId)
       : await this.paymentsService.createPayment({
           orderId: order.id,
-          amountRubles: order.totalAmount,
+          amountRubles: attempt.amount,
           description: `Заказ №${order.id.slice(0, 8)}`,
           returnUrl: this.getReturnUrl(order.id),
           customerEmail: order.customerEmail,
@@ -264,17 +264,20 @@ export class PaymentsController {
       const description = [item.product.title, ...additions]
         .join(', ')
         .slice(0, 128);
-      items.push({
-        description,
-        quantity: item.quantity.toFixed(3),
-        amount: {
-          value: item.unitPrice.toFixed(2),
-          currency: 'RUB',
-        },
-        vat_code: vatCode,
-        payment_mode: 'full_payment',
-        payment_subject: 'commodity',
-      });
+      const externallyPaidMerchandise =
+        item.unitPrice * item.quantity - item.bonusAllocation;
+      if (externallyPaidMerchandise > 0)
+        items.push({
+          description,
+          quantity: '1.000',
+          amount: {
+            value: externallyPaidMerchandise.toFixed(2),
+            currency: 'RUB',
+          },
+          vat_code: vatCode,
+          payment_mode: 'full_payment',
+          payment_subject: 'commodity',
+        });
 
       if (item.deliveryPrice > 0) {
         items.push({
@@ -291,6 +294,25 @@ export class PaymentsController {
       }
     }
 
+    for (const selection of order.deliverySelections) {
+      if (selection.customerCharge <= 0) continue;
+      items.push({
+        description:
+          `Доставка: ${selection.deliveryQuote.deliveryService.name}`.slice(
+            0,
+            128,
+          ),
+        quantity: '1.000',
+        amount: {
+          value: selection.customerCharge.toFixed(2),
+          currency: 'RUB',
+        },
+        vat_code: vatCode,
+        payment_mode: 'full_payment',
+        payment_subject: 'service',
+      });
+    }
+
     if (items.length > 80) {
       throw new BadRequestException(
         'Order has too many receipt positions (maximum is 80)',
@@ -301,7 +323,7 @@ export class PaymentsController {
       (sum, item) => sum + Number(item.amount.value) * Number(item.quantity),
       0,
     );
-    if (Math.round(receiptTotal * 100) !== order.totalAmount * 100) {
+    if (Math.round(receiptTotal * 100) !== order.externalPaymentAmount * 100) {
       throw new InternalServerErrorException(
         'Receipt total does not match order total',
       );
@@ -320,8 +342,8 @@ export class PaymentsController {
     const succeeded = payment.status === 'succeeded' && payment.paid;
     const canceled = payment.status === 'canceled';
 
-    await this.prismaService.$transaction([
-      this.prismaService.paymentAttempt.update({
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.paymentAttempt.update({
         where: { id: attemptId },
         data: {
           providerPaymentId: payment.id,
@@ -331,8 +353,8 @@ export class PaymentsController {
           cancellationReason: payment.cancellation_details?.reason,
           activeOrderId: canceled ? null : order.id,
         },
-      }),
-      this.prismaService.order.update({
+      });
+      await tx.order.update({
         where: { id: order.id },
         data: {
           yookassaPaymentId: payment.id,
@@ -340,8 +362,19 @@ export class PaymentsController {
             ? { status: OrderStatus.PAID }
             : {}),
         },
-      }),
-    ]);
+      });
+      if (succeeded && order.status === OrderStatus.AWAITING_PAYMENT) {
+        await this.rewardsService.settleSpendingHold(tx, order.id);
+        await this.rewardsService.createPendingForPaidOrder(order.id, tx);
+      }
+      if (canceled) {
+        await this.rewardsService.releaseSpendingHold(
+          tx,
+          order.id,
+          'Provider payment cancelled',
+        );
+      }
+    });
   }
 
   private assertPaymentMatchesOrder(
@@ -361,7 +394,7 @@ export class PaymentsController {
     }
     if (
       payment.amount.currency !== 'RUB' ||
-      payment.amount.value !== order.totalAmount.toFixed(2) ||
+      payment.amount.value !== order.externalPaymentAmount.toFixed(2) ||
       payment.metadata?.orderId !== order.id
     ) {
       throw new BadRequestException('Payment does not match order');
@@ -376,6 +409,27 @@ export class PaymentsController {
       canceled: PaymentAttemptStatus.CANCELED,
     };
     return statuses[status];
+  }
+
+  private async getOwner(
+    authorizationHeader?: string,
+    guestSessionId?: string,
+  ) {
+    const user: unknown =
+      await this.authService.getOptionalMeFromAuthorizationHeader(
+        authorizationHeader,
+      );
+    const userId =
+      user &&
+      typeof user === 'object' &&
+      'id' in user &&
+      typeof user.id === 'string'
+        ? user.id
+        : undefined;
+    return {
+      userId,
+      guestSessionId: userId ? undefined : guestSessionId,
+    };
   }
 
   private toPaymentResponse(payment: YookassaPayment) {

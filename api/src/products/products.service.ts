@@ -4,6 +4,7 @@ import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeProductAdditions } from './product-additions';
 import { resolveEffectiveOversizedStatus } from './oversized-status';
+import { calculateReward } from '../rewards/reward-calculation';
 
 type FindAllProductsParams = {
   categorySlug?: string;
@@ -98,6 +99,7 @@ export class ProductsService {
             image: true,
           },
         },
+        rewardShares: { include: { level: true }, orderBy: { depth: 'asc' } },
       },
       orderBy: this.getOrderBy(params.sort),
     });
@@ -133,6 +135,7 @@ export class ProductsService {
             image: true,
           },
         },
+        rewardShares: { include: { level: true }, orderBy: { depth: 'asc' } },
       },
     });
 
@@ -321,6 +324,15 @@ export class ProductsService {
   }
 
   private mapProduct(product: any, categoryById: Map<string, any>) {
+    const reward = calculateReward({
+      eligibleRevenue: product.price,
+      costBasis: product.purchasePrice,
+      rewardEnabled: product.rewardEnabled,
+      shares: (product.rewardShares ?? []).map((share: any) => ({
+        depth: share.depth,
+        shareBasisPoints: share.shareBasisPoints,
+      })),
+    });
     return {
       id: product.id,
       categoryId: product.categoryId,
@@ -336,6 +348,28 @@ export class ProductsService {
         product.category.isOversized,
       ),
       additions: normalizeProductAdditions(product.additions),
+      rewardPreview: {
+        available: reward.rewardBudget > 0,
+        fundAmount: reward.rewardBudget,
+        priceCategory:
+          product.price <= 10_000
+            ? 'Эконом'
+            : product.price <= 50_000
+              ? 'Стандарт'
+              : 'Премиум',
+        breakdown: reward.distributions
+          .filter((item) => item.amount > 0)
+          .map((item) => ({
+            depth: item.depth,
+            label:
+              item.depth === 0
+                ? 'Ваш кешбэк'
+                : (product.rewardShares.find(
+                    (share: any) => share.depth === item.depth,
+                  )?.level?.name ?? `Партнёр ${item.depth}-го уровня`),
+            amount: item.amount,
+          })),
+      },
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images
