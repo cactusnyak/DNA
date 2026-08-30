@@ -23,6 +23,21 @@ import {
   buildWarehouseOptions,
 } from "../../../../logic/product-logistics-options";
 
+const PACKAGE_TYPE_LABELS: Record<AdminProductPackage["type"], string> = {
+  BOX: "Коробка",
+  PALLET: "Палета",
+  ENVELOPE: "Конверт",
+  CRATE: "Обрешётка",
+  OTHER: "Другое",
+};
+
+const PACKAGE_TYPE_OPTIONS = Object.entries(PACKAGE_TYPE_LABELS).map(
+  ([value, label]) => ({
+    value: value as AdminProductPackage["type"],
+    label,
+  }),
+);
+
 function getStringArray(value: unknown) {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
@@ -318,7 +333,7 @@ export function ProductCrudFields({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-xs">
-                    {item.type}
+                    {PACKAGE_TYPE_LABELS[item.type]}
                   </span>
                   <span
                     className={`truncate text-sm font-medium ${item.name?.trim() ? "" : "text-muted-foreground"}`}
@@ -374,13 +389,7 @@ export function ProductCrudFields({
                     label="Тип"
                     className="sm:col-span-2 lg:col-span-6"
                     value={item.type}
-                    options={[
-                      "BOX",
-                      "PALLET",
-                      "ENVELOPE",
-                      "CRATE",
-                      "OTHER",
-                    ].map((value) => ({ value, label: value }))}
+                    options={PACKAGE_TYPE_OPTIONS}
                     onValueChange={(value) =>
                       updatePackage(index, {
                         type: value as AdminProductPackage["type"],
