@@ -180,6 +180,10 @@ export class AdsService {
     return ads.map((ad) => this.mapAd(ad, categoryById));
   }
 
+  findOwnedById(adId: string, sellerId: string) {
+    return this.getOwnedAdById(adId, sellerId);
+  }
+
   async create(sellerId: string, dto: CreateAdDto) {
     const title = this.getRequiredString(dto.title, 'Ad title is required');
     const categoryId = this.getRequiredString(
@@ -194,37 +198,39 @@ export class AdsService {
       fallback: title,
     });
 
+    const price = this.getPrice(dto.price);
+    const contacts = this.getContacts(dto);
+    const imageUrls = this.getImageUrls(dto.imageUrls);
     const decision = this.adsModerationService.moderateOnCreate({
       title,
       description: contentDescriptionToPlainText(dto.description),
-      price: this.getNumber(dto.price, 0),
+      price,
     });
 
-    const ad = await this.prismaService.ad.create({
-      data: {
-        title,
-        slug,
-        categoryId,
-        sellerId,
-        description: contentDescriptionToJson(dto.description),
-        price: this.getNumber(dto.price, 0),
-        location: locationToJson(dto.location),
-        status: decision.status,
-        moderatedAt: decision.moderatedAt,
-        contactPhone: this.getOptionalString(dto.contactPhone),
-        contactTelegram: this.getOptionalString(dto.contactTelegram),
-        contactEmail: this.getOptionalString(dto.contactEmail),
-        contactOther: this.getOptionalString(dto.contactOther),
-      },
+    const ad = await this.prismaService.$transaction(async (transaction) => {
+      const createdAd = await transaction.ad.create({
+        data: {
+          title,
+          slug,
+          categoryId,
+          sellerId,
+          description: contentDescriptionToJson(dto.description),
+          price,
+          location: locationToJson(dto.location),
+          status: decision.status,
+          moderatedAt: decision.moderatedAt,
+          ...contacts,
+        },
+      });
+      await this.replaceAdImages(transaction, createdAd.id, imageUrls);
+      return createdAd;
     });
-
-    await this.replaceAdImages(ad.id, this.getImageUrls(dto.imageUrls));
 
     return this.getOwnedAdById(ad.id, sellerId);
   }
 
   async update(adId: string, sellerId: string, dto: UpdateAdDto) {
-    const ad = await this.getOwnedAdOrThrow(adId, sellerId);
+    await this.getOwnedAdOrThrow(adId, sellerId);
 
     const title = this.getRequiredString(dto.title, 'Ad title is required');
     const categoryId = this.getRequiredString(
@@ -240,35 +246,38 @@ export class AdsService {
       exceptId: adId,
     });
 
+    const price = this.getPrice(dto.price);
+    const contacts = this.getContacts(dto);
     const decision = this.adsModerationService.moderateOnUpdate({
       title,
       description: contentDescriptionToPlainText(dto.description),
-      price: this.getNumber(dto.price, ad.price),
+      price,
     });
 
-    await this.prismaService.ad.update({
-      where: {
-        id: adId,
-      },
-      data: {
-        title,
-        slug,
-        categoryId,
-        description: contentDescriptionToJson(dto.description),
-        price: this.getNumber(dto.price, ad.price),
-        location: locationToJson(dto.location),
-        status: decision.status,
-        moderatedAt: decision.moderatedAt,
-        contactPhone: this.getOptionalString(dto.contactPhone),
-        contactTelegram: this.getOptionalString(dto.contactTelegram),
-        contactEmail: this.getOptionalString(dto.contactEmail),
-        contactOther: this.getOptionalString(dto.contactOther),
-      },
-    });
+    await this.prismaService.$transaction(async (transaction) => {
+      await transaction.ad.update({
+        where: { id: adId },
+        data: {
+          title,
+          slug,
+          categoryId,
+          description: contentDescriptionToJson(dto.description),
+          price,
+          location: locationToJson(dto.location),
+          status: decision.status,
+          moderatedAt: decision.moderatedAt,
+          ...contacts,
+        },
+      });
 
-    if ('imageUrls' in dto) {
-      await this.replaceAdImages(adId, this.getImageUrls(dto.imageUrls));
-    }
+      if ('imageUrls' in dto) {
+        await this.replaceAdImages(
+          transaction,
+          adId,
+          this.getImageUrls(dto.imageUrls),
+        );
+      }
+    });
 
     return this.getOwnedAdById(adId, sellerId);
   }
@@ -298,6 +307,7 @@ export class AdsService {
       where: {
         id: adId,
         sellerId,
+        deletedAt: null,
       },
       include: this.getAdInclude(),
     });
@@ -492,23 +502,27 @@ export class AdsService {
     });
   }
 
-  private async replaceAdImages(adId: string, imageUrls: string[]) {
-    await this.prismaService.adImage.deleteMany({
-      where: {
-        adId,
-      },
+  private async replaceAdImages(
+    transaction: Prisma.TransactionClient,
+    adId: string,
+    imageUrls: string[],
+  ) {
+    const previousImages = await transaction.adImage.findMany({
+      where: { adId },
+      select: { imageId: true },
     });
+    await transaction.adImage.deleteMany({ where: { adId } });
 
     await Promise.all(
       imageUrls.map(async (url, index) => {
-        const image = await this.prismaService.image.create({
+        const image = await transaction.image.create({
           data: {
             url,
             sortOrder: index,
           },
         });
 
-        return this.prismaService.adImage.create({
+        return transaction.adImage.create({
           data: {
             adId,
             imageId: image.id,
@@ -516,6 +530,19 @@ export class AdsService {
         });
       }),
     );
+
+    if (previousImages.length) {
+      await transaction.image.deleteMany({
+        where: {
+          id: { in: previousImages.map((image) => image.imageId) },
+          ads: { none: {} },
+          products: { none: {} },
+          categories: { none: {} },
+          adCategories: { none: {} },
+          userAvatars: { none: {} },
+        },
+      });
+    }
   }
 
   private getCategoryPath(
@@ -684,19 +711,37 @@ export class AdsService {
     return trimmedValue || undefined;
   }
 
-  private getNumber(value: unknown, fallback: number) {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
+  private getPrice(value: unknown) {
+    const price =
+      typeof value === 'number'
+        ? value
+        : typeof value === 'string' && value.trim()
+          ? Number(value)
+          : Number.NaN;
+    if (!Number.isSafeInteger(price) || price < 0) {
+      throw new BadRequestException(
+        'Ad price must be a non-negative whole-ruble integer',
+      );
     }
+    return price;
+  }
 
-    if (typeof value === 'string' && value.trim()) {
-      const parsedValue = Number(value);
-
-      if (Number.isFinite(parsedValue)) {
-        return parsedValue;
-      }
+  private getContacts(dto: CreateAdDto | UpdateAdDto) {
+    const contacts = {
+      contactPhone: this.getOptionalString(dto.contactPhone),
+      contactTelegram: this.getOptionalString(dto.contactTelegram),
+      contactEmail: this.getOptionalString(dto.contactEmail),
+      contactOther: this.getOptionalString(dto.contactOther),
+    };
+    if (!Object.values(contacts).some(Boolean)) {
+      throw new BadRequestException('At least one ad contact is required');
     }
-
-    return fallback;
+    if (
+      contacts.contactEmail &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacts.contactEmail)
+    ) {
+      throw new BadRequestException('Ad contact email is invalid');
+    }
+    return contacts;
   }
 }

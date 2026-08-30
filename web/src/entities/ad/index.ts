@@ -1,6 +1,7 @@
 export { getAds } from './api/get-ads';
 export { getAd } from './api/get-ad';
 export { getMyAds } from './api/get-my-ads';
+export { getMyAd } from './api/get-my-ad';
 export { createAd } from './api/create-ad';
 export { updateAd } from './api/update-ad';
 export { deleteAd } from './api/delete-ad';

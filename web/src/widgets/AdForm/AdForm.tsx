@@ -2,6 +2,7 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import {
+  FormBooleanField,
   FormImageFilesField,
   FormInputField,
   FormSelectField,
@@ -215,14 +216,6 @@ export function AdForm({
 
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-      <FormInputField
-        name="title"
-        required
-        label="Заголовок"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
-      />
-
       <FormSelectField
         required
         label="Категория"
@@ -232,12 +225,11 @@ export function AdForm({
       />
 
       <FormInputField
-        name="price"
+        name="title"
         required
-        type="number"
-        label="Цена, ₽"
-        value={price}
-        onChange={(event) => setPrice(event.target.value)}
+        label="Заголовок"
+        value={title}
+        onChange={(event) => setTitle(event.target.value)}
       />
 
       <FormTextareaField
@@ -249,46 +241,53 @@ export function AdForm({
         onChange={(event) => setDescription(event.target.value)}
       />
 
-      <fieldset className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card p-5">
-        <legend className="px-1 text-sm font-medium">Геопозиция</legend>
+      <FormInputField
+        name="price"
+        required
+        type="number"
+        min={0}
+        step={1}
+        label="Цена, ₽"
+        value={price}
+        onChange={(event) => setPrice(event.target.value)}
+      />
 
+      <FormInputField
+        name="locationName"
+        label="Геопозиция"
+        caption="Оставьте геопозицию и координаты пустыми, если они не нужны."
+        placeholder="Например, Талдом"
+        value={locationName}
+        onChange={(event) => setLocationName(event.target.value)}
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormInputField
-          name="locationName"
-          label="Название точки"
-          caption="Оставьте весь блок пустым, если геопозиция не нужна."
-          placeholder="Например, Талдом"
-          value={locationName}
-          onChange={(event) => setLocationName(event.target.value)}
+          name="locationLatitude"
+          type="number"
+          inputMode="decimal"
+          min={-90}
+          max={90}
+          step={0.000001}
+          label="Широта"
+          placeholder="56.7308"
+          value={locationLatitude}
+          onChange={(event) => setLocationLatitude(event.target.value)}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <FormInputField
-            name="locationLatitude"
-            type="number"
-            inputMode="decimal"
-            min={-90}
-            max={90}
-            step={0.000001}
-            label="Широта"
-            placeholder="56.7308"
-            value={locationLatitude}
-            onChange={(event) => setLocationLatitude(event.target.value)}
-          />
-
-          <FormInputField
-            name="locationLongitude"
-            type="number"
-            inputMode="decimal"
-            min={-180}
-            max={180}
-            step={0.000001}
-            label="Долгота"
-            placeholder="37.5276"
-            value={locationLongitude}
-            onChange={(event) => setLocationLongitude(event.target.value)}
-          />
-        </div>
-      </fieldset>
+        <FormInputField
+          name="locationLongitude"
+          type="number"
+          inputMode="decimal"
+          min={-180}
+          max={180}
+          step={0.000001}
+          label="Долгота"
+          placeholder="37.5276"
+          value={locationLongitude}
+          onChange={(event) => setLocationLongitude(event.target.value)}
+        />
+      </div>
 
       <FormImageFilesField
         name="images"
@@ -368,17 +367,16 @@ export function AdForm({
         </p>
       </div>
 
-      <label className="flex items-start gap-3 rounded-xl border border-border/80 bg-card p-4 text-sm leading-6">
-        <input
-          name="publicationConsent"
+      <div className="flex items-start gap-3 rounded-xl border border-border/80 bg-card p-4 text-sm leading-6">
+        <FormBooleanField
+          ariaLabel="Согласие на публикацию выбранных контактов"
           required
-          type="checkbox"
           checked={publicationConsent}
-          className="mt-1 size-4"
-          onChange={(event) => setPublicationConsent(event.target.checked)}
+          className="mt-1"
+          onCheckedChange={setPublicationConsent}
         />
         <LegalFormNotice kind="publication" />
-      </label>
+      </div>
 
       <LegalFormNotice />
 
@@ -424,15 +422,21 @@ function ContactVisibility({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <label className="-mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-      <input
-        name="contactVisibility"
-        type="checkbox"
+    <div className="-mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+      <FormBooleanField
+        ariaLabel={label}
         checked={checked}
         disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
+        onCheckedChange={onChange}
       />
-      {label}
-    </label>
+      <button
+        type="button"
+        disabled={disabled}
+        className="cursor-pointer text-left disabled:cursor-not-allowed"
+        onClick={() => onChange(!checked)}
+      >
+        {label}
+      </button>
+    </div>
   );
 }

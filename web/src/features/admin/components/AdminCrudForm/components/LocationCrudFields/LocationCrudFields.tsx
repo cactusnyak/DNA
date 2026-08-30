@@ -8,20 +8,18 @@ import type {
 type LocationCrudFieldsProps = {
   values: AdminCrudFormValues;
   onValueChange: AdminCrudUpdateValue;
-  plain?: boolean;
 };
 
 export function LocationCrudFields({
   values,
   onValueChange,
-  plain = false,
 }: LocationCrudFieldsProps) {
-  const fields = (
+  return (
     <>
       <FormInputField
         name="locationName"
-        label="Название точки"
-        caption="Оставьте весь блок пустым, если геопозиция не нужна."
+        label="Геопозиция"
+        caption="Оставьте геопозицию и координаты пустыми, если они не нужны."
         value={String(values.locationName ?? '')}
         onChange={(event) => onValueChange('locationName', event.target.value)}
       />
@@ -56,16 +54,5 @@ export function LocationCrudFields({
         />
       </div>
     </>
-  );
-
-  if (plain) {
-    return fields;
-  }
-
-  return (
-    <fieldset className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card p-5">
-      <legend className="px-1 text-sm font-medium">Геопозиция</legend>
-      {fields}
-    </fieldset>
   );
 }

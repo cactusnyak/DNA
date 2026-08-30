@@ -589,7 +589,7 @@ export function ProductCrudFields({
         onChange={(event) => onValueChange("description", event.target.value)}
       />
 
-      <LocationCrudFields plain values={values} onValueChange={onValueChange} />
+      <LocationCrudFields values={values} onValueChange={onValueChange} />
 
       <FormImageFilesField
         name="images"
