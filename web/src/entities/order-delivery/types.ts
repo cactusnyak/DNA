@@ -81,6 +81,8 @@ export type OrderDeliveryState = {
     automatedDeliveryAmount: number;
     deliveryAmount: number;
     totalAmount: number;
+    bonusDiscount: number;
+    externalPaymentAmount: number;
     currency: 'RUB';
     version: number;
   };

@@ -3503,6 +3503,29 @@ async function importProduct(params: {
         },
       });
 
+  const rewardLevels = await prisma.rewardProgramLevel.findMany({
+    where: { isActive: true },
+    orderBy: { depth: 'asc' },
+  });
+  const rewardShares = [
+    { depth: 0, shareBasisPoints: 1000, levelId: null as string | null },
+    ...rewardLevels.map((level) => ({
+      depth: level.depth,
+      shareBasisPoints:
+        level.depth === 1 ? 6000 : level.depth === 2 ? 3000 : 0,
+      levelId: level.id,
+    })),
+  ];
+  for (const share of rewardShares) {
+    await prisma.productRewardShare.upsert({
+      where: {
+        productId_depth: { productId: product.id, depth: share.depth },
+      },
+      create: { productId: product.id, ...share },
+      update: { levelId: share.levelId },
+    });
+  }
+
   await replaceProductImages({
     productId: product.id,
     title,

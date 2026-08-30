@@ -44,4 +44,10 @@ export type Product = {
   createdAt: string;
   updatedAt: string;
   images: Image[];
+  rewardPreview: {
+    available: boolean;
+    fundAmount: number;
+    priceCategory: 'Эконом' | 'Стандарт' | 'Премиум';
+    breakdown: Array<{ depth: number; label: string; amount: number }>;
+  };
 };

@@ -5,6 +5,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { StorageModule } from '../storage/storage.module';
 import { UsersModule } from '../users/users.module';
 import { DeliveryProvidersModule } from '../delivery-providers/delivery-providers.module';
+import { RewardsModule } from '../rewards/rewards.module';
 
 import { AdminAdCategoriesController } from './admin-ad-categories.controller';
 import { AdminAdsController } from './admin-ads.controller';
@@ -26,6 +27,7 @@ import { AdminUsersController } from './admin-users.controller';
 import { AdminUsersService } from './admin-users.service';
 import { AdminLogisticsController } from './admin-logistics.controller';
 import { AdminLogisticsService } from './admin-logistics.service';
+import { AdminRewardsController } from './admin-rewards.controller';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { AdminLogisticsService } from './admin-logistics.service';
     UsersModule,
     StorageModule,
     DeliveryProvidersModule,
+    RewardsModule,
   ],
   controllers: [
     AdminOverviewController,
@@ -47,6 +50,7 @@ import { AdminLogisticsService } from './admin-logistics.service';
     AdminAdsController,
     AdminUsersController,
     AdminLogisticsController,
+    AdminRewardsController,
   ],
   providers: [
     AdminService,

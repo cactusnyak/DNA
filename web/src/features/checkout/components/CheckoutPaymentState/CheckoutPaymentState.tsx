@@ -13,6 +13,7 @@ import { useSessionStore } from '@/entities/session';
 import { OrderDetailsTable } from './components/OrderDetailsTable';
 import { PaymentActions } from './components/PaymentActions';
 import { DeliveryWidget } from '../DeliveryWidget';
+import { BonusBalanceControl } from '../BonusBalanceControl';
 
 declare global {
   interface Window {
@@ -161,10 +162,39 @@ export function CheckoutPaymentState({
           order={currentOrder}
           onOrderChange={setCurrentOrder}
         />
+        {accessToken && (
+          <BonusBalanceControl
+            accessToken={accessToken}
+            orderId={currentOrder.id}
+            currentAmount={currentOrder.bonusDiscount}
+            onApplied={(result) =>
+              setCurrentOrder((value) => ({
+                ...value,
+                bonusDiscount: result.appliedAmount,
+                externalPaymentAmount: result.externalPaymentAmount,
+                delivery: {
+                  ...value.delivery,
+                  pricing: {
+                    ...value.delivery.pricing,
+                    bonusDiscount: result.appliedAmount,
+                    externalPaymentAmount: result.externalPaymentAmount,
+                    version: result.pricingVersion,
+                  },
+                },
+              }))
+            }
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-3 pt-4 border-t border-primary/8">
-        <OrderTotal amount={currentOrder.delivery.pricing.totalAmount} />
+        {currentOrder.bonusDiscount > 0 && (
+          <div className="grid gap-1 text-sm">
+            <p className="flex justify-between"><span>Стоимость заказа</span><span>{currentOrder.delivery.pricing.totalAmount} ₽</span></p>
+            <p className="flex justify-between text-primary"><span>Скидка бонусами</span><span>−{currentOrder.bonusDiscount} ₽</span></p>
+          </div>
+        )}
+        <OrderTotal amount={currentOrder.externalPaymentAmount} />
 
         <div className="flex flex-col gap-3">
           {stage !== 'widget' && (

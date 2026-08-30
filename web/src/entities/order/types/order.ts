@@ -16,6 +16,8 @@ export type Order = OrderCustomer & {
   };
   items: OrderItem[];
   totalAmount: number;
+  bonusDiscount: number;
+  externalPaymentAmount: number;
   delivery: OrderDeliveryState;
   createdAt: string;
   updatedAt: string;

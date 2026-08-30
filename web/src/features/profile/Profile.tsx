@@ -23,6 +23,7 @@ import { ProfileEditModal } from './components/ProfileEditModal/ProfileEditModal
 import { ProfileOrdersCard } from './components/ProfileOrdersCard';
 import { ProfileSessionErrorState } from './components/ProfileSessionErrorState';
 import { ProfileUnauthorizedState } from './components/ProfileUnauthorizedState';
+import { BalanceHistory } from './components/BalanceHistory';
 
 export function Profile() {
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -158,6 +159,7 @@ export function Profile() {
         isPending={isOrdersPending}
         isError={isOrdersError}
       />
+      <BalanceHistory accessToken={accessToken} />
 
       <ProfileEditModal
         key={`${user.id}:${isEditModalOpen}`}

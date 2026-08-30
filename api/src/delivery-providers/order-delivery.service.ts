@@ -490,7 +490,7 @@ export class OrderDeliveryService {
           (attempt) => attempt.activeOrderId === order.id,
         );
         if (existing) {
-          if (existing.amount !== order.totalAmount)
+          if (existing.amount !== order.externalPaymentAmount)
             throw new ConflictException(
               'Сумма заказа изменилась после начала оплаты.',
             );
@@ -501,7 +501,7 @@ export class OrderDeliveryService {
             orderId: order.id,
             activeOrderId: order.id,
             idempotenceKey: randomUUID(),
-            amount: order.totalAmount,
+            amount: order.externalPaymentAmount,
           },
         });
       },
@@ -796,6 +796,8 @@ export class OrderDeliveryService {
       })),
       pricing: {
         ...calculatedPricing,
+        bonusDiscount: order.bonusDiscount,
+        externalPaymentAmount: order.externalPaymentAmount,
         currency: 'RUB',
         version: order.pricingVersion,
       },
@@ -871,15 +873,25 @@ export class OrderDeliveryService {
   }
 
   private async reprice(tx: Prisma.TransactionClient, orderId: string) {
-    const [items, selections] = await Promise.all([
+    const [items, selections, order] = await Promise.all([
       tx.orderItem.findMany({ where: { orderId } }),
       tx.orderDeliverySelection.findMany({ where: { orderId } }),
+      tx.order.findUnique?.({
+        where: { id: orderId },
+        select: { bonusDiscount: true },
+      }) ?? Promise.resolve(null),
     ]);
     const totalAmount = calculateOrderPricing(
       items,
       selections.map((selection) => selection.customerCharge),
     ).totalAmount;
-    await tx.order.update({ where: { id: orderId }, data: { totalAmount } });
+    await tx.order.update({
+      where: { id: orderId },
+      data: {
+        totalAmount,
+        externalPaymentAmount: totalAmount - (order?.bonusDiscount ?? 0),
+      },
+    });
   }
 
   private loadOrder(

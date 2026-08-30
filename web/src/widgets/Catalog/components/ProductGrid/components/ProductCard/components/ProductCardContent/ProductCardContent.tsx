@@ -7,6 +7,7 @@ import {
 } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
+import { RewardPreview } from '@/components/RewardPreview';
 
 type ProductCardContentProps = {
   section: PlatformSectionId;
@@ -35,6 +36,7 @@ export function ProductCardContent({
   return (
     <div className="flex flex-1 flex-col p-2">
       <p className="text-xl font-bold">{formatPrice(product.price)}</p>
+      <RewardPreview preview={product.rewardPreview} compact />
 
       <div className="mt-2">
         <h3 className="line-clamp-2 font-semibold">{product.title}</h3>

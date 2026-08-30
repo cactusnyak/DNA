@@ -37,6 +37,38 @@ enum PaymentAttemptStatus {
   CANCELED
 }
 
+enum RewardType {
+  BUYER_CASHBACK
+  REFERRAL
+}
+
+enum RewardStatus {
+  PENDING
+  AVAILABLE
+  CANCELLED
+  PARTIALLY_REVERSED
+  REVERSED
+}
+
+enum BalanceOperationType {
+  REWARD_PENDING
+  REWARD_RELEASE
+  REWARD_CANCEL
+  REWARD_REVERSE
+  REWARD_DEBT_REPAYMENT
+  BONUS_HOLD
+  BONUS_HOLD_RELEASE
+  BONUS_SPEND
+  ADMIN_ADJUSTMENT
+}
+
+enum BonusSpendingHoldStatus {
+  ACTIVE
+  SETTLED
+  RELEASED
+  EXPIRED
+}
+
 enum OversizedDeliveryQuoteStatus {
   PENDING
   QUOTED
@@ -149,7 +181,7 @@ model User {
   patronymic     String?
   phone          String?
   currentAddress String?
-  referralCode   String?
+  referralCode   String? @unique
 
   avatarId String?
   avatar   Image?  @relation("UserAvatar", fields: [avatarId], references: [id])
@@ -163,9 +195,12 @@ model User {
   deliveryQuotes          DeliveryQuote[]
   shipmentStatusEvents    ShipmentStatusEvent[]    @relation("ShipmentStatusActor")
 
-  invitedReferrals Referral[] @relation("Inviter")
-  receivedReferral Referral?  @relation("Invited")
-  balance          Balance?
+  invitedReferrals   Referral[]          @relation("Inviter")
+  receivedReferral   Referral?           @relation("Invited")
+  balance            Balance?
+  rewardRecipients   ReferralReward[]    @relation("RewardRecipient")
+  balanceOperations  BalanceOperation[]
+  bonusSpendingHolds BonusSpendingHold[]
 
   @@unique([oauthProvider, oauthProviderId])
   @@index([phone])
@@ -230,10 +265,13 @@ model Favourite {
 }
 
 model Balance {
-  id       String   @id @default(uuid())
-  userId   String   @unique
-  value    Int
-  currency Currency @default(RUB)
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  value              Int
+  pendingRewardValue Int      @default(0)
+  spendingHoldValue  Int      @default(0)
+  debtValue          Int      @default(0)
+  currency           Currency @default(RUB)
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -285,6 +323,7 @@ model Product {
   price               Int
   sku                 String?  @unique
   purchasePrice       Int?
+  rewardEnabled       Boolean  @default(false)
   additions           Json?    @db.JsonB
   location            Json?    @db.JsonB
   isOversizedOverride Boolean?
@@ -307,6 +346,7 @@ model Product {
   shippingProfile         ProductShippingProfile?
   warehouses              ProductWarehouse[]
   deliveryServices        ProductDeliveryService[]
+  rewardShares            ProductRewardShare[]
 }
 
 model AdCategory {
@@ -407,11 +447,13 @@ model Order {
   deliveryAddress     String
   deliveryDestination Json?   @db.JsonB
 
-  status            OrderStatus @default(CREATED)
-  totalAmount       Int
-  deliveryVersion   Int         @default(1)
-  pricingVersion    Int         @default(1)
-  yookassaPaymentId String?
+  status                OrderStatus @default(CREATED)
+  totalAmount           Int
+  deliveryVersion       Int         @default(1)
+  pricingVersion        Int         @default(1)
+  yookassaPaymentId     String?
+  bonusDiscount         Int         @default(0)
+  externalPaymentAmount Int         @default(0)
 
   archivedAt       DateTime?
   archivedByUserId String?
@@ -426,7 +468,9 @@ model Order {
   deliveryQuotes     DeliveryQuote[]
   deliverySelections OrderDeliverySelection[]
 
-  referralRewards ReferralReward[]
+  referralRewards   ReferralReward[]
+  balanceOperations BalanceOperation[]
+  bonusSpendingHold BonusSpendingHold?
 }
 
 model PaymentAttempt {
@@ -450,23 +494,27 @@ model PaymentAttempt {
 }
 
 model OrderItem {
-  id                String  @id @default(uuid())
-  orderId           String
-  productId         String
-  productTitle      String?
-  quantity          Int
-  baseUnitPrice     Int
-  unitPrice         Int
-  selectedAdditions Json?   @db.JsonB
-  isOversized       Boolean @default(false)
-  deliveryQuoteId   String? @unique
-  deliveryPrice     Int     @default(0)
-  deliverySnapshot  Json?   @db.JsonB
+  id                   String  @id @default(uuid())
+  orderId              String
+  productId            String
+  productTitle         String?
+  quantity             Int
+  baseUnitPrice        Int
+  unitPrice            Int
+  selectedAdditions    Json?   @db.JsonB
+  isOversized          Boolean @default(false)
+  deliveryQuoteId      String? @unique
+  deliveryPrice        Int     @default(0)
+  deliverySnapshot     Json?   @db.JsonB
+  bonusAllocation      Int     @default(0)
+  rewardCostSnapshot   Int?
+  rewardPolicySnapshot Json?   @db.JsonB
 
-  order         Order                   @relation(fields: [orderId], references: [id])
-  product       Product                 @relation(fields: [productId], references: [id])
-  deliveryQuote OversizedDeliveryQuote? @relation(fields: [deliveryQuoteId], references: [id])
-  shipmentItems ShipmentItem[]
+  order           Order                   @relation(fields: [orderId], references: [id])
+  product         Product                 @relation(fields: [productId], references: [id])
+  deliveryQuote   OversizedDeliveryQuote? @relation(fields: [deliveryQuoteId], references: [id])
+  shipmentItems   ShipmentItem[]
+  referralRewards ReferralReward[]
 }
 
 model ProductShippingProfile {
@@ -827,14 +875,106 @@ model Referral {
 }
 
 model ReferralReward {
-  id         String   @id @default(uuid())
-  referralId String
-  orderId    String
-  amount     Int
-  createdAt  DateTime @default(now())
+  id                  String       @id @default(uuid())
+  referralId          String?
+  orderId             String
+  orderItemId         String?
+  recipientUserId     String?
+  type                RewardType?
+  levelDepth          Int?
+  amount              Int
+  reversedAmount      Int          @default(0)
+  status              RewardStatus @default(PENDING)
+  policyVersion       Int?
+  calculationSnapshot Json?        @db.JsonB
+  availableAt         DateTime?
+  cancelledAt         DateTime?
+  reversedAt          DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
-  referral Referral @relation(fields: [referralId], references: [id])
-  order    Order    @relation(fields: [orderId], references: [id])
+  referral  Referral?  @relation(fields: [referralId], references: [id], onDelete: Restrict)
+  order     Order      @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderItem OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  recipient User?      @relation("RewardRecipient", fields: [recipientUserId], references: [id], onDelete: Restrict)
+
+  @@unique([orderItemId, recipientUserId, type, levelDepth])
+  @@index([recipientUserId, status, createdAt])
+  @@index([orderId, status])
+}
+
+model RewardProgramLevel {
+  id            String   @id @default(uuid())
+  depth         Int      @unique
+  name          String
+  isActive      Boolean  @default(true)
+  configVersion Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  productShares ProductRewardShare[]
+}
+
+model ProductRewardShare {
+  id               String   @id @default(uuid())
+  productId        String
+  levelId          String?
+  depth            Int
+  shareBasisPoints Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  level   RewardProgramLevel? @relation(fields: [levelId], references: [id], onDelete: Restrict)
+
+  @@unique([productId, depth])
+  @@index([levelId])
+}
+
+model BalanceOperation {
+  id             String               @id @default(uuid())
+  userId         String
+  orderId        String?
+  rewardId       String?
+  holdId         String?
+  type           BalanceOperationType
+  amount         Int
+  activeDelta    Int                  @default(0)
+  pendingDelta   Int                  @default(0)
+  holdDelta      Int                  @default(0)
+  debtDelta      Int                  @default(0)
+  currency       Currency             @default(RUB)
+  idempotencyKey String               @unique
+  reason         String?
+  actorUserId    String?
+  metadata       Json?                @db.JsonB
+  createdAt      DateTime             @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt, id])
+  @@index([orderId])
+  @@index([rewardId])
+}
+
+model BonusSpendingHold {
+  id             String                  @id @default(uuid())
+  userId         String
+  orderId        String                  @unique
+  amount         Int
+  status         BonusSpendingHoldStatus @default(ACTIVE)
+  pricingVersion Int
+  expiresAt      DateTime
+  settledAt      DateTime?
+  releasedAt     DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status, expiresAt])
 }
 
 model CatalogCollection {

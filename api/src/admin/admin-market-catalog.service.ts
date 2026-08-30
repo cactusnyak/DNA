@@ -29,6 +29,10 @@ const ADMIN_PRODUCT_INCLUDE = {
   deliveryServices: {
     include: { deliveryService: { include: { provider: true } } },
   },
+  rewardShares: {
+    include: { level: true },
+    orderBy: { depth: 'asc' as const },
+  },
 } satisfies Prisma.ProductInclude;
 
 type AdminProductRecord = Prisma.ProductGetPayload<{
@@ -37,12 +41,12 @@ type AdminProductRecord = Prisma.ProductGetPayload<{
 
 type AdminProductViewRecord = Omit<
   AdminProductRecord,
-  'shippingProfile' | 'warehouses' | 'deliveryServices'
+  'shippingProfile' | 'warehouses' | 'deliveryServices' | 'rewardShares'
 > &
   Partial<
     Pick<
       AdminProductRecord,
-      'shippingProfile' | 'warehouses' | 'deliveryServices'
+      'shippingProfile' | 'warehouses' | 'deliveryServices' | 'rewardShares'
     >
   >;
 
@@ -170,6 +174,10 @@ export class AdminMarketCatalogService {
           payload.purchasePrice,
           'Purchase price',
         ),
+        rewardEnabled: this.adminInputService.getBoolean(
+          payload.rewardEnabled,
+          false,
+        ),
         location: locationToJson(payload.location),
         additions: productAdditionsToJson(
           normalizeProductAdditions(payload.additions),
@@ -186,6 +194,7 @@ export class AdminMarketCatalogService {
       this.adminInputService.getImageUrls(payload),
     );
     await this.replaceProductLogistics(product.id, payload);
+    await this.replaceProductRewards(product.id, payload);
 
     return this.getAdminProductById(product.id);
   }
@@ -225,6 +234,10 @@ export class AdminMarketCatalogService {
             payload.purchasePrice,
             'Purchase price',
           ),
+          rewardEnabled: this.adminInputService.getBoolean(
+            payload.rewardEnabled,
+            false,
+          ),
           location: locationToJson(payload.location),
           additions: productAdditionsToJson(
             normalizeProductAdditions(payload.additions),
@@ -236,6 +249,7 @@ export class AdminMarketCatalogService {
         },
       });
       await this.replaceProductLogistics(id, payload, transaction);
+      await this.replaceProductRewards(id, payload, transaction);
     });
 
     if ('imageUrls' in payload) {
@@ -809,6 +823,14 @@ export class AdminMarketCatalogService {
       price: product.price,
       sku: product.sku,
       purchasePrice: product.purchasePrice,
+      rewardEnabled: product.rewardEnabled,
+      rewardShares: product.rewardShares ?? [],
+      rewardConfigVersion: Math.max(
+        1,
+        ...(product.rewardShares ?? []).map(
+          (share) => share.level?.configVersion ?? 1,
+        ),
+      ),
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
       isOversizedOverride: product.isOversizedOverride,
@@ -831,6 +853,92 @@ export class AdminMarketCatalogService {
             firstImage.sortOrder - secondImage.sortOrder,
         ),
     };
+  }
+
+  private async replaceProductRewards(
+    productId: string,
+    payload: Record<string, unknown>,
+    tx: Prisma.TransactionClient | PrismaService = this.prismaService,
+  ) {
+    const levels = await tx.rewardProgramLevel.findMany({
+      where: { isActive: true },
+      orderBy: { depth: 'asc' },
+    });
+    const currentVersion = Math.max(
+      1,
+      ...levels.map((level) => level.configVersion),
+    );
+    const submittedVersion = this.adminInputService.getNumber(
+      payload.rewardConfigVersion,
+      currentVersion,
+    );
+    if (submittedVersion !== currentVersion) {
+      throw new BadRequestException(
+        'Reward-level configuration changed. Reload the product form.',
+      );
+    }
+
+    const submitted =
+      Array.isArray(payload.rewardShares) && payload.rewardShares.length > 0
+        ? payload.rewardShares.map((raw) =>
+            this.adminInputService.getObjectBody(raw),
+          )
+        : undefined;
+    const defaults = [
+      { depth: 0, shareBasisPoints: 1000 },
+      ...levels.map((level) => ({
+        depth: level.depth,
+        shareBasisPoints:
+          level.depth === 1 ? 6000 : level.depth === 2 ? 3000 : 0,
+      })),
+    ];
+    const shares = submitted
+      ? submitted.map((share) => ({
+          depth: Math.trunc(this.adminInputService.getNumber(share.depth, -1)),
+          shareBasisPoints: Math.trunc(
+            'shareBasisPoints' in share
+              ? this.adminInputService.getNumber(share.shareBasisPoints, -1)
+              : this.adminInputService.getNumber(share.sharePercent, -1) * 100,
+          ),
+        }))
+      : defaults;
+    const expectedDepths = new Set([0, ...levels.map((level) => level.depth)]);
+    if (
+      shares.length !== expectedDepths.size ||
+      new Set(shares.map((share) => share.depth)).size !== shares.length ||
+      shares.some(
+        (share) =>
+          !expectedDepths.has(share.depth) ||
+          share.shareBasisPoints < 0 ||
+          share.shareBasisPoints > 10_000,
+      )
+    ) {
+      throw new BadRequestException(
+        'Reward shares do not match active level configuration',
+      );
+    }
+    if (
+      shares.reduce((sum, share) => sum + share.shareBasisPoints, 0) > 10_000
+    ) {
+      throw new BadRequestException('Reward shares must not exceed 100%');
+    }
+
+    for (const share of shares) {
+      const level = levels.find((item) => item.depth === share.depth);
+      await tx.productRewardShare.upsert({
+        where: { productId_depth: { productId, depth: share.depth } },
+        create: {
+          productId,
+          levelId: level?.id,
+          depth: share.depth,
+          shareBasisPoints: share.shareBasisPoints,
+        },
+        update: {
+          levelId: level?.id,
+          shareBasisPoints: share.shareBasisPoints,
+        },
+      });
+    }
   }
 
   private async replaceProductLogistics(

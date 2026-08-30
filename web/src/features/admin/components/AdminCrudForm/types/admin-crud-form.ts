@@ -44,6 +44,7 @@ export type AdminCrudFormValue =
   | string[]
   | ProductAddition[]
   | AdminProductPackage[]
+  | Array<{ depth: number; shareBasisPoints: number }>
   | null;
 
 export type AdminCrudFormValues = Record<string, AdminCrudFormValue>;

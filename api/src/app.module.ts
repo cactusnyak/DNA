@@ -18,6 +18,7 @@ import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ReferralsModule } from './referrals/referrals.module';
+import { RewardsModule } from './rewards/rewards.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     ReferralsModule,
+    RewardsModule,
     AdminModule,
   ],
   controllers: [AppController],

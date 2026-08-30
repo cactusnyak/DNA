@@ -14,6 +14,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminInputService } from './admin-input.service';
 import { OrderDeliveryInvalidationService } from '../delivery-providers/order-delivery-invalidation.service';
+import { RewardsService } from '../rewards/rewards.service';
 
 const WAREHOUSE_REQUIRED_FIELDS = [
   'country',
@@ -42,6 +43,7 @@ export class AdminLogisticsService {
     private readonly prisma: PrismaService,
     private readonly input: AdminInputService,
     private readonly deliveryInvalidation?: OrderDeliveryInvalidationService,
+    private readonly rewardsService?: RewardsService,
   ) {}
 
   async getConfiguration() {
@@ -325,6 +327,64 @@ export class AdminLogisticsService {
     if (!item) throw new NotFoundException('Shipment not found');
     const safe = { ...item, providerMetadata: undefined };
     return safe;
+  }
+
+  async updateShipmentStatus(id: string, body: unknown, actorUserId?: string) {
+    const payload = this.input.getObjectBody(body);
+    const nextStatus = this.enumValue(ShipmentStatus, payload.status);
+    if (!nextStatus) throw new BadRequestException('Invalid shipment status');
+    const shipment = await this.prisma.shipment.findUnique({ where: { id } });
+    if (!shipment) throw new NotFoundException('Shipment not found');
+    const terminal = new Set<ShipmentStatus>([
+      ShipmentStatus.DELIVERED,
+      ShipmentStatus.CANCELLED,
+      ShipmentStatus.RETURNED,
+    ]);
+    if (terminal.has(shipment.status) && shipment.status !== nextStatus) {
+      throw new BadRequestException(
+        'Terminal shipment status cannot be changed directly',
+      );
+    }
+    await this.prisma.$transaction(async (tx) => {
+      await tx.shipment.update({
+        where: { id },
+        data: {
+          status: nextStatus,
+          deliveredAt:
+            nextStatus === ShipmentStatus.DELIVERED ? new Date() : undefined,
+          cancelledAt:
+            nextStatus === ShipmentStatus.CANCELLED ? new Date() : undefined,
+        },
+      });
+      await tx.shipmentStatusEvent.create({
+        data: {
+          shipmentId: id,
+          previousStatus: shipment.status,
+          status: nextStatus,
+          source: 'ADMIN',
+          actorUserId,
+        },
+      });
+    });
+    const active = await this.prisma.shipment.findMany({
+      where: {
+        orderId: shipment.orderId,
+        status: { not: ShipmentStatus.CANCELLED },
+      },
+      select: { status: true },
+    });
+    if (
+      active.length > 0 &&
+      active.every((item) => item.status === ShipmentStatus.DELIVERED)
+    ) {
+      const order = await this.prisma.order.findUniqueOrThrow({
+        where: { id: shipment.orderId },
+      });
+      if (order.status === 'PAID' || order.status === 'SHIPPED') {
+        await this.rewardsService?.releaseOrderRewards(order.id, true);
+      }
+    }
+    return this.getShipment(id);
   }
 
   private async parseWarehouse(body: unknown, id?: string) {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Settings2, X } from "lucide-react";
 
 import {
@@ -10,7 +11,9 @@ import {
   FormToggleField,
 } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import type { AdminProductPackage } from "@/entities/admin";
+import { getAdminRewardConfiguration, getAdminRewardPreview, type AdminProductPackage } from "@/entities/admin";
+import { formatPrice } from "@/shared/utils/format-price";
+import { useAuthStore } from "@/entities/auth";
 import type { AdminCrudFieldsProps } from "../../types/admin-crud-form";
 import type { ProductAddition } from "@/entities/product";
 import { ProductAdditionsFields } from "../ProductAdditionsFields";
@@ -63,6 +66,60 @@ export function ProductCrudFields({
   );
   const warehouseIds = getStringArray(values.warehouseIds);
   const serviceIds = getStringArray(values.deliveryServiceIds);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const rewardConfiguration = useQuery({
+    queryKey: ["admin-reward-configuration"],
+    queryFn: () => getAdminRewardConfiguration(accessToken ?? ""),
+    enabled: Boolean(accessToken),
+  });
+  const configuredShares = Array.isArray(values.rewardShares)
+    ? (values.rewardShares as Array<{ depth: number; shareBasisPoints: number }>)
+    : [];
+  const rewardRows = [
+    { depth: 0, name: "L0 · Кешбэк покупателя", defaultShare: 1000 },
+    ...(rewardConfiguration.data?.levels ?? []).map((level) => ({
+      depth: level.depth,
+      name: `L${level.depth} · ${level.name}`,
+      defaultShare: level.depth === 1 ? 6000 : level.depth === 2 ? 3000 : 0,
+    })),
+  ];
+  const effectiveShares = rewardRows.map((row) => ({
+    depth: row.depth,
+    shareBasisPoints:
+      configuredShares.find((share) => share.depth === row.depth)?.shareBasisPoints ?? row.defaultShare,
+  }));
+  const totalRewardShare = effectiveShares.reduce((sum, share) => sum + share.shareBasisPoints, 0);
+  const rewardPreview = useQuery({
+    queryKey: [
+      "admin-reward-preview",
+      values.price,
+      values.purchasePrice,
+      values.rewardEnabled,
+      effectiveShares,
+    ],
+    queryFn: () =>
+      getAdminRewardPreview(accessToken ?? "", {
+        price: Math.trunc(Number(values.price) || 0),
+        costBasis: String(values.purchasePrice ?? "").trim()
+          ? Math.trunc(Number(values.purchasePrice))
+          : null,
+        rewardEnabled: Boolean(values.rewardEnabled),
+        shares: effectiveShares,
+      }),
+    enabled: Boolean(accessToken) && totalRewardShare <= 10_000,
+  });
+
+  const updateRewardShare = (depth: number, percent: number) => {
+    onValueChange(
+      "rewardShares",
+      effectiveShares.map((share) =>
+        share.depth === depth
+          ? { ...share, shareBasisPoints: Math.max(0, Math.min(10_000, Math.trunc(percent * 100))) }
+          : share,
+      ),
+    );
+    onValueChange("rewardConfigVersion", String(rewardConfiguration.data?.version ?? 1));
+  };
 
   const warehouseOptions = buildWarehouseOptions(warehouses, warehouseIds);
 
@@ -144,6 +201,52 @@ export function ProductCrudFields({
             value={String(values.sku ?? "")}
             onChange={(event) => onValueChange("sku", event.target.value)}
           />
+          <FormToggleField
+            label="Начислять бонусы за товар"
+            checked={Boolean(values.rewardEnabled)}
+            onCheckedChange={(value) => onValueChange("rewardEnabled", value)}
+          />
+          <section className="rounded-2xl border border-border/80 p-4">
+            <h3 className="text-sm font-medium">Распределение бонусного фонда</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Проценты от фонда BV. Нераспределённая часть остаётся платформе.
+            </p>
+            {rewardConfiguration.isPending && <p className="mt-3 text-sm">Загружаем уровни…</p>}
+            {rewardConfiguration.isError && <p className="mt-3 text-sm text-dangerous">Не удалось загрузить конфигурацию уровней.</p>}
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {rewardRows.map((row) => {
+                const share = effectiveShares.find((item) => item.depth === row.depth);
+                return (
+                  <FormInputField
+                    key={row.depth}
+                    name={`rewardShare${row.depth}`}
+                    type="number"
+                    min={0}
+                    max={100}
+                    label={`${row.name}, %`}
+                    value={String((share?.shareBasisPoints ?? 0) / 100)}
+                    onChange={(event) => updateRewardShare(row.depth, Number(event.target.value))}
+                  />
+                );
+              })}
+            </div>
+            <p className={`mt-3 text-sm ${totalRewardShare > 10_000 ? "text-dangerous" : "text-muted-foreground"}`}>
+              Распределено: {(totalRewardShare / 100).toFixed(2)}% / 100%
+            </p>
+            {rewardPreview.data && (
+              <div className="mt-3 rounded-xl bg-primary/5 p-3 text-sm">
+                <p className="font-medium">Бонусный фонд: {formatPrice(rewardPreview.data.rewardBudget)}</p>
+                <ul className="mt-2 grid gap-1 text-muted-foreground">
+                  {rewardPreview.data.distributions.filter((item) => item.amount > 0).map((item) => (
+                    <li key={item.depth}>L{item.depth}: {formatPrice(item.amount)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {Boolean(values.rewardEnabled) && (!String(values.purchasePrice ?? "").trim() || Number(values.purchasePrice) <= 0) && (
+              <p className="mt-2 text-sm text-warning">Без положительной закупочной стоимости награда будет равна нулю.</p>
+            )}
+          </section>
           <FormInputField
             name="purchasePrice"
             type="number"

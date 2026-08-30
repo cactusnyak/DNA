@@ -16,7 +16,7 @@ export const referralEarningCategories: ReferralEarningCategory[] = [
     details: {
       title: 'Личный кешбэк',
       paragraphs: [
-        'Кешбэк в DNA Маркете пока не начисляется. Условия, ставки и порядок начисления будут опубликованы перед запуском.',
+        'За отмеченные товары покупателю начисляется бонус, а участникам его партнёрской цепочки — вознаграждение согласно уровням товара. Начисление становится доступным после доставки заказа.',
       ],
       examples: [],
     },
@@ -40,7 +40,7 @@ export const referralEarningCategories: ReferralEarningCategory[] = [
     id: 'drop-income',
     title: 'Дроп-доход',
     shortTitle: 'Дроп',
-    description: 'Программа для поставщиков и товаров пока не запущена.',
+    description: 'Размер бонусного фонда и распределение по уровням задаются отдельно для каждого товара.',
     icon: PackagePlus,
     details: {
       title: 'Дроп-доход',

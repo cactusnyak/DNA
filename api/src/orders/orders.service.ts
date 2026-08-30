@@ -18,6 +18,7 @@ import {
   type SelectedProductAddition,
 } from '../products/product-additions';
 import { normalizeRussianPhone } from '../delivery-providers/utils/logistics-units';
+import { RewardsService } from '../rewards/rewards.service';
 
 import type {
   CreateOrderDto,
@@ -37,6 +38,7 @@ export class OrdersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly orderDeliveryService: OrderDeliveryService,
+    private readonly rewardsService?: RewardsService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId?: string) {
@@ -247,6 +249,7 @@ export class OrdersService {
         deliveryDestination: deliveryDestination as Prisma.InputJsonValue,
         status: OrderStatus.AWAITING_PAYMENT,
         totalAmount,
+        externalPaymentAmount: totalAmount,
         items: {
           create: orderItems.map((item) => ({
             product: {
@@ -403,6 +406,11 @@ export class OrdersService {
       if (updated.count !== 1) {
         throw new ConflictException('Статус заказа уже изменился.');
       }
+      await this.rewardsService?.releaseSpendingHold(
+        tx,
+        orderId,
+        'Order cancelled by user',
+      );
       return { action: 'cancelled' };
     });
   }
@@ -527,6 +535,8 @@ export class OrdersService {
               : undefined,
       },
       totalAmount: order.totalAmount,
+      bonusDiscount: order.bonusDiscount,
+      externalPaymentAmount: order.externalPaymentAmount,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       items: order.items.map((item: any) => ({

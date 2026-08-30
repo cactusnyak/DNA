@@ -30,6 +30,9 @@ export type AdminProduct = Product & {
   isOversizedOverride: boolean | null;
   sku?: string | null;
   purchasePrice?: number | null;
+  rewardEnabled: boolean;
+  rewardConfigVersion: number;
+  rewardShares: Array<{ depth: number; shareBasisPoints: number; level?: { id: string; name: string; depth: number; configVersion: number } | null }>;
   shippingProfile?: ({ isFragile: boolean; isStackable: boolean; ageRestricted: boolean; handlingNotes?: string | null; packages: AdminProductPackage[] }) | null;
   warehouses: Array<{ warehouseId: string; isPrimary: boolean; isActive: boolean; warehouse: AdminWarehouse }>;
   deliveryServices: Array<{ deliveryServiceId: string; isEnabled: boolean; deliveryService: AdminDeliveryProvider['services'][number] & { provider: { id: string; code: string; name: string; isActive: boolean } } }>;
@@ -158,6 +161,9 @@ export type AdminProductPayload = {
   isOversizedOverride: boolean | null;
   sku?: string;
   purchasePrice?: number | null;
+  rewardEnabled?: boolean;
+  rewardConfigVersion?: number;
+  rewardShares?: Array<{ depth: number; shareBasisPoints: number }>;
   logistics?: AdminProductLogisticsPayload;
 };
 

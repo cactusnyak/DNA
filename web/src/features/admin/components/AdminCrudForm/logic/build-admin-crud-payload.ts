@@ -115,6 +115,11 @@ export async function buildAdminCrudPayload({
       price: Number(values.price ?? 0),
       sku: String(values.sku ?? '').trim() || undefined,
       purchasePrice: String(values.purchasePrice ?? '').trim() === '' ? null : Number(values.purchasePrice),
+      rewardEnabled: Boolean(values.rewardEnabled),
+      rewardConfigVersion: Number(values.rewardConfigVersion ?? 1),
+      rewardShares: Array.isArray(values.rewardShares)
+        ? (values.rewardShares as Array<{ depth: number; shareBasisPoints: number }>)
+        : [],
       location: getLocation(values),
       imageUrls: [...existingImageUrls, ...uploadedImageUrls],
       additions: Array.isArray(values.additions)

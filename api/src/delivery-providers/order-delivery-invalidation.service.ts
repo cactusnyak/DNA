@@ -45,7 +45,7 @@ export class OrderDeliveryInvalidationService {
       async (tx) => {
         const order = await tx.order.findUnique({
           where: { id: orderId },
-          select: { status: true },
+          select: { status: true, bonusDiscount: true },
         });
         if (!order || order.status !== OrderStatus.AWAITING_PAYMENT) return;
         await tx.orderDeliverySelection.deleteMany({ where: { orderId } });
@@ -62,6 +62,7 @@ export class OrderDeliveryInvalidationService {
           where: { id: orderId },
           data: {
             totalAmount,
+            externalPaymentAmount: totalAmount - order.bonusDiscount,
             deliveryVersion: { increment: 1 },
             pricingVersion: { increment: 1 },
           },

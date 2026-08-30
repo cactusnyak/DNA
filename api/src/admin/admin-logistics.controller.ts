@@ -7,10 +7,12 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
+import type { Request } from 'express';
 
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -83,5 +85,14 @@ export class AdminLogisticsController {
   @Get('shipments/:id')
   shipment(@Param('id') id: string) {
     return this.service.getShipment(id);
+  }
+
+  @Patch('shipments/:id/status')
+  updateShipmentStatus(
+    @Param('id') id: string,
+    @Body() body: unknown,
+    @Req() request: Request & { user?: { id: string } },
+  ) {
+    return this.service.updateShipmentStatus(id, body, request.user?.id);
   }
 }

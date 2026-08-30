@@ -5,6 +5,7 @@ import { getPlatformCategoryHref } from '@/shared/platform';
 import { formatPrice } from '@/shared/utils/format-price';
 import { ContentDescription } from '@/components/ui/ContentDescription';
 import { OversizedIndicator } from '@/components/OversizedIndicator/OversizedIndicator';
+import { RewardPreview } from '@/components/RewardPreview';
 
 type ProductDetailsInfoProps = {
   product: Product;
@@ -32,6 +33,7 @@ export function ProductDetailsInfo({ product }: ProductDetailsInfoProps) {
           <p className="text-3xl font-semibold text-primary">
             {formatPrice(product.price)}
           </p>
+          <RewardPreview preview={product.rewardPreview} />
         </div>
         <ContentDescription description={product.description} />
       </div>

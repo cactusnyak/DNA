@@ -15,6 +15,10 @@ const ADMIN_PRODUCT_INCLUDE = {
   deliveryServices: {
     include: { deliveryService: { include: { provider: true } } },
   },
+  rewardShares: {
+    include: { level: true },
+    orderBy: { depth: 'asc' as const },
+  },
 } satisfies Prisma.ProductInclude;
 
 type AdminProductRecord = Prisma.ProductGetPayload<{
@@ -251,6 +255,12 @@ export class AdminService {
       price: product.price,
       sku: product.sku,
       purchasePrice: product.purchasePrice,
+      rewardEnabled: product.rewardEnabled,
+      rewardShares: product.rewardShares,
+      rewardConfigVersion: Math.max(
+        1,
+        ...product.rewardShares.map((share) => share.level?.configVersion ?? 1),
+      ),
       location: product.location,
       additions: normalizeProductAdditions(product.additions),
       isOversizedOverride: product.isOversizedOverride,
